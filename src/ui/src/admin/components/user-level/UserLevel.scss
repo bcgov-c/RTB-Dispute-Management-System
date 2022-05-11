@@ -1,0 +1,37 @@
+.user-level {
+
+  &__container { 
+    display: flex; align-items: center;
+
+    &--inactive {
+      @extend .user-level__container;
+      color: #c84b4b;
+      text-decoration: line-through;
+      font-style: italic;
+    }
+  }
+  &__display {
+    font-family: Ariel, sans-serif;
+    min-width: 25px;
+    color: white;
+    background-color: #CCCCCC;
+    font-weight: bold;
+    font-size: 15px;
+    margin-right: 5px;
+    display: inline-block;
+    font-style: normal;
+    padding: 3px 3px 2px 3px;
+    line-height: 18px;
+    height:fit-content;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__duty-scheduler {
+    color: #f5c626;
+  }
+
+  &__emergency-scheduler {
+    color: #b92429;
+  }
+}

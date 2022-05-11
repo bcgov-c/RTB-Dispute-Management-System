@@ -1,0 +1,112 @@
+{
+  "POST_ON_DOOR_DOC_CODES": [15, 16, 17],
+  "POST_ON_DOOR_CLAIM_CODE_LIST": [102, 122, 104, 101, 103, 105, 111, 131, 130, 123, 125, 126, 223],
+  "SUB_SERVICE_REQUEST_SOURCE_DA": 1, 
+  "SUB_SERVICE_REQUEST_SOURCE_OS": 2,
+  "FALLBACK_DEFAULT_QUADRANT_POSITION": 0,
+  "FALLBACK_REVIEW_HEARING_QUADRANT_POSITION": 3,
+  "REQUEST_SOURCE_DISPLAY": {
+    "1": "Online",
+    "2": "Paper form"
+  },
+  
+  "quadrants": [
+    {
+      "quadrantId": 1,
+      "quadrantName": "Initial hearing documents",
+      "quadrantDocumentIds": [10, 11],
+      "documentId": 10,
+      "documentsName": "Initial hearing applicant documents",
+      "stage": [2,4,6],
+      "processes": [1,2,3,5,6,7],
+      "applicantAccess": true,
+      "respondentAccess": false,
+      "displayedDocumentList": [
+        "Notice of dispute resolution proceeding (Proceeding package) with supporting documents and evidence",
+        "Amendment to an application with supporting documents and evidence"
+      ],
+      "acceptedDocTypes": [1,2,3,6,10,11],
+      "futureHearingMustExist": true 
+    },
+    {
+      "quadrantId": 1,
+      "quadrantName": "Initial hearing documents",
+      "quadrantDocumentIds": [10, 11],
+      "documentId": 11,
+      "documentsName": "Initial hearing respondent documents",
+      "stage": [2,4,6],
+      "processes": [1,2,3,5,6,7],
+      "applicantAccess": false,
+      "respondentAccess": true,
+      "displayedDocumentList": [
+        "Supporting documents and evidence"
+      ],
+      "acceptedDocTypes": [1,2,3,6,10,11],
+      "futureHearingMustExist": true
+    },
+    {
+      "quadrantId": 2,
+      "quadrantName": "Initial hearing decisions and orders",
+      "quadrantDocumentIds": [12],
+      "documentId": 12,
+      "documentsName": "Initial hearing decisions and orders",
+      "stage": [8,10],
+      "processes": [1,2,3,5,6,7],
+      "respondentAccess": true,
+      "applicantAccess": true,
+      "displayedDocumentList": [
+        "Monetary Order"
+      ],
+      "acceptedDocTypes": [4,6,12],
+      "futureHearingMustExist": false
+    },
+    {
+      "quadrantId": 3,
+      "quadrantName": "Review hearing documents",
+      "quadrantDocumentIds": [13, 14],
+      "documentId": 13,
+      "documentsName": "Review hearing applicant documents",
+      "stage": [2,4,6],
+      "processes": [4],
+      "applicantAccess": true,
+      "respondentAccess": false,
+      "displayedDocumentList": [
+        "Decision for a Review Consideration and Notice of Review Hearing (Proceeding package) with supporting documents and evidence"
+      ],
+      "acceptedDocTypes": [3,5,13,14],
+      "futureHearingMustExist": true
+    },
+    {
+      "quadrantId": 3,
+      "quadrantName": "Review hearing documents",
+      "quadrantDocumentIds": [13,14],
+      "documentId": 14,
+      "documentsName": "Review hearing respondent documents",
+      "stage": [2,4,6],
+      "processes": [4],
+      "applicantAccess": false,
+      "respondentAccess": true,
+      "displayedDocumentList": [
+        "Supporting documents and evidence"
+      ],
+      "acceptedDocTypes": [3,5,13,14],
+      "futureHearingMustExist": true
+    },
+    {
+      "quadrantId": 4,
+      "quadrantName": "Review hearing decisions and orders",
+      "quadrantDocumentIds": [15],
+      "documentId": 15,
+      "documentsName": "Review hearing decisions and orders",
+      "stage": [8,10],
+      "processes": [4],
+      "respondentAccess": true,
+      "applicantAccess": true,
+      "displayedDocumentList": [
+        "Monetary Order"
+      ],
+      "acceptedDocTypes": [4,6,15],
+      "futureHearingMustExist": false
+    }
+  ]
+}

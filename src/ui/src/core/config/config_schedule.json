@@ -1,0 +1,72 @@
+{
+  "SCHED_PERIOD_STATUS_ACTIVE": 1,
+  "SCHED_PERIOD_STATUS_INACTIVE": 100,
+  "SCHED_PERIOD_STATUS_LOCKED_GENERATION": 101,
+  "SCHED_PERIOD_STATUS_LOCKED_PREP": 102,
+  "SCHED_PERIOD_STATUS_LOCKED_REBALANCE": 103,
+  "SCHED_PERIOD_RTB_TIME_ZONE": 1,
+  
+  "SCHED_BLOCK_TYPE_HEARING": 1,
+  "SCHED_BLOCK_TYPE_DUTY": 2,
+  "SCHED_BLOCK_TYPE_WRITING": 3,
+  "SCHED_BLOCK_TYPE_OTHER_WORKING": 4,
+  "SCHED_BLOCK_TYPE_VACATION": 100,
+  "SCHED_BLOCK_TYPE_OTHER_NON_WORKING": 102,
+
+  "SCHED_REQ_TYPE_VACATION": 1,
+  "SCHED_REQ_TYPE_WRITING": 2,
+  "SCHED_REQ_TYPE_OTHER_OFF": 3,
+  "SCHED_REQ_TYPE_OTHER_WORKING": 4,
+  "SCHED_REQ_TYPE_SCHEDULE_ADJUSTMENT": 5,
+  "SCHED_REQ_ARB_REQUEST_CODES": [1,3,2,4],
+  "SCHED_REQ_MANAGER_REQUEST_CODES": [5],
+  "SCHED_REQ_TYPE_DAILY_CODES": [2,4],
+  
+  "SCHED_REQ_STATUS_UNPROCESSED": 1,
+  "SCHED_REQ_STATUS_APPROVED_NOT_IMPLEMENTED": 2,
+  "SCHED_REQ_STATUS_IMPLEMENTED": 3,
+  "SCHED_REQ_STATUS_DENIED": 4,
+  "SCHED_REQ_STATUS_RETURNED_FOR_CLARIFICATION": 5,
+  "SCHEDULE_REQUEST_ALL_ACTION_STATUSES": [1,2],
+
+  "SCHEDULE_SUB_STATUS_DUTY_CODES": [2,5,6,8],
+  "SCHEDULE_SUB_STATUS_EMERGENCY_CODES": [3,4,7,8],
+
+  "SCHED_BLOCK_DESCRIPTION_MAX_LENGTH": 250,
+  "SCHED_BLOCK_MIN_DURATION_HOURS": 1,
+
+  "SCHEDULE_REQUEST_STATUS_DISPLAY": {
+    "1": "Unprocessed",
+    "2": "Approved, not implemented",
+    "3": "Implemented",
+    "4": "Denied",
+    "5": "Returned for Clarification"
+  },
+
+  "SCHEDULE_REQUEST_TYPE_DISPLAY": {
+    "1": "Vacation Time Off",
+    "3": "Other Time Off",
+    "2": "Additional Writing Time",
+    "4": "Other Working Time",
+    "5": "Schedule Adjustment"
+  },
+
+  "SCHEDULE_PERIODS_STATUS_DISPLAY": {
+    "1": "Active",
+    "100": "Inactive",
+    "101": "Locked for generation",
+    "102": "Locked for preparation",
+    "103": "Locked for rebalancing"
+  },
+
+  "SCHEDULE_BLOCK_TYPE_DISPLAY": {
+    "1": "Hearing",
+    "2": "Duty",
+    "3": "Writing",
+    "4": "Other Working Time",
+    "100": "Vacation",
+    "101": "Blocked (deprecated)",
+    "102": "Other Time Off"
+  }
+  
+}

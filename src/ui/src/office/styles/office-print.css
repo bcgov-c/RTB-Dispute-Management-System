@@ -1,0 +1,5 @@
+@media print {
+  .office-receipt-logout { display: none!important; }
+  #content-container { overflow: visible; }
+  #content { width: 950px; overflow: hidden} /* Sets content within page and prevents scroll wheel from displaying in print window*/
+}

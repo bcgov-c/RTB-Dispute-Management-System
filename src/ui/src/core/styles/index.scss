@@ -1,0 +1,25 @@
+
+
+/* Take styles from index.css and put here as they are used by other sites */
+
+.dms {
+
+  &__step-description {
+    font-size: 19px;
+    color: #343434;
+    margin: 4px 0 8px 0;
+    line-height: 22px;
+  }
+
+  &__error-red {
+    color: #d80000 !important;
+  }
+
+  &__file-display {
+    &__sizes { 
+      color: #8b8b8b; 
+    }
+  }
+
+  &__file__comma { margin-right: 5px; color:#333; }
+}

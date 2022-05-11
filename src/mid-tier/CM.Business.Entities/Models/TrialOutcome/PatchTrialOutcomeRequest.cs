@@ -1,0 +1,52 @@
+﻿using System;
+using Newtonsoft.Json;
+
+namespace CM.Business.Entities.Models.TrialOutcome;
+
+public class PatchTrialOutcomeRequest
+{
+    [JsonProperty("outcome_by")]
+    public byte OutcomeBy { get; set; }
+
+    [JsonProperty("outcome_subtype")]
+    public byte? OutcomeSubType { get; set; }
+
+    [JsonProperty("outcome_status")]
+    public byte? OutcomeStatus { get; set; }
+
+    [JsonProperty("outcome_title")]
+    public string OutcomeTitle { get; set; }
+
+    [JsonProperty("outcome_value1")]
+    public int? OutcomeValue1 { get; set; }
+
+    [JsonProperty("outcome_value2")]
+    public int? OutcomeValue2 { get; set; }
+
+    [JsonProperty("outcome_value3")]
+    public int? OutcomeValue3 { get; set; }
+
+    [JsonProperty("outcome_value4")]
+    public int? OutcomeValue4 { get; set; }
+
+    [JsonProperty("outcome_string1")]
+    public string OutcomeString1 { get; set; }
+
+    [JsonProperty("outcome_string2")]
+    public string OutcomeString2 { get; set; }
+
+    [JsonProperty("outcome_string3")]
+    public string OutcomeString3 { get; set; }
+
+    [JsonProperty("outcome_json")]
+    public string OutcomeJson { get; set; }
+
+    [JsonProperty("outcome_comment")]
+    public string OutcomeComment { get; set; }
+
+    [JsonProperty("start_date")]
+    public DateTime? StartDate { get; set; }
+
+    [JsonProperty("end_date")]
+    public DateTime? EndDate { get; set; }
+}

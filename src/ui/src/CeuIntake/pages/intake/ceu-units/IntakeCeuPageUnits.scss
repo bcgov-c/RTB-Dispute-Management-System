@@ -1,0 +1,47 @@
+
+.intake-ceu-p5 {
+  &__totalUnits {
+    .col-xs-12.col-sm-8 { max-width: 230px; }
+    .intake-input-component label { display: none; }
+  }
+
+  &__unitCount {
+    select { max-width: 200px; }
+    .intake-input-component label { display: none; }
+  }
+}
+
+.intake-ceu-unit {
+
+  &__num-tenants {
+    .form-control-label { display: none; }
+    input { width: 80px; }
+  }
+
+  &__tenants-container {
+    display: flex;
+    .general-link {
+      margin-top: 32px;
+      font-size: 20PX;
+      margin-left: 30px;
+      min-width: fit-content;
+    }
+  }
+
+  &__tenancy-end-date {
+    .intake-input-component label { display: none; }
+
+    .page-item-container { padding-top: 10px; }
+  }
+
+  &__ta-upload {
+    .page-item-container { padding-top: 10px; }
+
+    .evidence-item { padding-left: 0; }
+  }
+
+  &__ta-upload .help-icon { display: none; }
+
+  .participant-mailing-address .page-item-container { padding-top: 10px; }
+  .participant-address .provinceContainer label { color: #666; font-style: italic; }
+}

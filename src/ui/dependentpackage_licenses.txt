@@ -1,0 +1,76 @@
+name                                license type      link                                                                      installed version  author
+----                                ------------      ----                                                                      -----------------  ------
+@babel/core                         MIT               https://github.com/babel/babel.git                                        7.16.7             The Babel Team (https://babel.dev/team)
+@babel/eslint-parser                MIT               https://github.com/babel/babel.git                                        7.16.5             The Babel Team (https://babel.dev/team)
+@babel/preset-env                   MIT               https://github.com/babel/babel.git                                        7.16.7             The Babel Team (https://babel.dev/team)
+@babel/preset-react                 MIT               https://github.com/babel/babel.git                                        7.16.7             The Babel Team (https://babel.dev/team)
+babel-loader                        MIT               https://github.com/babel/babel-loader.git                                 8.2.3              Luis Couto <hello@luiscouto.pt>
+babel-plugin-lodash                 MIT               git+https://github.com/lodash/babel-plugin-lodash.git                     3.3.4              Graeme Yeates megawac@gmail.com https://github.com/megawac
+babel-preset-minify                 MIT               https://github.com/babel/minify/tree/master/packages/babel-preset-minify  0.5.1              amasad
+backbone                            MIT               git+https://github.com/jashkenas/backbone.git                             1.4.0              Jeremy Ashkenas
+backbone.marionette                 MIT               git+https://github.com/marionettejs/backbone.marionette.git               3.5.1              Derick Bailey derickbailey@gmail.com http://derickbailey.com/
+backbone.routefilter                MIT               http://aganglada.com                                                      1.0.0              Alejandro Garcia Anglada alejandro.garcia@trivago.com http://aganglada.com
+blueimp-file-upload                 MIT               git://github.com/blueimp/jQuery-File-Upload.git                           10.32.0            Sebastian Tschan https://blueimp.net
+bootstrap                           MIT               git+https://github.com/twbs/bootstrap.git                                 3.4.1              The Bootstrap Authors https://github.com/twbs/bootstrap/graphs/contributors
+clean-webpack-plugin                MIT               git+https://github.com/johnagan/clean-webpack-plugin.git                  4.0.0              John Agan johnagan@gmail.com
+cleave.js                           Apache-2.0        git+https://github.com/nosir/cleave.js.git                                1.6.0              Max Huang risonhuang@gmail.com http://github.com/nosir
+colresizable                        MIT, GPL          http://bacubacu.com/colresizable/                                         1.6.0              Alvaro Prieto Lauroba http://bacubacu.com/colresizable/
+concurrently                        MIT               git+https://github.com/open-cli-tools/concurrently.git                    6.5.1              Kimmo Brunfeldt
+copy-webpack-plugin                 MIT               git+https://github.com/webpack-contrib/copy-webpack-plugin.git            9.1.0              Len Boyette
+core-js                             MIT               git+https://github.com/zloirock/core-js.git                               3.20.2
+cropperjs                           MIT               git+https://github.com/fengyuanchen/cropperjs.git                         1.5.12             Chen Fengyuan https://chenfengyuan.com/
+cross-env                           MIT               git+https://github.com/kentcdodds/cross-env.git                           7.0.3              Kent C. Dodds me@kentcdodds.com https://kentcdodds.com
+css-loader                          MIT               git+https://github.com/webpack-contrib/css-loader.git                     2.1.1              Tobias Koppers @sokra
+dotenv                              BSD-2-Clause      git://github.com/motdotla/dotenv.git                                      10.0.0
+dragselect                          MIT               git+https://github.com/ThibaultJanBeyer/DragSelect.git                    2.3.0              Thibault Jan Beyer
+eslint                              MIT               git+https://github.com/eslint/eslint.git                                  8.6.0              Nicholas C. Zakas nicholas+npm@nczconsulting.com
+eslint-import-resolver-webpack      MIT               git+https://github.com/import-js/eslint-plugin-import.git                 0.13.2             Ben Mosher me@benmosher.com
+eslint-plugin-import                MIT               git+https://github.com/import-js/eslint-plugin-import.git                 2.25.4             Ben Mosher me@benmosher.com
+eslint-plugin-no-unused-vars-rest   MIT               git://github.com/bryanrsmith/eslint-plugin-no-unused-vars-rest.git        1.0.6              Bryan R Smith BryanRSmith@gmail.com
+file-loader                         MIT               git+https://github.com/webpack-contrib/file-loader.git                    3.0.1              Tobias Koppers @sokra
+filesize                            BSD-3-Clause      git://github.com/avoidwork/filesize.js.git                                8.0.6              Jason Mulligan jason.mulligan@avoidwork.com
+flexboxgrid                         Apache 2          git://github.com/kristoferjoseph/flexboxgrid.git                          6.3.1              @dam
+glob                                ISC               git://github.com/isaacs/node-glob.git                                     7.2.0              Isaac Z. Schlueter i@izs.me http://blog.izs.me/
+history                             MIT               git+https://github.com/remix-run/history.git                              5.2.0              Remix Software hello@remix.run
+html-webpack-harddisk-plugin        MIT               git+https://github.com/jantimon/html-webpack-harddisk-plugin.git          1.0.2              Jan Nicklas j.nicklas@me.com https://github.com/jantimon
+html-webpack-plugin                 MIT               git+https://github.com/jantimon/html-webpack-plugin.git                   5.5.0              Jan Nicklas j.nicklas@me.com https://github.com/jantimon
+jquery                              MIT               git+https://github.com/jquery/jquery.git                                  3.6.0              OpenJS Foundation and other contributors https://github.com/jquery/jquery/blob/3.6.0/AUTHORS.txt
+jquery-timepicker                   (GPL-2.0 OR MIT)  git://github.com/wvega/timepicker.git                                     1.3.3              Willington Vega wvega@wvega.com http://wvega.com
+jquery-ui                           MIT               git://github.com/jquery/jquery-ui.git                                     1.13.0             jQuery Foundation and other contributors https://github.com/jquery/jquery-ui/blob/1.13.1/AUTHORS.txt
+jquery-whenall                      MIT               git://github.com/galbi101/jquery-whenall.git                              0.1.5
+jquery.ui.widget                    MIT               git://github.com/jquery/jquery-ui.git                                     1.10.3             jQuery Foundation http://jqueryui.com
+json-formatter-js                   MIT               git+https://github.com/mohsen1/json-formatter-js.git                      2.3.4              Mohsen Azimi me@azimi.me
+lodash                              MIT               git+https://github.com/lodash/lodash.git                                  4.17.21            John-David Dalton john.david.dalton@gmail.com
+lodash.escape                       MIT               git+https://github.com/lodash/lodash.git                                  4.0.1              John-David Dalton john.david.dalton@gmail.com http://allyoucanleet.com/
+mini-css-extract-plugin             MIT               git+https://github.com/webpack-contrib/mini-css-extract-plugin.git        2.4.3              Tobias Koppers @sokra
+moment                              MIT               git+https://github.com/moment/moment.git                                  2.29.3             Iskren Ivov Chernev iskren.chernev@gmail.com https://github.com/ichernev
+moment-timezone                     MIT               git+https://github.com/moment/moment-timezone.git                         0.5.34             Tim Wood washwithcare@gmail.com http://timwoodcreates.com/
+node-sass                           MIT               git+https://github.com/sass/node-sass.git                                 6.0.1              Andrew Nesbitt andrewnez@gmail.com http://andrew.github.com
+normalize.css                       MIT               git+https://github.com/necolas/normalize.css.git                          8.0.1
+optimize-css-assets-webpack-plugin  MIT               git+ssh://git@github.com/NMFR/optimize-css-assets-webpack-plugin.git      6.0.1              Nuno Rodrigues
+polyglot.js                         BSD-2-Clause      git://github.com/mreinstein/polyglot.js.git                               3.1.0              Spike Brehm spike@airbnb.com
+popper.js                           MIT               git+https://github.com/FezVrasta/popper.js.git                            1.16.1             Federico Zivolo federico.zivolo@gmail.com
+postcss                             MIT               git+https://github.com/postcss/postcss.git                                8.4.5              Andrey Sitnik andrey@sitnik.ru
+postcss-cssnext                     MIT               git+https://github.com/MoOx/postcss-cssnext.git                           3.1.1              Maxime Thirouin
+postcss-import                      MIT               git+https://github.com/postcss/postcss-import.git                         14.0.2             Maxime Thirouin
+postcss-loader                      MIT               git+https://github.com/webpack-contrib/postcss-loader.git                 6.2.1              Andrey Sitnik andrey@sitnik.ru
+postcss-nested                      MIT               git+https://github.com/postcss/postcss-nested.git                         5.0.6              Andrey Sitnik andrey@sitnik.ru
+raw-loader                          MIT               git+https://github.com/webpack-contrib/raw-loader.git                     1.0.0              Tobias Koppers @sokra
+react                               MIT               git+https://github.com/facebook/react.git                                 17.0.2
+react-dom                           MIT               git+https://github.com/facebook/react.git                                 17.0.2
+regenerator-runtime                 MIT               https://github.com/facebook/regenerator/tree/master/packages/runtime      0.13.9             Ben Newman bn@cs.stanford.edu
+sass-loader                         MIT               git+https://github.com/webpack-contrib/sass-loader.git                    10.2.1             J. Tangelder
+scriptjs                            MIT               git+https://github.com/ded/script.js.git                                  2.5.9              Dustin Diaz dustin@dustindiaz.com http://dustindiaz.com
+scrollbooster                       MIT               git+https://github.com/ilyashubin/scrollbooster.git                       3.0.2              Ilya Shubin pixelwake@gmail.com
+serve                               MIT               git+https://github.com/vercel/serve.git                                   12.0.1             leo
+string-similarity                   ISC               git://github.com/aceakash/string-similarity.git                           4.0.4              Akash Kurdekar npm@kurdekar.com http://untilfalse.com/
+style-loader                        MIT               git+https://github.com/webpack-contrib/style-loader.git                   0.23.1             Tobias Koppers @sokra
+terser-webpack-plugin               MIT               git+https://github.com/webpack-contrib/terser-webpack-plugin.git          5.3.0              webpack Contrib Team
+trumbowyg                           MIT               git+https://github.com/Alex-D/Trumbowyg.git                               2.25.1             Alexandre Demode contact@alex-d.fr Alex-D
+underscore                          MIT               git://github.com/jashkenas/underscore.git                                 1.13.2             Jeremy Ashkenas jeremy@documentcloud.org
+underscore-loader                   MIT               git+https://github.com/tomek-f/underscore-loader.git                      3.0.0              Tomek Fijoł tomekfijol@gmail.com http://tomekf.pl/
+url-loader                          MIT               git+https://github.com/webpack-contrib/url-loader.git                     1.1.2              Tobias Koppers @sokra
+webpack                             MIT               git+https://github.com/webpack/webpack.git                                5.65.0             Tobias Koppers @sokra
+webpack-cli                         MIT               git+https://github.com/webpack/webpack-cli.git                            4.9.1
+webpack-dotenv-plugin               MIT               git+https://github.com/nwinch/webpack-dotenv-plugin.git                   2.1.0              Nathan Winch nwinch@gmail.com
+webpack-merge                       MIT               git+https://github.com/survivejs/webpack-merge.git                        5.8.0              Juho Vepsalainen bebraw@gmail.com

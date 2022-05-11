@@ -1,0 +1,946 @@
+{
+  "CLAIM_TOTAL_LIMIT": 35000,
+  "CLAIM_AMOUNT_MAX_NUM": 1000000,
+  "CLAIM_DESCRIPTION_MAX": 500,
+  "EVIDENCE_DESCRIPTION_MAX": 200,
+  "ADDRESS_FIELD_MIN": 6,
+  "ADDRESS_FIELD_MAX": 48,
+  "PARTICIPANT_ADDRESS_FIELD_MAX": 100,
+  "CITY_FIELD_MIN": 3,
+  "APPLICANT_FIELD_MAX": 48,
+  "PHONE_FIELD_MAX": 15,
+  "AMOUNT_FIELD_MAX": 12,
+  "FEE_WAIVER_INCOME_AMOUNT_FIELD_MAX": 8,
+  "UNIT_TYPE_DESCRIPTION_MAX": 35,
+  "POSTAL_CODE_FIELD_MAX": 15,
+  "RENT_PAYMENT_INTERVAL_MAX": 95,
+  "EVIDENCE_TITLE_MAX": 65,
+  "DESCRIPTIVE_FILE_LENGTH_MAX": 65,
+  "DESCRIPTIVE_FILE_LENGTH_MIN": 7,
+  "APPLICATION_LIST_COUNT": 50,
+  "ACCESS_SUBMITTER_NAME_MAX": 48,
+  "ACCESS_CODE_LENGTH": 7,
+  "FILE_TITLE_MAX_LENGTH": 95,
+  "FEE_DESCRIPTION_MAX_LENGTH": 255,
+  "AWARD_DETAILS_MAX_LENGTH": 250,
+  "OUTCOME_DOC_FILE_COMMENT_MAX_LENGTH": 495,
+  "SERVICE_COMMENT_MIN_LENGTH": 10,
+  "SERVICE_COMMENT_MAX_LENGTH": 255,
+  "OUTCOME_DOC_FILE_TITLE_MAX_LENGTH": 45,
+  "OUTCOME_DOC_FILE_ACRONYM_MAX_LENGTH": 5,
+  "OUTCOME_DOC_DELIVERY_COMMENT_MAX_LENGTH": 495,
+  "ADMIN_NOTE_MIN_LENGTH": 5,
+  "ADMIN_NOTE_MAX_LENGTH": 900,
+  "BUSINESS_NAME_MIN_LENGTH": 3,
+  "SERVICE_FILES_MAX": 5,
+  "NOTICE_FILES_MAX": 5,
+  "BUSINESS_NAME_MAX_NUM_WORDS": 9,
+  "IMPORT_NOTE_MAX_LENGTH": 255,
+  "HEARING_MIN_BOOKING_TIME": "8:00AM",
+  "HEARING_MAX_BOOKING_TIME": "5:00PM",
+  "HEARING_DEFAULT_START_TIME": "8:30AM",
+  "HEARING_DEFAULT_END_TIME": "4:30PM",
+  "HEARING_PARTICIPATION_COMMENT_MAX_LENGTH": 495,
+  "HEARING_PARTICIPATION_NAME_MAX_LENGTH": 250,
+  "EMAIL_ADDRESS_MAX_LENGTH": 65,
+  "EMAIL_SUBJECT_MIN_LENGTH": 5,
+  "EMAIL_SUBJECT_MAX_LENGTH": 255,
+  "DOC_REQUEST_OTHER_STATUS_DESCRIPTION_LENGTH": 100,
+  "NOTICE_SPECIAL_INSTRUCTIONS_MAX_LENGTH": 1500,
+  "AMENDMEND_NOTE_MAX_LENGTH": 255,
+  "DA_CORRECTION_MAX_ITEMS": 6,
+  "DA_CORR_CLAR_MAX_REQUESTS": 3,
+  "TASK_DESCRIPTION_MIN_LENGTH": 10,
+  "TASK_DESCRIPTION_MAX_LENGTH": 1000,
+  "OFFICE_PAYOR_NAME_MIN_LENGTH": 3,
+  "OFFICE_PAYOR_NAME_MAX_LENGTH": 200,
+  "FEE_WAIVER_MAX_FAMILY_MEMBERS": 7,
+  "OFFICE_BULK_EVIDENCE_DESCRIPTION": "This is the evidence provided with the original application at the office.",
+  "OFFICE_FORM_EVIDENCE_DESCRIPTION": "This is the original application and additional forms provided at the office.",
+  "RTB_STAFF_CODE_DISPLAY": "RTB Staff",
+  "SBC_STAFF_CODE_DISPLAY": "SBC Staff",
+  "CMS_STATUS_TEXT": {
+    "1": "Submitted",
+    "4": "Ready To Pay"
+  },
+  "DEFICIENT_REASON_MIN_LENGTH": 10,
+  "DEFICIENT_REASON_MAX_LENGTH": 250,
+  "SEARCH_CROSS_APP_ACTIVE_HEARING_DAY_OFFSET": 23,
+
+  "TENANCY_START_YEAR_MIN": 1950,
+  "DATE_MIN_YEAR_OFFSET": 10,
+
+  "OS_APPLICATION_NOTE_MIN_LENGTH": 3,
+  "OS_APPLICATION_NOTE_MAX_LENGTH": 200,
+
+  "OLD_APPLICATION_STATUS_CODES": {
+    "SAVED": 0,
+    "SUBMITTED_PAID": 1,
+    "NEEDS_UPDATE": 2,
+    "SUBMITTED_NOT_PAID": 4,
+    "DIRECT_REQUEST_APPROVED": 6,
+    "SCHEDULED": 7,
+    "ABANDONED": 8,
+    "ADJOURNED": 9,
+    "CLOSED": 10,
+    "WITHDRAWN": 11,
+    "REVIEW_HEARING": 12,
+    "REOPENED_FOR_CORRECTION": 13,
+    "REVIEW": 15,
+    "REOPENED_FOR_CLARIFICATION": 16,
+    "DIRECT_REQUEST_PROOF_OF_SERVICE": 17,
+    "DATA_TRANSFER_SCHEDULED": 87,
+    "DATA_TRANSFER_SENDING": 88,
+    "DELETED": 99
+  },
+  "OLD_APPLICATION_STATUS_CODES_DISPLAY": {
+    "0": "Saved, not submitted",
+    "1": "Submitted and paid",
+    "2": "Needs update",
+    "4": "Submitted not paid",
+    "6": "Ready for decision",
+    "7": "Hearing scheduled",
+    "8": "Abandoned",
+    "9": "Adjourned",
+    "10": "Closed",
+    "11": "Cancelled or Withdrawn",
+    "12": "Review hearing",
+    "13": "Reopened for correction",
+    "15": "Review considerations",
+    "16": "Reopened for clarification",
+    "17": "Waiting for proof of service",
+    "87": "Data transfer",
+    "88": "Data transfer",
+    "99": "Deleted"
+  },
+  "APPLICATION_STATUS_CODES": {
+    "SAVED": 0,
+    "NEEDS_UPDATE": 1,
+    "SUBMITTED_PAYMENT_REQUIRED": 2,
+    "SUBMITTED_FEE_WAIVER_PROOF_REQUIRED": 3,
+    "SUBMITTED_OFFICE_PAYMENT_REQUIRED": 4,
+    "DIRECT_REQUEST_APPROVED": 6,
+    "SCHEDULED": 7,
+    "ABANDONED": 8,
+    "ADJOURNED": 9,
+    "CLOSED": 10,
+    "WITHDRAWN": 11,
+    "REVIEW_HEARING": 12,
+    "REOPENED_FOR_CORRECTION": 13,
+    "REVIEW": 15,
+    "REOPENED_FOR_CLARIFICATION": 16,
+    "DIRECT_REQUEST_PROOF_OF_SERVICE": 17,
+    "DATA_TRANSFER_SCHEDULED": 87,
+    "DATA_TRANSFER_SENDING": 88,
+    "DELETED": 99
+  },
+
+  "NOTICE_TYPE_DISPLAY": {
+    "1": "Generated Standard",
+    "2": "Uploaded Standard",
+    "3": "Generated Amendment",
+    "4": "Uploaded Amendment",
+    "5": "Other"
+  },
+
+  "AMENDMENT_PARTICIPANT_TYPE_DISPLAY": {
+    "1": "Business",
+    "2": "Individual",
+    "3": "Agent/Lawyer",
+    "4": "Advocate/Assistant"
+  },
+
+  "DISPUTE_CREATION_METHOD_DISPLAY": {
+    "1": "Online Standard App",
+    "2": "Paper Standard App",
+    "99": "Migrated Legacy File",
+    "4": "Online Rent Increase",
+    "5": "Paper Rent Increase",
+    "6": "Online Possess for Reno"
+  },
+
+  "DISPUTE_URGENCY_DISPLAY": {
+    "1": "Emergency",
+    "2": "Standard",
+    "3": "Deferred",
+    "4": "Duty"
+  },
+
+  "DISPUTE_COMPLEXITY_DISPLAY": {
+    "1": "Basic",
+    "2": "Regular",
+    "3": "Specialized"
+  },
+
+  "DISPUTE_FILES_STORAGE_DISPLAY": {
+    "1": "Hot",
+    "2": "Cold"
+  },
+
+  "DISPUTE_MIGRATION_TRUTH_DISPLAY": {
+    "1": "DMS",
+    "2": "CMS Archive",
+    "3": "Split"
+  },
+
+  "DISPUTE_TENANCY_AGREEMENT_SIGNED_DISPLAY": {
+    "1": "Landlord(s) and Tenant(s)",
+    "2": "Landlord(s) Only",
+    "3": "Tenant(s) Only",
+    "4": "Not Signed"
+  },
+
+  "RENT_UNIT_TYPE_DISPLAY": {
+    "1": "Basement",
+    "2": "Upper",
+    "3": "Lower",
+    "4": "Main",
+    "5": "Coach House",
+    "6": "Laneway",
+    "7": "Other"
+  },
+
+  "PARTICIPANT_TYPE_DISPLAY": {
+    "1": "Business or Company",
+    "2": "Individual Person",
+    "3": "Agent or Lawyer",
+    "4": "Advocate or Assistant"
+  },
+
+  "PARTICIPANT_STATUS_DISPLAY": {
+    "0": "Not Validated",
+    "1": "Participating",
+    "2": "Not Participating"
+  },
+
+  "PARTICIPANT_CONTACT_METHOD_DISPLAY": {
+    "1": "Email",
+    "2": "Phone and Standard Mail"
+  },
+
+  "PARTICIPANT_KNOWN_CONTACT_DISPLAY": {
+    "1": "Address, phone and email",
+    "2": "Address and phone",
+    "3": "Address and email",
+    "4": "Email and phone",
+    "5": "Address only",
+    "6": "Email only",
+    "7": "Phone only",
+    "8": "None (no contact information)"
+  },
+
+  "PARTICIPANT_KNOWN_CONTACT_NO_ADDR_DISPLAY": {
+    "4": "Email and Phone provided",
+    "6": "Email provided",
+    "7": "Phone provided",
+    "8": "None (no contact information provided)"
+  },
+
+
+  "HEARING_OPTIONS_BY_DISPLAY": {
+    "1": "Email",
+    "2": "Pick up"
+  },
+
+  "HEARING_TYPE_DISPLAY": {
+    "1": "Conference Call",
+    "2": "Face to Face"
+  },
+
+  "HEARING_METHOD_DISPLAY": {
+    "1": "Adjudication",
+    "2": "Settlement",
+    "3": "Both",
+    "4": "Other"
+  },
+
+  "HEARING_COMPLEXITY_DISPLAY": {
+    "1": "Simple Hearing",
+    "2": "Standard Hearing",
+    "3": "Very Complex"
+  },
+
+
+  "HEARING_LINK_TYPE_DISPLAY": {
+    "1": "Single Application",
+    "2": "Cross Application",
+    "3": "Joined Application",
+    "4": "Repeated Application",
+    "5": "Cross-Repeat Application"
+  },
+
+  "PROCESS_DISPLAY": {
+    "1": "Participatory Hearing",
+    "2": "Non-Participatory Hearing",
+    "3": "Review Request",
+    "4": "Review Hearing",
+    "5": "Joiner Request",
+    "6": "Joiner Hearing",
+    "7": "Rent Increase"
+  },
+  
+
+  "NOTE_LINK_DISPLAY": {
+    "0": "Dispute",
+    "1": "Participant",
+    "2": "Claim / Issue",
+    "3": "File",
+    "4": "Notice",
+    "5": "Hearing",
+    "6": "General Evidence",
+    "7": "Dispute Information",
+    "8": "Evidence File",
+    "9": "Evidence File",
+    "99": "Legacy Amendment"
+  },
+
+  "EMAIL_TYPE_DISPLAY": {
+    "0": "Notification",
+    "1": "System",
+    "2": "Custom",
+    "3": "Receipt",
+    "4": "Pickup Notice",
+    "100": "Pickup Only",
+    "101": "Pickup With Email"
+  },
+
+  "EMAIL_SEND_STATUS_DISPLAY": {
+    "100": "Waiting for pick up",
+    "101": "Picked up",
+    "102": "Pickup Abandoned",
+    "103": "Pickup Cancelled"
+  },
+
+  "EMAIL_RECEIPT_SITE_CODES": {
+    "1": "Online Intake",
+    "2": "Office Submission",
+    "3": "Dispute Access"
+  },
+
+  "PROCESS_REASON_DISPLAY": {
+    "1": "Unable to attend",
+    "2": "New evidence",
+    "3": "Fraud",
+    "4": "Unable to attend, New evidence",
+    "5": "Unable to attend, Fraud",
+    "6": "New evidence, Fraud",
+    "7": "Unable to attend, New evidence, Fraud"
+  },
+
+  "OUTCOME_DOC_GROUP_COMPLEXITY_DISPLAY": {
+    "1": "Simple Decision",
+    "2": "Standard Decision",
+    "3": "Complex Decision"
+  },
+
+  "OUTCOME_DOC_FILE_SUB_STATUS_DISPLAY": {
+    "0": "Not Set",
+    "1": "Not Started",
+    "2": "In Progress",
+    "3": "Review",
+    "4": "Completed"
+  },
+
+  "OUTCOME_DOC_GROUP_SUB_TYPE_DISPLAY": {
+    "1": "Original Documents",
+    "2": "Corrected Decision and/or Order(s)",
+    "3": "Review Hearing Decision and Order(s)"
+  },
+
+  "OUTCOME_DOC_DELIVERY_METHOD_DISPLAY": {
+    "1": "Email",
+    "2": "Pick-Up",
+    "3": "Mail",
+    "4": "Other"
+  },
+
+  "OUTCOME_DOC_REQUEST_STATUS_DISPLAY": {
+    "1": "Withdrawn",
+    "2": "Completed",
+    "3": "Other",
+    "4": "Abandoned No Payment",
+    "5": "Cancelled/Deficient"
+  },
+
+  "OUTCOME_DOC_REQUEST_SOURCE_DISPLAY": {
+    "1": "Paper - Office Submission",
+    "2": "Online - Dispute Access"
+  },
+
+  "OUTCOME_DOC_REQUEST_AFFECTED_DOC_DISPLAY": {
+    "1": "Decision",
+    "2": "Monetary Order",
+    "3": "Order of Possession",
+    "4": "Decision, Monetary Order",
+    "5": "Decision, Order of Possession",
+    "6": "Monetary Order, Order of Possession",
+    "7": "Decision, Monetary Order, Order of Possession"
+  },
+
+  "OUTCOME_DOC_REQUEST_ITEM_TYPE_DISPLAY": {
+    "1": "Typing error",
+    "2": "Math error",
+    "3": "Obvious error",
+    "4": "Inadvertent omission",
+    "5": "Clarification",
+    "6": "Late Filing",
+    "7": "Unable to attend",
+    "8": "New and relevant evidence",
+    "9": "Decision obtained by fraud"
+  },
+
+  "OUTCOME_DOC_REQUEST_ITEM_TYPE_OFFICE_DISPLAY": {
+    "7": "Unable to attend",
+    "8": "New and relevant evidence",
+    "9": "Proof of fraud"
+  },
+  
+  "OUTCOME_DOC_REQUEST_ITEM_TYPES_CORRECTION": [1, 2, 3, 4],
+  "OUTCOME_DOC_REQUEST_ITEM_TYPES_REVIEW": [6, 7, 8, 9],
+
+  "HEARING_AUDIT_CHANGE_TYPE_DISPLAY": {
+    "1": "Add hearing",
+    "2": "Re-assign",
+    "3": "Edit hearing",
+    "4": "Delete hearing",
+    "5": "Add dispute",
+    "6": "Edit linking",
+    "7": "Remove dispute",
+    "20": "Add Reservation",
+    "21": "Book Reservation",
+    "22": "Cancel hold",
+    "23": "Put on hold"
+  },
+
+  "HEARING_PRIORITY_DISPLAY": {
+    "1": "Emergency",
+    "2": "Standard",
+    "3": "Deferred",
+    "4": "Duty"
+  },
+
+  "ALL_SERVICE_METHODS": {
+    "ON_DOOR": 1,
+    "MAIL_SLOT": 2,
+    "REGISTERED_MAIL": 3,
+    "REGULAR_MAIL": 4,
+    "IN_PERSON": 5,
+    "FAX": 6,
+    "OTHER": 7,
+    "EMAIL": 8
+  },
+
+  "SERVICE_METHOD_TYPE_CODES": [
+    "ON_DOOR", "REGISTERED_MAIL", "IN_PERSON", "EMAIL", "OTHER"
+  ],
+
+  "CLAIM_NOTICE_METHOD_TYPE_CODES": [
+    "ON_DOOR", "MAIL_SLOT", "REGISTERED_MAIL", "IN_PERSON", "FAX", "EMAIL", "OTHER"
+  ],
+
+  "SERVICE_DATE_USED_DISPLAY": {
+    "1": "Served",
+    "2": "Deemed Served",
+    "3": "Acknowledged Served"
+  },
+
+  "SERVICE_METHOD_DEEMED_DAY_OFFSETS": {
+    "ON_DOOR": 3,
+    "MAIL_SLOT": 3,
+    "REGISTERED_MAIL": 5,
+    "IN_PERSON": 0,
+    "FAX": 3,
+    "EMAIL": 3,
+    "OTHER": 0
+  },
+
+  "NOTICE_CREATION_TYPES_DISPLAY": {
+    "1": "Generated",
+    "2": "Uploaded",
+    "3": "Generated",
+    "4": "Uploaded",
+    "5": "Other Uploaded"
+  },
+
+  "NOTICE_DELIVERY_TYPES_DISPLAY": {
+    "1": "Email",
+    "2": "Pickup",
+    "3": "Mail",
+    "4": "Fax",
+    "5": "User Submitted",
+    "6": "Email and/or Mail",
+    "7": "Other (Describe)"
+  },
+
+  "NOTICE_METHOD_TYPES_DISPLAY": {
+    "1": "Posted on the door",
+    "2": "Left in mail slot or box",
+    "3": "Sent by registered mail",
+    "4": "Sent by regular mail",
+    "5": "Delivered in person",
+    "6": "Sent by Fax",
+    "8": "Sent to pre-agreed email",
+    "7": "Other"
+  },
+
+  "REMEDY_STATUS_REASONS_DISPLAY": {
+    "1": "The arbitrator permitted the issue to be removed through amendment at the applicant's request",
+    "2": "This issue was determined as not related to the main issue in the dispute and was severed as per Rules of Procedure",
+    "3": "The arbitrator permitted the issue to be removed through amendment at the respondent's request",
+    "4": "The arbitrator removed this issue through amendment"
+  },
+
+
+  "AMENDMENT_TO_DISPLAY": {
+    "1": "Dispute",
+    "2": "Party",
+    "3": "Claim",
+    "4": "Remedy"
+  },
+  "AMENDMENT_CHANGE_TYPE_DISPLAY": {
+    "1": "Edit",
+    "2": "Add",
+    "3": "Remove"
+  },
+
+  "SERVICE_DOC_TYPE_DISPLAY": {
+    "1": "Notice of Hearing Only",
+    "2": "Notice of Hearing and Evidence",
+    "3": "Evidence Only",
+    "4": "Order or Decision",
+    "5": "Notice of Review",
+    "6": "Other"
+  },
+
+  "SUB_SERVICE_REQUEST_STATUS_DISPLAY": {
+    "1": "Received",
+    "2": "Pending",
+    "3": "Approved",
+    "4": "Dismissed",
+    "5": "Withdrawn"
+  },
+
+  "TASK_TYPE_DISPLAY": {
+    "1": "Standard",
+    "2": "Communication",
+    "3": "System"
+  },
+
+  "TASK_STATUS_DISPLAY": {
+    "0": "Incomplete",
+    "1": "Complete"
+  },
+
+  "OUTCOME_DOC_DELIVERY_PRIORITY_DISPLAY": {
+    "1": "Low",
+    "2": "Normal",
+    "3": "High"
+  },
+
+  "FEE_WAIVER_CITY_SIZE_DISPLAY": {
+    "0": "Rural area",
+    "1": "Less than 30,000",
+    "2": "30,000 to 499,999",
+    "3": "Over 500,000"
+  },
+
+  "PAYMENT_METHOD_DISPLAY": {
+    "1": "Online",
+    "2": "Office",
+    "3": "Fee Waiver"
+  },
+
+  "PAYMENT_STATUS_DISPLAY": {
+    "1": "Pending",
+    "2": "Completed/Paid",
+    "3": "Rejected/Declined",
+    "4": "Cancelled",
+    "5": "Paid but cancelled"
+  },
+
+  "USER_ROLE_TYPE_DISPLAY": {
+    "11": "Standard",
+    "12": "Senior",
+    "13": "Supervisor",
+    "21": "Level 1",
+    "22": "Level 2",
+    "23": "Team Lead",
+    "24": "Adjudicator",
+    "25": "Level 3",
+    "41": "Admin"
+  },
+
+  "USER_ROLE_GROUP_MAPPINGS": {
+    "1" : "Information Officer",
+    "2" : "Arbitrator",
+    "4" : "Admin",
+    "5" : "Management",
+    "9" : "Other"
+  },
+
+  "USER_ROLE_GROUP_TASK_MAPPINGS": {
+    "1" : "Information Officer",
+    "2" : "Arbitrator",
+    "4" : "Office Admin"
+  },
+
+  "ROLE_GROUP_TO_SUB_GROUP_MAPPINGS": {
+    "0": [],
+    "1": [11, 12, 13],
+    "2": [21, 22, 23, 24],
+    "4": [41],
+    "5": [],
+    "9": []
+  },
+
+  "CLAIM_STATUS_DISPLAY": {
+    "0": "Not Validated",
+    "1": "Not Validated",
+    "2": "Open",
+    "3": "Withdrawn",
+    "4": "Resolved",
+    "5": "Dismissed",
+    "6": "Removed",
+    "7": "Deleted"
+  },
+
+
+  "EVIDENCE_METHODS_DISPLAY": {
+    "100": "I will upload it now (recommended)",
+    "101": "I will upload it later",
+    "103": "I will mail it",
+    "104": "I will drop it off",
+    "105": "I don't have it"
+  },
+
+  "OFFICE_PAYMENT_METHOD_CODE_DISPLAY": {
+    "1": "Cash",
+    "2": "Debit",
+    "3": "Credit Card",
+    "4": "Visa Debit",
+    "5": "Mastercard Debit",
+    "6": "Certified Cheque",
+    "7": "Money Order"
+  },
+
+  "HEARING_TELECONFERENCE_DEFAULTS": {
+    "PRIMARY_DIAL_IN": "6048991159",
+    "PRIMARY_DIAL_IN_TITLE": "(Vancouver)",
+    "SECONDARY_DIAL_IN": "18884581598",
+    "SECONDARY_DIAL_IN_TITLE": "(Elsewhere in BC - Toll Free)"
+  },
+
+  "EXPENSE_WARNING_MONTHS_OFFSET": 18,
+
+  "APPLICANT_EVIDENCE_WARNING_DAY_OFFSET": 14,
+  "RESPONDENT_EVIDENCE_WARNING_DAY_OFFSET": 7,
+
+  "MAX_NON_VIDEO_FILESIZE_BYTES": 10000000,
+  "MAX_VIDEO_FILESIZE_BYTES": 200000000,
+
+  "EMAIL_ATTACHMENT_MAX_FILESIZE_BYTES": 10000000,
+
+  "PDF_FILE_TYPES": {
+    "DISPUTE_NOTICE": 1,
+    "AMENDMENT_NOTICE": 2
+  },
+
+  "VALID_NOTICE_FILE_TYPES": {
+    "pdf": true
+  },
+
+  "VALID_PDF_ONLY_FILE_TYPES": {
+    "pdf": true
+  },
+
+  "VALID_OUTCOME_DOC_FILE_TYPES": {
+    "pdf": true
+  },
+
+  "VIDEO_FILE_TYPES": {
+    "avi": true,
+    "mts": true,
+    "mp4": true,
+    "mov": true,
+    "wmv": true,
+    "3gp": true,
+    "3g2": true,
+    "m4v": true,
+    "mpg": true,
+    "mpeg": true,
+    "h264": true,
+    "mkv": true,
+    "webm": true
+  },
+  "ALLOWED_FILE_TYPES": {
+    "pdf": true,
+    "jpg": true,
+    "png": true,
+    "jpeg": true,
+    "docx": true,
+    "mp4": true,
+    "mov": true,
+    "avi": true,
+    "doc": true,
+    "m4a": true,
+    "tif": true,
+    "mp3": true,
+    "txt": true,
+    "rtf": true,
+    "odt": true,
+    "m4v": true,
+    "xlsx": true,
+    "bmp": true,
+    "tiff": true,
+    "wav": true,
+    "wma": true,
+    "wmv": true,
+    "pptx": true,
+    "xls": true,
+    "csv": true,
+    "aac": true
+  },
+
+  "VALID_PREVIEW_FILE_TYPES": {
+    "png": true,
+    "jpg": true,
+    "jpeg": true,
+    "bmp": true,
+    "pdf": true,
+    "wav": true,
+    "mp3": true
+  },
+
+  "GENERATION_TEMPLATES": {
+    "DEFAULT": 1
+  },
+
+  "ISSUE_QUESTION_NAME_MAPPINGS": {
+    "IssueCode": "QL03",
+    "DirectRequest": "QL00",
+    "LandlordSeekingMoveOut": "QL01",
+    "LandlordSeekingMoney": "QL02",
+    "LandlordHoldingDeposit": "QL05",
+    "TenantDisputingTenancyEnd": "QT01",
+    "TenantSeekingMoney": "QT02",
+    "TenantSeekingRepairs": "QT03",
+    "TenantSeekingService": "QT04",
+    "TenantSeekingRestriction": "QT05",
+    "TenantSeekingOther": "QT06",
+    "TenantFilingLate": "QT08"
+  },
+  "PROVINCES": [
+    "Alberta",
+    "British Columbia",
+    "Manitoba",
+    "New Brunswick",
+    "Newfoundland and Labrador",
+    "Northwest Territories",
+    "Nova Scotia",
+    "Nunavut",
+    "Ontario",
+    "Prince Edward Island",
+    "Quebec",
+    "Saskatchewan",
+    "Yukon"
+  ],
+  "PARTY_TYPES": {
+    "applicant": 0,
+    "respondent": 1,
+    "representative": 2
+  },
+  "PAYMENT_METHODS": {
+    "online": 1,
+    "office": 2,
+    "fee_waiver": 3,
+    "online_pending": 4
+  },
+
+  "ENGAGEMENT_TYPE_DISPLAY" : {
+    "1": "FT Employee",
+    "2": "PT Employee",
+    "3": "FT Contractor",
+    "4": "PT Contractor"
+  },
+
+  "SCHEDULE_SUB_STATUS_DISPLAY": {
+    "1": "No Duty, Emergency or Review",
+    "2": "Duty Only",
+    "3": "Emergency Only",
+    "4": "Review Only",
+    "5": "Duty and Review",
+    "6": "Duty and Emergency",
+    "7": "Emergency and Review ",
+    "8": "Duty, Emergency and Review "
+  },
+
+  "OPERATIONAL_REPORT_USER_GROUP_DISPLAY": {
+    "1": "Everyone",
+    "2": "IO and Office Admin",
+    "3": "Arbitrators/Adjudicators",
+    "4": "Managers",
+    "5": "System Administrators and Support"
+  },
+
+  "LICO_TABLE": {
+    "0": {
+      "1": 1756,
+      "2": 2186,
+      "3": 2688,
+      "4": 3263,
+      "5": 3701,
+      "6": 4174,
+      "7": 4648
+    },
+    "1": {
+      "1": 1998,
+      "2": 2487,
+      "3": 3058,
+      "4": 3713,
+      "5": 4211,
+      "6": 4749,
+      "7": 5287
+    },
+    "2": {
+      "1": 2197,
+      "2": 2735,
+      "3": 3363,
+      "4": 4083,
+      "5": 4630,
+      "6": 5222,
+      "7": 5814
+    },
+    "3": {
+      "1": 2551,
+      "2": 3176,
+      "3": 3905,
+      "4": 4741,
+      "5": 5377,
+      "6": 6064,
+      "7": 6575
+    }
+  },
+  "victoria_poly_fill":[
+    {"lng":-133.593742,"lat":54.1688658},
+    {"lng":-132.9552843,"lat":52.9769584},
+    {"lng":-131.7099496,"lat":51.6929491},
+    {"lng":-130.7654386,"lat":51.8571441},
+    {"lng":-127.7709941,"lat":49.8733977},
+    {"lng":-125.4986804,"lat":48.6542257},
+    {"lng":-123.7280273,"lat":48.239309},
+    {"lng":-123.2720907,"lat":48.2795374},
+    {"lng":-123.1304536,"lat":48.4171088},
+    {"lng":-123.2584059,"lat":48.7045702},
+    {"lng":-123.0517428,"lat":48.7415032},
+    {"lng":-123.0558114,"lat":48.8302998},
+    {"lng":-123.3028976,"lat":48.9976217},
+    {"lng":-123.4469301,"lat":49.164613},
+    {"lng":-123.3391301,"lat":49.2846542},
+    {"lng":-123.2858236,"lat":49.4350918},
+    {"lng":-123.2650037,"lat":49.6489605},
+    {"lng":-123.3874491,"lat":49.8556933},
+    {"lng":-124.2004395,"lat":50.7989914},
+    {"lng":-126.1560059,"lat":52.0862573},
+    {"lng":-126.7163086,"lat":52.9353967},
+    {"lng":-127.9467773,"lat":53.8136258},
+    {"lng":-128.0566406,"lat":54.6928844},
+    {"lng":-131.7810059,"lat":54.412537},
+    {"lng":-133.0241276,"lat":54.4008049},
+    {"lng":-133.593742,"lat":54.1688658}
+  ],
+  "kelowna_poly_fill":[
+    {"lng":-120.8880615,"lat":48.9982401},
+    {"lng":-113.9804057,"lat":48.994636},
+    {"lng":-114.5262873,"lat":49.4861616},
+    {"lng":-114.6030743,"lat":49.6838286},
+    {"lng":-114.6325744,"lat":49.910685},
+    {"lng":-114.6374799,"lat":50.0225018},
+    {"lng":-114.7057176,"lat":50.1980057},
+    {"lng":-114.7480734,"lat":50.3629846},
+    {"lng":-115.0169799,"lat":50.606829},
+    {"lng":-115.1531174,"lat":50.6457616},
+    {"lng":-115.3985799,"lat":50.7870253},
+    {"lng":-115.6284257,"lat":51.0221808},
+    {"lng":-115.9330189,"lat":51.1690692},
+    {"lng":-116.4695187,"lat":51.6481126},
+    {"lng":-116.719251,"lat":51.933072},
+    {"lng":-116.8876955,"lat":51.7611661},
+    {"lng":-117.3051412,"lat":52.2227521},
+    {"lng":-120.9622192,"lat":52.1739317},
+    {"lng":-120.9210205,"lat":51.7542401},
+    {"lng":-121.0253906,"lat":51.3374757},
+    {"lng":-121.0144043,"lat":50.8683781},
+    {"lng":-121.2451172,"lat":49.6818469},
+    {"lng":-120.8880615,"lat":48.9982401}
+  ],
+  "burnaby_poly_fill":[
+    {"lng":-120.0009135,"lat":55.8367712},
+    {"lng":-119.9981669,"lat":56.4867618},
+    {"lng":-120.0010419,"lat":58.2538699},
+    {"lng":-119.9981669,"lat":60.0031059},
+    {"lng":-122.3917153,"lat":60.0000671},
+    {"lng":-124.7852708,"lat":60.0031502},
+    {"lng":-127.1848008,"lat":60.0012434},
+    {"lng":-129.5743088,"lat":60.0164044},
+    {"lng":-131.9725266,"lat":60.0047998},
+    {"lng":-134.3694979,"lat":59.9991677},
+    {"lng":-136.7229098,"lat":60.0090218},
+    {"lng":-139.0759257,"lat":59.9934923},
+    {"lng":-138.7723152,"lat":59.8810806},
+    {"lng":-138.733441,"lat":59.7877391},
+    {"lng":-138.1347763,"lat":59.4613375},
+    {"lng":-137.7504202,"lat":59.230655},
+    {"lng":-137.5241049,"lat":58.8563827},
+    {"lng":-136.8220255,"lat":59.1257034},
+    {"lng":-136.5177762,"lat":59.1533811},
+    {"lng":-136.3952576,"lat":59.3709921},
+    {"lng":-136.13698,"lat":59.629003},
+    {"lng":-135.5065425,"lat":59.7141389},
+    {"lng":-135.2197245,"lat":59.6122121},
+    {"lng":-134.9790485,"lat":59.2200374},
+    {"lng":-134.3036415,"lat":58.8251994},
+    {"lng":-133.8244609,"lat":58.5911616},
+    {"lng":-133.365372,"lat":58.1486599},
+    {"lng":-132.9785136,"lat":57.6982768},
+    {"lng":-132.407171,"lat":57.0590411},
+    {"lng":-132.0746913,"lat":56.7195559},
+    {"lng":-131.5502909,"lat":56.474628},
+    {"lng":-130.5505915,"lat":56.1430897},
+    {"lng":-130.1000937,"lat":55.912273},
+    {"lng":-130.2283539,"lat":55.7465993},
+    {"lng":-130.2021993,"lat":55.4447444},
+    {"lng":-130.228842,"lat":55.1923191},
+    {"lng":-130.6054687,"lat":54.9018822},
+    {"lng":-131.7810039,"lat":54.412537},
+    {"lng":-128.0566386,"lat":54.6928844},
+    {"lng":-127.9467773,"lat":53.8136258},
+    {"lng":-127.5043349,"lat":53.4881302},
+    {"lng":-126.7163066,"lat":52.9353967},
+    {"lng":-126.1560059,"lat":52.0862573},
+    {"lng":-125.6011943,"lat":51.7372345},
+    {"lng":-124.2004375,"lat":50.7989914},
+    {"lng":-123.3874471,"lat":49.8556933},
+    {"lng":-123.2650017,"lat":49.6489605},
+    {"lng":-123.2858216,"lat":49.4350918},
+    {"lng":-123.3391281,"lat":49.2846542},
+    {"lng":-123.4469281,"lat":49.164613},
+    {"lng":-123.3028956,"lat":48.9976217},
+    {"lng":-120.8880615,"lat":48.9982401},
+    {"lng":-121.2451172,"lat":49.6818469},
+    {"lng":-121.0144023,"lat":50.8683781},
+    {"lng":-121.0253886,"lat":51.3374757},
+    {"lng":-120.9210185,"lat":51.7542401},
+    {"lng":-120.9622172,"lat":52.1739317},
+    {"lng":-117.3051412,"lat":52.2227521},
+    {"lng":-118.0528965,"lat":52.5743014},
+    {"lng":-118.6495951,"lat":53.11546},
+    {"lng":-119.212701,"lat":53.38627},
+    {"lng":-119.6566358,"lat":53.4943229},
+    {"lng":-119.7015361,"lat":53.7259668},
+    {"lng":-119.9909042,"lat":53.9832579},
+    {"lng":-119.9954203,"lat":54.5338325},
+    {"lng":-120.0043494,"lat":55.1120779},
+    {"lng":-119.9899271,"lat":55.6682913},
+    {"lng":-120.0009135,"lat":55.8367712}
+  ]
+}

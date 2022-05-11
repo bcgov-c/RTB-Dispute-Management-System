@@ -1,0 +1,146 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: "${NAME}"
+  annotations:
+    openshift.io/display-name: RTB UI
+    description: Case-Management UI template
+    tags: cm, ui, rtb, dotnet
+    iconClass: icon-dotnet
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+
+  For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/nodejs-ex/blob/master/README.md.
+labels:
+  template: "${NAME}"
+  app: "${NAME}"
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: "${NAME}"
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: "${NAME}"
+- kind: Secret
+  apiVersion: v1
+  data:
+    env.json: >-
+      ewogICJSVU5fRU5WIjogImRldiIsCiAgIkFQSV9ST09UX1VSTCI6ICJodHRwczovL2Nhc2UtbWFuYWdlbWVudC1ydGItZG1zLWRldi5wYXRoZmluZGVyLmdvdi5iYy5jYS9hcGkvIiwKICAiSU5UQUtFX1VSTCI6ICJodHRwczovL2Nhc2UtbWFuYWdlbWVudC11aS1ydGItZG1zLWRldi5wYXRoZmluZGVyLmdvdi5iYy5jYS9JbnRha2UiLAogICJTV0FHR0VSX1VSTCI6ICJodHRwczovL2Nhc2UtbWFuYWdlbWVudC1ydGItZG1zLWRldi5wYXRoZmluZGVyLmdvdi5iYy5jYS9zd2FnZ2VyLyIKfQ==
+  metadata:
+    name: secret-appsettings-ui
+  type: Opaque
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+      template.alpha.openshift.io/wait-for-ready: 'true'
+  spec:
+    strategy:
+      type: Rolling
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${NAME}"
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}:latest"
+          namespace: "${TOOLS_NAMESPACE}"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        strategy:
+          rollingParams:
+            timeoutSeconds: 600
+          type: Rolling
+        containers:
+        - name: "${NAME}"
+          image: >-
+            docker-registry.default.svc:5000/${TOOLS_NAMESPACE}/${NAME}:latest
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+          - name: secrets
+            mountPath: /app/config
+            readOnly: true
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/Intake"
+              port: 8080
+          livenessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/Intake"
+              port: 8080
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+              cpu: "${CPU_LIMIT}"
+          env: []
+        volumes:
+        - name: secrets
+          secret:
+            secretName: secret-appsettings-ui
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: case-management-ui
+- name: NAMESPACE
+  displayName: Namespace
+  description: The OpenShift Namespace where the ImageStream resides.
+  required: true
+  value: openshift
+- name: TOOLS_NAMESPACE
+  displayName: Namespace
+  description: The RTB Namespace where the ImageStream resides.
+  required: true
+  value: rtb-dms-tools
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  description: Maximum amount of memory the container can use.
+  required: true
+  value: 1Gi
+- name: CPU_LIMIT
+  displayName: Cpu Limit
+  description: Maximum amount of cpu the container can use.
+  required: true
+  value: "2"
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the Node.js service, if left
+    blank a value will be defaulted.
+  value: ''

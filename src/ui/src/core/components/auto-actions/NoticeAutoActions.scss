@@ -1,0 +1,48 @@
+
+#noticeAutoAction_modal .modal-dialog { width: 100%; max-width: 1000px; }
+
+.noticeAutoAction_modal {
+
+  &__checkboxes { margin: 20px 0 10px 0; }
+  &__template-info { margin: 10px 0 }
+
+  &__loading-container {
+    text-align: center;
+    padding-bottom: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+
+    &__title { font-size: 19px; margin-bottom: -30px; }
+    &__img-container { min-height: 128px; }
+    &__info { font-size: 16px; color: #8e8e8e; margin-top: -30px; }
+
+    &__success {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      color: #38598a;
+      min-height: 128px;
+
+      &__img { margin-right: 12px; }
+    }
+
+    > button { margin-top:40px; }
+  }
+}
+
+.autoAction_modal {
+
+  &__autoAction_modal__error-state { padding: 15px; }
+  &__error-results-container { margin-top: 10px; }
+
+  &__error-results {
+    overflow: auto;
+    height: 250px;
+    width: 100%;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    margin-bottom: 15px;
+  }
+  &__error-result { }
+}

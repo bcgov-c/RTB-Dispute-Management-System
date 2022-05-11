@@ -1,0 +1,33 @@
+.ceu-complaint {
+  &__title-ref-num {
+    background-color: #dadada;
+    float: left;
+    position: absolute;
+    top: -10px;
+    left: -9px;
+    padding: 10px 15px 8px 15px;
+    font-size: 24px;
+    font-weight: 500;
+    width: fit-content;
+    min-width: 300px;
+  }
+  
+  &__edit-section {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__file-status { width: 250px; }
+  &__urgency { width: 250px; }
+  &__owner { width: 250px; }
+  &__description {
+    .rtb-editable-component-label {
+      min-width: fit-content;
+      white-space: nowrap;
+    }
+  }
+  &__receipt { margin-top: 20px; }
+  &__snapshot-container { margin-top: 10px; }
+  &__snapshot .file-display { display: inline-flex; }
+}

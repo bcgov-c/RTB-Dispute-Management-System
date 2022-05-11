@@ -1,0 +1,53 @@
+.intervention-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__title {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: #335c85;
+    margin: 10px 0 20px 0;
+    line-height: 34px;
+  }
+
+  &__img {
+    width: fit-content;
+  }
+
+  &__text {
+    font-size: 20px;
+    line-height: 24px;
+    margin: 10px 0 20px 0;
+    color: #4d4d4d;
+    text-align: center;
+  }
+
+  &__progress-icons {
+    width: 200px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+  }
+
+  &__button {
+
+    &__container {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .animation-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+#intervention_modal {
+  .modal-dialog { max-width: 600px; }
+}

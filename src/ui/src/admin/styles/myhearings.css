@@ -1,0 +1,46 @@
+/* Set Hearings Calendar Legend Colors */
+.hearings-calendar-legend--red { background-color: #B92429!important; }
+.hearings-calendar-legend--blue { background-color: #2772BE!important; }
+.hearings-calendar-legend--green { background-color: #2B9241!important; }
+.hearings-calendar-legend--orange { background-color: #EF9200!important; }
+.hearings-calendar-legend--grey { background-color: #302f2f!important; }
+.hearings-calendar-legend--light { background-color: #ccc !important; }
+.hearings-calendar-legend--light-grey { background-color: #494949; color: #494949; }
+
+
+.my-hearings-today-calendar-container { background-color: #808080!important; margin: 10px 0px; max-height: 120px; }
+
+.my-hearing-calendar-prev-image { margin: 0 5px 5px 5px; height: 28px; width: 28px; }
+.my-hearing-calendar-next-image { margin: 0 5px 5px 0px; height: 28px; width: 28px; }
+
+.hearings-calendar-legend-container { margin-left: auto; display: flex; padding-top: 34px; }
+.hearings-calendar-legend-text-and-color-container { display: flex; margin-left: 30px; }
+.hearings-calendar-legend-closed { width: 15px; height: 15px; margin-top: 4px; }
+.hearings-calendar-legend-emergency { width: 15px; height: 15px; margin-top: 4px; }
+.hearings-calendar-legend-standard { width: 15px; height: 15px; margin-top: 4px; }
+.hearings-calendar-legend-deferred { width: 15px; height: 15px;  margin-top: 4px; }
+.hearings-calendar-legend-f2f { width: 15px; height: 15px; margin-top: 4px; outline: 1px dashed #0000ff; }
+.hearings-calendar-legend-hold { width: 15px; height: 15px;  margin-top: 4px; }
+
+.hearing-calendar-legend-hold { color: #494949; }
+.hearing-calendar-legend-f2f { color: #302f2f!important; }
+.hearing-calendar-legend-emergency { color: #ff0000!important; }
+.hearing-calendar-legend-standard { color: #339966!important; }
+.hearing-calendar-legend-deferred { color: #0075ff!important; }
+.hearing-calendar-legend-duty { color: #ff6600!important; }
+.hearing-calendar-legend-linked { color: #302f2f!important; }
+.hearing-calendar-legend-linked-container {  height: 15px!important; width: 15px!important; margin-top: 4px; }
+.hearing-calendar-legend-linked-container { background: url('../static/Icon_Admin_ScheduleLink_Wht.png') no-repeat 4px !important; background-color: #302f2f!important; background-size: 7px!important; }
+
+.hearing-calendar-legend-text { margin-left: 5px; font-size: 17px; }
+
+.hearing-calendar-today { display: flex; border: #716e6e 5px solid; margin-bottom: 20px; }
+.hearing-calendar-today-arrow-with-label { background-color: #716e6e!important; color: white!important; }
+
+.hearing-calendar-today .calendar-time-interval-header { margin-top: 0; padding-left: 180px; }
+.hearing-calendar-today-header-and-hearings { overflow: hidden; }
+.hearing-calendar-today-arrow-with-label { width: 150px; }
+.hearing-calendar-today-date { font-weight: bold; width: 150px; font-size: 18px; padding-left: 15px; }
+.hearing-calendar-today-hearings-list { height: 60px; display: flex; padding-top: 20px; }
+
+.hearing-calendar-row-schedule { position: absolute; }

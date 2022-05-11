@@ -1,0 +1,93 @@
+{
+  "amendment_config": {
+    "CHANGE_RENTAL_ADDRESS": {
+      "amendment_title": "Changed Dispute Address",
+      "amendment_to": 1,
+      "amendment_change_type": 1,
+      "change_html_template": "<p><b>Dispute Address changed</b> FROM: <span class='amend-from'><%= oldAddress %></span> TO: <span class='amend-to'><%= newAddress %></span></p>"
+    },
+
+    "CHANGE_PARTY": {
+      "amendment_to": 2,
+      "amendment_change_type": 1
+    },
+
+    "CHANGE_PRIMARY": {
+      "amendment_title": "Changed Primary Applicant",
+      "amendment_to": 2,
+      "amendment_change_type": 1,
+      "change_html_template": "<p><b>Primary Applicant changed</b> <%= oldValue ? `FROM: <span class='amend-from'>${oldValue}</span>` : '' %> TO: <span class='amend-to'><%= newValue %></span></p>"
+    },
+
+    "CHANGE_PARTY_NAME": {
+      "amendment_title": "Changed Participant Name/Type",
+      "change_html_template": "<p><b>Participant name/type changed</b> FROM: <span class='amend-from'><%= oldValue %></span> TO: <span class='amend-to'><%= newValue %></span></p>"
+    },
+
+    "CHANGE_PARTY_MAILING": {
+      "amendment_title": "Changed Participant Mail Address",
+      "change_html_template": "<p><b>Participant (<%= applicantDisplay %>) mail address changed</b> <%= oldValue ? `FROM: <span class='amend-from'>${oldValue}</span>`:''%> TO: <span class='amend-to'><%= newValue %></span></p>"
+    },
+
+    "CHANGE_PRIMARY_NAME": {
+      "amendment_title": "Changed Primary Applicant Name",
+      "change_html_template": "<p><b>Primary Applicant name changed</b> FROM: <span class='amend-from'><%= oldValue %></span> TO: <span class='amend-to'><%= newValue %></span></p>"
+    },
+
+    "CHANGE_PRIMARY_MAILING": {
+      "amendment_title": "Changed Primary Applicant Mail Address",
+      "change_html_template": "<p><b>Primary Applicant (<%= applicantDisplay %>) mail address changed</b> FROM: <span class='amend-from'><%= oldValue %></span> TO: <span class='amend-to'><%= newValue %></span></p>"
+    },
+
+    "ADD_PARTY": {
+      "amendment_title": "Added Participant",
+      "amendment_to": 2,
+      "amendment_change_type": 2,
+      "change_html_template": "<p><b><%= applicantDisplay %> Added:</b> <span class='amend-to'><%= partyDisplay %></span></p>"
+    },
+
+    "ADD_APPLICANT": {
+      "amendment_title": "Added Applicant"
+    },
+
+    "ADD_RESPONDENT": {
+      "amendment_title": "Added Respondent"
+    },
+
+    "REMOVE_PARTY": {
+      "amendment_title": "Removed Participant",
+      "amendment_to": 2,
+      "amendment_change_type": 3,
+      "change_html_template": "<p><b><%= applicantDisplay %> Removed:</b> <span class='amend-to'><%= partyDisplay %></span></p>"
+    },
+
+    "REMOVE_APPLICANT": {
+      "amendment_title": "Removed Applicant"
+    },
+
+    "REMOVE_RESPONDENT": {
+      "amendment_title": "Removed Respondent"
+    },
+
+    "ADD_CLAIM": {
+      "amendment_title": "Added Issue",
+      "amendment_to": 3,
+      "amendment_change_type": 2,
+      "change_html_template": "<p><b>Issue Added:</b> <span class='amend-to'><%= issueDisplay %></span></p>"
+    },
+
+    "CHANGE_CLAIM": {
+        "amendment_title": "Changed Issue",
+        "amendment_to": 3,
+        "amendment_change_type": 1
+    },
+
+    "REMOVE_CLAIM": {
+      "amendment_title": "Removed Issue",
+      "amendment_to": 3,
+      "amendment_change_type": 3,
+      "change_html_template": "<p><b>Issue Removed </b><span class='amend-to'><%= issueDisplay %></span></p>"
+    }
+
+  }
+}

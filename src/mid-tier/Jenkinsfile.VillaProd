@@ -1,0 +1,141 @@
+pipeline {
+  agent any
+
+  environment {
+    dotnet = 'dotnet.exe'
+    ROOT_FOLDER = '\\\\COTTAGE.dmz\\RTB-DMS_PROD$\\dms-prod\\api'
+    TEMP_FOLDER = 'D:/Temp'
+    BACKUP_FOLDER = 'D:/dms-build-backup'
+  }
+
+  stages {
+    stage('Confirmation') {
+      input {
+        message "Are you sure you want to deploy to PRODUCTION?"
+        ok "Yes"
+      }
+      steps {
+          echo "proceeding..."
+      }
+    }
+
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Restore Packages') {
+      steps {
+        bat "dotnet restore  CaseManagement.sln --verbosity minimal"
+      }
+    }
+    stage('Clean') {
+      steps {
+        bat 'dotnet clean CaseManagement.sln'
+      }
+    }
+
+    stage('Take Offline') {
+      steps {
+        dir("${env.ROOT_FOLDER}"){
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'mid-tier')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'email-generator')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'email-notification')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'pdf')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'reconciliation-report-generator')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'reconciliation-report-sender')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'adhoc-report-sender')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'data-warehouse')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'posted-decision-data-collector')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'posted-decision')]){}
+          configFileProvider([configFile(fileId: 'app_offline.htm', targetLocation: 'data-warehouse-report')]){}
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir("${env.BACKUP_FOLDER}"){
+          fileOperations([folderDeleteOperation("dms-prod-mid-tier")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/mid-tier", destinationFolderPath: "dms-prod-mid-tier/mid-tier")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/email-generator", destinationFolderPath: "dms-prod-mid-tier/email-generator")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/email-notification", destinationFolderPath: "dms-prod-mid-tier/email-notification")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/pdf", destinationFolderPath: "dms-prod-mid-tier/pdf")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/reconciliation-report-generator", destinationFolderPath: "dms-prod-mid-tier/reconciliation-report-generator")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/reconciliation-report-sender", destinationFolderPath: "dms-prod-mid-tier/reconciliation-report-sender")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/adhoc-report-sender", destinationFolderPath: "dms-prod-mid-tier/adhoc-report-sender")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/data-warehouse", destinationFolderPath: "dms-prod-mid-tier/data-warehouse")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/posted-decision-data-collector", destinationFolderPath: "dms-prod-mid-tier/posted-decision-data-collector")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/posted-decision", destinationFolderPath: "dms-prod-mid-tier/posted-decision")])
+          fileOperations([folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/data-warehouse-report", destinationFolderPath: "dms-prod-mid-tier/data-warehouse-report")])
+        }
+
+        dir("CM.WebAPI") {
+          bat "dotnet publish CM.WebAPI.csproj -c Release --output ${env.ROOT_FOLDER}/mid-tier "
+        }
+        dir("CM.Services/EmailGenerator/EmailGeneratorService") {
+          bat "dotnet publish EmailGeneratorService.csproj -c Release --output ${env.ROOT_FOLDER}/email-generator "
+        }
+        dir("CM.Services/EmailNotification/EmailNotificationService") {
+          bat "dotnet publish EmailNotificationService.csproj -c Release --output ${env.ROOT_FOLDER}/email-notification "
+        }
+        dir("CM.Services/PdfConvertor/PdfService") {
+          bat "dotnet publish PdfService.csproj -c Release --output ${env.ROOT_FOLDER}/pdf "
+        }
+        dir("CM.Services/ReconciliationReportGenerator/ReconciliationReportGeneratorService") {
+          bat "dotnet publish ReconciliationReportGeneratorService.csproj -c Release --output ${env.ROOT_FOLDER}/reconciliation-report-generator "
+        }
+        dir("CM.Services/ReconciliationReportSender/ReconciliationReportSenderService") {
+          bat "dotnet publish ReconciliationReportSenderService.csproj -c Release --output ${env.ROOT_FOLDER}/reconciliation-report-sender "
+        }
+        dir("CM.Services/AdHocReportSender/AdHocReportSenderService") {
+          bat "dotnet publish AdHocReportSenderService.csproj -c Release --output ${env.ROOT_FOLDER}/adhoc-report-sender "
+        }
+        dir("CM.Services/DataWarehouse/FactDisputeService") {
+          bat "dotnet publish FactDisputeService.csproj -c Release --output ${env.ROOT_FOLDER}/data-warehouse "
+        }
+        dir("CM.Services/PostedDecisionDataCollector/PostedDecisionDataCollectorService") {
+          bat "dotnet publish PostedDecisionDataCollectorService.csproj -c Release --output ${env.ROOT_FOLDER}/posted-decision-data-collector "
+        }
+        dir("CM.Services/PostedDecision/PostedDecisionService") {
+          bat "dotnet publish PostedDecisionService.csproj -c Release --output ${env.ROOT_FOLDER}/posted-decision "
+        }
+        dir("CM.Services/DataWarehouseReporting/DataWarehouseReporting.API") {
+          bat "dotnet publish DataWarehouseReporting.API.csproj -c Release --output ${env.ROOT_FOLDER}/data-warehouse-report "
+        }
+      }
+    }    
+    stage("Take Online") {
+      steps {
+        dir("${env.TEMP_FOLDER}"){
+          fileOperations([folderDeleteOperation("dms-prod-mid-tier")])
+          fileOperations([folderCreateOperation("dms-prod-mid-tier")])
+          
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/mid-tier/app_offline.htm", destination: "dms-prod-mid-tier/1.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/email-generator/app_offline.htm", destination: "dms-prod-mid-tier/2.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/email-notification/app_offline.htm", destination: "dms-prod-mid-tier/3.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/pdf/app_offline.htm", destination: "dms-prod-mid-tier/4.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/reconciliation-report-generator/app_offline.htm", destination: "dms-prod-mid-tier/5.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/reconciliation-report-sender/app_offline.htm", destination: "dms-prod-mid-tier/6.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/adhoc-report-sender/app_offline.htm", destination: "dms-prod-mid-tier/7.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/data-warehouse/app_offline.htm", destination: "dms-prod-mid-tier/8.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/posted-decision-data-collector/app_offline.htm", destination: "dms-prod-mid-tier/9.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/posted-decision/app_offline.htm", destination: "dms-prod-mid-tier/10.temp")])
+          fileOperations([fileRenameOperation(source: "${env.ROOT_FOLDER}/data-warehouse-report/app_offline.htm", destination: "dms-prod-mid-tier/11.temp")])
+          fileOperations([folderDeleteOperation("dms-prod-mid-tier")])
+        }
+      }
+    }
+  }
+  post {
+    always {
+        cleanWs()
+        
+        echo 'I will always say Hello again!'
+        
+        emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
+            recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+            subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}"            
+    }
+  }
+}

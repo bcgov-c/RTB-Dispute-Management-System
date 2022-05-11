@@ -1,0 +1,96 @@
+/* Composer page styles */
+.composer-page { padding-bottom: 60px; }
+
+.composer-doc-template { font-size: 20px; }
+
+.composer-doc-row { display: flex; justify-content: space-between; }
+.composer-doc-row-right { }
+
+.composer-doc-template,
+.composer-doc-date,
+.composer-doc-status,
+.composer-doc-update-btn { margin-left: 15px; float: left; }
+
+.composer-doc-update-btn { margin-top: 19px; }
+
+.composer-page .composer-section-component { margin-top: 40px; }
+
+
+/* Component ComposerSectionView styles */
+.composer-section-component { width: 950px; }
+.composer-section-title-container { font-size: 17px; display: flex; justify-content: space-between; }
+.composer-section-title { font-style: italic; display: inline-block; position: relative; top: 4px; }
+.composer-section-links { height: 32px; }
+.composer-section-link { display: inline-block; color: #3c5f8c; padding-left: 10px; }
+.composer-section-link-refresh {
+  display: inline-block;
+  margin-left: 5px;
+  background: url('../static/Icon_AdminBar_Refresh.png') no-repeat;
+  background-size: 28px 28px;
+  height: 28px;
+  width: 28px;
+}
+.composer-section-content-container { border: 1px solid #999; min-height: 100px; }
+.composer-section-content { padding: 15px; }
+
+
+.composer-section-content-header { display: inline-block; color: #b2b2b2; }
+.composer-section-content-header-subtext { font-style: italic; }
+.composer-section-content-logo {
+  background: url('../static/DMSLogos.gif') no-repeat;
+  background-size: 200px 65px;
+  height: 65px;
+  width: 200px;
+  float: right;
+}
+
+.composer-section-content ul { padding-left: 30px; }
+
+.composer-section-content-h1 { font-size: 19px; }
+.composer-section-content-h2 { font-size: 19px; font-weight: bold; }
+
+.composer-section-content-h3-container {
+  font-size: 19px;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 10px 0 2px 10px;
+  background-color: #f6f6f6;
+  line-height: 24px;
+}
+.composer-section-content-h3 { font-size: 19px; }
+.composer-section-content-h4 { font-size: 18px; padding-bottom: 5px; border-bottom: 1px solid #e5e5e5; }
+.composer-section-content-h5 {
+  font-size: 18px;
+  background: url('../static/Icon_AdminPage_FindBridge.png') no-repeat;
+  padding-left: 35px;
+  background-size: 25px 25px;
+}
+
+.composer-section-content-block { display: block; margin-top: 10px; }
+.composer-section-content-flex { display: flex; }
+.composer-section-content-column { width: 50%; }
+
+
+/* DecisionInformation Composer Section styles */
+.composer-section-decision-information-parties { margin-top: 10px; max-width: 900px; }
+
+/* HearingAttendance Composer Section styles */
+.composer-section-hearing-attendance-header {
+  padding-left: 40px;
+  background-image: url('../static/Icon_Header_Hearings.png');
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-position: 5px 5px;
+}
+
+.composer-section-hearing-attendance .composer-section-content > .composer-section-content-block { padding: 0 10px; }
+
+/* ServiceOfNotice Composer Section styles */
+.composer-section-notice-header {
+  padding-left: 40px;
+  background-image: url('../static/Icon_Header_Notice.png');
+  background-repeat: no-repeat;
+  background-size: 30px 30px;
+  background-position: 5px 5px;
+}
+
+.composer-section-issues-section-title { font-size: 16px; }

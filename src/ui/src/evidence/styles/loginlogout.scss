@@ -1,0 +1,290 @@
+
+/**
+ * LoginPage and LogoutPage features
+ */
+
+$ICON-LOGOUT-URL: url('../static/DA_LogoutIcon.png');
+
+.dac {
+  // Joining selectors
+  // Sub-elements in BEM style
+
+  &__floating-header-page {
+    width: 100%;
+    padding: 60px 45px 20px 45px;
+  }
+
+  // LoginLink component
+  &__login-link {
+    font-size: 22px;
+    user-select: none;
+    display: inline-block;
+    color: #337ab7;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  // LogoutLink component
+  &__logout-link {
+    @extend .dac__login-link;
+    
+    background: $ICON-LOGOUT-URL 2px 5px no-repeat;
+    padding-left: 30px;
+  }
+
+  // LoginBanner
+  &__login-banner {
+    height: 150px;
+    background-color: #f2f2f2;
+    color: #222;
+    font-size: 20px;
+    padding: 10px 0 0 0;
+
+    &__content {
+      max-width: 455px;
+      margin: 0 auto;
+      width: 100%;
+      text-align: center;
+    }
+
+    &__text {
+      display: inline-block;
+      width: 300px;
+      font-size: 30px;
+      line-height: 31px;
+      text-align: left;
+      padding-top: 40px;
+      font-weight: 500;
+      color: #003366;
+    }
+  }
+
+  // LoginPage
+  &__login-page {
+    &__instructions {
+      text-align: center;
+      
+      &__title {
+        font-size: 28px;
+        color: #222;
+        padding: 20px 0 0 0;
+      }
+      &__text {
+        display: inline-block;
+        font-size: 22px;
+        margin: 1px 20px 10px 20px;
+        color: #858585;
+        max-width: 600px;
+        line-height: 26px;
+        font-style: italic;
+        padding: 0 20px 0 20px;
+      }
+    }
+
+    &__user-entry {
+      margin-top: 25px;
+      margin-bottom: 60px;
+
+      &__input {
+        display: flex;
+        justify-content: space-between;
+
+        > div { display: flex; }
+      }
+    }
+
+    &__access-code {
+      margin-right: 15px;
+      width: 188px;
+    }
+
+    &__access-code-type {
+      width: 125px;
+      margin-right: 25px;
+    }
+
+    &__user-name {
+      width: 322px;
+    }
+
+    &__terms-of-use {
+      padding-top: 10px;
+    }
+
+
+    &__buttons {
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    &__help {
+      font-size: 18px;
+      margin: 100px 0 0 0;
+      text-align: center;
+      width: 100%;
+      color: #337ab7;
+      cursor: pointer;
+
+      :hover, :focus, :active {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // LogoutPage
+  &__logout-page {
+    text-align: center;
+
+    span {
+      font-size: 19px;
+      color: #333;
+    }
+    .dac__login-link { margin-top: 40px; }
+  }
+
+  // LoginPage staff login modal
+  &__modal-staff-login {
+
+    &__inputs {
+      max-width: 450px;
+      display: flex;
+      justify-content: space-evenly;
+      margin: 15px auto;
+    }
+    
+    &__date { align-self: center; }
+
+    &__use-date {
+      padding-top: 17px;
+      margin-right: 30px;
+    
+      .radio label:nth-child(2) { margin-left: 5px; }
+    }
+
+    .modal-button-container { margin-top: 10px; }
+  }
+
+  // LoginPage AccessCodeHelp
+  &__modal-access-code-help {
+    .modal-dialog { max-width: 800px; width: 100%; }
+    .modal-title { padding-right: 40px; }
+  }
+}
+
+/* Desktop-only styles */
+@media (min-width: 768px) {
+  //
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .dac {
+    // FloatingHeaderPage
+    &__floating-header-page { padding: 20px; }
+
+    // LoginBanner
+    &__login-banner {
+      height: 100px;
+      
+      &__content {
+        max-width: 310px;
+      }
+
+      &__text {
+        width: 185px;
+        font-size: 20px;
+        line-height: 22px;
+        padding-top: 20px;
+      }
+    }
+
+    // LoginPage
+    &__login-page {
+      
+      &__instructions {
+        &__title {
+          font-size: 24px;
+          line-height: 26px;
+        }
+        &__text {
+          font-size: 18px;
+          margin: 15px 0px 10px 0px;
+          padding: 0;
+          line-height: 21px;
+        }
+      }
+  
+      &__user-entry__input {
+        display: block;
+  
+        > div { justify-content: center; }
+      }
+  
+      &__access-code {
+        margin-right: 15px;
+        width: 188px;
+      }
+  
+      &__access-code-type {
+        margin-right: 0;
+      }
+  
+      &__user-name {
+        width: 327px;
+      }
+  
+      &__terms-of-use {
+        padding-top: 10px;
+      }
+  
+  
+      &__buttons {
+        margin-top: 50px;
+        text-align: center;
+      }
+  
+      &__help {
+        font-size: 18px;
+        margin: 100px 0 0 0;
+        text-align: center;
+        width: 100%;
+        color: #337ab7;
+        cursor: pointer;
+  
+        :hover, :focus, :active {
+          text-decoration: underline;
+        }
+      }
+    }
+  
+    // LoginPage StaffModal
+    &__modal-staff-login {
+      &__use-date {
+        .radio label:nth-child(2) { margin-left: 0; }
+      }
+      
+      .modal-title { padding-right: 40px; }
+    }
+
+
+    // LoginPage AccessCodeHelp
+    &__modal-access-code-help {
+      .modal-dialog { max-width: 800px; width: 100%; }
+      .modal-title { padding-right: 40px; }
+    }
+  }
+}
+
+/* Very small screen styles */
+@media (max-width:440px) {
+  .dac {
+    // LoginPage
+    &__login-page {
+      &__user-entry__input > div { display: block; } 
+    
+      &__access-code,
+      &__access-code-type,
+      &__user-name { width: 100%; }
+    }
+  }
+}

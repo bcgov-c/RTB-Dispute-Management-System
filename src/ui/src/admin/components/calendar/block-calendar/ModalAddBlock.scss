@@ -1,0 +1,35 @@
+
+#modalAddScheduleBlock .modal-dialog { width: 1030px; }
+
+.modalAddScheduleBlock {
+
+  &__row {
+    display: flex;
+  }
+
+  &__block-id { float: right; }
+
+  &__owner { width: 300px; margin-right: 15px; }
+  &__type { width: 200px; margin-right: 15px; }
+  &__multi-periods { margin-top: 25px; }
+  &__description { width: 300px; margin-right: 15px; }
+
+  &__start-date { margin-right: 15px; }
+  &__start-time { margin-right: 30px; }
+
+  &__end-date { margin-right: 15px; }
+  &__end-time { margin-right: 15px; }
+
+  &__step-one-accept,
+  &__step-one-modify {
+    display: flex;
+    height: fit-content;
+    align-self: flex-end;
+  }
+
+  &__duration {
+    display: flex;
+    align-self: flex-start;
+    margin-top: 30px;
+  }
+}

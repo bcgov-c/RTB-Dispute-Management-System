@@ -1,0 +1,53 @@
+
+.ceu-contravention {
+
+  &__top-row {
+    display: flex;
+    flex-wrap: wrap;
+    
+    > div {
+      margin-right: 10px;
+      min-width: fit-content;
+    }
+  }
+
+  &__description { margin-top: 10px; }
+
+  &__dms-files-info,
+  &__witnesses-info {
+    font-size: 17px;
+    font-style: italic;
+    color: #8e8e8e;
+  }
+
+  &__dms-file,
+  &-witness {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #f2f2f2;
+    &:last-child { border-bottom: 0; }
+    padding-bottom: 5px;
+    padding-top: 5px;
+    
+    &__type select { width: 200px; }
+
+    &__delete {
+      background: 0 25px/20px url('../../../../core/static/Icon_Delete.png') no-repeat;
+      width: 20px;
+      cursor: pointer;
+    }
+
+    > div { margin-right: 15px; }
+  }
+
+  &__dms-files-add,
+  &__witnesses-add {
+    background: 0/25px url('../../../../core/static/Icon_AddBlue.png') no-repeat;
+    margin-top: 15px;
+    padding-left: 30px;
+    font-size: 17px;
+    line-height: 26px;
+    display: inline-block;
+  }
+  
+}

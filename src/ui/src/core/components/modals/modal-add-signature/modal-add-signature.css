@@ -1,0 +1,90 @@
+.signature-wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.signature-file-name-wrapper {
+  display: flex;
+}
+
+.signature-inputs {
+  width: 100%;
+  max-width: 350px;
+}
+
+.signature-inputs .error-block {
+  line-height: 20px;
+}
+
+.signature-arb {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 20px;
+}
+
+.signature-file-name, .signature-document-title {
+  width: 100%;
+  max-width: 250px;
+}
+
+.signature-file-extension {
+  display: flex;
+  align-items: center;
+  margin: 14px 0 0 5px;
+  font-size: 17px;
+}
+
+.signature-upload-error {
+  font-style: italic;
+  color: #e89293;
+}
+
+.signature-cropper-error {
+  color:#d80000;
+}
+
+.signature-cropper-info {
+  display: flex;
+  align-items: center;;
+}
+
+.file-cropper-image-container {
+  width: 100%;
+  height: 100%;
+  max-width: 490px;
+  max-height: 315px;
+}
+
+.file-cropper-image {
+  max-width: 490px;
+  max-height: 315px;
+  width: 100%;
+  height: 100%;
+}
+
+#addSignature_modal .modal-dialog {
+  width: 80%; 
+  max-width: 890px;
+}
+
+.signature-cropper-buttons {
+  display: flex;
+  margin: 10px 0;
+}
+
+.signature-cropper-button-group {
+  margin-right: 10px;
+}
+
+.btn-cropper, .btn-cropper:hover, .btn-cropper:focus {
+  cursor: pointer;
+  margin: 0 1px;
+  background: #7e7e7e;
+  color: white;
+  font-size: 12px;
+}
+
+.btn-reverse {
+  transform: scaleX(-1);
+}

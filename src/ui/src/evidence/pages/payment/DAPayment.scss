@@ -1,0 +1,68 @@
+@import "../../styles/variables";
+
+$ICON-TARGET-URL: url('../../static/DA_TargetIcon.png');
+
+.da-payments-payment-method-type { margin-top: 15px; max-width: 815px; }
+
+.da-payment-page {
+  font-size: $DAC-FONT-SIZE-CONTENT;
+
+  .da-upload-instructions { margin-top: 20px; }
+
+  /* NOTE: Taken from office.css, used for FeeWaiver Component buttons */
+  .office-sub-page-buttons { margin-top: 40px; margin-bottom: 10px; }
+  .office-sub-page-buttons > button,
+  .office-sub-page-buttons > div > button { margin-right: 10px; }
+
+  .office-page-payment-contents { margin-top: 20px; }
+  .office-page-payment-instructions { margin-bottom: 20px; }
+  .office-page-payment-details { margin: 15px 0; }
+  .office-payment-name { max-width: 500px; }
+  .office-payment-name input { max-width: 250px; }
+  .office-fee-waiver-component .step-description { margin-top: 30px; }
+
+  .office-page-step-container { margin: 10px 0 15px 0; display: flex; align-items: center; }
+  .office-page-step-icon {
+    display: inline-block;
+    background: $ICON-TARGET-URL no-repeat;
+    height: 35px;
+    min-height: 35px;
+    width:35px;
+    min-width:35px;
+    margin-right: 5px;
+  }
+
+  .office-fee-waiver-family,
+  .office-fee-waiver-city { max-width: 500px; }
+
+  .office-fee-waiver-family input { width: 50px; }
+  .office-fee-waiver-city select { width: 205px; }
+
+  .office-fee-waiver-confirm { margin-top: 50px; }
+
+  .office-page-fee-waiver-step2 { margin-top: 60px; }
+  .upload .office-page-fee-waiver-step2 { margin-top: 0; }
+
+  .office-upload-page .file-container { background-color: #fff6e5; }
+  .office-upload-page .da-upload-evidence-item { padding-top: 15px; padding-bottom: 5px; }
+
+  .btn-step1-validate { margin-right: 0!important; }
+
+  /* NOTE: Taken from intake.css */
+  .fee-waiver-error-container { max-width:900px; min-height: 40px; margin-bottom:15px; }
+  .fee-waiver-error { height: 40px; display: table-cell; vertical-align: middle; padding-right: 10px; }
+  .intake-radio-component .radio.payment-options label { display: block; margin: 10px 0 0 0; }
+
+
+  &--receipt {
+    .da-receipt-container { margin-top: 35px; margin-left:10px; }
+    .da-receipt-footer { margin-left: 10px; }
+  }
+}
+
+
+
+/* Mobile-only css */
+@media (max-width: 767px) {
+
+}

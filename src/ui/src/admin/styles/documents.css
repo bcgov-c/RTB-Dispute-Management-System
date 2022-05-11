@@ -1,0 +1,519 @@
+
+.documents-page .header-page-title { background: url('../static/Icon_Header_Documents.png') no-repeat !important; }
+
+
+.dispute-files-filters-container {
+  border-top: 0;
+  background-color: #f6f6f6;
+  padding: 0 15px 1px 15px;
+  display: flex;
+  flex-wrap: wrap;
+  height: fit-content;
+  min-height: 80px;
+  margin-top: -5px;
+}
+
+.add-file-button button {
+  color: #fff;
+  background-color: #335c85;
+  border-color: #335c85;
+  background-image: none;
+  margin-left: 10px;
+  padding: 8px 16px 6px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 0px;
+  top: 20px;
+  position: relative;
+}
+
+
+.file-type-container,
+.file-title-container,
+.file-custom-title-container,
+.file-provided-by-container { width: 250px; margin-right: 25px; margin-top: 5px; }
+
+.file-title-container { width: 400px; }
+
+.documents-page .standard-list-item { border-bottom: 1px solid #e5e5e5; }
+
+.outcome-documents-container .standard-list-empty { padding: 13px 0 40px 0;}
+.doc-requests-container .standard-list-empty { padding: 20px 0 40px 0; }
+.deficient-dispute-documents-list .standard-list-empty { padding: 13px 0 40px 0;}
+
+.standard-list-item .dispute-file-row { padding-right: 15px; }
+.dispute-file-row .dispute-file-contents { flex-grow: 1; }
+
+.dispute-file-contents .dispute-issue-evidence-item-inner { margin-bottom: 8px; }
+.document-list-items .standard-list-item:first-child .dispute-issue-evidence-item-inner { padding-top: 0; }
+
+.documents-page-legacy-service-portal-warning.warning { max-width: 100%; margin: 10px 0; padding: 12px 15px 10px 50px; }
+
+.outcome-documents-container .review-applicant-title.section-header { margin-top: -5px; }
+
+.documents-page .edit-file-icon { 
+  background: 0 0 url("../static/Icon_Edit.png") transparent no-repeat;
+  cursor: pointer;
+  min-width: 27px;
+  height: 27px;
+  margin-top: 15px;
+  margin-right: 10px;
+}
+
+.documents-page .delete-file-icon { 
+  background: 0 0 url("../static/Icon_AdminPage_Delete.png") transparent no-repeat;
+  cursor: pointer;
+  min-width: 27px;
+  height: 27px;
+  margin-top: 12px;
+}
+
+#documents-dispute-files { margin-bottom: 40px; }
+.dispute-documents-list .standard-list-empty { padding: 0; }
+.dispute-documents-list { margin-top: 20px; }
+
+.outcome-documents-container .context-container { margin-bottom: 30px; }
+
+.deficient-dispute-documents-list-container { margin-bottom: 0; }
+.dispute-doc-deficient-reason { padding-bottom: 5px; white-space: pre-wrap; }
+
+.deficient-dispute-documents-list .dispute-file-contents { margin-bottom: 0; }
+
+.outcome-documents-add-icon { background: url('../static/Icon_AdminPage_AddDocSet.png') no-repeat; }
+
+.outcome-doc-group .dispute-issue-evidence-submitted-info {
+  color: #8e8e8e;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dispute-outcome-doc-section-title-container { display: flex; justify-content: space-between; border-bottom: 2px solid #d2d2d2; margin-bottom: 5px; }
+.dispute-outcome-doc-section-title { font-size: 19px; display: inline-block; color: #b3afaf; padding: 0 0 5px 40px; }
+.dispute-outcome-doc-section-btn { float: right; }
+
+.dispute-outcome-doc-group-delivery-date-container { float:left; max-width: 305px; }
+.dispute-outcome-doc-group-delivery-date-icon {
+  background-image: url('../static/Icon_Header_Schedule.png');
+  background-repeat: no-repeat !important;
+  background-size: 30px;
+  height: 30px;
+  width: 30px;
+  display: inline-block;
+  margin-right: 10px;
+}
+.dispute-outcome-doc-group-delivery-date { display: inline-block; }
+
+.dispute-outcome-doc-group-delivery-status { float:right; display: flex; align-items: center; margin-top: 8px; }
+.dispute-outcome-doc-group-delivery-status > b { width: 23px; height: 21px; }
+.dispute-outcome-doc-group-delivery-status > .doc-group-delivery-checked {
+  background: url('../static/Admin_Icon_DeliverReadyCheck.png') no-repeat !important;
+  margin-right: 4px;
+}
+.dispute-outcome-doc-group-delivery-status > .doc-group-delivery-unchecked {
+  background: url('../static/Icon_Admin_DeliverNotReadyX.png') no-repeat !important;
+  margin-right: 2px;
+}
+.doc-group-delivery-date-text { color: #8e8e8e; }
+
+.dispute-outcome-doc-group-delivery-priority {
+  display: flex;
+  float: right;
+  margin-top: 8px;
+  margin-right: 20px;
+}
+.dispute-outcome-doc-group-delivery-priority > b { margin-right: 5px; }
+
+.documents-edit .dispute-outcome-doc-group-delivery-status,
+.documents-edit .dispute-outcome-doc-group-delivery-priority { margin-top: 24px; }
+
+.delivery-edit .dispute-outcome-doc-group-delivery-status,
+.delivery-edit .dispute-outcome-doc-group-delivery-priority { display: none; }
+
+
+.dispute-outcome-doc-group-different, .dispute-outcome-doc-group-noteworthy { float: left; margin-top: 24px; margin-right: 15px; }
+
+.dispute-outcome-doc-group-noteworthy-display {
+  float: left;
+  margin-top: 7px;
+  color: #eeb55a;
+  padding-left: 25px;
+  background-image: url('../static/Icon_FeedbackReminder.png');
+  background-repeat: no-repeat;
+  background-size: 20px;
+  line-height: 22px;
+  margin-left: 33px;
+}
+
+.documents-edit .dispute-outcome-doc-group-noteworthy-display,
+.delivery-edit .dispute-outcome-doc-group-noteworthy-display { display: none; }
+
+/* Dispute outcome files */
+.outcome-doc-delivery-other-delete-btn,
+.outcome-doc-file-delete-btn,
+.outcome-doc-file-uploads-delete-btn,
+.outcome-external-file-delete-btn {
+  display: none;
+  background: url('../static/Icon_AdminPage_Delete.png') no-repeat;
+  width: 28px;
+  height: 28px;
+  position: relative;
+  top: 25px;
+  left: 5px;
+}
+
+
+.dispute-outcome-doc-files-header,
+.dispute-outcome-doc-delivery-header {
+  display: flex;
+  color: #b3afaf;
+  border-bottom: 2px solid #d2d2d2;
+  margin-top: 18px;
+  line-height: 24px;
+}
+
+.dispute-outcome-doc-files-header > div { margin-right: 10px; }
+.dispute-outcome-doc-files-header > div:last-child { margin-right: 0; }
+.dispute-outcome-doc-files-header .outcome-doc-file-title { padding-left: 30px; background-size: 25px !important; background-repeat: no-repeat !important; }
+
+/* Add extra left margin to align header items with list items in display mode */
+.dispute-outcome-doc-files-header .outcome-doc-file-uploads-container { margin-left: 20px; }
+.dispute-outcome-doc-files-header > .outcome-doc-file-comment { margin-right: 20px; }
+.dispute-outcome-doc-files-header > .outcome-doc-file-source { text-align: right; }
+
+.outcome-doc-files-empty.dispute-outcome-doc-files-header > div:not(:first-child) { display: none; }
+
+.outcome-doc-file-title { max-width: 320px; min-width: 320px; white-space: pre-line !important; font-size: 17px; align-self: center !important; }
+.outcome-doc-file-title span { width: 100%; white-space: pre-line; }
+.outcome-doc-file-title .outcome-doc-file-delete-btn { top:0; left: 0; margin-right: 10px; align-self: center; }
+
+.outcome-doc-file-uploads-container { display: flex; flex-wrap: nowrap; justify-content: space-between; max-width: 315px; min-width: 315px; align-self: center !important; }
+.outcome-doc-file-uploads { display: inline-flex; max-width: 280px; min-width: 280px; }
+.outcome-doc-file-uploads-delete-btn { top: 10px; }
+.outcome-doc-file-status { display: none !important; }
+
+.outcome-doc-file-comment { flex-grow: 2; }
+.outcome-doc-file-source { max-width: 100px; min-width: 100px; }
+
+.outcome-doc-file-container { display: flex; justify-content: space-between; padding: 5px 0; }
+.outcome-doc-file-container > div { flex-direction: row; margin-right: 10px; align-self: center; }
+.outcome-doc-file-container .outcome-doc-file-title { line-height: 20px; }
+.outcome-doc-file-container .outcome-doc-file-comment { margin-right: 20px; width: 60%; white-space: break-spaces;}
+.outcome-doc-file-container .outcome-doc-file-source { margin-right: 0; width: fit-content; min-width: fit-content;}
+.outcome-doc-file-container > div:last-child { margin-right: 0; }
+.outcome-doc-file-container .outcome-external-file-container { border: none; width: 100%; }
+.outcome-doc-file-container .outcome-external-file-container .dispute-issue-evidence-file { display: inline; }
+.outcome-doc-file-container .outcome-external-file-delete-btn { display: none; }
+
+.dispute-outcome-doc-files-final,
+.dispute-outcome-doc-files-public,
+.dispute-outcome-doc-files-delivery,
+.dispute-outcome-doc-files-external { border-left: 15px solid #f1f1f1; padding-left: 5px; }
+
+/* Styles during edit */
+.documents-edit .outcome-doc-file-comment { white-space: normal; }
+.documents-edit .dispute-outcome-doc-files-final { padding-left: 15px; }
+.documents-edit .dispute-outcome-doc-group-delivery-date-icon { display: none; }
+.documents-edit .delivery-time-icon { display: none; }
+.documents-edit .dispute-outcome-doc-files-header > div:not(:first-child) { display: none; }
+.documents-edit .outcome-doc-file-container > div { align-self: center; }
+
+
+.documents-edit .outcome-doc-file-title { max-width: 240px; min-width: 240px; flex-grow: 1; display: flex; align-self: center; }
+.documents-edit .outcome-doc-file-delete-btn { display: inline-block; }
+.documents-edit .outcome-doc-file-uploads-delete-btn { display: inline-block; }
+.documents-edit .outcome-doc-file-source { max-width: 110px; min-width: 110px; top: -2px; position: relative; }
+.documents-edit .outcome-doc-file-visible { position: relative; bottom: 2px; }
+
+.documents-edit .outcome-doc-file-status,
+.documents-edit .outcome-doc-file-comment { top: -2px; position: relative; }
+
+.documents-edit .outcome-doc-group { margin-top: 0; }
+
+.dispute-outcome-writing-container { display: flex; }
+.dispute-outcome-writing-prep-time { margin-right: 10px; }
+.dispute-outcome-doc-group-delivery-date .form-control { width: 150px; min-width: 150px; }
+.dispute-outcome-writing-prep-time { min-width: 175px; width: 175px; }
+.dispute-outcome-writing-time .form-control{ min-width: 175px; width: 175px; }
+.dispute-outcome-writing-time { min-width: 300px; width: 300px; }
+.decision-complexity .form-control { min-width: 190px; width: 190px; }
+
+.dispute-outcome-doc-section-final .dispute-outcome-doc-files-header .outcome-doc-file-title { background-image: url('../static/Icon_Admin_OutcomeDoc_Final.png') !important; background-repeat: no-repeat !important; }
+.dispute-outcome-doc-section-public .dispute-outcome-doc-files-header .outcome-doc-file-title { background-image: url('../static/Icon_Admin_OutcomeDoc_Public.png') !important; background-repeat: no-repeat !important; }
+.dispute-outcome-doc-section-external .dispute-outcome-doc-files-header .outcome-doc-file-title { background-image: url('../static/Icon_Admin_OutcomeDoc_Working.png') !important; background-repeat: no-repeat !important; }
+
+.dispute-outcome-doc-section-btn { display: none; cursor: pointer; margin-top: 25px; padding: 5px 0 0 35px; }
+
+.documents-edit .dispute-outcome-doc-section-final .dispute-outcome-doc-section-title { display: inline-block; margin-top: 28px; }
+
+.dispute-outcome-doc-section-public .dispute-outcome-doc-section-btn,
+.dispute-outcome-doc-section-external .dispute-outcome-doc-section-btn {
+  display: inline-block;
+  margin-top: 0;
+  background: url('../static/Icon_Admin_WorkingDocAdd.png') no-repeat;
+  color: #3d608c;
+  margin-left: auto;
+  margin-bottom:3px;
+}
+
+.dispute-outcome-doc-section-public,
+.dispute-outcome-doc-section-delivery,
+.dispute-outcome-doc-section-external { margin-top: 30px; }
+
+.dispute-outcome-doc-section-checkbox .intake-checkbox-component:not(.disabled) label { font-weight: bold; color: #333; }
+
+.dispute-outcome-doc-files-external .outcome-external-file-container { border: none; display: inline-block; margin-right: 35px; }
+
+
+.other-doc-file .outcome-doc-file-source { display: none; }
+
+.outcome-doc-file-source-btn-container { display: none; width: 100px; min-width: fit-content; align-self: center !important; }
+.documents-edit .outcome-doc-file-source-btn-container { display: inline-block; }
+.outcome-doc-file-source-btn { margin: 10px auto 0 auto; display: flex; }
+
+.outcome-doc-file-visible { display: none; }
+.dispute-outcome-doc-section-public  .outcome-doc-file-visible { display: inline-block; }
+.dispute-outcome-doc-section-public  .outcome-doc-file-comment { display: none; }
+.dispute-outcome-doc-section-public .outcome-doc-file-status { margin-left: auto; }
+.dispute-outcome-doc-section-public .outcome-doc-file-visible { margin-right: auto; width: 145px; }
+
+.dispute-outcome-doc-section-public .dispute-outcome-doc-files-header .outcome-doc-file-status { position:relative; left: 20px; }
+
+
+
+/* Delivery styles */
+.dispute-outcome-doc-delivery-header {  }
+.dispute-outcome-doc-delivery-header > div { margin-right: 10px; align-self: flex-end; }
+.dispute-outcome-doc-delivery-header > div:last-child { margin-right: 0; }
+.dispute-outcome-doc-delivery-header .outcome-doc-delivery-sent-container { margin-right: 0; }
+/* Add extra left margin to align header items with list items in display mode */
+.dispute-outcome-doc-delivery-header .outcome-doc-delivery-inclusions-container { margin-left: 20px; }
+
+
+.dispute-outcome-doc-delivery-header .outcome-doc-delivery-name-container {
+  background-image: url('../static/Icon_Admin_OutcomeDoc_Deliver.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 25px !important;
+  padding-left: 30px;
+  height: 30px;
+  position: relative;
+  top: 8px;
+}
+
+.dispute-outcome-doc-group-add-other-delivery {
+  display: none;
+  margin-top: 0;
+  padding-left: 35px;
+  background: url('../static/Icon_AdminPage_AddDocSet.png') no-repeat;
+  color: #3d608c;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+#editDeliveryAddress_modal .modal-dialog { max-width: 900px; width: 100%; }
+.editDeliveryAddress_party .participant-address { width: 100%; }
+
+.editDeliveryAddress_party .participant-wrapper,
+.editDeliveryAddress_party .participant-business-name,
+.editDeliveryAddress_party .participant-name-section,
+.editDeliveryAddress_party .participant-name-section + .spacer-block-30,
+.editDeliveryAddress_party .participant-use-dispute-address-text,
+.editDeliveryAddress_party .participant-type,
+.editDeliveryAddress_party .participant-email,
+.editDeliveryAddress_party .participant-phone-container { display: none; }
+
+
+.outcome-doc-delivery-container { display: flex; padding: 5px 0; }
+.outcome-doc-delivery-container > div { flex-direction: row; margin-right: 10px; align-self: center; white-space: break-spaces;}
+.outcome-doc-delivery-container > div:last-child { margin-right: 0; }
+.outcome-doc-delivery-container .intake-checkbox-component { user-select: none; }
+.outcome-doc-delivery-container .intake-input-component.input-component-date input { max-width: 120px; }
+
+.outcome-doc-delivery-name-container { max-width: 250px; min-width: 250px; align-self: center !important; }
+.outcome-doc-delivery-name-container b {
+  display: inline-block;
+  background: url('../static/Icon_Admin_PrimaryApplicant.png') no-repeat !important;
+  height:16px;
+  width: 16px;
+  top: 2px;
+  position: relative;
+}
+.outcome-doc-delivery-name-container > div { overflow-x: hidden; text-overflow: ellipsis; overflow-x:hidden; padding-right: 5px; }
+
+.outcome-doc-delivery-inclusions-container {
+  display: flex;
+  align-self: flex-start;
+  min-width: 190px;
+  max-width: 190px;
+  display: inline-block;
+  white-space: pre-line !important;
+  margin: 15px 20px 0 0;
+}
+.delivery-edit .outcome-doc-delivery-inclusions-container { align-items: center; }
+.view .outcome-doc-delivery-inclusions-container { margin-top: 0; }
+
+.outcome-doc-delivery-inclusions { display: none; }
+.outcome-doc-delivery-method-container { display: flex; flex-grow: 1; margin-right: 20px !important; }
+.outcome-doc-delivery-method { min-width: 115px; max-width: 115px; }
+.outcome-doc-delivery-details-container { display: flex; flex-grow: 1; margin-right: 30px !important; }
+.outcome-doc-delivery-sent-container { display: flex; min-width: 150px; max-width: 150px; margin-left: auto; }
+.outcome-doc-delivery-is-sent { display: none; }
+.outcome-doc-delivery-is-sent span { padding-left: 35px!important; }
+.outcome-doc-delivery-delivery-date { display: none; min-width: 160px; width: 160px; }
+.outcome-doc-delivery-delivery-time { display: none; min-width: 160px; width: 160px; }
+
+.outcome-doc-delivery-delivery-date .error-block,
+.outcome-doc-delivery-delivery-time .error-block { white-space: pre-wrap; }
+
+.outcome-doc-delivery-sent-display--red { color: #bc3c3c; }
+.outcome-doc-delivery-sent-display--gray { color: #8e8e8e; }
+
+.dispute-outcome-doc-section-priority-container .radio-icon.disabled { opacity: 0.5; }
+
+.delivery-edit .dispute-outcome-doc-section-priority-container > span:last-child { position: relative; top: 6px; margin-left: 10px; color: #8e8e8e; }
+
+.delivery-edit .outcome-doc-delivery-method-display { display: none; }
+.delivery-edit .dispute-outcome-doc-group-add-other-delivery { display: inline-block; margin-right: 25px; margin-bottom: 5px; min-height: 26px; }
+.delivery-edit .outcome-doc-delivery-bulk-select { margin-left: 284px; display: inline-block; }
+.outcome-doc-delivery-bulk-select { display: none; }
+.delivery-edit .outcome-doc-delivery-method-mail-container { margin-top: 28px!important; }
+.delivery-edit:not(.delivery-sent-edit) .outcome-doc-delivery-method-mail-buttons { display: inline-block; }
+.outcome-doc-delivery-bulk-select span { color: #3d608c; }
+
+.delivery-edit .outcome-doc-delivery-method-email { margin-top: 28px; }
+.outcome-doc-delivery-method-email-edit { margin-top: 28px; min-width: fit-content; }
+.outcome-doc-delivery-missing-email { width: 100%; }
+
+/* Styles during delivery edit */
+.delivery-edit .dispute-outcome-doc-delivery-header > div:not(.dispute-outcome-doc-section-priority-container):not(.dispute-outcome-doc-section-checkbox):not(.dispute-outcome-doc-group-add-other-delivery):not(.outcome-doc-delivery-bulk-select) { display: none; }
+.delivery-edit .outcome-doc-delivery-container > div { align-self: flex-start; }
+.delivery-edit .outcome-doc-delivery-container > div, .delivery-edit .outcome-doc-delivery-details { white-space: normal; }
+
+.delivery-edit .outcome-doc-delivery-priority { display: inline-block; }
+.delivery-edit .dispute-outcome-doc-section-checkbox { display: inline-block; width: fit-content; align-content: flex-start; }
+.delivery-edit .dispute-outcome-doc-section-priority-container { display: flex; justify-content: flex-start; height: 38px; margin-right: 25px; }
+.delivery-edit .outcome-doc-delivery-inclusions { display: inline-block; }
+.delivery-edit .outcome-doc-delivery-inclusions-display { display: none; }
+.delivery-edit .outcome-doc-delivery-sent-display { display: none; }
+.delivery-edit .outcome-doc-delivery-sent-container { min-width: 420px; max-width: 420px; }
+.delivery-edit .outcome-doc-delivery-is-sent { margin-top: 20px; margin-right: 10px; display: inline-block; }
+.delivery-edit .outcome-doc-delivery-delivery-date { display: inline-block; margin-right: 5px; }
+.delivery-edit .outcome-doc-delivery-delivery-time { display: inline-block; }
+
+
+.delivery-edit .other-delivery .outcome-doc-delivery-other-delete-btn { display: inline-block; }
+.outcome-external-file-delete-btn { display: inline-block; top: -10px; left: 5px; }
+
+.outcome-doc-delivery-name { font-size: 17px;  }
+
+.outcome-doc-delivery-type { font-size: 14px; font-style: italic; color: #8e8e8e; }
+
+.outcome-doc-delivery-inclusions .intake-checkboxes-component .form-group { display: inline-block; }
+.outcome-doc-delivery-inclusions .intake-checkbox-component input[type="checkbox"] + span { margin-right: 10px; padding-left: 30px; }
+
+.outcome-doc-delivery-inclusions-display { width: 200px; white-space: pre-line; }
+.outcome-doc-delivery-method { margin-right: 10px; }
+
+.outcome-doc-delivery-method-display { margin-right: 10px; min-width: 50px; max-width: 50px; }
+
+.outcome-doc-delivery-method-email-container { display: flex; overflow: hidden; }
+.outcome-doc-delivery-method-email { margin-right: 10px; }
+
+.outcome-doc-delivery-method-email-input-container { display: flex; width: 600px }
+.outcome-doc-delivery-method-email-input { width: 315px; }
+.outcome-doc-delivery-method-email-buttons { display: flex; margin-top: 21px; }
+.outcome-doc-delivery-method-email-buttons > div:first-child { margin-right: 5px; }
+
+.outcome-doc-delivery-method-mail-container { display: flex; overflow: hidden; }
+
+.outcome-doc-delivery-method-email,
+.outcome-doc-delivery-method-mail { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; margin-right: 8px; }
+
+.outcome-doc-delivery-method-mail-buttons { display: none; min-width: fit-content; }
+.outcome-doc-delivery-method-mail-buttons > span:not(:last-child) { margin-right: 5px; }
+.outcome-doc-delivery-method-mail-buttons-separator { border-left: 1px solid #333; height: 20px; position:relative; }
+
+.outcome-doc-delivery-details-container { margin-top: 0px; }
+.outcome-doc-delivery-sent-container { margin-top: 0px; }
+
+.outcome-doc-delivery-details { display: inline-block; flex-grow: 1; white-space: break-spaces;}
+.outcome-doc-delivery-details .rtb-editable-component-label { min-width: 65px; }
+
+.delivery-sent-edit .dispute-outcome-doc-group-add-other-delivery,
+.delivery-sent-edit .dispute-outcome-doc-section-priority-container,
+.delivery-sent-edit .dispute-outcome-doc-section-checkbox { display: none !important; }
+
+.other-delivery .outcome-doc-delivery-inclusions-container,
+.other-delivery .outcome-doc-delivery-method { display: none; }
+
+#addOutcomeDocSet_modal .modal-dialog { width: 1000px; }
+.addOutcomeDocSet_top-container { display: flex; justify-content: space-between; }
+.addOutcomeDocSet_instructions { margin: 15px 0; }
+
+#addOutcomePublicDoc_modal .modal-dialog { width: 700px; }
+#addOutcomePublicDoc_modal .addOutcomeDocFile_inputs { align-items: flex-start; margin-top: 20px; }
+.addOutcomePublicDoc-visible { width: 125px; }
+.addOutcomePublicDoc-status { width: 200px; }
+.addOutcomePublicDoc-buttons { margin-top: 20px; }
+
+.addOutcomeDocFile_inputs { display: flex; flex-wrap: wrap; margin-bottom: 30px; }
+#addOutcomeDocFile_checkboxes { display: block; width: 100%; }
+.addOutcomeDocFile_checkboxes-other { display: flex; margin-left: 40px; }
+.addOutcomeDocFile_checkboxes-other > div:first-child { margin-right: 20px; }
+#addOutcomeDocFile_title { max-width: 360px; }
+#addOutcomeDocFile_acronym { min-width: 120px; }
+#addOutcomeDocFile_acronym input { width: 100px; }
+#addOutcomeDocDelivery_document select { width: 100px; }
+
+/* Generate conclusion */
+#decision-preview .content_container { margin: 0 auto; }
+.dispute-outcome-doc-section-external .outcome-external-file-container .dispute-issue-evidence-content { display: inline-block; }
+
+
+.primary-outcome-doc-groups .review-applicant-title.section-header { margin-top: -5px; }
+.primary-outcome-doc-groups .context-menu-title > b {
+  background: url('../static/Icon_Admin_PrimDocLink.png') no-repeat;
+  height: 23px;
+  width: 13px;
+  float: left;
+  margin-right: 10px;
+}
+
+.primary-outcome-doc-group { padding: 20px 0; border-bottom: 1px solid #d2d2d2; }
+.primary-outcome-doc-group:first-child { padding-top:0; }
+.primary-outcome-doc-group:last-child { border-bottom: none; }
+.primary-outcome-doc-group .dispute-outcome-doc-group-delivery-date-icon {
+  background-image: url('../static/Icon_Admin_PrimDocDate.png');
+  background-size: 24px;
+  margin-right: 5px;
+  top: 2px;
+  position: relative;
+}
+
+.delivery-time-icon {
+  background-image: url('../../core/static/Icon_Hearing_Time.png');
+  background-repeat: no-repeat !important;
+  background-size: 24px;
+  height: 24px;
+  width: 24px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+
+.primary-outcome-doc-group__top-row { display: flex; line-height: 30px; }
+.primary-outcome-doc-group__date { display: flex; align-items: center; margin-top: 0; }
+.primary-outcome-doc-group__primary-link {
+  background: url('../static/Icon_Admin_PrimDocGo.png') no-repeat;
+  background-position: left;
+  padding-left: 25px;
+  margin: 0 50px 0 40px;
+}
+.primary-outcome-doc-group__doc { display: flex; margin: 5px 0; }
+.primary-outcome-doc-group__doc-file { display: flex; }
+.primary-outcome-doc-group__doc-file > i { color: #8b8b8b; }
+.primary-outcome-doc-group__file { margin-right: 5px; }
+.primary-outcome-doc-group__file-size { color: #8b8b8b; font-size: 16px; }

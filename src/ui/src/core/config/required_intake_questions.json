@@ -1,0 +1,135 @@
+{
+  "intake_questions": [
+    {
+      "question_name": "S1_HomeOrTrailer",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_RentalUnit",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_OwnerOfMH",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_StartDateQuestion",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_SecurityDepositQuestion",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_PetDepositQuestion",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_LegacyDateAccept",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S1_HasCounterDispute",
+      "answer": null,
+      "group_id": 0
+    },
+    {
+      "question_name": "S2_ApplicantCount",
+      "answer": null,
+      "group_id": 1
+    },
+    {
+      "question_name": "S2_HasAgent",
+      "answer": null,
+      "group_id": 1
+    },
+    {
+      "question_name": "S2_AssistantCount",
+      "answer": null,
+      "group_id": 1
+    },
+    {
+      "question_name": "S3_RespondentCount",
+      "answer": null,
+      "group_id": 2
+    },
+
+    {
+      "question_name": "S5_LandlordUrgentIssue",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_LandlordDirectRequest",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_LandlordSeekingMoveOut",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_LandlordSeekingMoney",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantUrgentPossession",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantUrgentRepairs",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantDirectRequest",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingMoveOut",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantFilingLate",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingMoney",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingRepairs",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingService",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingRestriction",
+      "answer": null,
+      "group_id": 5
+    },
+    {
+      "question_name": "S5_TenantSeekingOther",
+      "answer": null,
+      "group_id": 5
+    }
+  ]
+}

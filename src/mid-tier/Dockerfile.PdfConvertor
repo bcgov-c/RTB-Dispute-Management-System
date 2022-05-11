@@ -1,0 +1,41 @@
+﻿FROM microsoft/dotnet:2.2-sdk
+
+WORKDIR /src
+
+COPY CM.Common.Utilities/CM.Common.Utilities.csproj CM.Common.Utilities/
+COPY CM.Messages/CM.Messages.csproj CM.Messages/
+COPY CM.Services/PdfConvertor/PdfService/PdfService.csproj CM.Services/PdfConvertor/PdfService/
+COPY CM.Data.Repositories/CM.Data.Repositories.csproj CM.Data.Repositories/
+COPY CM.Data.Model.Postgres/CM.Data.Model.Postgres.csproj CM.Data.Model.Postgres/
+COPY CM.UserResolverService/CM.UserResolverService.csproj CM.UserResolverService/
+COPY CM.Business.Entities/CM.Business.Entities.csproj CM.Business.Entities/
+
+WORKDIR /src/CM.Services/PdfConvertor/PdfService/
+
+RUN dotnet restore -nowarn:msb3202,nu1503
+
+WORKDIR /src
+
+COPY . .
+
+WORKDIR /src/CM.Services/PdfConvertor/PdfService/
+
+RUN dotnet publish -c Release -o /app
+
+FROM microsoft/dotnet:2.2-sdk
+RUN apt-get update
+RUN apt-get upgrade -y
+
+# Download and install wkhtmltopdf
+RUN apt-get install -y build-essential xorg libssl-dev libxrender-dev wget gdebi
+
+RUN wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
+RUN tar vxf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz 
+RUN cp wkhtmltox/bin/wk* /usr/local/bin/
+
+ENV ASPNETCORE_URLS=http://+:8080
+
+WORKDIR /app
+COPY --from=0 /app .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "PdfService.dll"]

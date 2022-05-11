@@ -1,0 +1,27 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Build Image') {
+      steps {
+        openshiftBuild(bldCfg: 'case-management-ui', namespace: 'rtb-dms-tools', waitTime: '12000000')
+      }
+    }
+    stage('Deliver to Dev') {
+      steps {
+        openshiftDeploy(depCfg: 'case-management-ui', namespace: 'rtb-dms-dev', waitTime: '12000000')
+      }
+    }
+  }
+
+  post {
+    failure {
+        mail (to: 'mikeharlow@hive1-cs.com', subject: "FYI: Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) failed", body: "Job failed. See ${env.BUILD_URL} for details. ");
+        mail (to: 'tigranarakelyan@hive1-cs.com', subject: "FYI: Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) failed", body: "Job failed. See ${env.BUILD_URL} for details. ");
+    }
+    success {
+        mail (to: 'mikeharlow@hive1-cs.com', subject: "FYI: Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) deployed to dev", body: "Deploy job succeeded. See ${env.BUILD_URL} for details. ");
+        mail (to: 'tigranarakelyan@hive1-cs.com', subject: "FYI: Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) deployed to dev", body: "Deploy job succeeded. See ${env.BUILD_URL} for details. ");
+    }
+  }
+}

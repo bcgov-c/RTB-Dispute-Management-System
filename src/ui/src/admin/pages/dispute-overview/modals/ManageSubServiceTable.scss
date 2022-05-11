@@ -1,0 +1,64 @@
+.sub-serv-table {
+  &__header {
+    display: flex;
+  }
+
+  &__row {
+    display: flex;
+
+    &--active {
+      background-color: #dbeaf6;
+      border-left: 5px #2772be solid;
+      margin-left: -5px;
+    }
+  }
+
+  &__requested-by {
+    width: 260px;
+  }
+
+  &__source {
+    width: 100px;
+  }
+
+  &__requested-date {
+    width: 150px;
+  }
+
+  &__service-to {
+    width: 260px;
+  }
+
+  &__documents {
+    width: 280px;
+  }
+
+  &__status {
+    display: flex;
+    justify-content: space-between;
+    width: 112px;
+
+    &__img {
+      width: 25px;
+      height: 24px;
+    }
+  }
+
+  .standard-list-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 3px 5px 3px;
+    border-bottom: 1px #e5e5e5 solid;
+    cursor: pointer;
+  }
+
+  .standard-list-item:hover {
+    background-color: #dbeaf6;
+  }
+
+  .standard-list-item:active {
+    background-color: #dbeaf6;
+  }
+
+  .standard-list-items { margin-top: 0; }
+}

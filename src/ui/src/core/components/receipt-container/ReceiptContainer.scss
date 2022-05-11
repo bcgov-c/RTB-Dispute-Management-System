@@ -1,0 +1,111 @@
+.receipt-container {
+  font-size: 16px; 
+  line-height:21px;
+  color:#292929;
+  -webkit-text-size-adjust: 100%; 
+  font-family: Arial, Helvetica, sans-serif;
+
+  &__img {
+    position: relative;
+    bottom: 3px;
+  }
+
+  &__thank-you {
+    margin-top: 25px;
+    font-size: 17px;
+
+    &__title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+  }
+
+  &__content {
+    border: 2px solid #dbdbdb;
+
+    &__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      background-color:  #dbdbdb;
+      padding: 10px;
+    }
+
+    &__buttons {
+      display: flex;
+
+      &__button {
+        width: 75px;
+        height: 40px;
+
+        &--print {
+          @extend .receipt-container__content__buttons__button;
+          margin-left: 10px;
+        }
+      }
+
+      &__link {
+        align-self: center;
+        margin-right: 10px;
+        min-width:fit-content;
+        white-space: nowrap;
+      }
+    }
+
+    &__html {
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    // Don't show any of the email-only titles in the receipt container preview
+    .visible-email { display: none !important; }
+
+  }
+
+  // body { margin: 0; padding: 0; color:#292929; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; font-family: Arial, Helvetica, sans-serif; background: #F0F0F0; font-size: 16px; line-height:21px;} should be applied at top level
+  table { border-spacing: 0; } 
+  table td { border-collapse: collapse; } 
+  .hidemobile { display: inline-block; } 
+  .showmobile { display: none; }  
+  table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; } 
+  img { -ms-interpolation-mode: bicubic; } 
+  td .header { padding-top: 10px; padding-left: 14px; padding-bottom: 10px; background-color: #003366; border-bottom: 1px solid #fcba19; } 
+  td .subheader { height: 25px; padding: 4px 4px 4px 14px; background-color: #38598a; color: #e2e9f3; font-size: 15px; font-style: normal; } 
+  td .subheader .p { color: #e2e9f3; font-size: 15px; padding: 0px 0px 0px 0px; margin: 0px; font-style: normal; }  
+  table.footer-items { border-collapse: separate; border-spacing: 0px; font-size: 15px; margin-top: 15px; } 
+  .footer a { color: #aaaaaa !important; text-decoration: underline; } 
+  td.footer { margin:0px; padding-top:5px; } 
+  td.footer-text { color: #989898; font-weight: normal; font-size: 14px !important; margin: 0px; padding: 2px 0px 3px 0px; } 
+  a:link { color: #aaaaaa !important; text-decoration: underline; } 
+  a:visited { color: #aaaaaa !important; text-decoration: underline; } 
+  a:hover { color: #aaaaaa !important; text-decoration: underline; } 
+  a:active { color: #aaaaaa !important; text-decoration: underline; } 
+}
+
+@media print {
+  .receipt-container {
+    &__content {
+      border: none;
+
+      &__title {
+        display: none;
+      }
+
+      &__html {
+        padding: 0;
+      }
+    }
+
+    &__thank-you {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) { 
+  .showmobile { display: inline-block; } 
+  .hidemobile { display: none!important; } 
+}

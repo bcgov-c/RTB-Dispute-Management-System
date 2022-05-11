@@ -1,0 +1,88 @@
+{
+  "CEU_TYPE_RTA": 1,
+  "CEU_TYPE_MHPTA": 2,
+  "CEU_SUB_TYPE_LANDLORD": 1,
+  "CEU_SUB_TYPE_TENANT": 0,
+
+  "CEU_URGENCY_EMERGENCY": 1,
+  "CEU_URGENCY_STANDARD": 2,
+  "CEU_URGENCY_DEFERRED": 3,
+  "CEU_URGENCY_DISPLAY": {
+    "0": "Not Determined",
+    "1": "Emergency",
+    "2": "Standard",
+    "3": "Deferred"
+  },
+
+  "CEU_ISSUE_SEVERITY_LOW": 1,
+  "CEU_ISSUE_SEVERITY_LOW_MED": 2,
+  "CEU_ISSUE_SEVERITY_MED": 3,
+  "CEU_ISSUE_SEVERITY_MED_HIGH": 4,
+  "CEU_ISSUE_SEVERITY_HIGH": 5,
+
+  "CEU_STATUS_PENDING": 1,
+  "CEU_STATUS_SUBMITTED": 2,
+  "CEU_STATUS_PROCESSED": 3,
+  "CEU_STATUS_COMPLETED": 4,
+  "CEU_STATUS_DISPLAY": {
+    "1": "Pending",
+    "2": "Submitted",
+    "3": "Processed",
+    "4": "Completed"
+  },
+
+  "CEU_SUBMITTED_BY_THIRD_PARTY": 1,
+  "CEU_SUBMITTED_BY_LANDLORD_TENANT": 2,
+
+  "CEU_PARTICIPANT_ROLE_APPLICANT": 1,
+  "CEU_PARTICIPANT_ROLE_RESPONDENT": 2,
+  "CEU_PARTICIPANT_CONTACT_NONE": 8,
+
+  "CEU_CONTACT_METHOD_PHONE": 1,
+  "CEU_CONTACT_METHOD_EMAIL": 2,
+
+  "CEU_PARTICIPANT_TYPE_DISPLAYS": {
+    "1": "Individual",
+    "2": "Business",
+    "3": "Agent or Assistant",
+    "4": "Advocate or Legal Counsel",
+    "5": "Government or Municipal Agency",
+    "6": "Police or Fire Department",
+    "7": "Property Manager",
+    "8": "Other"
+  },
+  
+  "CEU_PARTICIPANT_TYPE_AGENT": 3,
+  "CEU_PARTICIPANT_TYPE_PROPERTY_MANAGER": 7,
+  "CEU_PARTICIPANT_TYPE_OTHER": 8,
+  "CEU_PARTICIPANT_TYPES_SUBMITTER": [3,4,5,6,8],
+  "CEU_PARTICIPANT_TYPES_TT": [1,2],
+  "CEU_PARTICIPANT_TYPES_LL": [1,2],
+
+  "CEU_DMS_FILE_STATUS_DISPLAYS": {
+    "1": "Open",
+    "2": "Closed",
+    "3": "Unknown"
+  },
+  "CMS_DMS_FILE_STATUS_CLOSED": 2,
+
+  "CMS_WITNESS_TYPE_DISPLAYS": {
+    "1": "Individual Person",
+    "2": "Advocate or Agency",
+    "3": "Business",
+    "4": "Police, Fire, or Government Agency"
+  },
+  "CEU_WITNESS_TYPE_INDIVIDUAL": 1,
+  "CMS_WITNESS_TYPES_WITH_BUSINESS_NAME": [2,3,4],
+
+  "CEU_EVIDENCE_METHODS_DISPLAY": {
+    "100": "I will upload it now (recommended)",
+    "101": "I can provide it later",
+    "103": "I will mail it",
+    "104": "I will drop it off",
+    "105": "I don't have it"
+  },
+
+  "CEU_MIN_RESPONDENT_AGE": 16,
+  "CEU_ISSUE_LATEST_OCCURRENCE_MAX_YEARS": 2
+}

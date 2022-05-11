@@ -1,0 +1,49 @@
+$ICON-BUTTON-BACK-URL: url('../../../core/static/Icon_Back.png');
+
+.da-review {
+  height: 100%;
+
+  &__buttons {
+    
+    &__next {
+      height: 40px;
+      background-size: 28px;
+      padding: 3px 15px 0 45px!important;
+      outline:none;
+
+      &--step3 {
+        @extend .da-review__buttons__next;
+
+        &:before {
+          content: "Submit"
+        }
+      }
+
+      &--step2 {
+        @extend .da-review__buttons__next;
+      }
+    }
+
+    &__back {
+      @extend .da-review__buttons__next;
+      margin-right: 5px!important;
+      
+      background-image: $ICON-BUTTON-BACK-URL !important;
+    }
+  }
+
+  .file-container {
+    background-color: #fff6e5;
+  }
+} 
+
+// NOTE: Is there a downside in supporting many n mobile breakpoints?
+@media only screen and (max-width: 420px) {
+  .da-review {
+    &__buttons__next--step3 {
+      &:before {
+        content: "Submit"
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+pipeline {
+  agent any
+
+  environment {
+    dotnet = 'dotnet.exe'
+    ROOT_FOLDER = 'D:/inetpub/wwwroot/ext/dms-preprod/ui'
+    TEMP_FOLDER = 'D:/Temp'
+    BACKUP_FOLDER = 'D:/dms-build-backup'
+  }
+
+  stages {
+    stage('Confirmation') {
+      input {
+        message "Are you sure you want to deploy to PrePROD?"
+        ok "Yes"
+      }
+      steps {
+          echo "proceeding..."
+      }
+    }
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Install dependencies') {
+      steps {
+        bat "yarn install --ignore-engines"
+      }
+    }
+    stage('Build') {
+      steps {
+        bat 'yarn build:preprod'
+      }
+    }
+
+    stage('Configuration') {
+      steps {
+        dir("${env.ROOT_FOLDER}"){
+          configFileProvider([configFile(fileId: 'preprod-ui-configuration.json', targetLocation: 'siteconfig')]) {}
+        }
+      }
+    }
+
+
+    stage('Remove old backup') {
+      steps {
+        dir("${env.BACKUP_FOLDER}"){
+          fileOperations([
+            folderDeleteOperation("dms-preprod-ui"),
+            folderCreateOperation("dms-preprod-ui")
+          ])
+        }
+      }
+    }
+
+    stage('Backup') {
+      steps {
+        fileOperations([
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-preprod-ui")
+        ])
+      }
+    }
+
+    stage('Cleanup') {
+      steps {
+        dir("${env.ROOT_FOLDER}"){
+          fileOperations([
+            folderDeleteOperation("Admin"),
+            folderDeleteOperation("DisputeAccess"),
+            folderDeleteOperation("Intake"),
+            folderDeleteOperation("OfficeSubmission"),
+            folderDeleteOperation("AdditionalLandlordIntake"),
+            folderDeleteOperation("PostedDecisions"),
+            folderDeleteOperation("Common"),
+            folderDeleteOperation("CeuIntake")
+          ])
+        }
+      }
+    }
+
+    stage('Deploy') {
+      steps {
+        fileOperations([
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/Admin", sourceFolderPath: 'public/Admin'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/DisputeAccess", sourceFolderPath: 'public/DisputeAccess'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/Intake", sourceFolderPath: 'public/Intake'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/OfficeSubmission", sourceFolderPath: 'public/OfficeSubmission'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/AdditionalLandlordIntake", sourceFolderPath: 'public/AdditionalLandlordIntake'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/PostedDecisions", sourceFolderPath: 'public/PostedDecisions'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/Common", sourceFolderPath: 'src/common'),
+          folderCopyOperation(destinationFolderPath: "${env.ROOT_FOLDER}/CeuIntake", sourceFolderPath: 'public/CeuIntake')
+        ])
+      }
+    }
+  }
+  post {
+    always {
+      cleanWs()
+
+      echo 'I will always say Hello again!'
+
+      emailext body: "${currentBuild.currentResult}: Job ${env.JOB_NAME} build ${env.BUILD_NUMBER}\n More info at: ${env.BUILD_URL}",
+        recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+        subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}"
+    }
+  }
+}
+

@@ -1,0 +1,244 @@
+@import '../../../assets/styles/common.scss';
+/*
+    &__input {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+
+    &__label {
+      width: 300px;
+      margin-top: 30px;
+*/
+.decision-search {
+  margin: 20px 0;
+  font-size: 17px;
+
+  &__input {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+
+    &__label {
+      width: 300px;
+      margin-top: 28px;
+      font-size: 17px;
+      color: #585858;
+
+      &--inline {
+        @extend .decision-search__input__label;
+        width: auto;
+        margin-right: 5px;
+      }
+    }
+
+    &__checkbox-label {
+      @extend .decision-search__input__label;
+      margin-top: 24px;
+    }
+
+    &__business-name {
+      width: 322px;
+      margin-right: 20px;
+    }
+
+    &__applicant, &__rental-type,  &__tenancy-status, &__resolution-process, &__attendance {
+      width: 320px;
+    }
+
+    &__wrapper {
+      display: flex;
+    }
+
+    &__rental-type {
+      margin-right: 20px;
+    }
+
+    &__specific-issue__img {
+      margin: 0 20px 3px 5px;
+    }
+  }
+
+  &__issue {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-top: 29px;
+    max-width: 621px;
+
+    &__checkbox {
+      display: flex;
+      align-items: center;
+      width: 300px;
+    }
+
+    &__add {
+      color: #347ab7;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+  
+      &__image {
+        margin-right: 5px;
+      }
+
+      &__text {
+        margin-top: 2px;
+      }
+    }
+
+    &__tip {
+      color: #b4b2b2;
+      margin-top: 28px;
+
+      &__title {
+        margin: 0 5px;
+        font-weight: bold;
+      }
+
+      &__text {
+        display: flex;
+        align-items: center;
+      }
+
+      &__body {
+        font-weight: normal;
+        margin: 0;
+      }
+    }
+  }
+
+  &__decision-date {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1500px;
+    padding-top: 10px;
+
+    &__date-checkbox {
+      width: 300px;
+      min-width: 300px;
+      margin-top: 24px;
+    }
+
+    &__date-dropdown {
+      min-width: 216px;
+      margin-right: 20px;
+    }
+
+    &__date-text {
+      width: 27px;
+      min-width: 27px;
+      margin: 32px 10px 0 10px;
+      display: flex;
+      align-items: center;
+      height: 20px;
+    }
+
+    &__date-before, &__date-after {
+      width: 180px;
+      min-width: 180px;
+    }
+  }
+
+  &__chosen-issues {
+    margin: 10px 0 10px 30px;
+
+    &__issue {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 17px;
+      padding: 5px 0;
+      border-top: 1px solid #e4e4e4;
+      border-bottom: 1px solid #e4e4e4;
+      width: 100%;
+
+      &__wrapper {
+        display: flex;
+        flex-direction: column;
+      }
+
+      &__index {
+        color: #b4b2b2;
+      }
+
+      &__img {
+        cursor: pointer;
+      }
+    }
+  }
+
+  &__free-text {
+    max-width: 1000px;
+  }
+}
+
+@media only screen and (max-width: 880px) {
+  .decision-search {
+    &__input, &__issue, &__decision-date, &__input__wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__issue__tip {
+      margin-left: 0;
+
+      &__img {
+        display: none;
+      }
+    }
+
+    &__decision-date {
+      &__date-after {
+        margin-left: 0;
+      }
+
+      &__date-text {
+        margin: 0;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1171px) {
+  .decision-search__input__label--inline {
+    width: 300px;
+    margin-right: 0;
+  }
+}
+
+@media only screen and (max-width: 880px) {
+  .decision-search__decision-date__date-text { display: none; }
+}
+
+@media only screen and (max-width: 767px) {
+  .decision-search {//decision-search__input
+    &__input {
+      padding: 0;
+
+      label {
+        font-size: 17px;
+      }
+    }
+
+    &__chosen-issues {
+      margin-left: 0;
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .decision-search__input {
+    &__applicant, &__rental-type,  &__tenancy-status, &__resolution-process, &__attendance {
+      width: 300px;
+    }
+    
+    &__business-name {
+      width: 300px;
+
+      p {
+        line-height: 20px
+      }
+    }
+  }
+}

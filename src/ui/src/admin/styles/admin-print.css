@@ -1,0 +1,285 @@
+@media print {
+  
+  /*
+  @page {
+    size: A4 portrait;
+    max-height:100%;
+    max-width:100%
+  }
+  */
+
+  #dispute-parties-info .context-container,
+  .dispute-issue-evidence-content,
+  #task-list .standard-list-item,
+  .dispute-party-column,
+  .dispute-outcome-doc-files-public,
+  .dispute-outcome-doc-files-final,
+  .standard-list-item,
+  .page-section-title-container
+   {
+    break-inside: avoid;
+  }
+
+  @page {
+    size: A4 portrait;
+    max-height:100%;
+    max-width:100%;
+    margin: 50px;
+  }
+  
+  #mainview-content { left:0; padding-bottom:10px; width: 1000px!important; }
+  .page-section-title-container { padding-left: 0!important; }
+  .page-view { position: relative; padding: 0; min-width: unset !important; max-width: 1000px!important; overflow-y: visible; }
+
+  .subpage-header-action-container { display: none; }
+  .dispute-section-title-add { display: none; }
+
+  .dispute-overview-refresh-text { display: flex; justify-content: space-between; }
+  .dispute-overview-refresh-text > span:nth-child(1) { margin-right: 15px; }
+
+  .general-link { display: none; }
+
+  .context-container-with-notes .has-notes-column { padding-right: 0!important; }
+
+  .amendment-icon { display: none !important; }
+
+  .print-filter-text { font-size: 17px; }
+
+  /* Dispute page css */
+  .review-status-icon { display: none; }
+  .review-information-body { overflow-y: hidden; margin-bottom: 10px; }
+  .dispute-overview-header { border: none; position: relative; top: 70px; }
+  #dispute-overview-upper-bar { margin: 0; }
+  .dispute-remedy-hearing-tools-container .hearing-tools-container { display: none; }
+  .dispute-claim-outcome-display { display: block !important; }
+  .show-thumbnails .file-card-image img { position: relative; top: 1px; }
+  .dispute-general-info-title { display: none !important; }
+
+  .amendment-toggle-minimal .amendment-full-container { display: flex; }
+  .amendment-toggle-minimal .amendment-minimal-container { display: none; }
+  .amendment-toggle-minimal .dispute-amendment-change-html { margin-bottom: 15px; display: flex; justify-content: space-between; }
+  .dispute-claim-outcome-display-img { display: none; }
+
+  /* Evidence page */
+  .dispute-notice-service-name > span { margin-left: 0!important; }
+  .service-view .dispute-notice-service-name { min-width: 200px; width: 200px; }
+  .service-view .dispute-notice-service-details-container + div { margin-left: 200px!important; }
+  .evidence-page .hearing-tools-container { border: none; }
+  .evidence-page .hearing-tools-edit { display: none; }
+
+  /* Hearing page */
+  .hearing-participant-hearing-attendance { display: contents!important; }
+
+  /* Task page */
+  .header-page-title-container { display: none!important; }
+  .task-list-item .task-details-column { min-width: 370px; width: 370px; margin-right: 0; }
+  .task-due-time { display: none; }
+  .task-list-due-date { width: 100% !important; }
+  .task-list-item .task-due-column { min-width: 180px !important; width: 180px !important;}
+  .task-list-item .task-completed-column { min-width: 150px; width: 150px; }
+  .task-complete-checkbox { display: none; }
+
+  /* Communications page */
+  .communication-page .recipient-column { min-width: 220px !important; width: 220px !important; }
+  .communication-page .subject-column { min-width: 300px; width: 300px; }
+  .communication-page .email-created-column { min-width: 170px; width: 170px; }
+  #comm-pickups .subject-column { min-width: 200px; width: 200px; }
+  #comm-emails .send-status-column { min-width: 240px; width: 240px;}
+  .communication-receipt__created-column { min-width: 200px!important; width: 200px!important;}
+  .communication-receipt__participant-column { width: 260px!important; min-width: 260px!important; }
+  .communication-receipt__site-column { min-width: 170px!important; width: 170px!important; }
+
+  /* Payments page */
+  .dispute-fee-paid-icon-and-label, .dispute-fee-not-paid-icon-and-label { padding-left: 0; }
+
+  /* History Page */
+  .history-page-icon { padding-left: 0; }
+  .status-stats-container { padding-left: 0; }
+  .history-page .audit-filters label { padding-left: 0!important; }
+  .audit-log-print-wrapper { display: flex!important; flex-direction: column; }
+  .audit-view-details-header { display: none; }
+  .hearing-info-display-container { width: 490px!important; }
+  .hearing-recording .review-label { width: 84px!important; min-width: 84px!important; }
+
+  /* Notice Page */
+  .hearing-tools-container { border: none; }
+  .hearing-tools-edit { display: none; }
+  .service-type, .respondent-notice-delivery-method, .respondent-notice-delivery-date, .respondent-notice-received-date { margin-right: 15px; }
+  .notice-sub-service-print { display: inline-flex; font-size: 17px; padding-left: 10px; }
+  .hearing-tools-header.service-view { padding-left: 0!important; }
+
+  /* Documents Page */
+  .dispute-outcome-doc-group-delivery-date-icon, .delivery-time-icon { display: none; }
+  .outcome-doc-file-source {     
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+  .doc-request__select { min-width: 500px; }
+  .documents-page .help-icon { display: none; }
+  .admin-banner__thumbnails { display: none; }
+  .dispute-outcome-doc-section-btn { display: none !important; }
+  .doc-request-item__left, .doc-request-item__right { width: 48% !important;}
+  .dispute-documents-list { margin-top: 0; }
+
+  /* Scheduling */
+  .schedule-request__status-column, .schedule-request__start-column, .schedule-request__created-column, .schedule-request__end-column { min-width: 152px!important; width: 152px!important; }
+  .schedule-request__edit-column { display: none!important; }
+  .my-schedule-filters input { border: none; padding: 0; }
+  .my-schedule-filters .input-group-addon { display: none; }
+  .my-schedule-filters .my-schedule-filters-filter-text::after {
+    content: ":";
+  }
+  .my-schedule-filters .filter-region select { border: none; padding: 0; }
+  .my-schedule-filters select, .my-schedule-calendar-myschedule select, .my-schedule-calendar-arbitrator select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    border: none;
+    font-weight: bold;
+  }
+  .my-schedule-calendar-myschedule { border: none; padding: 0; }
+
+  .history-schedule .form-control-label { font-weight: bold; }
+  .history-schedule-view-type select, .history-schedule-sub-schedulers select, .history-schedule-sub-arbs select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    border: none;
+    padding: 0;
+  }
+  .history-schedule-sub-dispute input, .history-schedule-sub-date input { border: none; padding: 0; }
+  .history-schedule .input-group-addon { display: none; }
+  .history-schedule-sub-inactive-staff { display: none; }
+
+  .calendar-grid-event-menu { display: none; }
+  .calendar-grid-event { padding-left: 0; padding-right: 0;}
+  .calendar-grid-event-text { text-align: center !important; }
+
+  .calendar-grid-time-item--block-start-offset,
+  .calendar-grid-time-item--block-end-offset { display: none; }
+
+  .sm-page__sub-view .schedule-request { margin-top: 95px!important; }
+  .schedule-manager-request__submitter-column { width: 190px!important; }
+  .my-schedule-page .general-filters-row-schedule-request { padding-left: 0!important; }
+  
+  .evidence-page-filters-container { display: none; }
+
+  .tasks-sort-by-filters { display: none; }
+
+  .tasks-type-filters { display: none; }
+  .task-due-column .task-due-time { display: none; }
+  .task-owner-column .task-owner-column-assign-link { display: none; } 
+  .task-list, #task-list { width: 115%; }
+  .task-show-more { display: none; }
+  .tasks-page .general-filters-row { display: none; }
+
+  .comm-note-edit-container { display: none; }
+  .communication-page .general-filters-row { display: none; }
+  .communication-page .note-column { max-width: 400px; min-width: 0; }
+
+  .audit-filters input { display: none; }
+  .audit-filters .radio label { margin-left: 0; }
+  .audit-filters .intake-radio-component label > span { display: none; }
+  .audit-filters input[checked=checked] + span { display: block !important; padding-left:0; }
+
+
+  /* NOTE: Hide comments and details on documents for first release */
+  .outcome-doc-file-comment,
+  .outcome-doc-delivery-details-container,
+  .dispute-outcome-doc-section-btn { display: none; }
+
+  .my-schedule-inactive-filter { display: none; }
+
+
+  /* Composer page print */
+  .composer-page .header-page-title-container { display: none; }
+  .composer-page .composer-doc-row { display: none; }
+  .composer-section-title-container { display: none; }
+  .composer-section-content-container { border: none; }
+  .composer-section-content { padding: 0; }
+
+  /* Components */
+  .daily-schedule-calendar-previous > span, .my-hearings-calendar-previous > span {
+    margin: 0 5px 5px 10px!important;
+    clear: left!important;
+    float: left!important;
+  }
+  .my-hearing-calendar-next-image {
+    margin: 0 10px 5px 0px!important;
+    clear: right!important;
+    float: left!important;
+  }
+
+  .dispute-claim-outcome-display { padding-left: 0; }
+
+  /* dispute flags Print */
+  .dispute-flags-wrapper, .dispute-flags-list > div { display: block !important; }
+  .dispute-flags-flag--linked-menu-icon { display: none; }
+  .dispute-flags-flag, .dispute-flags-flag--linked { height: auto !important; }
+  .dispute-flags-icon { margin-left: 10px !important; }
+  .dispute-flags-print-header { 
+    margin-left: 10px;
+    display: flex;
+    align-items: flex-end;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .dispute-flags-flag-text { font-size: 16px !important;}
+  .context-menu-title { margin-right: 0; }
+
+  /* Schedule print styles */
+  .hearings-calendar-legend-container { margin-left: 0; }
+  /* For scheduling pages, increase max width or there isn't enough real-estate for correct display */
+  .page-view.my-schedule-page, .page-view.scheduled-hearings { max-width: 1000px; }
+  .calender-grid-container { max-width: 1000px; min-width: 1000px; }
+  /* .calendar-header-time-wrapper { min-width: 100%; } */
+  .calendar-header-container { max-width: 1000px; min-width: unset; }
+  .today-calendar-header-container { max-width: 1000px; min-width: unset; }
+
+  .calendar-grid-event-menu { display: none; }
+  .calendar-grid-event-text { text-align: left; }
+  .calendar-grid-event--linked .calendar-grid-event-text { text-align: center; }
+
+.daily-schedule-calendar-container > .calendar-container,
+.personal-schedule-calendar-container > .calendar-container { display: flex; }
+
+  /* Working Schedule */
+  .schedule-manager-periods__end-column, .schedule-manager-periods__start-column { width: 170px!important; min-width: 170px!important; }
+  .schedule-manager-periods__creator-column, .schedule-manager-periods__modifier-column { width: 190px!important; min-width: 190px!important; }
+  .schedule-manager-periods__blocks-column { width: 65px!important; min-width: 65px!important; }
+  .sm-page__top-bar { padding-left: 0!important; display: flex!important; flex-direction: column!important; }
+  .sm-page__top-bar > div { margin-top: 0!important; }
+  .schedule-manager-request__owner-column { width: 170px!important; min-width: 170px!important; }
+  .schedule-manager-request__created-column { width: 220px!important; }
+
+
+  /* Scheduling */
+  .my-hearings-calendar-previous,
+  .my-hearings-calendar-next,
+  .schedule-calendar-previous,
+  .schedule-calendar-next,
+  .schedule-calendar-year-next,
+  .daily-schedule-calendar-previous,
+  .daily-schedule-calendar-next,
+  .schedule-add-hearing-btn,
+  .schedule-import-btn,
+  .schedule-inactive-filter { display: none !important; }
+
+  .schedule-calendar-year-text { margin-top: 10px; }
+  .schedule-calendar-month-text, .schedule-calendar-year-text { display: flex !important; font-size: 17px; }
+  .schedule-type-filter-print { font-size: 17px; display: flex!important; align-items: center; }
+
+  .dashboard-disputes .general-filters-row { display: none!important;}
+  .daily-schedule-calendar-date .intake-input-component { text-align: unset!important; }
+
+  .history-schedule-hearing-start, .history-schedule-change-date, .history-schedule-owner, .history-schedule-change-by { min-width: 110px !important; }
+  .history-schedule-role { min-width: 75px; }
+  .history-schedule-hearing-id { min-width: 90px !important; }
+  .daily-schedule-calendar-container { overflow-x: hidden; }
+  .calendar-grid-event-text { margin-left: 0; width: 100%; font-size: 14px; }
+  .input-model-custom-link-container { display: none; }
+}

@@ -1,0 +1,99 @@
+.dispute-flags {
+  display: flex;
+  flex-wrap: wrap;
+
+  > div {
+    width: 100%;
+  }
+
+  &-icon {
+    width: 25px;
+    height: 28px;
+    margin: 6px 5px 0 0;
+  }
+
+  &-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    border-top: 1px solid #e5e5e5;
+    padding-top: 5px;
+  }
+
+  &-list > div {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &-linked-list > div {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &-flag {
+    position: relative;
+    top: -5px;
+    height: 30px;
+    width: fit-content;
+    background-color: #64769e;
+    border-radius: 2px;
+    margin: 10px 5px 0 0;
+    min-width: 80px;
+
+    &-menu {
+      display: flex;
+      height: 100%;
+      cursor: pointer;
+
+      &-icon {
+        background-color: #666666;
+        cursor: pointer;
+        color: #ffffff;
+        height: 30px;
+        width: 20px;
+        padding: 5px;
+        border-radius: 2px;
+      }
+    }
+
+    &-floating-menu {
+      position: relative;
+      z-index: 10;
+      background: #666666;
+      width: 85px;
+      right: 5px;
+
+      &-item {
+        user-select: none; 
+        color: #ffffff; 
+        font-size: 14px; 
+        padding: 5px 0;
+        text-align: center;
+
+        &:hover { 
+          background-color: #9a9a9a;
+        }
+      }
+    }
+  
+    &--linked {
+      @extend .dispute-flags-flag;
+      background-color: #a97140;
+
+      &-menu {
+        @extend .dispute-flags-flag-menu;
+        &-icon {
+          @extend .dispute-flags-flag-menu-icon;
+        }
+      }
+    }
+
+    &-text {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      padding: 0px 10px;
+      font-size: 15px;
+    }
+  }
+}

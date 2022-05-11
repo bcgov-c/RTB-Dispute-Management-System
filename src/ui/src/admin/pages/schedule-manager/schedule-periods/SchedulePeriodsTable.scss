@@ -1,0 +1,97 @@
+.schedule-manager-periods {
+  &__table {
+    .standard-list-item { 
+      display: flex;
+      border-bottom: 1px #e5e5e5 solid;
+      padding: 8px 0 2px 0;
+    }
+  }
+  
+  &__table-header {
+    display: flex;
+    margin-top: 10px;
+  }
+
+  &__count-display {
+    font-size: 17px;
+    margin-top: 10px;
+  }
+
+  &__start-column {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  &__end-column {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  &__creator-column {
+    width: 230px;
+    min-width: 230px;
+  }
+
+  &__modifier-column {
+    width: 230px;
+    min-width: 230px;
+  }
+
+  &__blocks-column {
+    width: 80px;
+    min-width: 80px;
+  }
+
+  &__hearings-column {
+    min-width: 75px;
+  }
+
+  &__status-column {
+    min-width: 180px;
+    width: 180px;
+    > div {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    &--green{
+      @extend .schedule-manager-periods__status-column;
+      color: #2B9241;
+    }
+
+    &--grey{
+      @extend .schedule-manager-periods__status-column;
+      color: #8e8e8e;
+    }
+
+    &--red{
+      @extend .schedule-manager-periods__status-column;
+      color: #B92429;
+    }
+
+    &--orange{
+      @extend .schedule-manager-periods__status-column;
+      color: #EF9200;
+    }
+  }
+
+  &__edit-column {
+    margin-left: auto;
+    min-width: 110px;
+
+    &__link {
+      cursor: pointer;
+    }
+  }
+
+  &__open-column {
+    width: 155px;
+
+    &__link {
+      cursor: pointer;
+    }
+  }
+}
+
+.standard-list-items { margin-top: 0; }

@@ -1,0 +1,65 @@
+@import '../../../styles/variables';
+@import '../../../../core/styles/index.scss';
+
+.dar-step-three {
+  font-size: $DAC-FONT-SIZE-CONTENT;
+  margin-top: 10px;
+
+  &__print {
+    margin-left: 0!important;
+  }
+
+  &__certifications {
+    margin-top: 15px;
+
+    &__header {
+      color: rgb(114, 114, 114);
+    }
+  }
+
+  &__answers {
+    margin-top: 40px;
+  }
+
+  &__question {
+    margin-bottom: 40px;
+
+    &__title {
+      font-size: $DAC-FONT-SIZE-CONTENT!important;
+      border-bottom: 2px solid #f1f1f1;
+      display: flex;
+      color: rgb(114, 114, 114);
+    }
+
+    &__answer {
+      white-space: nowrap;
+      font-size: $DAC-FONT-SIZE-CONTENT!important;
+      color: #333333;
+    }
+  }
+
+  &__payment-warning {
+    @extend .dms__error-red;
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+
+    &__img {
+      margin-bottom: 2px;
+    }
+
+    &__wrapper {
+      margin-top: 50px;
+    }
+
+    + span {
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+    }
+  }
+
+  &__submission-description {
+    margin-right: 10px;
+  }
+
+  &__container {
+    margin: 15px 20px 0 20px;
+  }
+}

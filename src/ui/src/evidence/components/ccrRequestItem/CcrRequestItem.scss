@@ -1,0 +1,18 @@
+.request-item {
+  margin-top: 40px;
+
+  &__question {
+    margin-bottom: 30px;
+  }
+
+  &__evidence {
+    .step-description {
+      display: none;
+    }
+  }
+
+  &__margin-bottom {
+    margin-bottom: 40px;
+  }
+}
+

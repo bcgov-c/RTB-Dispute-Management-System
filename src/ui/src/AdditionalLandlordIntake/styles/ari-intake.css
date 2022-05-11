@@ -1,0 +1,261 @@
+
+/* Site/general styles */
+#menu { width: 230px; }
+
+/* Dispute list styles */
+.dispute-list-ari-start-container { margin-top: 20px; margin-bottom: 50px; }
+.dispute-list-ari-start-text { font-size: 18px; color: #333; }
+
+.dispute-list-disputes-container { margin-bottom: 40px; }
+.ari-start-radio .intake-radio-component .radio label { display: block; margin: 10px 0 0 0; }
+.ari-start-radio .radio { margin-top: 0; }
+
+.dispute-list-container-title { font-size: 17px; color: #666; }
+
+.dispute-list-container > table {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 0;
+  display: block;
+}
+
+.dispute-list-container > table > tr {
+  min-height: 80px;
+  margin-bottom: 5px;
+  position: relative;
+  float: left;
+  width: 100%;
+  padding: 15px 10px 0 0;
+  border-bottom: 1px solid #b8b8b8;
+  min-width: 300px;
+}
+
+.dispute-list-container > table > tr:first-child {
+  border-top: 1px solid gray;
+}
+
+.dispute-list-container > table > tr:last-child {
+  border-bottom: none;
+}
+
+.dispute-list-container > table > tr > td {
+  display: inline-block;
+  text-overflow: ellipsis;
+  padding-bottom: 5px;
+  margin-top: 10px;
+  margin-right:15px;
+  height: 65px;
+  font-size: 17px;
+}
+
+.dispute-list-container > table > tr > td.dispute-list-right-buttons { height: auto; margin-right:0; }
+
+
+/* Step 1 styles */
+
+.ari-intake-page-warning {
+  font-size: 16px;
+  position: relative;
+  top: -2px;
+  padding-left: 24px;
+  background-color: #fff6e5;
+  background-image: url("../../core/static/Icon_Warning.png");
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  max-width: 1230px;
+  color: #666;
+  margin: 10px 15px 0 0;
+  padding: 10px 10px 10px 50px !important;
+  line-height: 22px;
+}
+
+/* Step 4 styles */
+.ari-page-content-title { font-size: 20px; font-weight: bold; margin-top: 20px; }
+
+.ari-intake-unitCount .page-item-container { padding-top: 0; }
+.ari-intake-unitCount .page-item-child-view { max-width: 125px !important; }
+.ari-intake-unitCount .error-block { white-space: nowrap; }
+
+#ari-iu-units .provinceContainer label { padding-top: 0; }
+#ari-iu-units .participant-delete-icon { margin-right: 10px; }
+#ari-iu-units .participant-use-mail .step-description { margin-bottom: 0; }
+#ari-iu-units .participant-mailing-address .page-item-container { padding-top: 0; }
+
+
+/* Step 5 styles */
+.evidence-claim-remedy-totals-container { font-size: 17px; margin-top: 20px; display: flex; justify-content: flex-start; }
+
+.evidence-claim-remedy-totals { background-color: #f1f1f1; padding: 5px; border: 1px solid #b2b2b2; margin-top: 15px; width: 100%; max-width: 180px; margin-right:30px; }
+
+.evidence-claim-add-remedy-container { display: flex; align-self: center; margin-top:15px; }
+
+.evidence-claim-add-remedy {
+  width: fit-content;
+  background-image: url('../../core/static/Icon_AddBlue.png');
+  background-repeat: no-repeat;
+  height: 28px;
+  line-height: 21px;
+  padding-left: 35px;
+  display: inline-block;
+  padding-top: 4px;
+}
+
+.intake-remedy-separator { border-top: 1px solid #d2d2d2; margin: 20px 15px; }
+.intake-remedy:first-child > .intake-remedy-separator { display: none; }
+
+.ari-remedy-warning { margin: 12px 15px 8px 15px; padding-top: 12px !important; padding-bottom: 10px !important; }
+.ari-remedy-text-description-container { display: flex; padding-left: 15px; padding-right: 15px; }
+.ari-remedy-text-description-container .text-description { flex-grow: 1; }
+.ari-remedy-text-description-container .evidence-claim-delete { min-width: fit-content; margin: 22px 5px 0 20px; height: fit-content; }
+.ari-remedy-text-description-container .evidence-delete-icon { margin: 0; }
+
+
+
+/* Step 6 styles */
+.unit-cost-component { margin-top: 30px; }
+.unit-cost-component:first-child { margin-top: 0; }
+.unit-cost-lines > .intake-checkbox-component { margin-top:10px; }
+.unit-cost-title-container { font-size: 18px; border-bottom: 1px solid #bbb; }
+.unit-cost-title { color: #8b8b8b; }
+
+.unit-cost-description { font-size: 16px; line-height: 18px; color: #8b8b8b; margin: 2px 0; }
+
+.unit-cost-sub-title-container { display: flex; justify-content: flex-start; margin: 5px 0 10px 0; font-size: 16px; font-style: italic; }
+.unit-cost-sub-title-container > div:first-child { min-width: 150px; width: 150px; color: #8b8b8b }
+.unit-cost-selected-count { color: #333; }
+
+.unit-cost-unit-display { color: #8b8b8b; }
+
+/* Step 7 styles */
+.unit-rent-increase:not(.unit-rent-increase--open) { padding-top: 5px; padding-left: 5px; }
+.unit-rent-increase--open { background-color: #f3f3f3; padding: 5px; margin-bottom: 15px; }
+.unit-rent-increase--open .unit-rent-increase-addr { font-weight: bold; }
+
+.unit-rent-increase .hidden-xs.validateContainer { margin-top: 18px; margin-left: 25px; }
+.unit-rent-increase .visible-xs.validateContainer { margin: 18px 0 5px 0; }
+
+.unit-rent-increase-content-inputs { display: flex; justify-content: flex-start; }
+.unit-rent-increase-content-inputs > div:first-child { margin-right: 20px; }
+
+#ari-rent-increase-units .page-item-container { padding-top: 0; }
+
+.ari-rent-increase-units-text { font-size: 18px; color: #666; margin-top: 35px; }
+.ari-rent-increase-units-text span { color: #333; font-weight: bold; }
+
+.ari-rent-increase-units-title-container { margin-top: 30px; margin-bottom: 5px; padding: 0 5px 0 0; border-bottom: 1px solid #bbb; font-size: 16px; }
+.rent-increase-select-all { display: inline-block; text-align: left; }
+
+.unit-rent-increase-tenants { width: 90px; }
+.unit-rent-increase-tenants .error-block { white-space: nowrap; }
+
+.modal-rent-increase-removal .modal-title { padding-right: 40px; }
+
+
+/* Step 8 styles */
+.participant-unit-address { font-size: 18px; padding-top: 10px; }
+.intake-participant-unit .participant-type label { padding-left: 16px; }
+
+.intake-participant-unit .participant-section.section-header { margin-bottom: 5px; }
+
+/* Step 9 styles */
+.review-page .review-section-title { border-bottom: 1px solid #666; line-height: 22px; }
+.review-general td:nth-child(2) { white-space: pre-line; }
+
+.review-applicants > div { margin-top: 10px; margin-bottom: 10px; }
+
+.review-edit-button { white-space: nowrap; }
+
+.review-applicants .review-information-body { margin-top: 8px; }
+.review-section { line-height: 20px; margin-bottom: 10px; }
+.ari-review-improvement-unit-container { margin-top: 20px; }
+.review-cost-item { padding-bottom: 20px; border-bottom: 1px solid #d2d2d2; }
+.review-fee-calculation tr:last-child { border-top: 2px solid #000; }
+.review-fee-calculation td:first-child { width: 220px; }
+.review-fee-calculation td:last-child { text-align: right; }
+.review-cost-evidence-container { margin-top: 20px; }
+.review-tenants > div { margin-bottom: 20px; }
+
+
+/* PFR step 4 */
+.pfr-units-list .evidence-claim-number { font-size: 20px; padding-bottom: 35px; padding-top: 4px; }
+.pfr-units-list .evidence-claim-delete { margin-top: 7px; }
+
+.pfr-unit-section { padding-left: 15px; padding-right: 15px; }
+.pfr-unit-section .input-model-custom-link-container { float: right; }
+
+.pfr-unit-section .intake-address-component { display: flex; }
+.pfr-unit-section .intake-address-component > div { margin-right: 15px; }
+.pfr-unit-section .intake-address-component > div:last-child { margin-right: 0; }
+
+.pfr-unit-section .streetContainer { flex-grow: 2; min-width: 330px; }
+.pfr-unit-section .cityContainer { flex-grow: 1; min-width: 200px; }
+.pfr-unit-section .postalCodeContainer { flex-grow: 1; min-width: 100px; }
+
+.pfr-unit-tenants { margin-top: 15px; }
+.pfr-unit-tenants .page-item-child-view { width: 135px !important; }
+
+#pfr-iu-units .page-item-container { padding-top: 5px; }
+.pfr-unit-tenants .error-block { white-space: nowrap; }
+
+.review-renovation-unit:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+.review-renovation-unit {
+  border-top: 2px solid #f2f2f2;
+  padding-top: 15px;
+  margin-top: 5px;
+}
+
+.pfr-unit-evidence-warning { margin-bottom: 20px; }
+
+.pfr-unit-has-permits { }
+.pfr-permits { margin-bottom: 15px; }
+.pfr-unit-permit { display:flex; flex-wrap: wrap; padding-bottom:10px; border-bottom: 1px solid #ddd; margin-bottom:10px; }
+.pfr-unit-permit:last-child { border-bottom: 0; }
+.pfr-unit-permit > div { margin-right: 10px; flex: 1; min-width: 235px; }
+.pfr-unit-permit > div:last-child { margin-right: 0; }
+.pfr-unit-permit-date { max-width: 260px; }
+.pfr-unit-permit-id { }
+.pfr-unit-permit .pfr-unit-permit-issued-by { min-width: 280px; }
+.pfr-unit-permit .pfr-unit-permit-description-container { display: flex; flex-wrap: no-wrap; flex-grow: 2; min-width: 300px; }
+.pfr-unit-permit-description { margin-right: 10px; width: 100%; }
+.pfr-unit-permit-delete .evidence-delete-icon { position: relative; top: 30px; cursor: pointer; }
+
+.pfr-permits-add {
+  width: fit-content;
+  background-image: url('../../core/static/Icon_AddBlue.png');
+  background-repeat: no-repeat;
+  height: 28px;
+  line-height: 21px;
+  padding-left: 35px;
+  display: inline-block;
+  padding-top: 4px;
+}
+
+.pfr-unit-description label {
+  font-size: 19px;
+  color: #343434;
+  margin: 4px 0 8px 0;
+  line-height: 22px;
+}
+
+/* Tablet breakpoint */
+@media (max-width: 991px) {
+  .pfr-unit-section .intake-address-component { display: block; max-width: 600px; }
+}
+
+/* Mobile css */
+@media (max-width: 767px) {
+  .pfr-unit-section .streetContainer { min-width: unset; }
+  .pfr-unit-section .input-model-custom-link-container { float: none; }
+  .pfr-units-list .evidence-item { margin-left: -15px; margin-right: -15px; }
+
+  .evidence-claim-remedy-totals-container { flex-wrap: wrap-reverse; }
+  .evidence-claim-add-remedy-container { width: 100%; }
+
+  .unit-rent-increase-content-inputs { display: block; }
+  .unit-rent-increase-content-inputs > div { margin-top: 12px; }
+
+  .review-fee-calculation td:first-child { width: 180px; }
+  
+  .review-page .option-button.step-previous { padding-left: 12px; padding-right: 50px; }
+  .review-page .option-button.step-next { padding-left: 55px; padding-right: 15px; }
+}

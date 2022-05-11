@@ -1,0 +1,41 @@
+#emailReceipt_modal {
+  
+  .modal-content {
+    min-width: 635px;
+  }
+
+  .email {
+    width: 300px;
+  }
+
+  .confirm-email {
+    @extend .enter-email;
+  }
+
+  .email-to-choice {
+    margin-bottom: 20px;
+
+    .radio {
+      display: flex!important;
+      flex-direction: column;
+
+      label { margin: 0 0 5px 0;}
+    }
+  }
+
+  .email-sent-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .email-update-wrapper { margin-top: 20px; }
+
+  .email-sent-wrapper-image { height: 57px; margin-right: 10px; }
+}
+
+@media (max-width: 767px) {
+  #emailReceipt_modal {
+    .modal-content { min-width: auto; }
+    .enter-email { width: auto; }
+  }
+}

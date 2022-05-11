@@ -1,0 +1,124 @@
+@import '../../styles/variables';
+
+.ccr {
+  height: 100%;
+
+  &__label {
+    margin-top: 40px;
+  }
+
+  .step-description {
+    margin-top: 40px;
+  }
+
+  &__cc-warning {
+    margin: 20px 0 30px 0;
+  }
+
+  &__date-received .page-item-child-view {
+    margin-top: 5px;
+    max-width: 392px;
+
+    .row { margin-right: 0; }
+  }
+
+  &__list .step-description {
+    margin-top: 0;
+  }
+
+  &__add-file__open-modal {
+    color: blue;
+    cursor: pointer;
+    color: #337ab7;
+  }
+
+  &__add-container {
+    padding: 0px;
+    border: 2px solid #e3e3e3;
+    width: 100%;
+    margin-bottom: 30px;
+
+    &__title {
+      display: flex;
+      -webkit-box-pack: start;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f6f6f6;
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+
+      &__text {
+        font-size: $DAC-FONT-SIZE-PAGE-TITLES;
+        min-width: 100px;
+        background-color: #8e8e8e;
+        display: flex;
+        justify-content: center;
+        color: #fff;
+        padding: 5px 10px;
+        font-weight: bold;
+      }
+
+      &__icon {
+        cursor: pointer;
+        margin-right: 5px;
+      }
+    }
+
+    &__body {
+      padding: 10px 20px;
+    }
+
+    &__type-dropdown {
+      width: 250px;
+      margin-bottom: 15px;
+    }
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    color: #347ab7;
+    font-size: $DAC-FONT-SIZE-BUTTON;
+    cursor: pointer;
+    margin-top: 10px;
+
+    &__image {
+      margin-right: 5px;
+    }
+
+    &__text {
+      margin-right: 10px;
+    }
+
+    &-file {
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+
+      .da-upload-evidence-title {
+        font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+      }
+
+      .file-container {
+        background-color: #fff6e5;
+      }
+
+      .other-evidence-description {
+        display: none;
+      }
+
+      .file-container {
+        margin-top: 10px;
+      }
+    }
+  }
+
+  &__terms-checkbox {
+    margin-top: 10px;
+  }
+
+  .upload .ccr__add-file .step-description { display: none; }
+}
+
+@media (max-width: 767px) {
+  .ccr__add-container__body {
+    padding: 10px 10px;
+  }
+}

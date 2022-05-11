@@ -1,0 +1,153 @@
+.dashboard-disputes { margin-right: 10px; }
+
+.dashboard-disputes .header-print-icon { margin-right: 0; }
+
+.dashboard-disputes .search-results {
+  margin-top: 10px;
+}
+
+.dashboard-disputes .postal-code {
+  margin-right: 25px;
+}
+
+.dashboard-disputes .dispute-list-item {
+  margin: 7px 0px 0px 0px;
+  border-left: 15px solid #f1f1f1;
+  padding-left: 15px;
+}
+
+
+.dashboard-disputes .middle-row, .dashboard-disputes .bottom-row {
+  color: #999;
+  font-size: 15px;
+  margin: 1px 0px 0px 0px;
+}
+
+.dashboard-disputes .cross-app-search {
+  color: #337ab7;
+  cursor: pointer;
+  padding-left: 5px;
+}
+
+.dashboard-disputes .search-option-row {
+  display: flex;
+  padding: 12px 0px;
+  border-bottom: 1px solid #d2d2d2;
+}
+
+.dashboard-disputes .dispute-info-row, .dashboard-disputes .contact-info-row {
+  border-bottom: none;
+}
+
+.dashboard-disputes .name-type {
+  margin-top: 21px;
+  margin-right: 15px;
+}
+
+.dashboard-disputes .participant-first-name {
+  margin-right: 15px;
+}
+
+.dashboard-disputes .contact-type {
+  margin-top: 21px;
+  margin-right: 15px;
+}
+
+.dashboard-disputes .status-row-top, .dashboard-disputes .status-row-bottom, .dashboard-disputes .hearing-row-top {
+  border-bottom: none;
+}
+
+.dashboard-disputes .search-option-stage, .dashboard-disputes .search-option-status, .dashboard-disputes .search-option-process, .include-owner {
+  margin-right: 15px;
+}
+
+.dashboard-disputes .urgency-expedited { color: #ff0000; }
+
+.dashboard-disputes .urgency-regular { color: #339966; }
+
+.dashboard-disputes .urgency-deferred { color: #0075ff; }
+
+.dashboard-dispute-filters-section .general-filters-row { border-bottom: 1px solid #e5e5e5; padding: 0; }
+.dashboard-dispute-filters-section .general-filters-row:last-child { border-bottom: none; }
+
+.dashboard-disputes .my-disputes-title { width: 100%; max-width: 210px; margin-right: 2px; margin-top: 10px; font-size: 17px; }
+
+.dashboard-disputes .file-number-result { width: 90px; }
+
+.dashboard-disputes .dispute-assign-button {
+  background: url('../static/Icon_Assign_Dispute.png') no-repeat;
+  height: 15px;
+  width: 15px;
+  cursor: pointer;
+  margin-top: 4px;
+  margin-left: 5px;
+}
+
+.dashboard-disputes .assign-button-container { display: inline-flex; width: 105px; margin-left: 40px; }
+.dashboard-disputes .dispute-assign-title { margin-left: 5px; }
+
+.my-disputes-container .search-header { margin-top: 25px; }
+
+.dashboard-dispute-filters-section { background-color: #f6f6f6; padding: 0 15px; }
+
+.dashboard-disputes-view-all-and-user-dropdown-container { display: flex; background-color: #e6e6e6; padding: 10px 10px 0 15px; }
+
+.view-all-radio { font-size: 18px; color: #3d608c; font-weight: normal; padding: 0; cursor: pointer; }
+
+.my-disputes-filter .radio label { margin-left: 0; margin-right: 15px; line-height: 40px; }
+.my-disputes-filter .radio { margin-top: 0; margin-bottom: 5px; }
+
+.dashboard-user-filter { margin-right: 30px; width: 300px; margin-top: 10px; }
+.dashboard-disputes .header-page-title-with-icon { background: url('../static/Icon_Header_Dashboard.png')  no-repeat !important; }
+
+.dashboard-disputes .my-disputes-container > .general-filters-row { justify-content: space-between; }
+
+.dashboard-dispute-optional-filters { display: flex; margin-top: 10px; margin-left: 20px; }
+
+.dashboard-source-filter { width: 210px; }
+.dashboard-urgency-filter { margin-left: 10px; width: 130px; }
+
+.dashboard-dispute-sort { margin-left: 40px; width: 250px; }
+.dashboard-dispute-sort > .intake-dropdown-component > div { display: flex; flex-wrap: nowrap; }
+.dashboard-dispute-sort .dropdown-display-title { white-space: nowrap; display: inline-block; margin-right: 10px; }
+
+.undelivered-doc-filter .dropdown-display-title { white-space: nowrap; display: inline-block; margin-right: 10px; }
+.undelivered-doc-filter > .intake-dropdown-component > div { display: flex; flex-wrap: nowrap; }
+.undelivered-doc-filter select { width: fit-content; }
+
+#assignUser-modal .modal-dialog { width: 700px; }
+#assignUser-modal .float-right { margin-top: 15px; }
+#assignUser-modal .assign-user-status-container,
+#assignUser-modal .assign-user-description { margin-bottom: 20px; }
+
+.filters-row-calender-filters { margin-left: auto; display: flex; justify-content: space-between; }
+.filters-row-calender-filters > .filters-row-calender-filter:first-child { margin-right: 20px; }
+
+.docs-sort-by-filters-priority { margin-left: auto; margin-right: 200px; }
+
+.docs-sort-by-filters-priority .radio,
+.docs-sort-by-filters-method .radio { margin-bottom: 9px; }
+
+.undelivered-docs-list-container { margin-top: 25px; }
+
+.undelivered-doc-list .standard-list-item,
+.undelivered-docs-header { display: flex; }
+
+.undelivered-doc-list .standard-list-item > div { margin-top: 10px; }
+
+.undelivered-docs-header > div { padding: 3px; }
+
+.undelivered-doc-dispute { min-width: 110px; }
+.undelivered-doc-creation { min-width: 165px; }
+.undelivered-doc-process { min-width: 200px; }
+.undelivered-doc-status { min-width: 228px; width: 228px;}
+.undelivered-doc-total { min-width: 140px; text-align: center; }
+.undelivered-doc-priority { min-width: 120px; text-align: center; }
+.undelivered-doc-email { min-width: 100px; text-align: center; }
+.undelivered-doc-mail { min-width: 100px; text-align: center; }
+.undelivered-doc-pickup { min-width: 100px; text-align: center; }
+.undelivered-doc-other { min-width: 100px; text-align: center; }
+
+.undelivered-doc-list .undelivered-doc-priority { margin-top: 3px !important; display: flex; flex-direction: row; justify-content: center; }
+
+.undelivered-doc-priority-icon { margin-top: 0; cursor: default; background-position-y: center !important; }

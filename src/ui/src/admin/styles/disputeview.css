@@ -1,0 +1,626 @@
+
+.is-migrated-dispute .dispute-general-info-title { background-color: #009999 !important; color: #fff !important; }
+.is-migrated-dispute .dispute-general-info-title + span { left: 188px; position:absolute; user-select: none; }
+
+.is-migrated-dispute .page-section-title-container,
+.is-migrated-dispute .general-filters-row--dark { background-color: #bbe8e8 !important; }
+
+.is-migrated-dispute .context-container .review-applicant-title.section-header,
+.is-migrated-dispute .process-group-detail .review-applicant-title.section-header,
+.is-migrated-dispute .general-filters-row:not(.general-filters-row--dark) { background-color: #d6f5f5 !important; }
+
+
+.dispute-general-info-title {
+  background-color: #dadada;
+  float: left;
+  position: absolute;
+  top: -10px;
+  left: -9px;
+  padding: 10px 15px 8px 15px;
+  font-size: 24px;
+  font-weight: 500;
+  max-width: 180px;
+}
+
+#dispute-general-info .amendment-icon { margin-left: 160px; }
+
+#dispute-general-info { margin-bottom: 20px; }
+#dispute-general-info .wrapped-view-container { margin-top: 10px; }
+
+.review-dispute-info-container { margin-top: 30px; }
+
+.dispute-edit .review-act-type { width: 100px; }
+
+.dispute-edit .review-urgency,
+.dispute-edit .review-complexity,
+.dispute-edit .review-cross-app-file-number,
+.dispute-edit .review-migration-truth,
+.dispute-edit .review-tenancy-status .rtb-editable-component-editstate { width: 200px; }
+
+.dispute-edit .review-urgency-wrapper, .dispute-edit .review-complexity-wrapper { display: flex; }
+.review-urgency-auto-set { display: none; }
+.dispute-edit .review-urgency-auto-set, .dispute-edit .review-complexity-auto-set {
+  display: flex;
+  position: relative;
+  top: 29px;
+  margin-left: 10px;
+}
+
+.dispute-edit .review-notice-provided,
+.dispute-edit .review-file-number,
+.dispute-edit .review-rental-amount-interval-view,
+.dispute-edit .review-tenancy-agreement-info { display: none; }
+
+.review-rental-interval .first-dropdown-container,
+.review-rental-interval .second-dropdown-container,
+.review-rental-interval .other-input-container { float: left; }
+
+.review-rental-interval .first-dropdown-container { width: 115px; margin-right: 15px; }
+.review-rental-interval .second-dropdown-container,
+.review-rental-interval .other-input-container { width: calc(100% - 130px); }
+
+.review-tenancy-effective-edit,
+.review-tenancy-signed-edit { width: 235px; float: left; margin-right: 15px; display: none; }
+
+.review-participant-unit { margin-bottom: 30px; }
+
+.review-tenancy-effective-edit .input-component-date { overflow-x: visible; white-space: nowrap; }
+
+.dispute-edit .review-tenancy-effective-edit,
+.dispute-edit .review-tenancy-signed-edit { display: inline-block; }
+
+#dispute-applicants-info,
+#dispute-respondents-info { margin-bottom: 5px; }
+#dispute-claims-info { margin-bottom: 20px; }
+
+#dispute-applicants-info .dispute-overview-parties,
+#dispute-respondents-info .dispute-overview-parties { top: -5px; position: relative; }
+
+#dispute-claims-info .dispute-overview-claims { top: -8px; position: relative; }
+
+.modal-issue-state-breaking-change .modal-dialog { width: 800px; }
+.modal-issue-state-breaking-change ul { padding-left: 30px; }
+
+.modal-status-change-warning .modal-dialog { width: 800px; }
+
+.dispute-section-title-add { float: right; font-size: 18px; color: #3d608c; font-weight: normal; padding: 2px 0 0 32px; cursor: pointer; }
+
+#dispute-claims-info .review-information-body { margin: 0 0 0 0; padding: 20px 10px 0 10px; }
+
+#dispute-claims-info .hearing-tools-save-controls.claim-view { display: none; }
+
+.page-section-title-container .dispute-overview-claims-info { font-weight: normal; }
+.dispute-overview-claims-info { font-size: 18px; margin: 5px 0 0 0; color: #8e8e8e; }
+.dispute-overview-claims-total { top: 8px; position: relative; margin-right: 15px; }
+.dispute-overview-claims-total > span { color: #333; }
+.dispute-overview-claim-add-icon-container { float: right; }
+.dispute-overview-claims > div > .standard-list-empty { margin-top: 7px; }
+
+.claim-add-icon { float: unset; margin-left: 50px; display: inline-block; position: relative; top: 4px; }
+.dispute-overview-claims-tools-buttons { display: flex; float: right; }
+.dispute-overview-claims-tools-buttons > div { display: inline-block; }
+
+.dispute-overview-claims-hearing-tools,
+.dispute-overview-claims-thumbnails { margin-right: 15px; user-select: none; }
+.dispute-overview-claims-show-evidence { user-select: none; }
+
+.review-claim-evidence { margin-top: 30px; }
+.review-claim-description .rtb-editable-component-label { display: table-caption; }
+.review-claim-description .rtb-editable-component-viewstate { width: 100%; }
+
+.amendment-info-container { margin-bottom: 30px; font-size: 18px; }
+.amendment-info-item { margin-bottom: 5px; }
+.amendment-info-item .amendment-icon { width: 26px; height: 24px; float:left; margin-right: 10px; }
+
+.dispute-claim-remedy { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #bbb; }
+.dispute-claim-remedy:last-child { border-bottom: none; }
+
+/* Hearing Tools */
+.dispute-claim-hearing-tools-container { margin: -20px -10px 10px -10px; }
+
+.claim-edit .claim-outcome-display { display: none; }
+.claim-view .claim-outcome-display { display: block; }
+.claim-outcome-container { padding: 0 10px; }
+.claim-view.claim-outcome-container { cursor: pointer; }
+
+.claim-view .claim-outcome-edit { display: none; }
+.claim-edit .claim-outcome-edit { display: block; }
+
+.claim-edit .hearing-tools-edit { display: none; }
+.claim-edit .hearing-tools-edit-mode-buttons { display: inline; }
+
+.claim-edit .dispute-claim-outcome-wrapper { display: none; }
+.dispute-claim-outcome-wrapper { display: flex;}
+.dispute-claim-details { margin-top: 25px; }
+.dispute-claim-modified-by { font-size: 16px; color: #8e8e8e;}
+.dispute-claim-outcome-text { font-weight: bold; }
+.dispute-claim-outcome-text-not-decided { color: #bc3c3c; }
+.dispute-claim-outcome-icon-not-decided { background-image: url('../static/Icon_Alert_SML.png'); background-repeat: no-repeat; background-position-y: 1px; width: 17px; height: 17px; padding-left: 20px; background-size: 16px 16px; }
+
+.dispute-claim-outcome-display-img { background-color: #e6e6e6; margin-right: 10px; padding: 5px 2px; }
+.dispute-claim-outcome-display-wrapper {line-height: 22px;}
+
+.dispute-claim-outcome-display { margin-bottom: 10px}
+.dispute-claim-outcome-display .dispute-claim-outcome-display-description { font-style: italic; color: #7b7b7b; }
+
+.dispute-claim-prev-outcome-display { margin-top: 20px; }
+.dispute-claim-prev-outcome-display .dispute-claim-outcome-display-img { background-color: #e8cccd; }
+.dispute-claim-prev-outcome-display .dispute-claim-outcome-text { text-decoration: line-through; }
+.dispute-claim-prev-outcome-display .dispute-claim-outcome-display-description { text-decoration: line-through; }
+
+
+.dms-trumbowyg-save-controls.claim-view { display: none; }
+
+.claim-outcome-edit .radio label { padding-left: 15px; }
+
+.hearing-tools-top-row { display: flex; justify-content: flex-start; margin-top: 20px; }
+
+.hearing-tools-issue-options,
+.hearing-tools-include-outcome,
+.hearing-tools-remove-outcome,
+.hearing-tools-award-amount { display: inline-block; }
+
+.hearing-tools-issue-options { margin-top: -7px; margin-right: 15px; flex-shrink: 0; }
+.hearing-tools-issue-options .radio { margin-top: 5px; }
+
+.hearing-tools-include-outcome,
+.hearing-tools-remove-outcome { margin-right: 30px; }
+
+.hearing-tools-include-outcome .dropdown-display-title { top:0; font-weight: normal; font-size: 17px; margin-right: 15px; }
+
+.hearing-tools-award-date-container { display: flex; min-width: 431px; }
+.hearing-tools-award-date-container > div { display: inline-block; }
+.hearing-tools-award-date-container select { width: auto; }
+
+.hearing-tools-award-date-type { margin-right: 15px; }
+.hearing-tools-award-date-offset { width: 80px; }
+
+.hearing-tools-include-outcome select,
+.hearing-tools-remove-outcome select { min-width: 140px; width: auto; }
+
+.hearing-tools-award-amount { width: 215px; }
+.hearing-tools-award-amount .intake-input-component-input-container { display: flex; }
+.hearing-tools-award-amount input { flex-grow: 1; }
+.hearing-tools-award-amount .error-block { overflow-x: visible; white-space: nowrap; }
+
+.hearing-tools-include-details .intake-input-component-input-container { display: flex; }
+.hearing-tools-include-details input { flex-grow: 1; }
+
+.hearing-tools-include-details,
+.hearing-tools-amend-options,
+.hearing-tools-sever-options { flex-grow: 1; }
+
+/* Participants */
+.edit .review-participant-type .rtb-editable-component-editstate,
+.edit .review-participant-first .rtb-editable-component-editstate,
+.edit .review-participant-last .rtb-editable-component-editstate,
+.edit .review-participant-contact-first .rtb-editable-component-editstate,
+.edit .review-participant-contact-last .rtb-editable-component-editstate,
+.edit .review-participant-daytime-phone .rtb-editable-component-editstate,
+.edit .review-participant-other-phone .rtb-editable-component-editstate,
+.edit .review-participant-fax .rtb-editable-component-editstate,
+.edit .review-participant-tou .rtb-editable-component-editstate,
+.edit .review-participant-tou-date .rtb-editable-component-editstate,
+.edit .review-participant-status .rtb-editable-component-editstate { width: 200px; }
+
+.edit .review-participant-contact-method .rtb-editable-component-editstate { width: 250px; }
+.edit .review-participant-hearing-options-by .rtb-editable-component-editstate { width: 250px; }
+
+.edit .review-participant-tou select { width: 80px; }
+
+.edit .review-participant-first { margin-right: 15px; }
+.edit .review-participant-first,
+.edit .review-participant-last { display: inline-block; }
+
+.dispute-party-container .input-placeholder,
+.intake-participant .input-placeholder { display: none; }
+
+.dispute-party-container .rtb-editable-component-label { white-space: nowrap; }
+
+.edit .review-participant-business-name .rtb-editable-component-editstate { width: 300px; }
+
+.edit .dispute-party-container .streetContainer,
+.edit .dispute-party-container .provinceContainer,
+.edit .dispute-party-container .postalCodeContainer { padding-right: 0; }
+
+.edit .component-email-input { margin-right: 0; }
+
+
+.participant-name-section,
+.participant-address,
+.participant-email,
+.edit .intake-address-component,
+.edit .review-participant-email { width: 500px; }
+
+/* Edit Participant address */
+.edit .intake-address-component { width: 350px; }
+
+.edit .dispute-party-container .cityContainer,
+.edit .dispute-party-container .countryTextContainer { width: 210px; }
+
+
+.edit .dispute-party-container .postalCodeContainer .intake-input-component { width: 150px; }
+.edit .dispute-party-container .postalCodeContainer input { width: 100px; }
+
+.participant-phone-container { width: 700px; }
+
+/* Add party/claim modal */
+
+#addParty_modal .participant-known-contact-warning { display: none; }
+#addParty_modal .participant-address-unit-container { margin-top: 30px; }
+
+#addParty_modal .participant-type { margin-bottom: 15px; }
+#addParty_modal .participant-business-name { width: 300px; }
+
+#addParty_modal .participant-phone-container > div { padding-right: 0; }
+
+#addParty_modal a { font-size: 15px; }
+
+#addClaim_modal .modal-dialog { min-height: 800px; width: 1200px; }
+#addParty_modal .modal-dialog { min-height: 800px; width: 900px; }
+
+#addParty_modal .radio .label,
+#addClaim_modal .radio .label { margin-left: 10px; }
+
+#addParty_modal .participant-hearing-options-by { width: 300px; }
+
+#addParty_modal .amendment-container,
+#addClaim_modal .amendment-container { margin-top: 20px; }
+
+#addParty_modal .amendment-info-container,
+#addClaim_modal .amendment-info-container { padding-top: 50px; }
+
+#addParty_modal .amendment-warning,
+#addClaim_modal .amendment-warning { margin-top: 20px; padding: 10px 5px 7px 55px; line-height: 30px; }
+#addParty_modal .amendment-warning { margin-top: 0; }
+
+.amendment-regions { display: flex; flex-wrap: wrap; }
+.amendment-by { width: 300px; margin-right: 40px; }
+.amendment-rtb-init, .amendment-respondent-init { width: fit-content; margin: 25px 20px 0 0; }
+.amendment-respondent-init { margin-right: 0; }
+
+#addParty_modal .amendment-regions,
+#addClaim_modal .amendment-regions { padding: 20px 0 20px 0; }
+
+#addParty_modal .amendment-regions > div,
+#addClaim_modal .amendment-regions > div { float: left; }
+
+#addParty_modal .amendment-note,
+#addClaim_modal .amendment-note { width: calc(100% - 330px); }
+
+/* Add claim modal */
+#addClaim_modal { font-size: 18px; }
+#addClaim_modal .claim-selector { margin-top: 30px; }
+.claim-add-edit-container .review-claim-evidence { display: none; }
+
+#addClaim_modal .review-claim-amount,
+.dispute-edit .review-claim-amount,
+#addClaim_modal .review-claim-delivery-date,
+.dispute-edit .review-claim-delivery-date,
+#addClaim_modal .review-claim-delivery-method,
+.dispute-edit .review-claim-delivery-method { width: 235px; }
+
+#addClaim_modal .review-claim-delivery-date-warning,
+.dispute-edit .review-claim-delivery-date-warning { display: none; }
+
+.review-claim-delivery-date { display: flex; }
+.review-claim-delivery-date-warning {
+  margin-left: 10px;
+  background: url('../static/Icon_FeedbackReminderRed.png') no-repeat left center;
+  background-size: 22px;
+  padding-left: 27px;
+}
+
+#addClaim_modal .dispute-claim-outcome-display,
+#addClaim_modal .dispute-claim-hearing-tools-container { display: none !important; }
+
+.review-primary-applicant,
+.review-submitted-date,
+.review-rental-amount-interval-view,
+.review-tenancy-start-date,
+.review-tenancy-agreement-files,
+.review-hearing-container,
+.review-migration-truth { margin-top: 15px; }
+
+.dispute-edit .review-primary-applicant,
+.dispute-edit .review-submitted-date,
+.dispute-edit .review-rent-amount,
+.dispute-edit .review-tenancy-start-date,
+.dispute-edit .review-tenancy-agreement-files { margin-top: 25px; }
+
+/* Manage sub service modal */
+#manageSubService-modal .modal-dialog { min-height: 800px; width: 1200px; overflow: hidden; }
+.sub-serv-inactive-checkbox { margin-bottom: 10px; }
+.manage-sub-service-service-to { width: 350px; min-width: 350px; }
+.manage-sub-service-dropdown { flex-grow: 2; max-width: 500px; }
+.manage-sub-service-edit-container img { margin-bottom: 4px; }
+.manage-sub-service-edit-container { margin-top: 20px;}
+.sub-service-requested-doc { margin: 10px 0; min-width: 350px; }
+.sub-service-requested-doc-wrapper { display: flex; align-items: center; }
+.sub-service-requested-doc-list { position: relative; top: 9px; }
+
+.sub-service-source-documents { display: flex; margin-top: 10px; }
+.sub-service-source-documents .dispute-issue-evidence-title { display: none; }
+.sub-service-source-documents label { min-width: 164px; }
+.sub-service-source-document .sub-service-request-file-description { position: relative; bottom: 1px; }
+
+.sub-service-request-file-description { position: relative; bottom: 8px;}
+
+.sub-service-application-by, .sub-service-service-to, .sub-service-request-source { width: 350px; }
+.sub-service-requested-doc .rtb-editable-component-label { width: 193px; }
+.edit .sub-service-requested-doc { margin-right: 10px; }
+
+.sub-service-doc-type { margin-right: 10px; }
+.sub-service-doc-type-wrapper { display: flex; align-items: center; }
+.sub-service-doc-type-list { position: relative; top: 9px; }
+
+.sub-service-request-stats, .sub-service-doc-other, .sub-service-method-title { min-width: 350px; }
+.sub-service-request-stats .form-control, .sub-service-doc-other .form-control, .sub-service-method-title .form-control { width: 350px; }
+.sub-service-doc-type { min-width: 350px; }
+
+/*
+.sub-service-previous-service-description .rtb-editable-component-viewstate,
+.sub-service-request-description .rtb-editable-component-viewstate,
+.sub-service-request-justification .rtb-editable-component-viewstate,
+.sub-service-previous-service-description .rtb-editable-component-value,
+.sub-service-request-description .rtb-editable-component-value,
+.sub-service-request-justification .rtb-editable-component-value,
+.sub-service-internal-note .rtb-editable-component-viewstate,
+.sub-service-internal-note .rtb-editable-component-label { display: block; }
+*/
+
+.sub-service-previous-service-description .rtb-editable-component-label,
+.sub-service-request-description .rtb-editable-component-label,
+.sub-service-request-justification .rtb-editable-component-label,
+.sub-service-internal-note, .sub-service-confirmed-methods-wont-work .rtb-editable-component-label { display: table-row; }
+.sub-service-request-stats { margin-bottom: 10px; }
+
+.sub-service-internal-note { margin-top: 10px; flex-grow: 1; width: 350px;}
+.sub-service-internal-note .form-control { width: 500px; }
+.sub-service-outcomes { margin-top: 18px; }
+
+.sub-service-previous-service-description,
+.sub-service-request-description,
+.sub-service-request-justification { margin: 20px 0; }
+
+.sub-service-service-to .rtb-editable-component-label { min-width: 90px; }
+
+/* RI Dashboard Modal */
+#permitsDashboard-modal .modal-dialog,
+#ariDashboard-modal .modal-dialog { min-height: 500px; min-width: 800px; width: fit-content; max-width: 95%; }
+
+#permitsDashboard-modal .modal-dialog { min-width: 1200px; }
+
+#permitsDashboard-modal .modal-button-container .general-link,
+#ariDashboard-modal .modal-button-container .general-link { margin-right: 20px; }
+
+.ari-checkmark-img {
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+  background-image: url('../static/Icon_CheckboxSelected_DIS.gif');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.ari-dashboard-table-container { overflow: scroll; width: 100%; padding: 0 15px 15px 0; font-size: 17px; }
+
+.ari-dashboard-line { display: flex; flex-wrap: nowrap; height: 36px; }
+
+.ari-dashboard-table-section { display: flex; position: relative; border-bottom: 1px solid #999; }
+.ari-dashboard-table-section .ari-dashboard-table-section { border-bottom: none; }
+.ari-dashboard-table-section:last-child { border-right: none; };
+
+.ari-dashboard-table-lines .ari-dashboard-table-arb-awards-container,
+.ari-dashboard-table-lines .ari-dashboard-table-arb-awards,
+.ari-dashboard-table-lines .ari-dashboard-table-unit-costs { padding-top: 0 }
+
+.ari-dashboard-table-lines .ari-dashboard-table-section > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-top: 5px; }
+
+.ari-dashboard-table-units { width: 550px; min-width: 550px; }
+.ari-dashboard-table-unit { min-width: 250px; width: 250px; }
+.ari-dashboard-table-rent { min-width: 120px; width: 120px; }
+.ari-dashboard-table-tenants { min-width: 80px; width: 80px; }
+.ari-dashboard-table-ri-unit { min-width: 110px; width: 110px; text-align: center; padding-top: 1px !important; }
+.ari-dashboard-table-ri-unit > .ari-checkmark-img { margin-top: -2px; }
+
+.ari-dashboard-table-costs { width: fit-content; }
+.ari-dashboard-table-unit-cost { min-width: 200px; width: 200px; border-right: 1px solid #999; text-align: center; padding-top: 1px !important; }
+.ari-dashboard-table-unit-cost:last-child { border-right: none; }
+
+.ari-dashboard-table-arb-awards { padding-top: 0 !important; }
+.ari-dashboard-table-arb-award { display: flex; border-right: 1px solid #999; width: 250px; min-width: 250px; padding-top: 1px !important; }
+.ari-dashboard-table-arb-award:last-child { border-right: 0; }
+
+.ari-dashboard-table-arb-award-checkbox { min-width: 140px; width: 140px; text-align: center; }
+.ari-dashboard-table-arb-award-calc { min-width: 100px; width: 100px; text-align: center; }
+
+.ari-dashboard-table-lines .ari-dashboard-table-arb-award-calc { text-overflow: ellipsis; overflow: hidden; padding-top: 3px; }
+
+.ari-dashboard-table-ri-container { min-width: 200px; width: 200px; }
+.ari-dashboard-table-ri-checkbox { min-width:100px; width: 100px; text-align: center; padding-top: 1px !important; }
+.ari-dashboard-table-ri-calc { min-width:100px; width: 100px; text-align: center; }
+
+/* RI Dash header styles */
+.ari-dashboard-table-header-titles { display: flex; }
+
+.ari-dashboard-table-header-titles .ari-dashboard-line,
+.ari-dashboard-table-header-titles,
+.ari-dashboard-table-header { height: auto; }
+
+.ari-dashboard-table-header-titles .ari-dashboard-table-units,
+.ari-dashboard-table-header-titles .ari-dashboard-table-unit-costs,
+.ari-dashboard-table-header-titles .ari-dashboard-table-arb-awards-container,
+.ari-dashboard-table-section { border-right: 2px solid #666; }
+
+.ari-dashboard-table-header-titles .ari-dashboard-table-section { padding-top: 0; }
+
+.ari-dashboard-table-header-title { font-weight: bold; padding-left: 10px; }
+.single-unit-costs .ari-dashboard-table-header-title { padding-left: 5px; }
+.ari-dashboard-table-units .ari-dashboard-table-header-title { padding-left: 0; }
+
+/* RI Dash footer styles */
+.ari-dashboard-table-footer { display: flex; }
+
+.ari-dashboard-table-footer .ari-dashboard-table-units { display: flex; justify-content: flex-end; }
+.ari-dashboard-table-footer .ari-dashboard-table-units > div { display: flex; justify-content: space-around; }
+.ari-dashboard-table-footer .ari-dashboard-table-units > div > span { padding: 0 15px; }
+
+.ari-dashboard-table-footer .ari-dashboard-table-arb-award { display: flex; justify-content: space-around; }
+
+.ari-dashboard-table-footer .ari-dashboard-table-ri-container { display: flex; justify-content: flex-end; padding-right: 10px; }
+
+.ari-dashboard-table-header-titles .ari-dashboard-table-section,
+.ari-dashboard-table-footer .ari-dashboard-table-section { border-bottom: 0; }
+
+/* Hide all disabled checkboxes */
+.ari-dashboard-table-container .intake-checkbox-component.disabled { visibility: hidden; }
+
+/* Permits dashboard styles */
+.permits-dashboard-line {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 36px;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.permits-dashboard-line > div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.permits-dashboard-has-permits { min-width: 80px; width: 80px }
+.permits-dashboard-permit-id { min-width: 190px; width: 190px }
+.permits-dashboard-permit-date { min-width: 120px; width: 120px; }
+.permits-dashboard-permit-by { min-width: 260px; width: 260px; }
+
+/* Overrides from ARI-C dashboard for Permits dashboard: */
+#permitsDashboard-modal .ari-checkmark-img { display: flex; height: 27px; width: 27px; }
+#permitsDashboard-modal .ari-dashboard-table-footer-container { display: flex; margin-top: 5px; }
+#permitsDashboard-modal .ari-dashboard-table-header .general-link { width: fit-content; }
+#permitsDashboard-modal .ari-dashboard-table-container { overflow: hidden; }
+
+/* Status section */
+.review-dispute-status-container { border-bottom: 1px solid #d2d2d2; padding: 0 0 5px 0; width: 100%; }
+.review-dispute-status .review-applicant-title.section-header { display: none!important; }
+.status-edit .review-dispute-status .review-information-body { margin-top: 0; }
+.review-dispute-status .review-information-body { margin-top: 20px; }
+.review-dispute-status .context-container { padding-top: 0; padding-bottom: 0; }
+
+.review-dispute-status-container .context-menu-actions { background-color: #f2f2f2; }
+.review-dispute-status-container .context-menu-name { border-left: 0; color: #777; font-style: italic; }
+.review-dispute-status-container .wrapped-view-container { margin-top: 10px; }
+
+.review-dispute-status .context-menu { display: none; }
+.status-edit .review-dispute-status .context-menu,
+.dispute-edit .review-dispute-status .context-menu { display: block; }
+
+.status-edit .review-status-stage,
+.status-edit .review-status { width: 350px; display: inline-block; }
+
+.status-edit .review-status-process { width: 240px; }
+.status-edit .review-evidence-override { width: 215px; }
+
+.review-status-icon { display: inline-block; background-size: 39px 30px; height: 45px; width: 50px; position: relative; margin-right: 2px; background-repeat: no-repeat; background-position-x: 5px; background-position-y: 8px; }
+.review-status-stage-icon { background-image: url('../static/Icon_Admin_SSPOStatus.png'); }
+.review-status-owner-icon { background-image: url('../static/Icon_Admin_SSPOOwner.png'); }
+.review-status-process-icon { background-image: url('../static/Icon_Admin_SSPOProcess.png'); }
+.review-status-override-icon { background-image: url('../static/Icon_Admin_SSPOOverride.png'); }
+
+/*
+.status-edit .review-status-stage-icon,
+.status-edit .review-status-owner-icon,
+.status-edit .review-status-process-icon,
+.status-edit .review-status-override-icon,
+*/
+
+.status-edit .review-status-icon { top: 16px; }
+
+.status-icon-edit-only { display: none; }
+.status-edit .status-icon-edit-only { display: inline-block; }
+.status-edit .review-status-owner-display-container { display: none; }
+
+
+.status-edit .status-icon-display-only { display: none; }
+
+
+.review-status-stage-container,
+.review-status-owner-display-container,
+.review-status-process-container,
+.review-status-override-container { display: inline-block; }
+
+.review-status-owner-display,
+.review-status-process,
+.review-evidence-override { position: absolute; top: 13px; }
+
+.status-edit .review-status-process,
+.status-edit .review-evidence-override { position: relative; top: unset; }
+
+.review-status-note { margin: 10px 0px 0px 4px; }
+.review-status-note--empty { display: none; }
+.status-edit .review-status-note--empty { display: inline;}
+
+.review-status-note .rtb-editable-component-label,
+.review-status-note .rtb-editable-component-value,
+.review-status-note .rtb-editable-component-value > div { display: inline }
+
+.review-status-owner-edit-container { display: none; }
+.status-edit .review-status-owner-edit-container { display: flex; margin-top: 25px; }
+.status-edit .review-status-owner-container { display: inline-block; flex-grow: 1; }
+
+
+.quickstatus-container { width: 100%; }
+.quickstatus-container-title {
+  display: flex;
+  font-size: 19px;
+  color: #4b4b4b;
+  border-bottom: 1px solid #e5e5e5;
+  margin-top: 8px;
+  padding: 5px 0px 2px 10px;
+  background-color: #f6f6f6;
+  line-height: 28px;
+  height: 38px;
+}
+.quickstatus-region { width: 100%; margin-left:10px; }
+
+.quickstatus-list { width: 100%; }
+.quickstatus-item { display: flex; position:relative; padding: 0 0 10px 0; border-bottom: 1px solid #d2d2d2; }
+.quickstatus-item:last-child { border-bottom: none; }
+.quickstatus-title { top:10px; min-width: 340px; width: 340px; position: relative; display: flex; align-items: center; margin-right: 10px; }
+.quickstatus-stage { min-width: 220px; width: 220px; margin-right: 10px; }
+.quickstatus-status { min-width: 230px; width: 230px; margin-right: 10px; }
+.quickstatus-owner { min-width: 220px; width: 220px; margin-right: 10px; }
+.quickstatus-override { min-width: 212px; width: 212px; margin-right: 10px; margin-top: 23px; }
+.quickstatus-override input[type="checkbox"] + span { padding-left: 35px; }
+.quickstatus-save {
+  margin-top: 25px;
+  background-image: url('../static/Icon_Admin_QuickStatusGo.png');
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.quickstatus-item .intake-checkbox-component input[type="checkbox"]:checked + span {
+  background-image: url('../static/Admin_Icon_DeliverReadyCheck.png');
+  opacity: 1;
+  background-size: 26px 25px;
+  padding-left: 32px;
+  margin-left: 2px;
+}
+.quickstatus-item .intake-checkbox-component input[type="checkbox"] + span {
+  background-image: url('../static/Icon_Admin_DeliverNotReadyX.png');
+  opacity: 1;
+  background-size: 26px 25px;
+  padding-left: 32px;
+  margin-left: 2px;
+}
+
+.quickstatus-modal-info { margin: 20px 10px 20px 10px; }
+
+.review-claim-delivery-method select { width: auto; }
+
+.review-applicant-name .rtb-editable-component-value,
+.review-participant-business-name .rtb-editable-component-value { font-weight: bold; }

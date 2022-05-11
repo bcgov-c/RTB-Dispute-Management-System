@@ -1,0 +1,93 @@
+@import '../../styles/variables';
+@import '../../../core/styles/index.scss';
+
+$ICON-ADD-URL: url('../../../core/static/Icon_AddBlue.png');
+$ICON-MODIFY-URL: url('../../static/DA_ModifyIcon.png');
+$ICON-CHECK-URL: url('../../static/DA_CheckIcon.png');
+$ICON-SERVICE-CROSS-URL: url('../../static/DA_XIIcon.png'); 
+$ICON-TARGET-URL: url('../../static/DA_TargetIcon.png');
+
+.da-notice-service-page,
+.da-modify-notice-service-page { font-size: $DAC-FONT-SIZE-CONTENT; }
+
+.da-update-notice-service-list-container { display: flex; justify-content: space-between; }
+.da-notice-service-tenant-initials-container { min-width: 190px; }
+
+.da-receipt-complete-service { margin-right: 15px; }
+
+.da-modify-notice-service-container { margin-top: 20px; }
+
+.da-update-notice-service-progress-bar-container { display: flex; margin: 20px 0 15px 0; }
+.da-update-notice-service-progress-bar { max-width: 300px; margin-right: 20px; }
+
+.da-update-contact-service-info-desc { border-bottom: 1px solid #d2d2d2; padding-bottom: 15px;}
+.da-update-contact-service-info-header {
+  @extend .dms__step-description;
+  margin-bottom: 15px;
+}
+.da-notice-service-status-information, .da-notice-service-modify-add { display: flex; flex-direction: row; }
+
+.da-notice-service-status-information > div { display: flex; flex-direction:column; justify-content: center; text-align: center; background-position: center; line-height: 21px; }
+
+.da-update-service-receipt-page .error-block.warning { margin-top: 10px; }
+.da-notice-service-modify-and-add-button { color: $DMS-COLOR-BLUE-PRIMARY; width: 200px; margin-left: 5px; margin-top: 4px;}
+.da-notice-service-modify-add { cursor: pointer; }
+.da-plus-icon { background-image: $ICON-ADD-URL; background-repeat: no-repeat; width: 30px; height: 28px; }
+.da-modify-icon { background-image: $ICON-MODIFY-URL; background-repeat: no-repeat; width: 30px; height: 28px; }
+.da-notice-service-checked-icon { background-image: $ICON-CHECK-URL; background-repeat: no-repeat; min-width: 24px; width: 24px; margin-right: 10px; }
+.da-notice-service-cross-icon { background-image: $ICON-SERVICE-CROSS-URL; background-repeat: no-repeat; min-width: 24px; width: 24px; margin-right: 10px; }
+.notice-service-initials-icon { margin-top: 4px; background-image: $ICON-TARGET-URL; background-repeat: no-repeat; width: 35px; margin-right: 5px; }
+.da-notice-tenant-initials-access-code-container { margin-left: 5px; }
+
+.da-notice-service-no-info-provided { color: $DMS-COLOR-RED-PRIMARY; margin-top: 3px; }
+.da-notice-service-info-provided { margin-top: 3px; text-align: left !important; }
+
+.add-service-info-for-container { display: flex; }
+.add-service-info-for-container { margin-top: 15px; }
+
+.da-notice-service-comment-header { margin-top: 25px; }
+
+.da-notice-service-method select { width: 260px; }
+
+.da-notice-service-comment { max-width: 600px; }
+
+.da-notice-service-list .standard-list-item { padding-top: 20px; padding-bottom: 20px; }
+
+.da-notice-service-add-files-container .file-container { background-color: #fff6e5; }
+.da-notice-service-add-files-container .da-upload-add-button { margin-right: 15px; }
+.da-notice-service-add-files-container > span { font-style: italic; }
+.da-notice-service-add-files-container .da-notice-service-files { margin-top: 10px; }
+
+/* Upload styles */
+.da-modify-notice-service-container.upload .dac__page-buttons,
+.da-modify-notice-service-container.upload .file-remove-container,
+.da-modify-notice-service-container.upload .file-delete-container  { display: none; }
+
+.da-notice-service-delivered-date,
+.da-notice-service-comment,
+.da-notice-service-method { margin-bottom: 10px; }
+
+.skipService-modal .intake-checkbox-component { margin-top: 30px; }
+
+/* Desktop-only styles */
+@media (min-width: 768px) {
+  .da-notice-service-status-information { flex-grow: 1; margin-right: 20px;  }
+  .da-notice-service-list .standard-list-item { padding-top: 20px; padding-bottom: 20px; }
+
+  .skipService-modal .modal-dialog { width: 700px; }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .da-update-notice-service-container, .da-modify-notice-service-container { padding-left: 10px; padding-right: 10px; }
+  .da-update-notice-service-list-container { display: block; }
+  .da-notice-service-tenant-initials-container, .da-notice-service-status-information { margin-bottom: 10px; }
+
+  .da-update-notice-service-progress-bar-container .access-issue-progress-bar { width: 100%; }
+}
+
+@media (max-width: 500px) {
+  .da-update-notice-service-progress-bar-container { display: block; }
+  .da-update-notice-service-progress-bar { max-width: 100%; }
+  .da-update-notice-service-progress-text { display: inline-block; margin-top: 5px; float: right; }
+}

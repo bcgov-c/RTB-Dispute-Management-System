@@ -1,0 +1,134 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: ${NAME}
+  annotations:
+    openshift.io/display-name: Email Generator
+    description: ${NAME} template
+    tags: cm, rtb, dotnet
+    iconClass: icon-dotnet
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+labels:
+  template: ${NAME}
+  app: "${NAME}"
+objects:
+- kind: Secret
+  apiVersion: v1
+  data:
+    appsettings.json: >-
+      ewogICJDb25uZWN0aW9uU3RyaW5ncyI6IHsKICAgICJEYkNvbm5lY3Rpb24iOiAKICAgICAgIkhvc3Q9cG9zdGdyZXNxbDsgUG9ydD01NDMyO0RhdGFiYXNlPWNhc2VtYW5hZ2VtZW50O1VzZXJuYW1lPXBvc3RncmVzO1Bhc3N3b3JkPXBvc3RncmVzO0ludGVncmF0ZWQgU2VjdXJpdHk9ZmFsc2U7IgogIH0sCiAgICAiTVEiOiB7CiAgICAgICJDbHVzdGVyIjogImhvc3Q9cmFiYml0bXEtY2x1c3Rlcjt1c2VybmFtZT1ndWVzdDtwYXNzd29yZD1ndWVzdDtwdWJsaXNoZXJDb25maXJtcz10cnVlO3RpbWVvdXQ9MTAiCiAgICB9Cn0=
+  metadata:
+    name: secret-appsettings-email-generator
+  type: Opaque
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+      service.alpha.openshift.io/dependencies: '[{"name": "${NAME}", "kind": "Service"}]'
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: "${NAME}"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}:${TAG}"
+          namespace: "${TOOLS_NAMESPACE}"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        containers:
+        - name: ${NAME}
+          ports:
+          - containerPort: 8080
+          image: >-
+            docker-registry.default.svc:5000/${TOOLS_NAMESPACE}/${NAME}:${TAG}
+          env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: "Staging"
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+          volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+          livenessProbe:
+            httpGet:
+              path: "api/health"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: "api/health"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+        volumes:
+        - name: secrets
+          secret:
+            secretName: secret-appsettings-email-generator
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: email-generator
+- name: TAG
+  displayName: Tag
+  description: Specify tag name.
+  required: true
+  value: latest
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  required: true
+  description: Maximum amount of memory the .NET Core container can use.
+  value: 2Gi
+- name: TOOLS_NAMESPACE
+  displayName: Namespace
+  description: The RTB Namespace where the ImageStream resides.
+  required: true
+  value: rtb-dms-tools
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the .NET Core service, if left blank a value will be defaulted.
+  value: ''

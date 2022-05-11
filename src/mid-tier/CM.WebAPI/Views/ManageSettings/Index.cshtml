@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>System Settings edit</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/js/gijgo.js" type="text/javascript"></script>
+    <link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.6/css/gijgo.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <table id="grid"></table>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">$(document).ready(function() {
+    var grid = $('#grid').grid({
+                dataSource: 'api/settings',
+                uiLibrary: 'bootstrap4',
+                primaryKey: 'system_settings_id',
+                inlineEditing: { mode: 'command' },
+                columns: [
+                    { field: 'system_settings_id', title: 'ID', width: 70 },
+                    { field: 'key', title: 'Key' },
+                    { field: 'value', title: 'Value', editor: true }
+                ],
+                pager: { limit: 50 }
+            });
+            grid.on('rowDataChanged', function(e, id, record) {
+                // Clone the record in new object where you can format the data to format that is supported by the backend.
+                var data = $.extend(true, {}, record);
+                // Post the data to the server
+                $.ajax({
+                    url: 'api/settings',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    method: 'POST'
+                })
+                    .fail(function() {
+                        alert('Failed to save.');
+                    });
+            });
+});</script>
+</body>
+</html>

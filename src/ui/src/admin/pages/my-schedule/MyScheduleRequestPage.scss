@@ -1,0 +1,83 @@
+.schedule-request {
+  margin-top: 20px;
+
+  &__table {
+    
+  }
+
+  &__table-header {
+    display: flex;
+  }
+
+  &__created-column {
+    width: 15%;
+    min-width: 200px;
+  }
+
+  &__type-column {
+    width: 15%;
+    min-width: 155px;
+  }
+
+  &__status-column {
+    width: 210px;
+    min-width: 210px;
+  }
+
+  &__owner-column {
+    width: 14%;
+    min-width: 175px;
+  }
+
+  &__start-column {
+    width: 210px;
+    min-width: 210px;
+  }
+
+  &__end-column {
+    width: 210px;
+    min-width: 210px;
+  }
+
+  &__duration-column {
+    width: 120px;
+    min-width: 120px;
+  }
+
+  &__edit-column {
+    width: 80px;
+    min-width: 80px;
+    display: flex;
+    justify-content: space-between;
+
+    &__link {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+  }
+
+  &__delete {
+    cursor: pointer;
+    width: 27px;
+  }
+
+  &__show-more {                                                                                                                                                                                                                                                         
+    display: inline-block;
+    font-size: 20px;
+    margin: 15px 0 15px 0;
+    color: #8e8e8e;
+    padding-left: 31px;
+    background: url('../../static/Icon_ShowMore.png') 0 0 no-repeat;
+    cursor: pointer;
+  }
+
+  .standard-list-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 3px 5px 3px;
+    border-bottom: 1px #e5e5e5 solid;
+  }
+
+  .standard-list-items { margin-top: 0; }
+}

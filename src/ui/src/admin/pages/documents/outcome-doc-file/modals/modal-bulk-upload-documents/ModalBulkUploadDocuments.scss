@@ -1,0 +1,42 @@
+.bulk-upload-documents {
+  &__header {
+    background-image: url('../../../../../static/Icon_Admin_OutcomeDoc_Final.png');
+    background-repeat: no-repeat !important;
+    display: flex;
+    color: #b3afaf;
+    border-bottom: 2px solid #d2d2d2;
+    margin-top: 18px;
+    line-height: 24px;
+    padding: 0 0 3px 35px;
+    margin-bottom: 20px;
+  
+    &--working-docs {
+      @extend .bulk-upload-documents__header;
+      background-image: url('../../../../../static/Icon_Admin_OutcomeDoc_Working.png');
+      margin-top: 40px;
+    }
+  }
+
+  .dispute-outcome-doc-files-external {
+    margin-bottom: 10px;
+
+    .dispute-issue-evidence-content { display: inline-block; }
+  }
+
+  &__body {
+    margin-bottom: 20px;
+  }
+
+  &__document {
+    margin-bottom: 20px;
+
+    &__header {
+      font-weight: bold;
+      font-size: 20px;
+    }
+  }
+
+  .modal .button-row { margin: 0; }
+}
+
+#bulkUploadDocuments_modal .modal-dialog { width: 1000px; }

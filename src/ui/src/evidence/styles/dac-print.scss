@@ -1,0 +1,27 @@
+@media print {
+  
+  #root, #main-content, #content-container, #content, .page-view {
+    display: block !important;
+    overflow: visible !important;
+  }
+  #root { padding-bottom: 0 !important; }
+  #footer { display: none; }
+  
+  /* Seems heavy, but this reliably prints all elements on page */
+  * { position: relative !important; }
+  
+  #access-dispute-issues .access-issue-row { page-break-after: always; }
+
+  .dac__receipt__thank-you,
+  .dac__page-buttons,
+  .dac__page-header-container,
+  .dac__page-header,
+  .dac__dispute-overview-container,
+  .error-block.warning,
+  .help-icon { display: none!important; }
+  
+  /* This is important to eliminate the extra blank page when printing */
+  .dac__page-buttons,
+  .dac__page-buttons + .spacer-block-10 { height: 0px!important; }
+
+}

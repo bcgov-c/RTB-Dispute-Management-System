@@ -1,0 +1,84 @@
+{
+  "FLAG_ID_SUB_SERVICE_REQUESTED": "1-1",
+  "FLAG_ID_SUB_SERVICE_APPROVED": "1-2",
+  "FLAG_ID_CORRECTION": "2-1",
+  "FLAG_ID_CLARIFICATION": "3-1",
+  "FLAG_ID_REVIEW": "4-1",
+  "FLAG_ID_ADJOURNED": "5-1",
+  "FLAG_ID_AMENDMENT": "6-1",
+  "FLAG_ID_REVIEW_LATE": "7-1",
+  "FLAG_ID_PRELIM_HEARING": "8-1",
+  "FLAG_ID_REVIEW_HEARING": "9-1",
+  "dispute_flags": {
+    "1-1": {
+      "flag_title": "Sub-service requested",
+      "flag_type": 1,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "1-2": {
+      "flag_title": "Sub-service approved",
+      "flag_type": 1,
+      "flag_subtype": 2,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "2-1": {
+      "flag_title": "Correction requested",
+      "flag_type": 2,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "3-1": {
+      "flag_title": "Clarification requested",
+      "flag_type": 3,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "4-1": {
+      "flag_title": "Review consideration requested",
+      "flag_type": 4,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "5-1": {
+      "flag_title": "Adjourned hearing",
+      "flag_type": 5,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "6-1": {
+      "flag_title": "Amendment on file",
+      "flag_type": 6,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "7-1": {
+      "flag_title": "Review consideration requested - Late",
+      "flag_type": 7,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "8-1": {
+      "flag_title": "Prehearing Conference",
+      "flag_type": 8,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    },
+    "9-1": {
+      "flag_title": "Review Hearing",
+      "flag_type": 9,
+      "flag_subtype": 1,
+      "flag_status": 1,
+      "is_public": false
+    }
+  }
+}

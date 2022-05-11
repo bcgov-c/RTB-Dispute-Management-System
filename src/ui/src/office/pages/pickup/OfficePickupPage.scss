@@ -1,0 +1,85 @@
+.office-pickup {
+  span { font-size: inherit!important;} //fixes bug which causes all spans to go to font-size: 16px once this.render() inside this.listenTo(this.pickupOptionsModel) is called??
+  &__title {
+    display: flex;
+    align-items: center;
+  }
+
+  &__options {
+    .radio {
+      display: flex !important;
+      flex-direction: column;
+      label { margin-left: 0; margin-top: 5px; }
+    }
+
+    &__created-date {
+      color: #999;
+    }
+
+    &__wrapper {
+      margin-top: 20px;
+    }
+  }
+
+  &__overview-text {
+    margin: 20px 0;
+  }
+
+  &__email {
+    &__wrapper {
+      border: 2px solid #dbdbdb;
+      margin-top: 10px;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      background-color: #dbdbdb;
+      padding: 10px;
+    }
+  }
+
+  &__print {
+    display: flex;
+    align-items: center;
+
+    &__initiated {
+      margin-left: 20px;
+
+      &__text {
+        top: 4px;
+        position: relative;
+        margin-left: 5px;
+      }
+    }
+  }
+
+  &__attachments { margin-top: 20px; }
+
+  &__attachment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &__display {
+      font-size: 18px;
+      margin-left: 20px;
+
+      &__file-size {
+        color: #a3a3a3;
+      }
+
+      &__file-text {
+        font-weight: bold;
+        color: #a3a3a3;
+      }
+
+      &__icon {
+        bottom: 2px;
+        position: relative;
+        margin-left: 20px;
+      }
+    }
+  }
+}

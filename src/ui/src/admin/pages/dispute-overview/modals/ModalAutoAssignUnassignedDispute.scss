@@ -1,0 +1,14 @@
+.assign-dispute {
+  &__assign-dropdowns {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__stage-label, &__status-label { color: #8e8e8e; }
+  &__stage, &__status { width: 180px; }
+  &__owner { width: 225px; }
+}
+
+#assign-dispute_modal {
+  .modal-dialog { min-width: 655px; }
+}

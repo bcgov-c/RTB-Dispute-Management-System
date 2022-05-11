@@ -1,0 +1,380 @@
+
+/**
+ * Core DA components
+ */ 
+@import "variables";
+@import '../../core/styles/index.scss';
+
+$ICON-DMS-LOGO-URL: url('../static/DA_DMSLogo_125.png');
+$ICON-FEEDBACK-REMINDER-URL: url('../static/Icon_FeedbackReminder.png');
+$ICON-DELETE-URL: url('../static/Icon_AdminPage_Delete.png');
+$ICON-PRINT-URL: url('../static/DA_Icon_Print.png');
+//
+$ICON-HAND-PAPER-LIGHT-URL: url('../static/DA_MenuIcon_NoticeService.png');
+$ICON-HAND-PAPER-URL: url('../static/DA_MenuIcon_NoticeService_Drk.png');
+$ICON-PAYMENT-URL: url('../static/DA_MenuIcon_MakePayment.png');
+$ICON-EVIDENCE-URL: url('../static/DA_MenuIcon_Evidence.png');
+$ICON-CONTACT-URL: url('../static/DA_MenuIcon_UpdateContact.png');
+
+$_PADDING-DISPUTE-OVERVIEW-ROWS-DESKTOP: 6px;
+$_PADDING-DISPUTE-OVERVIEW-ROWS-MOBILE: 8px;
+$_SITE-MAX-WIDTH: 1280px;
+
+#root {
+  padding-bottom: 50px;
+  overflow: auto;
+  height: 100vh;
+
+  &.root-rendered { background-color: #e5e5e5; }
+}
+
+#floating-header {
+  #header {
+    position: relative;
+
+    .header-inner, .bannerlogo, .subbannertext {
+      max-width:$_SITE-MAX-WIDTH;
+      margin: 0 auto;
+    }
+  }
+}
+
+#header {
+  position: relative;
+
+  .header-inner, .bannerlogo, .subbannertext {
+    max-width:$_SITE-MAX-WIDTH;
+    margin: 0 auto;
+  }
+}
+
+#footer {
+  .footer-inner {
+    max-width: $_SITE-MAX-WIDTH;
+    margin: 0 auto;
+  }
+}
+
+#main-content { background-color: #f1f1f1; }
+
+#content-container {
+  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+  max-width:$_SITE-MAX-WIDTH;
+  overflow: auto;
+}
+
+#content {
+  height: 100%;
+}
+
+#floating-main-content {
+  max-width: 767px;
+  overflow: auto;
+  margin: 0 auto;
+  position:relative;
+  top: 20px;
+  border: 3px solid #f1f1f1;
+  background-color: #fff;
+}
+
+/* Global component styles - NOTE: these defaults should be in the base stylesheet, they /should/ apply everywhere */
+.info-help-container { width: 100%; }
+.error-block.warning { line-height: 22px; }
+
+// Overrides for button wrapping
+#addFiles_modal .button-row {
+  margin-top: 16px;
+  > div.float-right, > div.float-left { line-height: $DAC-LINE-HEIGHT-WRAPPING-BUTTONS; }
+}
+
+
+.dac {
+  // Joining selectors
+  // Sub-elements in BEM style
+
+  // Icons for menu and site
+  &__icons {
+
+    // SiteIcon component
+    &__site {
+      float: left;
+      min-width: 115px;
+      width: 115px;
+      height: 125px;
+      background: $ICON-DMS-LOGO-URL 0 0 no-repeat;
+      background-size: 125px 125px;
+      margin: 0 20px 0 0;
+      background-position: -10px;
+    }
+
+    &__menu__evidence { background-image: $ICON-EVIDENCE-URL; }
+    &__menu__contact { background-image: $ICON-CONTACT-URL; }
+    &__menu__payment { background-image: $ICON-PAYMENT-URL; }
+    &__menu__service { background-image: $ICON-HAND-PAPER-URL; }
+
+    &__exclamation {
+      background-image: $ICON-FEEDBACK-REMINDER-URL;
+      height: 28px;
+      background-repeat: no-repeat;
+      width: 30px;
+      min-width: 30px;
+      margin: -2px 8px 0 0;
+    }
+
+    &__trash {
+      @extend .dac__icons__exclamation;
+      background-image: $ICON-DELETE-URL;
+    }
+  }
+
+  &__contact {
+    &__receipt {
+      margin-bottom: 30px;
+    }
+  }
+
+  // DisputeOverview component
+  &__dispute-overview-container { padding: 40px 0 0 0; }
+  &__dispute-overview {
+    display: flex;
+    &__title-container {
+      font-size: 22px;
+      color: #333;
+      border-bottom: 2px solid #d2d2d2;
+      margin-top: 10px;
+      
+      .dac__logout-link {
+        float: right;
+        margin-bottom: 3px;
+      }
+    }
+
+    &__info {
+      display: inline-block;
+      width: 100%;
+
+      &__content {
+        display: flex;
+        margin-top: 5px;
+        font-size: $DAC-FONT-SIZE-CONTENT;
+
+        &__col {
+          flex-grow: 1;
+
+          > div {
+            line-height: 18px;
+            padding-bottom: $_PADDING-DISPUTE-OVERVIEW-ROWS-DESKTOP;
+
+            &:last-child { padding-bottom: 0; }
+          }
+        }
+
+        .review-label { font-size: $DAC-FONT-SIZE-CONTENT; }
+      }
+    }
+
+  }
+
+  // PageHeader component
+  &__page-header-container { margin-top: 30px; }
+  &__page-header {
+    font-size: $DAC-FONT-SIZE-PAGE-TITLES;
+    line-height: 22px;
+    color: #333;
+    padding-bottom: 2px;
+    border-bottom: 2px solid #f1f1f1;
+    display: flex;
+
+    &__icon {
+      height: 32px;
+      width: 32px;
+      min-width: 32px;
+      display: inline-block;
+      background-size: 32px 32px;
+      margin-right: 5px;
+      background-repeat: no-repeat;
+    }
+    &__title {
+      margin-top: 8px;
+    }
+    &__instructions {
+      margin-top: 20px;
+      font-size: $DAC-FONT-SIZE-CONTENT;
+      color: #333;
+      
+      .instructions-em { color: #e1940a; }
+    }
+  }
+
+  // PageButtons component
+  &__page-buttons {
+    // When buttons wrap, add an extra 10px of top padding on the second row
+    line-height: $DAC-LINE-HEIGHT-WRAPPING-BUTTONS;
+    > * {
+      margin-right: 10px;
+      &:last-child { margin-right:0; }
+    }    
+
+    &__print-btn {
+      display: inline-block;
+      width: 100px;
+      height: 34px;
+      cursor: pointer;
+      color: #8e8e8e;
+      background-image: $ICON-PRINT-URL;
+      background-repeat: no-repeat;
+      padding-left: 40px;
+      background-size: 34px;
+      line-height: 1.3333333;
+      font-size: $DAC-FONT-SIZE-BUTTON;
+    }
+  }
+
+  // ReceiptPage submission component
+  &__receipt-container {
+    margin-bottom: 30px;
+  }
+
+  &__receipt__thank-you {
+    margin-top: 25px;
+    font-size: $DAC-FONT-SIZE-CONTENT;
+
+    &__title {
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+  }
+
+  // DA yes/no buttons
+  &__yes-no {
+    font-size: $DAC-FONT-SIZE-BUTTON;
+    min-width: 70px;
+    height: 40px;
+    line-height: 38px;
+    padding: 0;
+  }
+  
+  // Descendant selectors
+  .page-view {
+    padding: 0 20px;
+    max-width: none;
+    overflow: auto;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .btn-lg {
+    padding: 8px 16px 6px 16px;
+    font-size: $DAC-FONT-SIZE-BUTTON;
+    line-height: 1.3333333;
+    border-radius: 0px;
+    height: 40px;
+  }
+
+  .step-description {
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+  }
+
+
+  .da-receipt-page .dac__page-header { margin: 10px 0;  }
+
+  // Add top alignnment to logout linnk
+  .receipt-logout-btn { top: 3px; position: relative; }
+
+  // NOTE: The font size is baked in globally for email styles
+  //   Should it be done this way, or should each site/receipt define the size?
+  //   If we have the global font size in index, it means we have to manually subclass here if font size is to be increased
+  .emailable-content table td {
+    font-size:$DAC-FONT-SIZE-CONTENT;
+  }
+  .emailable-content span {
+    font-size:$DAC-FONT-SIZE-CONTENT;
+  }
+  .emailable-content td.email-content {
+    font-size:$DAC-FONT-SIZE-CONTENT;
+  }
+  .emailable-content .email-content p {
+    font-size:$DAC-FONT-SIZE-CONTENT;
+  }
+}
+
+/* Desktop-only styles */
+@media (min-width: 768px) {
+  .dac {
+    &__dispute-overview__title { float: left; }
+    &__dispute-overview__info__content__col:first-child { margin-right: 10px; }
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+
+  #root { padding-bottom: 0; }
+  #main-content {
+    position: fixed!important;
+    height: auto;
+    overflow: auto;
+    bottom: 0;
+  }
+
+  #floating-main-content {
+    top: 0;
+    border: 0;
+    width: 100%;
+    height: 100vh;
+  }
+
+  #addFiles_modal .btn-delete-all .glyphicon { display: inline; }
+  #addFiles_modal .btn-delete-all span { display: none; }
+
+  .dac {
+    &__icons__site {
+      width: 80px;
+      min-width: 80px;
+      height: 80px;
+      margin: 0 8px 0 0;
+      background-size: 80px 80px;
+      background-position: 0;
+    }
+
+    // DisputeOverview component
+    &__dispute-overview-container { padding-top: 20px; }
+    &__dispute-overview {
+      &--mobile { margin: 15px 0 0 0; border-top: 2px solid #d2d2d2; }
+      
+      &__title-container {
+        margin-top: 20px;
+        border: 0;
+        width: calc(100% - 5px);
+        text-align: right;
+        
+        .dac__logout-link { font-size: 20px; padding-top: 3px; }
+      }
+
+      &__info {
+        &__content {
+          display: block;
+          
+          &__col:first-child { padding-bottom: $_PADDING-DISPUTE-OVERVIEW-ROWS-MOBILE; }
+          &__col > div { padding-bottom: $_PADDING-DISPUTE-OVERVIEW-ROWS-MOBILE; }
+        }
+      }
+    }
+
+    
+    // ****** Descendant selectors  ******
+    .page-view {
+      padding: 0 10px;
+    }
+  }
+}
+
+/* Very small screen styles */
+@media (max-width:440px) {
+  .dac {
+    &__opt-out-modal .modal-blank-buttons { line-height: 50px; }
+  }
+}

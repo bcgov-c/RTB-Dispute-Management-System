@@ -1,0 +1,13 @@
+
+
+.extLogin_modal {
+  &--inputs { margin-top: 20px; }
+  &--date { margin: 20px 0; }
+  &--tou { padding-top: 30px; }
+
+  .option-button { height: unset; }
+}
+
+@media (min-width: 768px) {
+  #extLogin_modal .modal-dialog { width: 85%; max-width: 800px; }
+}

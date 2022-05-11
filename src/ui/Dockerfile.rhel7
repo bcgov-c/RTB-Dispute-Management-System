@@ -1,0 +1,17 @@
+FROM node:8.10
+
+RUN npm install --global http-server yarn
+
+WORKDIR /usr/src/app
+
+COPY package.json ./
+
+RUN yarn install
+
+COPY . ./
+
+RUN yarn build:openshift
+
+EXPOSE 8080
+
+CMD ["http-server", "public"]

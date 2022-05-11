@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
+    <RootNamespace>CM.Services.DataWarehouse.FactDisputeService</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;DevServer;StagingServer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'StagingServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EasyNetQ" Version="6.3.1" />
+    <PackageReference Include="EasyNetQ.DI.Microsoft" Version="6.3.1" />
+    <PackageReference Include="FluentAssertions" Version="6.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.HealthChecks" Version="1.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CM.Business.Services\CM.Business.Services.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Model\CM.Data.Model.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Repositories\CM.Data.Repositories.csproj" />
+    <ProjectReference Include="..\..\..\CM.Messages\CM.Messages.csproj" />
+    <ProjectReference Include="..\..\..\CM.Scheduler.Task\CM.Scheduler.Task.csproj" />
+    <ProjectReference Include="..\..\CM.ServiceBase\CM.ServiceBase.csproj" />
+    <ProjectReference Include="..\DataWarehouseDataModel\DataWarehouseDataModel.csproj" />
+    <ProjectReference Include="..\DataWarehouseRepository\DataWarehouseRepository.csproj" />
+  </ItemGroup>
+
+</Project>

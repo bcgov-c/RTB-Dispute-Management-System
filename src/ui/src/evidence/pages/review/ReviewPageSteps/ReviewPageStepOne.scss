@@ -1,0 +1,97 @@
+@import '../../../styles/variables';
+@import '../../../../core/styles/index.scss';
+
+//dar = dispute access review
+.dar-step-one {
+  &__terms {
+    margin-top: 20px;
+  }
+
+  &__label {
+    margin-top: 40px;
+
+    &__text {
+      @extend .dms__step-description;
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+    }
+  }
+
+  &__question-one {
+    margin-top: 20px;
+  }
+
+  &__question-two {
+    @extend .dar-step-one__question-one;
+  }
+
+  &__warning {
+    padding: 10px 10px 10px 50px !important;
+  }
+
+  &__late-filing {
+    margin-top: 20px;
+  }
+
+  &__received-date {
+    margin-top: 20px;
+
+    .step-description {
+      margin-right: 5px;
+    }
+
+    .page-item-child-view {
+      max-width: 392px;
+      .row { margin-right: 0; }
+    }
+  }
+
+  &__list {
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+    margin-top: 20px;
+
+    .da-upload-evidence-title {
+      @extend .dms__step-description;
+    }
+
+    .file-container {
+      background-color: #fff6e5;
+    }
+
+    .other-evidence-description {
+      display: none;
+    }
+
+    .page-item-container {
+      width: 100%;
+    }
+
+    .file-container {
+      margin-top: 5px;
+    }
+
+    .request-item {
+      margin-top: 5px;
+    }
+  }
+
+  &__review-upload {
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+    margin-top: 20px;
+
+    .add-evidence-title {
+      @extend .dms__step-description;
+    }
+
+    .file-container {
+      background-color: #fff6e5;
+    }
+
+    .other-evidence-description {
+      display: none;
+    }
+
+    .page-item-container {
+      width: 100%;
+    }
+  }
+}

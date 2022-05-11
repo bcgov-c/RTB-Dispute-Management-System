@@ -1,0 +1,11 @@
+@import './colors.scss';
+@import './fontSizes.scss';
+
+body {
+  height: 100%;
+}
+#header .header-inner, .subbannertext,
+#footer .footer-inner { max-width: 1650px; margin: 0 auto; }
+#main-content {overflow-y: scroll; bottom: 0px;}
+
+html { overflow-y: hidden };

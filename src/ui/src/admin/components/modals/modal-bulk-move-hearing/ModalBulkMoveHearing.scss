@@ -1,0 +1,99 @@
+.move-hearing {
+  &__filters {
+    display: flex;
+    margin-top: 10px;
+
+    &__assigned-arb {
+      margin-right: 10px;
+    }
+
+    &__start-date {
+      width: 200px;
+      margin-right: 5px;
+    }
+
+    &__start-time {
+      margin-right: 10px;
+      width: 150px;
+    }
+
+    &__end-date {
+      width: 200px;
+      margin-right: 5px;
+      margin-left: 10px;
+    }
+
+    &__end-time {
+      margin-right: 10px;
+      width: 150px;
+    }
+
+    &__to {
+      position: relative;
+      top: 30px;
+    }
+
+    &__search-button {
+      height: 35px;
+      position: relative;
+      top: 24px;
+      min-width: 140px;
+
+      &:disabled {
+        background-color: #999999;
+        border-color: #999999;
+
+        &:hover {
+          background-color: #999999;
+          border-color: #999999;
+        }
+      }
+    }
+  }
+
+  &__bulk-move-table {
+    margin-top: 20px;
+  }
+
+  &__stats {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    
+    &__download {
+      color: #337ab7;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+  }
+
+  &__selected-hearing {
+    margin-top: 40px;
+  }
+
+  &__button-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__delete-all {
+    display: flex;
+    margin-top: 20px;
+  }
+
+  &__end-process {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  &__summary-text {
+    margin-bottom: 20px;
+  }
+}
+
+#moveHearings_modal {
+  .modal-dialog { min-width: 1284px; }
+}

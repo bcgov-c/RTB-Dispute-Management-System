@@ -1,0 +1,69 @@
+.schedule-manager-request {
+  margin-top: 20px;
+
+  &__table {
+    
+  }
+
+  &__table-header {
+    display: flex;
+  }
+
+  &__created-column {
+    width: 205px;
+
+    &__header {
+      padding-left: 5px;
+    }
+  }
+
+  &__submitter-column {
+    min-width: 160px;
+    width: 15%;
+  }
+
+  &__type-column {
+    min-width: 145px;
+    width: 15%;
+
+    &__header {
+      padding-left: 5px;
+    }
+  }
+
+  &__status-column {
+    width: 210px;
+  }
+
+  &__owner-column {
+    min-width: 160px;
+    width: 15%;
+  }
+
+  &__start-column {
+    width: 200px;
+  }
+
+  &__end-column {
+    width: 200px;
+  }
+
+  &__duration-column {
+    width: 115px;
+  }
+
+  &__edit-column {
+    width: 40px;
+    display: flex;
+
+    &__link {
+      cursor: pointer;
+    }
+}
+  .standard-list-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 3px 5px 3px;
+    border-bottom: 1px #e5e5e5 solid;
+  }
+}

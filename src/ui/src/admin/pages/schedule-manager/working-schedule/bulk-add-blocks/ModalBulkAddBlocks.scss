@@ -1,0 +1,269 @@
+$COLOR-HEAR: #2a9240;
+$COLOR-WRIT: #666;
+$COLOR-BLK: #333;
+$COLOR-NOSELECT: #c1c1c1;
+$COLOR-DISABLED: #b3696d;
+
+
+
+#bulkAddBlocks-modal {
+ 
+  .modal-dialog { min-width: 1250px; }
+
+  .bulkAddBlocks-modal {
+
+    &__step-one { margin-top: 20px; }
+    &__dates { display: flex; }
+    &__start { margin-right: 15px; }
+    &__end {
+      margin-right: 15px; width: 190px;
+      .error-block { white-space: nowrap; }
+    }
+    &__duration { margin-top: 28px; }
+   
+    &__user-selects { margin-top: 30px; }
+
+    &__user-role-type, &__user-engagement {
+      padding-bottom: 15px;
+      .intake-checkboxes-component { display: flex; flex-wrap: wrap; }
+      .form-group { margin-right: 15px; }
+      .error-block { width: 100%; }
+    }
+
+    
+    &__staff-list-container {
+      margin-top: 20px;
+
+      &__info { font-size: 15px; font-style: italic; }
+      + .modal-button-container { margin-top: 15px; }
+    }
+    
+    &__staff-list {
+      display: flex;
+
+
+      &__title {
+        font-size: 18px;
+        > .general-link { float: right; }
+      }
+
+      &__list {
+        width: 400px;
+        height: 250px;
+        overflow-y: scroll;
+        border: 1px solid #333;
+        padding-right: 10px;
+      }
+
+      &__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #f2f2f2;
+        height: 34px;
+        padding-left: 5px;
+
+        &__arrow {
+          cursor: pointer;
+          width: fit-content;
+          height: fit-content;
+          margin-right: 3px;
+        }
+      }
+
+      > div:first-child { margin-right: 20px; }
+    }
+
+
+    &__duty-row { display: flex; margin-top: 30px; }
+    
+    &__duty-checkbox { margin-top: 21px; margin-right: 35px; }
+    &__duty-user { margin-right: 10px; }
+    &__duty-daily { margin-right: 10px; }
+    &__duty-btn-container .error-block { width: 100%; margin-left: 10px; }
+    &__duty-btn { height: fit-content; margin-top: 23px; }
+
+    &__tou-row {
+      margin-top: 15px;
+      &__title { color: #999; border-bottom: 1px solid #999; margin-bottom: 5px; }
+      + .modal-button-container { text-align: right; }
+    }
+    &__tou {
+      margin-top: 30px;
+      
+    }
+
+
+    /* Day Select component */
+    &__day-select-container { margin-top: 20px; }
+    &__day-select {
+      border: 2px solid #cfcfcf;
+
+      &__header {
+        display: flex;
+        background-color: #f2f2f2;
+        padding: 1px 10px 1px 15px;
+
+        > div {
+          display: flex;
+          align-items: center;
+          margin-right: 15px;
+        }
+
+        &__title { font-size: 15px; font-style: italic; }
+        &__icon {
+          position: relative;
+          height: 16px;
+          width: 16px;
+          margin-right: 5px;
+        }
+
+        &--hear {
+          color: $COLOR-HEAR;
+          .bulkAddBlocks-modal__day-select__header__icon { background-color: $COLOR-HEAR; }
+        }
+
+        &--writ {
+          color: $COLOR-WRIT;
+          .bulkAddBlocks-modal__day-select__header__icon { background-color: $COLOR-WRIT; }
+        }
+
+        &--blk {
+          color: $COLOR-BLK;
+          .bulkAddBlocks-modal__day-select__header__icon { background-color: $COLOR-BLK; }
+        }
+
+        &--noselect {
+          color: $COLOR-NOSELECT;
+          .bulkAddBlocks-modal__day-select__header__icon {
+            background-color: #fff;
+            border: 2px solid #c1c1c1;
+          }
+        }
+
+        &--disabled {
+          color: $COLOR-DISABLED;
+          .bulkAddBlocks-modal__day-select__header__icon { background: url('../../../../static/Icon_WS_NotAvail_SML.png') no-repeat; }
+        }
+      }
+
+      &__week-row {
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #cfcfcf;
+        height: 55px;
+
+        &__text {
+          padding-left: 10px;
+          padding-right: 10px;
+          flex-grow: 1;
+
+          > b { margin-left: 10px; }
+        }
+
+        &__radio {
+          display: flex;
+          align-items: center;
+          border-left: 2px solid #cfcfcf;
+          height: 100%;
+          padding-left: 13px;
+          padding-right: 16px;
+
+          &__icon {
+            width: 30px;
+            height: 30px;
+            position: relative;
+            margin-right: 5px;
+
+            &--hear { background-color: $COLOR-HEAR; }
+            &--writ { background-color: $COLOR-WRIT; }
+            &--blk { background-color: $COLOR-BLK; }
+            &--noselect {
+              background-color: #fff;
+              border: 2px solid #c1c1c1;
+            }
+    
+            &--disabled {
+              background: center/30px url('../../../../static/Icon_WS_NotAvail.png') no-repeat;
+            }
+
+            // This is the inner icon
+            .radio-icon {
+              width: 30px;
+              height: 30px;
+            }
+          }
+        }
+      }
+    }
+
+
+
+
+    /* Uploader component */
+    &__upload {
+      &__progress { margin-top: 15px; margin-bottom: 10px; }
+      &__list-header {
+        display: flex;
+        background-color: #d2d2d2;
+        border: 1px solid #333;
+        border-bottom: none;
+        font-weight: bold;
+
+        > div { padding: 2px 4px; }
+      }
+      &__list {
+        height: 500px;
+        overflow-y: scroll;
+        border: 1px solid #333;
+      }
+      &__list-item {
+        display: flex;
+        border-bottom: 1px solid #333;
+        
+        > div { padding: 2px 4px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+        &__id { width: 50px; background-color: #8e8e8e; border-right: 1px solid #333; padding-left: 1px; }
+        &__name { width: 280px; border-right: 1px solid #333; }
+        &__date { width: 190px; border-right: 1px solid #333; }
+        &__duration { width: 190px; border-right: 1px solid #333; }
+        &__type { width: 140px; border-right: 1px solid #333; }
+        &__result { width: 295px; }
+      }
+      
+      &__error {
+        background-image: url('../../../../../core/static/Icon_AlertLrg.png');
+        background-repeat: no-repeat;
+        background-size: 35px;
+        background-position-y: 6px;
+        padding-left: 48px;
+        margin-top: 20px;
+        font-size: 17px;
+      }
+
+      &__buttons {
+        margin-top: 20px;
+        text-align: right;
+        
+        > * { margin-right: 15px; }
+        > button:last-child { margin-right: 0; }
+      }
+    }
+  }
+
+
+  .modal-button-container {
+    text-align: left;
+    > button:first-child { margin-left: 0; }
+  }
+
+
+  .disabled .bulkAddBlocks-modal__staff-list__list {
+    overflow: hidden;
+    opacity: 0.8;
+    background-color: #eee;
+
+    .bulkAddBlocks-modal__staff-list__item__arrow { display: none; }
+  }
+  .disabled .bulkAddBlocks-modal__staff-list__item__arrow { cursor: default; }
+}

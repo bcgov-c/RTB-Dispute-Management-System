@@ -1,0 +1,93 @@
+.subserv {
+  font-size: 17px;
+
+  .dac__page-buttons { margin-top: 40px; }
+
+  &__overview-container {
+    margin-bottom: 30px;
+  }
+
+  &__receipt-container {
+    margin-bottom: 30px;
+  }
+  
+  &__page-header {
+    font-size: 18px;
+    line-height: 22px;
+    color: #333;
+    padding-bottom: 2px;
+    border-bottom: 2px solid #f1f1f1;
+    display: flex;
+    align-items: center;
+
+    &__title {
+      margin-top: 8px;
+    }
+  }
+
+  &__questions-container {
+    margin-top: 10px;
+  }
+
+  &__page-description {
+    margin-top: 10px;
+  }
+
+  &__documents-to-serve {
+    margin-top: 20px;
+
+    &__title {
+      font-size: 18px;
+    }
+  }
+
+  &__question-one {
+    margin-top: 20px;
+
+    &__warning {
+      margin: 20px 0 10px 0;
+    }
+
+    &__continue-button {
+      margin: 10px 0 20px 0;
+    }
+  }
+
+  &__question-two {
+    margin-top: 30px;
+    .form-control { max-width: 420px; }
+  }
+
+  &__question-three {
+    margin-top: 30px;
+  }
+
+  &__service-options {
+    margin-top: 30px;
+
+    &__title {
+      font-size: 18px;
+    }
+  }
+
+  &__service-method-result__description {
+    margin-top: 10px;
+  }
+
+  &__evidence-upload {
+    margin-top: 20px;
+    font-size: 18px;
+
+    &__open-modal {
+      color: blue;
+      cursor: pointer;
+      color: #337ab7;
+    }
+
+    .other-evidence-description { display: none; }
+    .files-to-upload { margin-top: 10px; }
+    .file-container { background-color: #fff6e5; }
+  }
+
+  .upload .step-description { display: none; }
+}

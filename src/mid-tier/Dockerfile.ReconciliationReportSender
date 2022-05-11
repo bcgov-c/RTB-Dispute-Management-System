@@ -1,0 +1,25 @@
+FROM microsoft/dotnet:2.2-sdk
+WORKDIR /src
+COPY CM.Services/ReconciliationReportSender/ReconciliationReportSenderService/ReconciliationReportSenderService.csproj CM.Services/ReconciliationReportSender/ReconciliationReportSenderService/
+COPY CM.Common.Utilities/CM.Common.Utilities.csproj CM.Common.Utilities/
+COPY CM.Messages/CM.Messages.csproj CM.Messages/
+COPY CM.Data.Repositories/CM.Data.Repositories.csproj CM.Data.Repositories/
+COPY CM.Data.Model.Postgres/CM.Data.Model.Postgres.csproj CM.Data.Model.Postgres/
+COPY CM.UserResolverService/CM.UserResolverService.csproj CM.UserResolverService/
+COPY CM.Business.Entities/CM.Business.Entities.csproj CM.Business.Entities/
+
+WORKDIR /src/CM.Services/ReconciliationReportSender/ReconciliationReportSenderService/
+RUN dotnet restore -nowarn:msb3202,nu1503
+
+WORKDIR /src
+COPY . .
+
+WORKDIR /src/CM.Services/ReconciliationReportSender/ReconciliationReportSenderService/
+RUN dotnet publish -c Release -o /app
+
+FROM microsoft/dotnet:2.2-sdk
+ENV ASPNETCORE_URLS=http://+:8080
+WORKDIR /app
+COPY --from=0 /app .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "ReconciliationReportSenderService.dll"]

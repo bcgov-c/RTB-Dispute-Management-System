@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
+    <RootNamespace>CM.Services.EmailGenerator.EmailGeneratorService</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;DevServer;StagingServer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'StagingServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="IntegrationEvents\" />
+    <Folder Include="secrets\" />
+    <Folder Include="Tags\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.2" />
+    <PackageReference Include="StyleCop.Analyzers.Error" Version="1.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="EasyNetQ" Version="6.3.1" />
+    <PackageReference Include="EasyNetQ.DI.Microsoft" Version="6.3.1" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.HealthChecks" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CM.Common.Utilities\CM.Common.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Model\CM.Data.Model.csproj" />
+    <ProjectReference Include="..\..\..\CM.Messages\CM.Messages.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Repositories\CM.Data.Repositories.csproj" />
+    <ProjectReference Include="..\..\CM.ServiceBase\CM.ServiceBase.csproj" />
+  </ItemGroup>
+</Project>

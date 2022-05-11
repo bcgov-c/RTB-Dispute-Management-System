@@ -1,0 +1,56 @@
+.selected-hearing {
+  border: 2px solid #d2d2d2;
+
+  &__info-container {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+
+    .hearing-date-display-container { width: 45%; }
+    .hearing-owner-display { width: 45%; padding-top: 0; }
+    .hearing-link-display { margin-top: 10px; }
+    .hearing-display-link-container span { font-size: 18px; position: initial; padding-left: 0 }
+  }
+
+  &__header {
+    padding: 10px 0;
+    background-color: #f6f6f6;
+    margin-bottom: 20px;
+    
+    &__text {
+      font-size: 22px;
+      margin-left: 10px;
+      color: #4b4b4b;
+    }
+  }
+
+  &__reassign-table {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  &__delete {
+    margin: 20px 0;
+    padding-left: 10px;
+    color: #d80000;
+
+    &__wrapper {
+      width: fit-content;
+      cursor: pointer;
+    }
+
+    &__text {
+      position: relative;
+      top: 4px;
+
+      &--reserved {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        padding-left: 10px;
+        color: #ff6600;
+        @extend .selected-hearing__delete__text;
+      }
+    }
+  }
+}

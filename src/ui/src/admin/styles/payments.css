@@ -1,0 +1,63 @@
+
+.payments-page .header-page-title { background: url('../static/Icon_Header_Payments.png') no-repeat !important; }
+
+.dispute-fee-overview { display: flex; margin-bottom: 10px; }
+
+.payments-add-fee { background: url('../static/Icon_Admin_DisputeFeeAdd.png') no-repeat; padding-left: 36px; }
+
+.payment-transaction-list .standard-list-empty .payment-transaction-item { padding-top: 15px; }
+
+.payment-transaction-item.review-information-body { margin-top: 0px; }
+
+.payment-transaction-item { border-top: 1px solid #d2d2d2;  }
+.standard-list-item .payment-transaction-item-wrapper { display: flex; border-left: 10px solid #d2d2d2; padding-left: 15px; margin: 10px 0 10px 0; }
+
+.payment-transaction-method .rtb-editable-component-editstate { margin-top:10px; }
+
+.dispute-fee-active select { width: 80px; }
+
+.addTransaction-office-idir,
+.payment-transaction-idir .rtb-editable-component-editstate  { width: 150px; }
+
+.addFee_payor,
+.dispute-fee-payor .rtb-editable-component-editstate { width: 260px; }
+
+.addTransaction-method,
+.addTransaction-status,
+.payment-transaction-status .rtb-editable-component-editstate { width: 180px; }
+
+.payment-transaction-note { white-space: pre-wrap; line-height: 18px; padding: 3px 0; }
+
+.payment-transaction-family-size input,
+.addTransaction-family-count input { width: 50px; }
+
+.payment-transaction-hardship select,
+.addTransaction-hardship select { width: 80px; }
+
+.payment-transaction-city-size select,
+.addTransaction-city select { width: 205px; }
+
+.addFee_fee-type { width: 220px; }
+
+.payment-transaction-hardship-details .rtb-editable-component-label { display: table-caption; }
+.payment-transaction-hardship-details .rtb-editable-component-viewstate { width: 100%; }
+.payment-transaction-hardship-details .rtb-editable-component-value { white-space: pre-line; line-height: 18px; }
+
+.dispute-fee-paid-status-and-label-container { display: flex; }
+
+.dispute-fee-paid-icon-and-label { 
+	background-image: url('../static/Icon_InlineCheck.png'); 
+	background-repeat: no-repeat; 
+	color: #139b39;
+	font-weight: bold;
+	padding-left:22px;
+  background-position-y: 1px;
+}
+.dispute-fee-not-paid-icon-and-label { 
+	background-image: url('../static/Icon_InlineX.png'); 
+	background-repeat: no-repeat; 
+	color: #bc3c3c;
+	font-weight: bold;
+	padding-left:22px;
+  background-position-y: 1px;	
+}

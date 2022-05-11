@@ -1,0 +1,53 @@
+.addIssue-modal {
+  font-size: 17px;
+
+  &__properties {
+    display: flex;
+
+    &__title {
+      color: #8e8e8e;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    &__value {
+      text-transform: capitalize;
+    }
+  }
+
+  &__add-issue {
+    margin: 20px 0;
+
+    select {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 0 10px 0;
+  }
+}
+
+#add-issue-modal {
+  overflow-x: scroll;
+}
+
+#add-issue-modal .modal-dialog {
+  width: 1050px;
+}
+
+@media only screen and (max-width: 1050px) { 
+  #add-issue-modal .modal-dialog {
+    width: 96%;
+  }
+}
+
+@media only screen and (max-width: 767px) { 
+  .addIssue-modal__properties {
+    margin-bottom: 5px;
+    flex-direction: column;
+  }
+}

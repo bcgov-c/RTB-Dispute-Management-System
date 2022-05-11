@@ -1,0 +1,217 @@
+@import "../../styles/variables";
+
+$ICON-FILES-READY-SEND-URL: url('../../static/All_Icon_FilesReadyToSend.png');
+$ICON-ADD-BLUE-URL: url('../../../core/static/Icon_AddBlue.png');
+
+.access-issue-progress-bar-container { margin: 5px 0; }
+
+.da-upload-issue {
+  padding: 0;
+  border: 2px solid #e3e3e3;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+#other-uploads .da-upload-issue { margin-bottom: 10px; }
+
+.da-upload-issue-body { padding: 15px 10px 15px 10px; }
+
+.da-upload-title-container {
+  display: flex;
+  justify-content: flex-start;
+  background-color: #f6f6f6!important;
+  font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+}
+
+.da-upload-type-title {
+  min-width: 100px;
+  background-color: #8e8e8e!important;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  color: #fff!important;
+  font-weight: bold;
+}
+
+.da-upload-title {
+  font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+  display: inline-block;
+  padding: 8px 5px 5px 8px;
+  line-height:23px;
+  width: 100%;
+}
+
+.da-upload-added-label { color: #b3b3b3; font-size: $DAC-FONT-SIZE-CONTENT-TITLES; border-bottom: 1px solid #c0c0c0; margin-top: 20px; }
+
+.no-files-added-text { font-size: $DAC-FONT-SIZE-CONTENT-TITLES; font-style: italic; color: #8e8e8e; }
+.added-otherissue-evidence { padding-top: 10px; }
+
+.da-upload-evidence-item { padding-top: 10px; border-bottom: 1px solid #f1f1f1;}
+.da-upload-evidence-item:last-child { border-bottom: none; }
+.da-upload-evidence-item-subtext { font-style: italic; font-size: 16px; color: #8e8e8e; }
+
+.custom-issue-evidence .da-upload-evidence-item:first-child { margin-top: 5px; border-top: 1px solid #c0c0c0; }
+
+.da-upload-evidence-file-uploader { display: inline-block; margin-right: 15px; }
+.da-upload-add-button {
+  background-repeat: no-repeat;
+  height: 28px;
+  line-height: 28px;
+  padding-left: 35px;
+  color: #3873ad;
+  cursor:pointer;
+  display: inline-block;
+  font-size: $DAC-FONT-SIZE-BUTTON;
+  line-height: 21px;
+  padding-top: 4px;
+}
+
+.da-upload-add-button.da-upload-add-evidence-button { background-image: $ICON-ADD-BLUE-URL; }
+.da-upload-add-button.da-upload-add-other-button { background-image: $ICON-ADD-BLUE-URL; margin-top: 30px; }
+
+.da-upload-page .file-container { background-color: #fff6e5; }
+.da-upload-add-evidence-line-container { display: flex; justify-content: space-between; flex-wrap: wrap; min-height:27px; }
+
+.da-upload-add-evidence-line-container .file-upload-ready-count > .glyphicon-download { margin-left: 5px; }
+
+.files-to-upload { margin-top: 10px; }
+.files-to-upload .file-container { padding: 15px 10px 15px 10px; }
+
+//.da-upload-page-wrapper b.glyphicon.glyphicon-download { top: 3px; margin-left: 3px; }
+
+.da-upload-page-wrapper b.glyphicon.glyphicon-download {
+  background: $ICON-FILES-READY-SEND-URL no-repeat;
+  height: 18px;
+  width: 18px;
+}
+.da-upload-page-wrapper b.glyphicon.glyphicon-download::before {
+  content: ''
+}
+
+.file-upload-ready-count b { top: 2px; }
+
+/* Upload-in-progress styles */
+
+.da-upload-page-wrapper.upload .da-upload-title-container,
+.da-upload-page-wrapper.upload .dac__evidence__dispute-overview,
+.da-upload-page-wrapper.upload .da-upload-add-button,
+.da-upload-page-wrapper.upload .file-remove-container,
+.da-upload-page-wrapper.upload .file-delete-container,
+.da-upload-page-wrapper.upload .related-issue-evidence,
+.da-upload-page-wrapper.upload .add-evidence-help,
+.da-upload-page-wrapper.upload .file-upload-ready-count,
+.da-upload-page-wrapper.upload .other-evidence-description { display: none; }
+
+.da-upload-page-wrapper.upload .btn-cancel,
+.da-upload-page-wrapper.upload .btn-cancel:hover,
+.da-upload-page-wrapper.upload .btn-cancel:active,
+.da-upload-page-wrapper.upload .btn-cancel:focus {
+  background-color: #8e8e8e;
+  border: 1px solid #8e8e8e;
+  color: #fff;
+}
+
+.da-upload-page-wrapper.upload .da-upload-issue { border: none; }
+.da-upload-page-wrapper.upload .da-upload-issue-body { padding: 0; }
+
+/* End Upload-in-progress styles */
+
+/* End upload page styles */
+
+.access-issue-progress-bar {
+  height: 21px;
+  padding: 1px;
+  border: 1px solid #b6b6b6;
+  background-color: #f6f6f6;
+  width: 280px;
+  float: left;
+}
+
+.access-issue-progress-bar > .access-issue-progress-bar-fill {
+  height: 17px;
+  background-color: #6483b0;
+  width: 0;
+}
+
+.access-issue-progress-text {
+  color: #6483b0;
+  float: left;
+  height: 26px;
+  font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+  margin-left: 5px;
+}
+
+
+/* Upload page styles */
+
+#evidence-uploads, #other-uploads, #office-uploads { margin-top: 30px; font-size: $DAC-FONT-SIZE-CONTENT-TITLES; }
+
+.add-evidence-title { display: inline-block; }
+
+
+.da-upload-evidence-item .files-to-upload { margin-top: 0; }
+.other-evidence-description {
+  color: #8e8e8e;
+  font-size: $DAC-FONT-SIZE-CONTENT;
+  padding-right:10px;
+  margin: 10px 0 5px 0;
+}
+
+.other-evidence-empty-error.error-block.warning {
+  min-height: 50px;
+  padding-top: 15px;
+  max-width: none;
+  font-size: $DAC-FONT-SIZE-CONTENT;
+  margin-right: 10px;
+  padding-right:10px;
+}
+
+.add-evidence-help { margin-right:15px; }
+.add-evidence-files-count  { margin-right: 10px; }
+
+.file-upload-ready-count,
+.all-file-upload-ready-count { color: #e1940a; background-color: #fff; }
+
+.file-upload-ready-count {
+  flex-grow: 1;
+  text-align: right;
+  padding: 0 0 2px 10px;
+  margin: 0;
+}
+
+.all-file-upload-ready-count { font-size: 20px; padding: 2px 0 2px 0; }
+
+/* Office use styles */
+#office-uploads { margin-top: 120px; }
+#office-uploads .da-upload-issue { border-color: #e8292c; }
+#office-uploads .da-upload-type-title { background-color: #e8292c !important; color: #fef2f2; }
+#office-uploads .da-upload-title { color: #e8292c; background-color: #fef2f2 !important; }
+
+.modal-office-upload .modal-header { background-color: #c90000; }
+/* End office use stylers */
+
+
+.dac {
+  &__evidence {
+    &__add-files-btn { margin-right: 25px; }
+  }
+}
+.da-upload-page .dac__page-buttons > .btn-standard { min-width: 140px; }
+
+@media (max-width: 767px) {
+  .da-upload-added-label { margin-top:15px; }
+
+  .files-to-upload .file-added-name { white-space: pre-line; }
+
+  .file-upload-ready-count { padding: 10px 0 0 10px; margin: 0; }
+
+  .da-upload-evidence-file-upload-container { display: flex; flex-direction: column-reverse; width: 100%; }
+  .da-upload-evidence-file-uploader { margin-top: 8px; }
+
+  .da-upload-title-container,
+  .da-upload-title { display: block; }
+
+  .da-upload-type-title { display: block; width: 100%; height: 34px; line-height: 34px; }
+  .access-issue-progress-bar { width: 180px; }
+}

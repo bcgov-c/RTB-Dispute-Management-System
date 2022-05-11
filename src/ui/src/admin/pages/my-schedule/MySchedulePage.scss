@@ -1,0 +1,43 @@
+.my-schedule-page {
+ 
+  & .header-page-title-with-icon { background-image: url('../../static/Icon_Header_Hearings.png'); }
+
+  & .header-page-title { background: url('../../static/Icon_Header_Hearings.png') no-repeat !important; }
+
+  & .general-filters-row {
+
+    &-schedule-request {
+      @extend .general-filters-row;
+      padding: 0 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    & .my-schedule-filter { display: flex; align-items: center }
+
+    & .my-schedule-filters { 
+      display: flex;
+      .my-schedule-filters-filter {
+        display: flex;
+        margin-top: 10px;
+        .my-schedule-filters-filter-text { font-size: 20px; font-weight: bold; }
+        .filter-region { margin-left: 10px; }
+        .request-starting-date {
+          margin-right: 20px;
+          margin-left: 10px;
+        }
+      }
+     }
+
+    & .my-schedule-add { margin: 10px 0 0 40px; font-size: 17px; color: #335c85!important; cursor: pointer; }
+  }
+
+  & .schedule-add-hearing-btn { margin: 10px 0 0 30px; }
+}
+
+
+/* Hearing page calendar styles */
+.my-schedule-calendar-myschedule { display:flex; margin: 10px 15px 0 0 !important; font-size: 17px; }
+.my-schedule-calendar-myschedule .general-link { margin-right: 10px; position: relative; top: 6px;}
+.my-schedule-calendar-arbitrator { margin-top: 10px; width: 300px; }
+.my-schedule-inactive-filter { margin-top: 10px; color: #395d87!important; margin-left: 10px; }

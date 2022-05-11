@@ -1,0 +1,147 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: ${NAME}
+  annotations:
+    openshift.io/display-name: PostgreSQL (Persistent)
+    description: ${NAME} template
+    tags: db, rtb
+    iconClass: icon-dotnet
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+labels:
+  template: ${NAME}
+  app: "${NAME}"
+objects:
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  stringData:
+    database-password: "${DATABASE_PASSWORD}"
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-data"
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${VOLUME_CAPACITY}"
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Exposes the database server
+  spec:
+    ports:
+    - name: "${NAME}"
+      port: 5432
+      targetPort: 5432
+    selector:
+      name: "${NAME}"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to deploy the database
+  spec:
+    strategy:
+      type: Recreate
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${NAME}"
+        from:
+          kind: ImageStreamTag
+          namespace: "${NAMESPACE}"
+          name: postgresql:10
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        volumes:
+        - name: "${NAME}-data"
+          persistentVolumeClaim:
+            claimName: "${NAME}-data"
+        containers:
+        - name: "${NAME}"
+          image: " "
+          ports:
+          - containerPort: 5432
+          livenessProbe:
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: 5432
+          volumeMounts:
+          - name: "${NAME}-data"
+            mountPath: "/var/lib/pgsql/data"
+          env:
+          - name: POSTGRESQL_USER
+            value: "${DATABASE_USER}"
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "${NAME}"
+                key: database-password
+          - name: POSTGRESQL_DATABASE
+            value: "${DATABASE_NAME}"
+          - name: POSTGRESQL_MAX_CONNECTIONS
+            value: "${POSTGRESQL_MAX_CONNECTIONS}"
+          - name: POSTGRESQL_SHARED_BUFFERS
+            value: "${POSTGRESQL_SHARED_BUFFERS}"
+          resources:
+            limits:
+              memory: "${MEMORY_POSTGRESQL_LIMIT}"
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: postgresql
+- name: MEMORY_POSTGRESQL_LIMIT
+  displayName: Memory Limit (PostgreSQL)
+  required: true
+  description: Maximum amount of memory the PostgreSQL container can use.
+  value: 4Gi
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the .NET builder ImageStream resides.
+  value: openshift
+- name: DATABASE_USER
+  displayName: Database Username
+  required: true
+  value: postgres
+- name: DATABASE_PASSWORD
+  displayName: Database Password
+  required: true
+  value: postgres
+- name: DATABASE_NAME
+  required: true
+  displayName: Database Name
+  value: casemanagement
+- name: POSTGRESQL_MAX_CONNECTIONS
+  displayName: Maximum Database Connections
+  value: '100'
+- name: POSTGRESQL_SHARED_BUFFERS
+  displayName: Shared Buffer Amount
+  value: 12MB
+- name: VOLUME_CAPACITY
+  displayName: Volume Capacity
+  description: Volume space available for data, e.g. 512Mi, 2Gi
+  value: 30Gi
+  required: true

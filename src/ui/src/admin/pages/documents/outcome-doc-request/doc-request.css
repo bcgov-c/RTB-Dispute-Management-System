@@ -1,0 +1,58 @@
+
+.admin-banner {
+  font-size: 20px;
+  background-color: #e6e6e6;
+  padding: 12px 10px 8px 10px;
+  color: #333;
+  font-weight: bold;
+  display: inline-block;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.admin-banner__options { display: flex; margin-top: -5px; }
+.admin-banner__thumbnails .form-group { margin-bottom: 0; }
+
+.thumbnails .doc-request__docs-label.has-files { display: block; }
+
+.doc-requests .review-applicant-title.section-header { margin-top: 0; }
+.doc-requests .context-menu-title { font-weight: bold; }
+
+.doc-request { padding: 5px 10px 5px 10px; }
+.doc-request__labelval label { color: #8e8e8e; }
+.doc-request .file-block { display: inline; }
+.doc-request .file-block > .file-display { display: inline-flex; margin: 0; }
+.doc-request .file-block > .file-display:first-child > .file-display-name { margin-left: 0; }
+
+.doc-request__processing-time input { max-width: 125px; }
+.doc-request__source-files { display: inline; }
+.doc-request__source-files .standard-list-empty { display: none; }
+
+.doc-request__status-description .rtb-editable-component-label,
+.doc-request__status-description .rtb-editable-component-value,
+.doc-request__status-description .rtb-editable-component-value > div { display: inline; }
+.doc-request__status-description .rtb-editable-component-label { white-space: nowrap; }
+
+.doc-request__top { display: flex; }
+.doc-request__topleft, .doc-request__topright { width: 48%; }
+.doc-request__topleft { margin-right: 20px; }
+.doc-request__bottom { margin-top: 20px; }
+.doc-request__status select { width: 220px; }
+
+.doc-request-item { display: flex; border-top: 1px solid #f2f2f2; padding: 10px 0; }
+.doc-request-item .help-icon { margin-right: 8px; }
+.doc-request-item__left { width: 400px; min-width: 400px; margin-right: 20px; }
+.doc-request-item__right { display: flex; flex-grow: 1; flex-direction: column; }
+.doc-request-item__status select { width: 150px; }
+.doc-request-item__status-display { font-size: 16px; color: #8e8e8e; font-style: italic; }
+.doc-request-item__docs { display: inline; }
+.doc-request-item__docs .standard-list-empty { display: none; }
+
+.doc-request-item__note .rtb-editable-component-label,
+.doc-request-item__note .rtb-editable-component-value,
+.doc-request-item__note .rtb-editable-component-value > div { display: inline; }
+
+.edit .doc-request-item__status { display: inline-block; }
+.edit .doc-request-item__status-display { display: none; }
+.edit .doc-request__affected-docs-display { display: none; }

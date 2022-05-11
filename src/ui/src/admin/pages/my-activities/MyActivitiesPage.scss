@@ -1,0 +1,47 @@
+.my-activities {
+  &__filters {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__left-filters {
+    display: flex;
+    align-items: center;
+  }
+
+  &__right-filters {
+    display: flex;
+    align-items: center;
+  }
+
+  &__owner { position: relative; top: 4px; margin-right: 20px; }
+
+  &__filter {
+    position: relative; 
+    top: 4px;
+
+    &__label { font-size: 20px; margin-right: 10px; font-weight: bold;  }
+  }
+
+  &__general-filters {
+    display: flex;
+    align-items: center;
+    position: relative;
+    justify-content: flex-end;
+  }
+
+  &__date-first, &__date-second {
+    margin-right: 10px;
+  }
+
+  &__date-range { position: relative; top: 3px; margin-right: 10px;}
+
+  &__results-count {
+    &__label { font-size: 20px; margin-right: 10px; font-weight: bold; margin: 0 10px 0 20px }
+    position: relative; top: 3px; 
+  }
+
+  &__search-header { margin-top: 25px; }
+
+  &__dispute-list { margin-bottom: 40px; }
+}

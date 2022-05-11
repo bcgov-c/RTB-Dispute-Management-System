@@ -1,0 +1,41 @@
+{
+  "RUN_MODE": "staging",
+  "API_ROOT_URL": "https://www.hive1dev.ca/ext/dms-test2/api-gateway/dms-api/",
+  "API_POSTED_DECISION_URL": "https://www.hive1dev.ca/ext/dms-test2/api/posted-decision/arpi/",
+  "COMMON_IMAGE_ROOT": "https://www.hive1dev.ca/ext/dms-test2/ui/Common/img/",
+  "EXTERNAL_LOGOUT_URL": "https://test-dms.tenancydispute.gov.bc.ca/Common/logout_page.html",
+  "SITEMINDER_LOGOUT_URL": "https://logontest7.gov.bc.ca/clp-cgi/logoff.cgi?retnow=1",
+  "INTAKE_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/Intake",
+  "DISPUTE_ACCESS_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/DisputeAccess",
+  "OFFICE_SUBMISSION_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/OfficeSubmission",
+  "POSTED_DECISIONS_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/PostedDecisions",
+  "SWAGGER_URL": "https://www.hive1dev.ca/ext/dms-test2/mid-tier/swagger/index.html",
+  "SERVER_ERROR_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/Common/500.html",
+  "CONFIG_ERROR_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/Common/Config.html",
+  "EMAIL_SUPPORT_TO": "_FAKE_EMAIL_ADDRESS@hive1-cs.com",
+  "EMAIL_FROM_DEFAULT": "noreply.rtb@gov.bc.ca",    
+  "EMAIL_FROM_HSRTO": "hsrto@gov.bc.ca",
+  "MAINTENANCE_CHECK_URL": "https://www.hive1dev.ca/ext/dms-test2/api-gateway/dms-api/scheduledmaintenance",
+  "MAINTENANCE_WARNING_OFFSET_MINUTES": 60,
+  "MAINTENANCE_WARNING_OFFSET_DAYS": 7,
+  "ALLOWABLE_TIME_SYNC_DIFFERENCE_MINUTES": 55,
+  "CHECK_TIME_SYNC": true,
+  "UNASSIGNED_TASK_OWNER_IO": 129,
+  "UNASSIGNED_TASK_OWNER_ARB": 130,
+  "UAT_TOGGLING": {
+    "SHOW_ARB_TOOLS": true,
+    "SHOW_OUTCOME_PUBLIC_DOCS": true,
+    "SHOW_DECISION_GENERATOR": false,
+    "SHOW_ADD_CUSTOM_EMAIL": true,
+    "SHOW_COMMON_FILES": true,
+    "SHOW_PFR": true,
+    "SHOW_SCHEDULE_MANAGEMENT": true,
+    "SHOW_TRIALS_INTAKE_CONTROL": true,
+    "SHOW_SCHEDULE_PERIOD_EDITS": true
+  },
+  "CEU_CONFIG": {
+    "START_URL": "https://www.hive1dev.ca/ext/dms-test2/api/mid-tier/ceuintake/login",
+    "LOGOUT_URL": "https://www.hive1dev.ca/ext/dms-test2/ui/Common/CeuLogout.html",
+    "CEU_TIMEOUT_MS": 10000000
+  }
+}

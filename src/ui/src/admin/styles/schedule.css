@@ -1,0 +1,621 @@
+.dashboard-schedule { background: url('../static/Icon_Header_Schedule.png')!important; background-repeat: no-repeat!important; }
+
+.no-top-border { border-top: none!important; }
+.no-right-border { border-right: none!important; }
+
+/* Colors Setup */
+.schedule-calendar-grid-event-bg1--dark { background-color: #B92429!important; }
+.schedule-calendar-grid-event-bg1--light { background-color: #EDC8C9!important; }
+.schedule-calendar-grid-event-bg1--none { background-color: #ffffff!important; color: #B92429!important;  }
+.schedule-calendar-grid-event-bg2--dark { background-color: #2B9241!important; }
+.schedule-calendar-grid-event-bg2--light { background-color: #CAE3CF!important; }
+.schedule-calendar-grid-event-bg2--none { background-color: #ffffff!important; color: #2B9241!important;  }
+.schedule-calendar-grid-event-bg3--dark { background-color: #2772BE!important; }
+.schedule-calendar-grid-event-bg3--light { background-color: #C9DBEE!important; }
+.schedule-calendar-grid-event-bg3--none { background-color: #ffffff!important; color: #d9dbdf!important;  }
+.schedule-calendar-grid-event-bg4--dark { background-color: #EF9200!important; }
+.schedule-calendar-grid-event-bg4--light { background-color: #F7C980!important; }
+.schedule-calendar-grid-event-bg4--none { background-color: #ffffff!important; color: #EF9200!important;  }
+
+.schedule-calendar-grid-event-text1--dark { color: #ffffff!important; }
+.schedule-calendar-grid-event-text1--light { color: #B92429!important; }
+.schedule-calendar-grid-event-text2--dark { color: #ffffff!important; }
+.schedule-calendar-grid-event-text2--light { color: #2B9241!important; }
+.schedule-calendar-grid-event-text3--dark { color: #ffffff!important; }
+.schedule-calendar-grid-event-text3--light { color: #2772BE!important; }
+.schedule-calendar-grid-event-text4--dark { color: #ffffff!important; }
+.schedule-calendar-grid-event-text4--light { color: #EF9200!important; }
+
+.schedule-calendar-legend1 { background-color: #f6f6f6!important; border: 1px solid #B92429; float: right; width: 150px; height: 20px; margin: 2px 5px; padding: 1px; }
+.schedule-calendar-legend2 { background-color: #f6f6f6!important; border: 1px solid #2B9241; float: right; width: 150px; height: 20px; margin: 2px 5px; padding: 1px; }
+.schedule-calendar-legend3 { background-color: #f6f6f6!important; border: 1px solid #2772BE; float: right; width: 150px; height: 20px; margin: 2px 5px; padding: 1px; }
+.schedule-calendar-legend4 { background-color: #f6f6f6!important; border: 1px solid #EF9200;  float: right; width: 150px; height: 20px; margin: 2px 5px; padding: 1px; }
+
+.schedule-calendar-legend1-text { color: #B92429!important; }
+.schedule-calendar-legend2-text { color: #2B9241!important; }
+.schedule-calendar-legend3-text { color: #2772BE!important; }
+.schedule-calendar-legend4-text { color: #EF9200!important; }
+/* End Colors Setup */
+
+.schedule-calendar-grid-time-item {
+  background-color: #ffffff!important;
+  border: 1px solid #a9a9a9;
+  border-top: none!important;
+  border-right: none!important;
+  display: table-cell;
+  position: relative;
+  margin: 0px;
+  padding: 10px 2px 2px 2px;
+  height: 120px!important;
+  width: calc(100% / 7);
+}
+
+.schedule-calendar-grid-day-text {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 10px;
+  position: relative;
+  top: -5px;
+  z-index: 2;
+  cursor: pointer;
+}
+.schedule-calendar-header-time-item-container { float: left; font-size: 17px; font-weight: 600; padding-left: 3px; }
+
+.schedule-calendar-grid-time-item--border { border: 4px solid #3d5a8c !important; }
+
+.calendar-grid-event-menu-item--adjourned-check, .calendar-grid-event-menu-item--adjourned-check-complete { background-color: #4d4c4e; }
+.calendar-grid-event-menu-item--adjourned-check-complete span { text-align: right; font-size: 13px; }
+
+/* Monthly Schedule Style */
+.schedule-calendar-grid-event-container { height: 30px; position: relative; top: -8px; text-align: center; }
+.schedule-calendar-grid-event { height: 30px; }
+.schedule-calendar-grid-event-text { font-size: 16px; position: relative; top: -25px; z-index: 2; }
+
+.schedule-calendar-legend-wrapper { margin-left: 15px; }
+.schedule-calendar-legend-box { display: block; width: 100%; }
+.schedule-calendar-legend-info { font-size: 12px; margin-right: 5px; text-align: right; position: relative; top: 3px; }
+.schedule-calendar-legend-data { position: relative; height: 16px; z-index: 2; }
+
+.schedule-calendar-info { margin-left: auto; display: flex; margin-top: 10px; float: right; }
+.schedule-calendar-info-text { color: #a3a3a3!important; font-size: 16px; margin-left: 20px; white-space: nowrap; }
+.schedule-calendar-info-text > span { color: #302f2f!important; font-size: 16px; margin-left: 5px; }
+
+.schedule-calendar-year-month-dropdown-container,
+.scheduled-hearings-calendar-year-month-dropdown-container { display: flex; margin-top: 10px; width: 100%; }
+.schedule-calendar-year { margin: 0 5px 0 0px; }
+.schedule-calendar-prev-image { margin: 0 0 5px 5px; height: 28px; width: 28px; }
+.schedule-calendar-next-image { margin: 0 5px 5px 0px; height: 28px; width: 28px; }
+.schedule-calendar-month { margin: 0 15px 0 5px; }
+.schedule-calendar-year-next { margin: 22px 10px 0px; }
+.schedule-calendar-next, .schedule-calendar-previous { margin-top: 22px; margin-right: 10px; width: fit-content; white-space: nowrap; }
+.schedule-calendar-next > span, .schedule-calendar-year-next > span, .schedule-calendar-previous > span { font-size: 20px; }
+
+.schedule-calendar-legend-container { margin-left: auto; display: flex; padding-top: 10px; }
+.schedule-calendar-legend-text-and-color-container, .schedule-calendar-info-text-and-color-container { display: flex; }
+.schedule-calendar-info-container--inline { -ms-flex-pack: center; justify-content: center; padding: 10px 2px 6px 2px; }
+.schedule-calendar-info-container--inline > div { font-size: 13px!important; }
+.schedule-calendar-info-container--inline > div > span { font-size: 13px!important; }
+.schedule-calendar-info-container--inline > .schedule-calendar-info-text { margin-left: 8px; }
+.schedule-calendar-info-container--inline > .schedule-calendar-info-text:first-child { margin-left: 0; }
+.schedule-calendar-info-container--inline > .schedule-calendar-info-text:first-child > span { margin-left: 0; }
+
+.schedule-calendar-legend-linked { color: #302f2f!important; }
+.schedule-calendar-legend-linked-container {
+  background: url('../static/Icon_Admin_ScheduleLink_Wht.png') no-repeat!important;
+  background-size: 7px!important;
+  background-position: 4px; height: 15px!important;
+  width: 15px!important;
+  margin-top: 2px;
+}
+.schedule-calendar-legend-text { float: left; margin-right: 5px; font-size: 15px; }
+.schedule-calendar-grid-container { margin: 0px; width: 100%; }
+
+.schedule-calendar-header-container { margin: 10px 0 0px 0px; width: 100%; min-width: 1000px; }
+.schedule-calendar-header-time-wrapper { width: 100%; }
+.schedule-calendar-header-time-flex, .schedule-calendar-grid-time-flex {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+.schedule-calendar-header-time-ul, .schedule-calendar-grid-time-ul {
+  border-right: 1px solid #808080;
+  display: table;
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.schedule-month-calendar-header-time-item {
+  background-color: #efefef!important;
+  border: 1px solid #a9a9a9;
+  border-right: none!important;
+  padding: 7px 10px;
+  display: table-cell;
+  height: 38px;
+  width: calc(100% / 7);
+}
+/* End Monthly Schedule Style */
+
+
+/* Yearly Schedule Style */
+.schedule-yearly-calendar-grid-time-flex {
+  border: 2px solid #a9a9a9;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+.schedule-calendar-header-time-item {
+  background-color: #efefef!important;
+  border: 1px solid #a9a9a9;
+  border-right: none!important;
+  border-left: none!important;
+  padding: 7px 10px;
+  height: 38px;
+  display: table-cell;
+  float: left;
+}
+.schedule-yearly-calendar-grid-time-ul {
+  display: table;
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+  table-layout: fixed;
+  width: 100%;
+}
+.schedule-yearly-calendar-grid-event-container { height: 30px; position: relative; top: -3px; text-align: center; padding: 0 2px; }
+.currentMonthPadding { padding: 0px 3px!important; }
+.schedule-yearly-calendar-header {
+  background-color: #efefef!important;
+  border-bottom: 1px solid #a9a9a9;
+  display: inline-block!important;
+  float: none!important;
+  padding: 7px 10px;
+  width: 100%!important;
+  cursor: pointer;
+}
+.schedule-calendar-grid-time-wrapper {
+  border-bottom: 2px solid #a9a9a9;
+}
+.schedule-yearly-calendar-grid-time-item {
+  background-color: #ffffff!important;
+  border-right: 2px solid #a9a9a9;
+  display: table-cell;
+  margin: 0px;
+  padding: 0px;
+  height: 120px;
+  min-height: 180px;
+  position: relative;
+}
+/* End Yearly Schedule Style */
+
+/* Personal Schedule Style */
+.personal-schedule-today-calendar-container {
+  background-color: #808080!important;
+  margin: 10px 0px;
+  max-height: 140px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  padding-bottom: 5px;
+}
+
+.personal-schedule-today-calendar-container > .today-calendar-container { min-width: 2000px; }
+
+/* End Personal Schedule Style */
+
+.monthly-schedule-container {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
+}
+
+
+/* Daily Schedule styles */
+/* Schedule personal/daily floating header  */
+@media (min-width: 1615px) {
+  .floatingHeaderMode.scheduled-hearings .floatingHeader,
+  .floatingHeaderMode.my-schedule-page .floatingHeader {
+    position: fixed;
+    z-index: 1000;
+  }
+  .floatingHeaderMode:not(.sm-page) .calendar-container .floatingHeader {
+    top: 170px;
+    width: calc(100% - 255px);
+  }
+  .floatingHeaderMode:not(.sm-page) .calendar-container { padding-top: 80px; }
+
+  .floatingHeaderMode .schedule-calendar-year-month-dropdown-container.floatingHeader {
+    padding-bottom: 20px;
+    padding-right: 40px;
+    width: calc(100% - 215px);
+    background-color: #fff;
+    top: 95px;
+    max-width: 100vw;
+    border-bottom: 2px solid #808080;
+  }
+
+  .dms-menu-collapse .floatingHeaderMode .schedule-calendar-year-month-dropdown-container.floatingHeader {
+    width: calc(100% - 21px);
+  }
+}
+/* Working schedule floating header  */
+.floatingHeaderMode.sm-page .floatingHeader {
+  position: fixed;
+  z-index: 12;
+}
+.floatingHeaderMode.sm-page .calendar-container .floatingHeader {
+  position: sticky;
+  top: 93px;
+  width: 100%;
+}
+.floatingHeaderMode.sm-page .calendar-container { margin-top: 98px; }
+
+.floatingHeaderMode .working-sched__inputs-row.floatingHeader {
+  padding-bottom: 10px;
+  padding-right: 35px;
+  padding-left: 26px;
+  margin-left: -26px;
+  margin-top:10px;
+  padding-top:10px;
+  width: calc(100% - 200px);
+  background-color: #fff;
+  top: 95px;
+}
+.dms-menu-collapse .floatingHeaderMode .working-sched__inputs-row.floatingHeader {
+  width: 100%;
+}
+
+.daily-schedule-calendar-container,
+.personal-schedule-calendar-container { overflow-x: scroll; overflow-y:hidden; }
+
+.daily-schedule-calendar-container > .calendar-container,
+.personal-schedule-calendar-container > .calendar-container { min-width: 2000px; margin-bottom: 10px; }
+
+
+/* Schedule page styles */
+.schedule-page-top-bar-container { display: flex; background-color: #f6f6f6!important; padding: 5px 15px 1px 15px; height: 80px; }
+.schedule-page-top-bar-container > div { margin-top: 20px; margin-right: 10px; }
+.schedule-type-filter-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 26px!important;
+  margin-right: 10px!important;
+}
+.schedule-type-filter { width: 160px; }
+.schedule-inactive-filter { color: #395d87!important; }
+.schedule-calendar-arbitrator { width: 300px; }
+.schedule-import-btn {
+  padding-left: 40px;
+  margin-left: 15px;
+	background: url('../static/Icon_AdminBar_HearingAdd.png')!important;
+	background-repeat: no-repeat!important;
+	font-size: 17px;
+	height: 34px;
+	line-height: 34px;
+	color: #395d87!important;
+	cursor: pointer;
+}
+.schedule-add-hearing-btn {
+  padding-left: 40px;
+  margin-left: 15px;
+	background: url('../static/Icon_AdminBar_HearingAdd.png')!important;
+	background-repeat: no-repeat!important;
+	font-size: 17px;
+	height: 34px;
+	line-height: 34px;
+	color: #335c85!important;
+	cursor: pointer;
+}
+
+.schedule-bulk-move-hearings { margin-top: 10px; }
+
+.schedule-bulk-move-hearing {
+  padding-left: 40px;
+  margin-left: 15px;
+	background: url('../static/Icon_AdminBar_HearingBulkMove.png')!important;
+	background-repeat: no-repeat!important;
+	font-size: 17px;
+	height: 34px;
+	line-height: 34px;
+	color: #335c85!important;
+	cursor: pointer;
+}
+
+
+.scheduled-hearings .calendar-time-interval-header { margin-top: 5px; }
+.daily-schedule-calendar-date { margin: 0 15px; }
+.daily-schedule-calendar-date .form-control-label { display: none; }
+.daily-schedule-calendar-date .intake-input-component { text-align: right; }
+.daily-schedule-calendar-next, .daily-schedule-calendar-previous { margin-top: 22px; }
+.daily-schedule-calendar-next > span, .daily-schedule-calendar-previous > span { font-size: 20px; }
+
+.daily-schedule .hearings-calendar-legend-container { padding-top: 27px; }
+.calendar-legend { margin-left: auto; }
+
+/* Import schedule styles */
+#importHearings-modal .modal-dialog { width: 1100px; }
+#importHearings-modal .modal-button-container { padding-top: 20px; }
+
+.import-schedule-info-container { margin-top: 20px; }
+
+.import-schedule-info-dates-container { display: flex; }
+.import-schedule-file-container { margin-top: 10px; }
+
+.import-schedule-start-date,
+.import-schedule-end-date { width: 270px; }
+.import-schedule-date-duration { margin-top: 30px; color: #716e6e; font-size: 16px; flex-grow: 1; text-align: right; }
+
+.import-schedule-uploader-display {
+  display: flex;
+  justify-content: space-between;
+  height: 100px;
+  width: 100%;
+  border: 2px solid #c3cfdb;
+  background-color: #eaeef3!important;
+  padding: 35px 25px 0 20px;
+}
+
+
+.import-schedule-uploader-display > div:first-child { display: flex; padding-right: 20px; overflow-x: hidden; }
+.import-schedule-uploader-display > div:first-child > span:first-child { overflow-x: hidden; flex-shrink: 2; font-size: 20px; margin-right: 15px; text-overflow: ellipsis; }
+.import-schedule-uploader-display > div:first-child > span:nth-child(2) { flex-shrink: 0; color: #8b8b8b!important; display: inline-block; min-width: fit-content; width: fit-content; }
+.import-schedule-uploader-display > div:nth-child(2) { min-width: fit-content; width: fit-content; }
+
+.import-schedule-note-container { margin-top: 20px; }
+
+.import-schedule-info-container,
+.import-schedule-note-container,
+.import-schedule-container .modal-button-container { min-height: 80px; width: 700px; }
+
+.import-schedule-hearings-count { color: #716e6e!important; font-size: 16px; margin-right: 20px; }
+
+.import-schedule-processing-report-container { margin-top: 20px; }
+/* Processing errors */
+.import-schedule-processing-report { height: 100%; font-size: 16px; }
+
+.import-errors-header-row { margin-left: 5px; }
+.import-errors-content { overflow: scroll; border: 1px solid #333333; max-height: 500px; }
+
+.import-errors-content-row { min-height: 50px; padding: 15px 5px 10px 5px; border-bottom: 1px solid #f2f2f2; }
+.import-errors-content-row p { margin: 0; }
+
+.import-errors-header-row,
+.import-errors-content-row { display: flex; }
+
+.import-errors-header-row > div:first-child,
+.import-errors-content-row > div:first-child { min-width: 200px; width: 200px; }
+
+.import-errors-header-row > div:nth-child(2),
+.import-errors-content-row > div:nth-child(2) { min-width: 100px; width: 100px; }
+
+.import-errors-header-row > div:nth-child(3),
+.import-errors-content-row > div:nth-child(3) { flex-grow: 1; }
+/* Processing errors end */
+
+
+/* Import in progress styles */
+
+.import-schedule-progress-container { margin-top: 20px; }
+.import-schedule-progress-container .modal-button-container { height: 100px; }
+
+.import-schedule-progress-loader-container { font-size: 17px; color: #335c85!important; }
+
+.import-schedule-progress-msg { margin-top: 60px; }
+.import-schedule-progress-loader-msg {
+  background-image: url('../../core/static/loader_blue_lrg.gif')!important;
+  background-repeat: no-repeat!important;
+  padding-left: 140px;
+  height: 80px;
+  margin-left: -28px;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+}
+
+.import-schedule-progress-note { max-width: 800px; margin-top:10px; color: #716e6e!important; }
+.import-schedule-progress-info-container { margin-top: 50px; display: flex; max-width: 800px; }
+.import-schedule-progress-info-container > div { width: 49%; }
+
+.import-schedule-progress-log-container { margin-top: 40px; }
+.import-schedule-progress-log-header { margin-left: 5px; color: #716e6e!important; }
+.import-schedule-progress-log { overflow: scroll; border: 1px solid #333333; height: 400px; padding: 10px; }
+
+/* End import in progress styles */
+
+/* End import schedule styles */
+
+
+/* Scheduled History styles */
+
+.schedule-page-history-mode .schedule-type-filter-text { display: none; }
+.schedule-page-history-mode .schedule-type-filter { width: fit-content; }
+
+.history-schedule-container { display: flex; }
+.history-schedule-sub-container { display: flex; }
+
+.history-schedule-container > div { margin-right: 20px; }
+.history-schedule-container > div:last-child { margin-right: 0; }
+.history-schedule-sub-container > div { margin-right: 20px;  }
+.history-schedule-sub-container > div:last-child { margin-right: 0; }
+
+.history-schedule-view-type { width: fit-content; }
+.history-schedule-sub-dispute { }
+.history-schedule-sub-arbs { width: fit-content; }
+.history-schedule-sub-schedulers { width: fit-content; }
+.history-schedule-sub-inactive-staff { margin-top: 20px; }
+.history-schedule-sub-date { }
+
+.history-schedule-sub-hearing-info { display: flex; margin-top: 10px; align-items: center; }
+.history-schedule-sub-hearing-info .hearing-date-display-container { border: none; min-width: fit-content; margin-right:15px; }
+.history-schedule-sub-hearing-info .hearing-start-date-display { margin-right: 20px; }
+.history-schedule-sub-hearing-info-text { font-size: 17px; color: #a9a9a9; margin-top: 10px; }
+
+.history-schedule-sub-hearing-info .hearing-date-display-container span { padding-left: 0; }
+
+.history-schedule-search-button {
+  background: url('../static/Icon_Admin_Search.png') no-repeat;
+  height: 35px;
+  width: 35px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  margin-top: 18px;
+}
+
+.history-schedule-list-region { margin-top: 40px; }
+
+.history-schedule-list { font-size: 16px; }
+.history-schedule-list-header { display: flex; border-bottom: 1px solid #d2d2d2; color: #7f7f7f; }
+.history-schedule-list-item { display: flex; border-bottom: 1px solid #e5e5e5; min-height: 35px; margin: 10px 0 0 0; }
+
+.history-schedule-change-date { min-width: 175px; }
+.history-schedule-change-by { min-width: 190px; }
+.history-schedule-change { min-width: 130px; }
+.history-schedule-hearing-id { min-width: 115px; text-overflow: unset !important; white-space: normal !important; overflow: visible !important; }
+.history-schedule-hearing-id > span { cursor: pointer; }
+.history-schedule-priority { min-width: 90px; }
+.history-schedule-owner { min-width: 190px; }
+.history-schedule-hearing-start { min-width: 175px; }
+.history-schedule-file-number { min-width: 110px; }
+.history-schedule-role { min-width: 95px; }
+.history-schedule-link { min-width: 80px; }
+
+.history-schedule-priority1 { color: #B92429!important; }
+.history-schedule-priority2 { color: #2B9241!important; }
+.history-schedule-priority3 { color: #2772BE!important; }
+.history-schedule-priority4 { color: #EF9200!important; }
+
+/* End Scheduled History styles */
+
+
+/* Schedule Blocks */
+.block-calendar__block-parent { display: flex; justify-content: space-around; height: 100%; width: 100%; padding: 1px 5px; }
+.block-calendar__block { width: 17%; height: 90%; align-self: center; background-color: #ccc; }
+.block-calendar__block:first-child:not(.ds-selected), .block-calendar__block:nth-child(5):not(.ds-selected) { background-color: #e6e6e6;/*opacity: 0.7;*/}
+
+.block-calendar__block.ds-selected { background-color: #2772BE; opacity: 1; }
+
+.--hear .block-calendar__block.ds-selected { background-color: #2a9240; }
+.--duty .block-calendar__block.ds-selected { background-color: #f5c626; }
+.--writ .block-calendar__block.ds-selected { background-color: #666; }
+.--vac .block-calendar__block.ds-selected { background-color: #9d5786; }
+.--blk .block-calendar__block.ds-selected { background-color: #333; }
+.--oth .block-calendar__block.ds-selected { background-color: #4e96bb; }
+
+.block-calendar__saved-block {
+  position: absolute;
+  z-index: 11;
+  background-color: orange;  
+  font-size: 16px;
+  text-align: center;
+  color: #fff;
+  padding: 5px 5px 0 5px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.working-sched__calendar.disabled { opacity: 0.7; }
+
+.working-sched__calendar:not(.disabled) .block-calendar__saved-block { cursor: pointer; }
+.working-sched__calendar:not(.disabled) .block-calendar__saved-block:hover {
+  border: 1px solid black;
+  box-shadow: #2772BE;
+}
+
+.ds-selector { background: rgba(0, 255, 0, 0.1); border: 2px solid rgba(0, 255, 0, 0.45); } 
+
+.block-calendar .calendar-header-time-item,
+.block-calendar .calendar-grid-time-item {
+  min-width: 100px;
+  width: calc(100% / 9);
+}
+
+.calendar-grid-time-item--today { border-left: 3px solid #333; border-right: 3px solid #333; }
+.calendar-grid-time-flex:first-child .calendar-grid-time-item--today { border-top: 3px solid #333; }
+.calendar-grid-time-flex:last-child .calendar-grid-time-item--today { border-bottom: 3px solid #333; }
+.calendar-header-time-item--today::after {
+  content: '';
+  background-color: #333;
+  position: absolute;
+  top: 0;
+  width: calc(100% - 16px);
+  margin-left: 7px;
+  height: 5px;
+}
+
+.block-calendar .calendar-header-time-item { text-align: center; }
+.block-calendar .calendar-header-time-item-container { float: unset; }
+
+.block-calendar__user-buttons { min-width: fit-content; margin-left: auto; }
+
+.calendar-grid-label-item-btn {
+  display: inline-block;
+  top: -1px;
+  margin-left: 5px;
+  color: #38598a;
+  height: 20px;
+  width: 20px;
+}
+.block-calendar__add-block { background: url('../static/Icon_WS_AddEdit.png') no-repeat; }
+.block-calendar__user-requests { background: url('../static/Icon_WS_Requests.png') no-repeat; }
+.block-calendar__popover.popover { border: 1px solid #fff; background-color: #b92429; color: #fff; }
+.block-calendar__popover.popover.right > .arrow:after { border-right-color: #b92429; }
+.block-calendar__popover.popover.left > .arrow:after { border-left-color: #b92429; }
+.block-calendar__popover.popover.top > .arrow:after { border-top-color: #b92429; }
+.block-calendar__popover.popover.bottom > .arrow:after { border-bottom-color: #b92429; }
+.block-calendar__popover .popover-title,
+.block-calendar__popover .popover-content { background-color: #b92429; color: #fff; line-clamp: unset; -webkit-line-clamp: unset; max-height: 500px; }
+
+.block-calendar__popover .popover-content ul { padding-left: 22px; }
+
+.block-calendar__popover .popover-footer {
+  padding-top: 8px;
+  padding-bottom: 5px;
+  padding-left: 31px;
+  background: 8px 8px/20px url('../static/Icon_WS_RequestsGo.png') no-repeat;
+}
+
+
+.block-calendar__popover a { color: #fff !important; }
+
+.block-calendar__report-column {
+  display: flex;
+  max-width: 50px !important;
+  min-width: 50px !important;
+  line-height: 12px;
+}
+.block-calendar__report-column > div {
+  display: flex;
+  align-self: center;
+  height: fit-content;
+  margin-left: auto;
+  margin-right: 2px;
+  flex-wrap: wrap;
+  text-align: right;
+}
+.block-calendar__report-column__text,
+.block-calendar__report-column__text-duty { width: 100%; font-size: 13px; color: #2a9240; }
+.block-calendar__report-column__text-duty { color: #f5c626; }
+
+.block-calendar__header-report-column { text-align: center; line-height: 13px; }
+
+.block-calendar__header-report-column .block-calendar__report-column__text-duty { margin-top: 3px; }
+
+.block-calendar__report-column.calendar-grid-time-item { border-left: 2px solid #a9a9a9; }
+
+
+.block-calendar__saved-block.hear { background-color: #97bfa6; }
+.block-calendar__saved-block.duty { background-color: #fae6aa; }
+.block-calendar__saved-block.writ { background-color: #666; }
+.block-calendar__saved-block.vac { background-color: #9d5786; }
+.block-calendar__saved-block.blk { background-color: #333; }
+.block-calendar__saved-block.other { background-color: #4e96bb; }
+
+.block-calendar__saved-block.hear.has-hearings { background-color: #2a9240; }
+.block-calendar__saved-block.duty.has-hearings { background-color: #f5c626; }

@@ -1,0 +1,1113 @@
+{
+  "STATUS_DELETED": 99,
+  "STATUS_WITHDRAWN": 90,
+  "STAGE_APPLICATION_IN_PROGRESS": 0,
+  "STATUS_PAYMENT_REQUIRED": 2,
+  "STATUS_FEE_WAIVER_PAYMENT_REQUIRED": 3,
+  "STATUS_OFFICE_PAYMENT_REQUIRED": 4,
+  "STAGE_APPLICATION_SCREENING": 2,
+  "STATUS_APPLICATION_RECEIVED": 20,
+  "STATUS_ADJOURNED": 63,
+
+  "STATUS_WARN_INCOMPLETE": [90, 91, 93, 94, 103],
+  "STAGE_0_STATUSES_THAT_CANNOT_BE_SET": [0, 5, 99],
+  "STATUS_CLOSED": 103,
+
+  "STAGE_STATUS_PAYMENT": {
+    "0:2": true,
+    "0:3": true,
+    "0:4": true
+  },
+
+  "PROCESS_OUTCOME_DISMISSED_WITH_LEAVE": 4,
+  "PROCESS_OUTCOME_DISMISSED_WITHOUT_LEAVE": 5,
+
+  "user_type_groups": {
+    "io": [1],
+    "admin": [4],
+    "io_admin": [
+      1,
+      4
+    ],
+    "arb": [
+      2
+    ]
+  },
+  "user_subtype_groups": {
+    "io": [11,12,13],
+    "admin": [41],
+    "io_admin": [
+      11,
+      12,
+      13,
+      41
+    ],
+    "arb": [
+      21,
+      22,
+      23,
+      24
+    ]
+  },
+  "stage_config": {
+    "0": {
+      "id": 0,
+      "title": "Application in progress",
+      "statuses": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        90,
+        92,
+        94,
+        99
+      ]
+    },
+    "2": {
+      "id": 2,
+      "title": "Application screening",
+      "statuses": [
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        90,
+        91,
+        94,
+        95,
+        96
+      ]
+    },
+    "4": {
+      "id": 4,
+      "title": "Serving documents",
+      "statuses": [
+        41,
+        90,
+        94,
+        95
+      ]
+    },
+    "6": {
+      "id": 6,
+      "title": "Hearing pending",
+      "statuses": [
+        60,
+        61,
+        62,
+        63,
+        90,
+        95
+      ]
+    },
+    "8": {
+      "id": 8,
+      "title": "Hearing",
+      "statuses": [
+        80,
+        81,
+        95
+      ]
+    },
+    "10": {
+      "id": 10,
+      "title": "Decision and post support",
+      "statuses": [
+        100,
+        101,
+        103,
+        95
+      ]
+    }
+  },
+  "status_config": {
+    "0": {
+      "id": 0,
+      "title": "Saved not submitted"
+    },
+    "1": {
+      "id": 1,
+      "title": "Update required"
+    },
+    "2": {
+      "id": 2,
+      "title": "Payment required"
+    },
+    "3": {
+      "id": 3,
+      "title": "Fee waiver proof required"
+    },
+    "4": {
+      "id": 4,
+      "title": "Office payment required"
+    },
+    "5": {
+      "id": 5,
+      "title": "Incomplete Paper Application"
+    },
+    "6": {
+      "id": 6,
+      "title": "Paper Application - Update Required"
+    },
+    "20": {
+      "id": 20,
+      "title": "Received"
+    },
+    "21": {
+      "id": 21,
+      "title": "Assessing application"
+    },
+    "22": {
+      "id": 22,
+      "title": "Confirming information"
+    },
+    "23": {
+      "id": 23,
+      "title": "Ready for scheduling"
+    },
+    "24": {
+      "id": 24,
+      "title": "Document ready to send"
+    },
+    "25": {
+      "id": 25,
+      "title": "Case Management"
+    },
+    "40": {
+      "id": 40,
+      "title": "Waiting for documents pick up"
+    },
+    "41": {
+      "id": 41,
+      "title": "Waiting for proof of service"
+    },
+    "42": {
+      "id": 42,
+      "title": "Partial proof of service"
+    },
+    "43": {
+      "id": 43,
+      "title": "Waiting for dismissal decision"
+    },
+    "45": {
+      "id": 45,
+      "title": "Waiting for process decision"
+    },
+    "60": {
+      "id": 60,
+      "title": "Open for submissions"
+    },
+    "61": {
+      "id": 61,
+      "title": "Closed for submissions"
+    },
+    "62": {
+      "id": 62,
+      "title": "To be rescheduled"
+    },
+    "63": {
+      "id": 63,
+      "title": "Adjourned"
+    },
+    "80": {
+      "id": 80,
+      "title": "Hearing assigned"
+    },
+    "81": {
+      "id": 81,
+      "title": "Waiting for allowed evidence"
+    },
+    "90": {
+      "id": 90,
+      "title": "Withdrawn"
+    },
+    "91": {
+      "id": 91,
+      "title": "Cancelled by RTB"
+    },
+    "92": {
+      "id": 92,
+      "title": "Abandoned no payment"
+    },
+    "93": {
+      "id": 93,
+      "title": "Dismissed"
+    },
+    "94": {
+      "id": 94,
+      "title": "Abandoned applicant inaction"
+    },
+    "95": {
+      "id": 95,
+      "title": "Process decision required"
+    },
+    "96": {
+      "id": 96,
+      "title": "Screening decision required"
+    },
+    "99": {
+      "id": 99,
+      "title": "Deleted"
+    },
+    "100": {
+      "id": 100,
+      "title": "Decision pending"
+    },
+    "101": {
+      "id": 101,
+      "title": "Interim decision pending"
+    },
+    "102": {
+      "id": 102,
+      "title": "Decision ready to send"
+    },
+    "103": {
+      "id": 103,
+      "title": "Closed"
+    },
+    "104": {
+      "id": 104,
+      "title": "Simple correction pending"
+    },
+    "105": {
+      "id": 105,
+      "title": "Clarification pending"
+    },
+    "106": {
+      "id": 106,
+      "title": "Correction pending"
+    }
+  },
+  "status_stage_rules": {
+    "0:0": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": true
+    },
+    "0:1": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:2": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:3": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:4": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:5": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:6": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:90": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": true
+    },
+    "0:92": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": true
+    },
+    "0:94": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "0:99": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": true
+    },
+    "2:20": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:21": {
+      "ownerOptional": false,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:22": {
+      "ownerOptional": false,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:23": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:24": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:25": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "2:90": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "2:91": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "2:94": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "2:95": {
+      "ownerOptional": true,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "2:96": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "4:41": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "4:90": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "4:94": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "4:95": {
+      "ownerOptional": true,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "6:60": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "6:61": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "6:62": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "6:63": {
+      "ownerOptional": true,
+      "ownerTypes": "io",
+      "ownerSubTypes": "io",
+      "processOptional": false
+    },
+    "6:90": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
+    "6:95": {
+      "ownerOptional": true,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "8:80": {
+      "ownerOptional": false,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "8:81": {
+      "ownerOptional": false,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "8:95": {
+      "ownerOptional": true,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "10:95": {
+      "ownerOptional": true,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "10:100": {
+      "ownerOptional": false,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "10:101": {
+      "ownerOptional": false,
+      "ownerTypes": "arb",
+      "ownerSubTypes": "arb",
+      "processOptional": false
+    },
+    "10:103": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    }
+  },
+  "process_config": {
+    "process_outcomes": {
+      "1": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Decision for Landlord"
+      },
+      "2": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Decision for Tenant"
+      },
+      "3": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Split decision"
+      },
+      "4": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Dismissed - with leave to re-apply"
+      },
+      "5": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Dismissed - without leave to re-apply"
+      },
+      "6": {
+        "associated_processes": [1,4,5,6,7],
+        "title": "Settled"
+      },
+      "7": {
+        "associated_processes": [1,2,3,4,5,6,7],
+        "title": "Withdrawn"
+      },
+      "8": {
+        "associated_processes": [1,2,4,6,7],
+        "title": "Jurisdiction refused"
+      },
+      "9": {
+        "associated_processes": [3],
+        "title": "Review granted"
+      },
+      "10": {
+        "associated_processes": [3],
+        "title": "Review dismissed"
+      },
+      "11": {
+        "associated_processes": [2],
+        "title": "Moved to participatory"
+      },
+      "12": {
+        "associated_processes": [5],
+        "title": "Joiner granted"
+      },
+      "13": {
+        "associated_processes": [5],
+        "title": "Joiner dismissed"
+      },
+      "14": {
+        "associated_processes": [1,2,3,4,5,6,7],
+        "title": "Other"
+      }
+    }
+  },
+
+
+  "quickstatus_config": [
+    {
+      "stage": 2,
+      "status": 20,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Start Information Officer assessment",
+      "ownerTypes": "io_admin",
+      "dest_owner": null,
+      "dest_stage": 2,
+      "dest_status": 21,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2,7],
+      "creation_methods": [1,4,6],
+      "title": "Return to applicant for update",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 0,
+      "dest_status": 1,
+      "dest_override": null,
+      "order": 2
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2],
+      "creation_methods": [2,5],
+      "title": "Return to applicant for update",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 0,
+      "dest_status": 6,
+      "dest_override": null,
+      "order": 2
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hold to confirm information",
+      "ownerTypes": "io_admin",
+      "dest_owner": "same",
+      "dest_stage": 2,
+      "dest_status": 22,
+      "dest_override": null,
+      "order": 4
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "SIO Action Required",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 2,
+      "dest_status": 96,
+      "dest_override": null,
+      "order": 3
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Open",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 60,
+      "dest_override": null,
+      "order": 1
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [2],
+      "creation_methods": [1,2],
+      "title": "DR - Waiting for Proof of Service",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 4,
+      "dest_status": 41,
+      "dest_override": null,
+      "order": 1
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Substituted Service decision required",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 2,
+      "dest_status": 95,
+      "dest_override": null,
+      "order": 5
+    },
+    
+    {
+      "stage": 2,
+      "status": 95,
+      "processes": [1,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Open ",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 60,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 2,
+      "status": 95,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Dispute Withdrawn",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 2,
+      "dest_status": 90,
+      "dest_override": null,
+      "order": 2
+    },
+    {
+      "stage": 2,
+      "status": 95,
+      "processes": [2],
+      "creation_methods": [1,2],
+      "title": "DR - Waiting for Proof of Service",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 4,
+      "dest_status": 41,
+      "dest_override": null,
+      "order": 1
+    },
+
+    {
+      "stage": 2,
+      "status": 96,
+      "processes": [1,5,6,7],
+      "creation_methods": [1,2,3,4,5],
+      "title": "Hearing pending - Open",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 60,
+      "dest_override": null,
+      "order": 1
+    },
+
+    {
+      "stage": 6,
+      "status": 60,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Assign to me for hearing",
+      "ownerTypes": "arb",
+      "dest_owner": null,
+      "dest_stage": 8,
+      "dest_status": 80,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 6,
+      "status": 60,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Reschedule Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 62,
+      "dest_override": null,
+      "order": 2
+    },
+    {
+      "stage": 6,
+      "status": 60,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Dispute Withdrawn",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 90,
+      "dest_override": null,
+      "order": 3
+    },
+
+    {
+      "stage": 6,
+      "status": 61,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Assign to me for hearing",
+      "ownerTypes": "arb",
+      "dest_owner": null,
+      "dest_stage": 8,
+      "dest_status": 80,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 6,
+      "status": 61,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Reschedule Hearing",
+      "ownerTypes": "arb",
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 62,
+      "dest_override": null,
+      "order": 2
+    },
+    {
+      "stage": 6,
+      "status": 61,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Dispute Withdrawn",
+      "ownerTypes": "arb",
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 90,
+      "dest_override": null,
+      "order": 3
+    },
+
+    {
+      "stage": 6,
+      "status": 62,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Open",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 60,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 6,
+      "status": 62,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Closed",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 61,
+      "dest_override": null,
+      "order": 2
+    },
+
+    {
+      "stage": 6,
+      "status": 63,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Closed",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 61,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 6,
+      "status": 63,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Hearing pending - Open",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 60,
+      "dest_override": null,
+      "order": 2
+    },
+    
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Close Dispute (Decision Ready to Deliver)",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 10,
+      "dest_status": 103,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Decision Pending",
+      "ownerTypes": "arb",
+      "dest_owner": "same",
+      "dest_stage": 10,
+      "dest_status": 100,
+      "dest_override": null,
+      "order": 2
+    },
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Interim Decision Pending",
+      "ownerTypes": "arb",
+      "dest_owner": "same",
+      "dest_stage": 10,
+      "dest_status": 101,
+      "dest_override": null,
+      "order": 3
+    },
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Adjourn Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 63,
+      "dest_override": null,
+      "order": 4
+    },
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Waiting for evidence",
+      "ownerTypes": "arb",
+      "dest_owner": "same",
+      "dest_stage": 8,
+      "dest_status": 81,
+      "dest_override": true,
+      "order": 5
+    },
+
+    {
+      "stage": 8,
+      "status": 81,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Close Dispute (Decision Ready to Deliver)",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 10,
+      "dest_status": 103,
+      "dest_override": false,
+      "order": 1
+    }, {
+      "stage": 8,
+      "status": 81,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Decision Pending",
+      "ownerTypes": "arb",
+      "dest_owner": "same",
+      "dest_stage": 10,
+      "dest_status": 100,
+      "dest_override": false,
+      "order": 2
+    }, {
+      "stage": 8,
+      "status": 81,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Interim Decision Pending",
+      "ownerTypes": "arb",
+      "dest_owner": "same",
+      "dest_stage": 10,
+      "dest_status": 101,
+      "dest_override": false,
+      "order": 3
+    }, {
+      "stage": 8,
+      "status": 81,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Adjourn Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 63,
+      "dest_override": false,
+      "order": 4
+    },
+    
+    {
+      "stage": 10,
+      "status": 100,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Close Dispute (Decision Ready to Deliver)",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 10,
+      "dest_status": 103,
+      "dest_override": null,
+      "order": 1
+    },
+    {
+      "stage": 10,
+      "status": 100,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Adjourn Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 63,
+      "dest_override": null,
+      "order": 2
+    },
+
+    {
+      "stage": 10,
+      "status": 101,
+      "processes": [1,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Adjourn Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 63,
+      "dest_override": null,
+      "order": 1
+    },
+
+    {
+      "stage": 10,
+      "status": 103,
+      "processes": [1,2,4,5,6,7],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Review Hearing Granted",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 62,
+      "dest_override": null,
+      "order": 1
+    }
+  ],
+
+  "assignment_rules": [
+    {
+      "current_stage": "6",
+      "current_status": "61",
+      "current_process": "2",
+      "next_stage": "8",
+      "next_status": "80",
+      "next_process": "2",
+      "next_owner_type": "arb"
+    }
+  ],
+
+  "colour_class_map": {
+    "0:0" : "status-Ext-owner",
+    "0:1" : "status-Ext-owner",
+    "0:2" : "status-Ext-owner",
+    "0:3" : "status-Ext-owner",
+    "0:4" : "status-Ext-owner",
+    "0:5" : "status-Ext-owner",
+    "0:6" : "status-Ext-owner",
+    "0:90" : "status-no-owner",
+    "0:92" : "status-no-owner",
+    "0:94" : "status-no-owner",
+    "0:99" : "status-no-owner",
+
+    "2:20" : "status-IO-owner",
+    "2:21" : "status-IO-owner",
+    "2:22" : "status-IO-owner",
+    "2:23" : "status-IO-owner",
+    "2:24" : "status-IO-owner",
+    "2:25" : "status-IO-owner",
+    "2:90" : "status-no-owner",
+    "2:91" : "status-no-owner",
+    "2:94" : "status-no-owner",
+    "2:95" : "status-arb-owner",
+    "2:96" : "status-IO-owner",
+
+    "4:40" : "status-Ext-owner",
+    "4:41" : "status-Ext-owner",
+    "4:42" : "status-IO-owner",
+    "4:43" : "status-arb-owner",
+    "4:44" : "status-Ext-owner",
+    "4:45" : "status-IO-owner",
+    "4:90" : "status-no-owner",
+    "4:93" : "status-no-owner",
+    "4:94" : "status-no-owner",
+    "4:95" : "status-arb-owner",
+
+    "6:60" : "status-no-owner",
+    "6:61" : "status-no-owner",
+    "6:62" : "status-IO-owner",
+    "6:63" : "status-IO-owner",
+    "6:90" : "status-no-owner",
+    "6:95" : "status-arb-owner",
+    
+    "8:80" : "status-arb-owner",
+    "8:81" : "status-Ext-owner",
+    "8:95" : "status-arb-owner",
+    
+    "10:95" : "status-arb-owner",
+    "10:100" : "status-arb-owner",
+    "10:101" : "status-arb-owner",
+    "10:102" : "status-IO-owner",
+    "10:103" : "status-no-owner",
+    "10:104" : "status-IO-owner",
+    "10:105" : "status-arb-owner",
+    "10:106" : "status-arb-owner"
+  }
+}

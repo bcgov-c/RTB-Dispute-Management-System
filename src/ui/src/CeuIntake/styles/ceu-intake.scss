@@ -1,0 +1,50 @@
+
+.intake-ceu-p1 {
+
+  &__warning.warning {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  &__property {
+    .option-button { height: 85px; max-width: 295px; }
+    .property-type-mhpta { padding-top: 15px; }
+  }
+
+  &__rtb-matter .step-description { display: inline-block; }
+
+  .applicant-type-tenant { width: 100%; padding-top: 25px; }
+
+  .page-item-container .warning { margin-top: 25px; }
+}
+
+
+.intake-ceu-p2 {
+  &__applicants-dropdown {
+    select { width: fit-content; min-width: 80px; }
+    .page-item-container { padding-top: 0; }
+  }
+
+}
+
+.intake-ceu-p3 {
+  .primary-applicant-select .radio label { margin-left:0; margin-right: 20px; }
+  .primary-applicant-select .radio label:last-child { margin-left:0 }
+}
+
+.intake-ceu-p5 {
+  &__totalUnits input { width: 100px; }
+  &__unitCount .form-control-label { display: none; }
+}
+
+.intake-ceu-p6 {
+  .step-description { display: inline-block; }
+}
+
+.ceu-error-modal .modal-dialog { width: 100%; max-width: 1000px; }
+
+
+// Global overrides
+.error-block.warning { line-height: 22px; }
+
+.page-navigation-button-container { line-height: 65px; margin-top: 30px; }

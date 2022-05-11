@@ -1,0 +1,43 @@
+.communication-receipt {
+  .standard-list { margin-top: 20px;}
+  .standard-list .standard-list-item { color: #999; margin: 8; padding: 8px 0 2px 0; }
+
+  &__section-header {
+    font-size: 20px;
+    background-color: #e6e6e6;
+    padding: 12px 10px 8px 10px;
+  }
+  
+  &__table-header {
+    display: flex;
+  }
+
+  &__created-column {
+    width: 260px;
+    min-width: 260px;
+  }
+
+  &__participant-column {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  &__site-column {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  &__title-column {
+    width: 380px;
+    min-width: 380px;
+  }
+
+  &__view-column {
+    margin-left: auto;
+    margin-right:10px;
+
+    &__link {
+      cursor: pointer;
+    }
+  }
+}

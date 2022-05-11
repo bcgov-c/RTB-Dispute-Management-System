@@ -1,0 +1,1060 @@
+#header .subbannertext > span:first-child { margin-right: 0; }
+#header .subbannertext > span:last-child { margin-left: 0; }
+#header .header-inner { padding: 0 10px 0 8px; }
+
+/* Dispute list page styles */
+.dispute-list-page {
+  max-width: 1440px;
+  padding: 40px 0 45px 20px;
+}
+
+.dispute-list-spacer {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid gray;
+
+}
+
+.dispute-list-login-name {
+  font-weight: normal;
+  font-size: 18px;
+  display: inline-block;
+  margin-top: 0;
+  line-height: 36px;
+}
+
+.dispute-list-login-username { font-weight: bold; }
+
+.dispute-list-count-container { margin-top: 20px; font-size: 18px; }
+.dispute-list-count > span { display: inline-block; }
+
+#dispute-list-loader {
+  text-align: center;
+  display: none;
+}
+
+#disputes > table {
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+#disputes > table > tr {
+  min-height: 80px;
+  margin-bottom: 5px;
+  position: relative;
+  float: left;
+  width: 100%;
+  padding-top: 15px;
+  border-bottom: 1px solid #b8b8b8;
+  min-width: 300px;
+}
+
+.dispute-list-file { font-size: 18px; }
+.dispute-list-file-number-label { color: #808080; }
+.dispute-list-file-number { margin-right: 20px; font-weight: bold; }
+.dispute-list-rental { font-weight: bold; }
+
+
+#disputes > table > tr:first-child {
+  border-top: 1px solid gray;
+}
+
+#disputes > table > tr:last-child {
+  border-bottom: none;
+}
+
+.dispute-list-none-text {
+  font-size: 16px;
+}
+
+tr.dispute-list-none-box {
+  height: auto;
+  padding: 30px 15px;
+  font-size: 18px;
+}
+
+#disputes > table > tr > td {
+  display: inline-block;
+  text-overflow: ellipsis;
+  padding-bottom: 5px;
+  margin-top: 10px;
+  margin-right:15px;
+  min-height: 65px;
+  font-size: 17px;
+}
+
+
+#disputes > table > tr > td.dispute-list-right-buttons {
+  height: auto;
+}
+
+
+.dispute-list-item { font-size: 16px; }
+
+
+.dispute-list-info-block { width: 100%; max-width: 500px; margin-right: 15px; white-space: nowrap; }
+.dispute-list-evidence-block { min-width: 240px; }
+.dispute-list-hearing-block { min-width: 300px; }
+
+.dispute-list-review-block {   
+  background-color: #fbf3f2;
+  background-image: url("../static/Icon_AlertSml.png");
+  background-size: 20px 20px;
+  padding: 10px 5px 10px 30px;
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  color: #de2f3c; 
+  font-size: 18px; 
+  border: 1px solid #de2f3c;
+  margin-bottom: 10px;
+  background-position-y: 12px;
+}
+
+.dispute-list-review-notification { color: #337ab7; cursor: pointer; display: inline-block; }
+.dispute-list-review-bloc-label { margin-right: 10px; }
+.dispute-list-hearing-block { min-width: 300px; }
+
+.dispute-list-details-modal .modal-dialog { width: 90%; max-width: 1200px; }
+
+.withdrawTenantWarningModal .modal-dialog { max-width: 750px; width: 90%; }
+
+
+.dispute-list-main-text { font-size: 17px; }
+
+.dispute-list-sub-text { color: #808080; }
+
+.dispute-list-add-evidence-link {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+}
+
+.dispute-list-mobile-buttons > .dispute-list-add-evidence-link {
+  display: block;
+  padding-bottom: 10px;
+}
+
+.dispute-list-details-btn,
+.dispute-list-add-evidence-btn,
+.dispute-list-hearing-details-btn {
+  color: #337ab7;
+  cursor: pointer;
+  padding: 3px 0 1px 25px;
+  text-decoration: none;
+}
+
+.dispute-list-details-btn { background: url('../static/Icon_DisputeDetails.png') no-repeat; }
+
+.dispute-list-add-evidence-btn { background: url('../../core/static/Icon_UploadDA.png') no-repeat; }
+
+.dispute-list-hearing-details-btn { background: url('../static/Icon_Hearing_sml.png') no-repeat; }
+
+
+#modal_hearing_info .hearing-details-row { margin-left:15px; }
+
+.dispute-list-upload-evidence-btn { margin-top: 2px; }
+
+.dispute-list-right-buttons { float: right; }
+
+.dispute-list-delete-app { margin-right: 5px; }
+
+span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left: 8px; }
+
+.dispute-list-error-text { color: #cc2d2d; }
+
+.dispute-list-btn-actions, .dispute-list-btn-actions:hover, .dispute-list-btn-actions:active, .dispute-list-btn-actions:focus {
+  padding: 8px 14px 6px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 0px;
+  color: #fff;
+  background-color: #335c85;
+  border-color: #335c85;
+  background-image: none;
+  max-width: 210px;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 10px;
+  margin-top: 2px;
+}
+
+.remove-withdraw, .remove-withdraw:hover, .remove-withdraw:active, .remove-withdraw:focus {
+  background-color: #808080;
+  border-color: #808080;
+}
+
+.dispute-list-start, .dispute-list-start:hover, .dispute-list-start:focus {
+  background-color: #7bbf6a;
+  border-color: #7bbf6a;
+  margin-bottom: 5px;
+}
+
+.dispute-list-right-buttons .add-other-evidence, .dispute-list-right-buttons .add-other-evidence:hover, .dispute-list-right-buttons .add-other-evidence:active, .dispute-list-right-buttons .add-other-evidence:focus {
+  color: #fff;
+}
+
+
+.dispute-list-hearing-calendar {
+  cursor: pointer;
+  color: #337ab7;
+  text-decoration: none;
+}
+
+
+#out-of-bc-warning {
+  font-size: 16px;
+  position: relative;
+  top: -2px;
+  padding-left: 24px;
+  background-color: #fff6e5;
+  background-image: url("../../core/static/Icon_Warning.png");
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  max-width: 1230px;
+  color: #666;
+  margin: 10px 15px 0 0;
+  padding: 10px 10px 10px 50px !important;
+  line-height: 22px;
+}
+
+/* Menu styles */
+#menu-overlay {
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background-color:rgba(0, 0, 0, 0.55);
+  background: url(data:;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAABl0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuNUmK/OAAAAATSURBVBhXY2RgYNgHxGAAYuwDAA78AjwwRoQYAAAAAElFTkSuQmCC) repeat scroll transparent\9; /* ie fallback png background image */
+  z-index:10;
+  color:white;
+  height: 100%;
+  width: 100%;
+  min-height: 600px;
+}
+
+#menu .step.logout {
+  font-weight: normal;
+  color:#335c85;
+  background: 5px 6px #fff url("../static/Nav_ExitIcon.png") no-repeat;
+  cursor: pointer;
+  margin: 3px 0 0 0;
+}
+
+#menu .step.disputelist {
+  font-weight: normal;
+  color:#335c85;
+  background: 5px 6px #fff url("../static/Nav_ListIcon.png") no-repeat;
+  cursor: pointer;
+  margin: 10px 0 0 0;
+}
+
+
+#intake-content-container {
+
+}
+
+/* Intake styles */
+#intake-content {
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 220px;
+  padding: 0;
+  height: auto;
+  overflow: auto;
+  width: calc(100% - 220px);
+  overscroll-behavior: none;
+}
+
+/* Page styles */
+
+.page-navigation-button-container {
+  margin-top: 40px;
+  margin-bottom: 30px;
+  min-height: 75px;
+}
+
+.page-navigation-button-container.row .step-previous{
+  margin-left: 10px;
+}
+
+.page-view .page-item-container {
+  max-width:1200px;
+  position:relative;
+  padding-top: 30px;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.page-view .page-item-container .page-item-child-view {
+  max-width: 1200px;
+}
+
+.page-item-container > .warning {
+  margin: -20px 15px 20px 0px;
+  padding: 10px 10px 10px 50px;
+  line-height: 22px;
+  background-color: #fff6e5;
+  background-image: url("../../core/static/Icon_Warning.png");
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  max-width: 1230px;
+  color: #666;
+  font-size: 16px;
+}
+
+.option-button.step-list {
+  background-image: url('../static/Icon_List.png');
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  padding: 3px 25px 0 55px;
+  font-size: 22px;
+  margin-right:0;
+}
+
+
+/* Component styles */
+.intake-radio-component .radio.payment-options label,
+.intake-radio-component .radio.hearing-options label {
+  display: block;
+  margin: 10px 0 0 0;
+}
+
+
+/* Page one "general info" styles */
+.applicant-type-landlord, .applicant-type-tenant, .property-type-rta, .property-type-mhpta, .tenancy-status-current, .tenancy-status-past {
+  max-width: 230px;
+  height: 70px;
+  text-align: left;
+  padding: 15px 15px 0 75px;
+  white-space: normal;
+  background-position: 5px 10px;
+  background-repeat: no-repeat;
+}
+
+.property-type-mhpta {
+  /* Property type mhpta language is 3 lines that wrap, so reduce top padding */
+  padding-top: 5px;
+}
+
+.property-type-mhpta, .property-type-rta {
+  max-width:210px;
+}
+
+.applicant-type-landlord {
+  background-image: url('../static/Icon_Landlord_gry.png');
+}
+
+.applicant-type-tenant {
+  background-image: url('../static/Icon_Tenant_gry.png');
+}
+
+.applicant-type-landlord.selected {
+  background-image: url('../static/Icon_Landlord_wht.png');
+}
+
+.applicant-type-tenant.selected {
+  background-image: url('../static/Icon_Tenant_wht.png');
+}
+
+.property-type-rta {
+  background-image: url('../static/Icon_RTA_gry.png');
+}
+
+.property-type-mhpta {
+  background-image: url('../static/Icon_MHPTA_gry.png');
+}
+
+.property-type-rta.selected {
+  background-image: url('../static/Icon_RTA_wht.png');
+}
+
+.property-type-mhpta.selected {
+  background-image: url('../static/Icon_MHPTA_wht.png');
+}
+
+.tenancy-status-current {
+  background-image: url('../static/Icon_Current_gry.png');
+}
+
+.tenancy-status-past {
+  background-image: url('../static/Icon_Past_gry.png');
+}
+
+.tenancy-status-current.selected {
+  background-image: url('../static/Icon_Current_wht.png');
+}
+
+.tenancy-status-past.selected {
+  background-image: url('../static/Icon_Past_wht.png');
+}
+
+.tou-title {
+  min-height: 50px;
+  width: 90%;
+  font-weight: bold;
+  margin-bottom: 0px;
+  font-size: 18px;
+  padding-bottom:5px;
+}
+
+#p1-TOU .page-item-container { padding-top: 10px; margin-bottom: 0; }
+
+#p1-TOU .disabled .accepted-terms-content { opacity: 0.6; }
+
+#p1-TOU .disabled .checkbox-title { cursor: default; }
+
+.accepted-terms-tou-parent { margin-top:20px; }
+
+
+#p1-TenancyEndDateLegacy {
+  padding-top: 0 !important;
+}
+
+#p1-TenancyEndDateLegacy .step-description {
+  margin-top: -10px;
+}
+
+
+
+#p1-RentalInterval .first-dropdown-container,
+#p1-RentalInterval .second-dropdown-container,
+#p1-RentalInterval .other-input-container { float: left; }
+#p1-RentalInterval .first-dropdown-container { width: 115px; margin-right: 15px; }
+#p1-RentalInterval .second-dropdown-container,
+#p1-RentalInterval .other-input-container { width: calc(100% - 130px); }
+
+
+#p1-RentalAddress .page-item-child-view { max-width: 700px; }
+
+.component-double-selector .validateContainer { line-height: 72px; }
+
+.component-double-selector .component-double-selector-input-container > .error-block { float: left; }
+
+.warning-option .step-description {
+  background-color: #fff6e5;
+  background-image: url('../../core/static/Icon_Warning.png');
+  background-repeat: no-repeat;
+  background-position: left 5px center;
+  max-width: 1230px;
+  color: #666;
+  padding: 8px 5px 5px 50px;
+
+  margin: 5px 0 8px 0;
+  font-size: 16px;
+  line-height: 22px;
+  position: relative;
+  top: -2px;
+}
+
+/* Page two / threestyles */
+#p2-ApplicantCountDropdown .page-item-container,
+#p2-AssistantCountDropdown .page-item-container,
+#p3-RespondentCountDropdown .page-item-container {
+  padding-top:0;
+  margin-top: -20px;
+}
+
+#p2-ApplicantCountDropdown select,
+#p2-AssistantCountDropdown select,
+#p3-RespondentCountDropdown select {
+  max-width: 280px;
+}
+
+
+.participant-wrapper {
+  max-width: 820px;
+}
+#p2-Applicants .page-item-child-view, #p2-Agent .page-item-child-view, #p2-Support .page-item-child-view,
+#p2-Applicants .page-item-container, #p2-Agent .page-item-container, #p2-Support .page-item-container,
+#p3-Respondents .page-item-child-view, #p3-Respondents .page-item-container,
+#is_tenant .page-item-child-view, #is_tenant .page-item-container,
+#is_landlord .page-item-child-view, #is_landlord .page-item-container,
+#p5-ClaimInformation .page-item-child-view, #p5-ClaimInformation .page-item-container {
+  max-width: none;
+}
+
+.claim-information-collection-view {
+  margin-bottom: 20px;
+}
+
+.claim-total-error {
+  margin-top:-20px;
+  margin-left: 10px;
+}
+
+.claim-total-warning {
+  font-size: 16px;
+}
+
+.claim-total-amount-container {
+  font-size: 19px;
+  margin-bottom: 30px;
+  background: url('../static/Icon_RightArrowBlue.png') 0 0 no-repeat;
+  padding-left: 25px;
+}
+
+.claim-information-item-237,
+.claim-information-item-238,
+.claim-information-item-239 {  }
+
+
+/* Files thumbnail preview */
+.file-thumbnail-preview-container {
+  margin-top: 5px;
+}
+
+.file-thumbnail-preview {
+  display: inline-block;
+  max-width: 300px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+}
+
+
+.file-thumbnail-preview-container > img {
+  margin-right: 10px;
+}
+
+.file-thumbnail-preview-error > img {
+  height: 150px;
+  width: 157px;
+}
+
+
+.file-thumbnail-preview-container.file-thumbnail-preview-error::after {
+  content: "Preview unavailable";
+  color: #727272;
+  display: block;
+  margin-left: 7px;
+}
+
+
+/* Participant info - intake only */
+.floatingHeader {
+  position: fixed;
+  z-index: 10;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.intake-participants-component .floatingHeader { top: 95px; }
+
+.intake-participant { margin-bottom: 30px; }
+
+/* Application selection page */
+
+#p3-EmailValidate .page-item-container {
+  padding-top: 0;
+}
+
+#p3-EmailValidate .intake-input-component label {
+  padding-left:0;
+}
+
+
+/* Claim selection page */
+/* Always hide the direct request checkbox */
+.direct-request-claims .checkbox {
+    display: none !important;
+}
+.direct-request-claims .intake-claim-checkbox-component .intake-dropdown-component {
+    margin-left: 20px;
+}
+
+.intake-dropdown-component .hold-security,
+.intake-dropdown-component .filing-late { max-width: 400px; }
+
+.intake-dropdown-component .hold-security select,
+.intake-dropdown-component .filing-late select { max-width: 80px; }
+
+.intake-claim-checkbox-component .intake-dropdown-component {
+  margin-left: 60px;
+}
+
+.claim-issue-number-container {
+  font-size: 18px;
+  background-image: url('../static/Icon_RightArrowBlue.png');
+  background-repeat: no-repeat;
+  background-position: 10 0;
+  padding-left: 25px;
+  margin-bottom: 10px;
+  margin-left: 15px;
+  margin-top: 40px;
+}
+
+.no-claims-error {
+  margin-left: 10px;
+}
+
+.claim-total-error {
+  margin-top:-20px;
+  margin-left: 10px;
+}
+
+
+
+/* ClaimInformation (SP "evidence_claim") styles */
+/* EvidenceClaim styles */
+.intake-claim { margin-top: 20px; }
+.intake-claim:first-child { margin-top: 0; }
+
+.evidence-claim-header.floatingHeader .help-icon { display: none; }
+
+.evidence-claim-header.floatingHeader .evidence-claim-delete { display: none; }
+
+.evidence-claim-header.floatingHeader { top: 105px !important; }
+
+.evidence-info-heading {
+    font-size: 19px;
+    line-height: 23px;
+    padding-bottom: 0;
+}
+
+.evidence-claims > div {
+  margin-bottom: 20px;
+}
+
+.container-with-border {
+  border: 2px solid #e7ebf0;
+  border-radius: 0;
+}
+
+.evidence-claim-header {
+  background-color: #f2f4f7;
+  color: black;
+  font-size: 17px;
+  overflow: hidden;
+}
+
+.evidence-claim-number {
+  float: left;
+  min-width: 40px;
+  display: table-cell;
+  height: 40px;
+  font-size: 28px;
+  padding-top: 2px;
+  padding-right: 13px;
+  padding-bottom: 120px;
+  padding-left: 13px;
+  margin-bottom: -120px;
+  background-color: #e7ebf0;
+  font-weight: bold;
+  /* cursor: pointer; */
+}
+
+.evidence-claim-title {
+  float: left;
+  margin-top: 10px;
+  margin-left: 10px;
+  padding-bottom: 5px;
+  width: calc(100% - 130px);
+  /* cursor: pointer; */
+}
+
+.evidence-claim-delete {
+  float: right;
+  margin-right: 10px;
+  color: #dc3030;
+  margin-top:11px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.evidence-claim-delete span {
+  bottom: 4px;
+  position: relative;
+}
+
+.evidence-delete-icon {
+  background-image: url('../../core/static/Icon_Delete.png');
+  margin-right: 5px;
+  width: 17px;
+  height: 20px;
+  display: inline-block;
+}
+
+.evidence-claim-warning-provided, .evidence-claim-warning-missing, .evidence-claim-warning-later {
+  padding: 5px 8px 5px 8px;
+  border-top: 1px solid #e7ebf0;
+  border-radius: 0;
+  line-height: 22px;
+}
+
+.evidence-claim-warning-provided div, .evidence-claim-warning-missing div, .evidence-claim-warning-later div {
+  background-repeat: no-repeat;
+  background-position: left center;
+  height: 28px;
+  line-height: 20px;
+  padding: 2px 0px;
+  padding-left: 40px;
+  display: table-cell;
+}
+
+.evidence-claim-warning-provided span, .evidence-claim-warning-missing span, .evidence-claim-warning-later span {
+  top: 3px;
+  position: relative;
+  font-size: 16px;
+}
+
+.evidence-claim-warning-provided {
+  background-color: #f8fcf9;
+}
+.evidence-claim-warning-provided div {
+  background-image: url('../static/Icon_FeedbackOK.png');
+  color: #139b39;
+}
+
+.evidence-claim-warning-missing {
+  color: #dc3030;
+  background-color: #fdf3f2;
+}
+.evidence-claim-warning-missing div {
+  background-image: url('../static/Icon_FeedbackWarning.png');
+}
+
+.evidence-claim-warning-later {
+  color: #e09400;
+  background-color: #fffcf5;
+}
+.evidence-claim-warning-later div {
+  background-image: url('../static/Icon_FeedbackReminder.png');
+}
+
+.evidence-claim-details {
+  border-top: 1px solid #e7ebf0;
+  padding-top: 15px;
+}
+
+.evidence-claim-details > .info-help-container {
+  margin: 0 10px 10px 10px;
+}
+
+.container-with-border .section-header {
+  font-size: 19px;
+  font-weight: normal;
+  color: #4b4b4b;
+  background-color: #f6f6f6;
+  padding: 10px 0px 2px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  width: 100%;
+}
+.evidence-claim-evidence-section .section-header {
+  margin-top: 35px;
+  margin-bottom: 20px;
+}
+
+
+.standalone-evidence-container { }
+.standalone-evidence-header { }
+.standalone-evidence-header .section-header { margin: 0; padding-right: 0; }
+.standalone-evidence-main { padding: 10px 10px 20px 15px; font-size: 17px; }
+.standalone-evidence-main ul { padding-left: 25px; }
+.standalone-evidence .info-help-container { margin-left:15px; margin-right:15px; }
+
+.standalone-extra-container { display: flex; justify-content: flex-start; flex-wrap: wrap; margin: 0 15px; }
+.standalone-evidence-date { min-width: 265px; max-width: 265px; margin-right: 10px; }
+.standalone-evidence-signed select { width: 259px; }
+
+
+#p6-ClaimInformation .page-item-child-view { max-width: 100%; }
+
+#p6-TenancyAgreement .page-item-container, #p6-TenancyAgreementEvidence .page-item-container { padding-top: 0; }
+
+
+/* Review page items */
+
+.review-page .section-header { height: auto; }
+
+.review-general table:first-child { margin: 0; max-width: auto; }
+
+.review-section-title-text { margin-right: 15px; }
+
+.review-label { margin-right: 5px; }
+
+.review-edit-button { font-weight: normal; font-size: 18px; }
+
+.review-file-name { margin-right: 10px; color: #8e8e8e; }
+
+.review-file-size { color: #b5b5b5; font-size: 14px; }
+
+.review-claims .evidence-banner { margin-top: 5px; }
+.review-claims .evidence-banner > div { background-color: #fff; border: 0; }
+
+/* Payment styles */
+
+.payment-type-description { padding-top: 30px; }
+.payment-page-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; line-height: 26px; }
+.payment-page-subtitle { font-size: 17px; line-height: 21px; margin: 0px 0px 20px 0px; }
+
+.intake-receipt-footer {
+  display: flex;
+  margin: 40px 0 0 0;
+}
+
+.intake-logout-btn { font-size: 22px; height: 50px; display: flex; align-items: center;}
+.intake-file-list-btn { font-size: 22px; height: 50px; }
+
+.da-receipt-main-menu-btn {
+  padding: 8px 16px 6px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 0px;
+}
+
+
+.smallest-form-field input, .smallest-form-field select { max-width: 80px; }
+.small-form-field input, .small-form-field select { max-width: 200px; }
+
+/* For a currency field to be the 200px total */
+.small-form-field .input-group-addon + input { max-width:166px }
+
+/* Fee waiver styles */
+#p8-paymentMethod .page-item-container { padding-top: 0 }
+
+.family-income-question .input-group,
+.expenses-amount .input-group { margin-bottom:7px; }
+
+.fee-waiver-page-description { font-size: 16px; }
+
+
+.fee-waiver-step2 .view-evidence-link,
+.fee-waiver-step2 .evidence-link-separator { display: none; }
+
+.fee-waiver-progress-container {
+  background-color: #f3f3f4;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 15px;
+}
+
+.fee-waiver-progress-container .title-underline { border-color: #333; }
+
+.fee-waiver-edit-link {
+  margin-left: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #337ab7 !important;
+}
+
+.fee-waiver-submitted-date {
+  margin-left: 15px;
+  font-size:16px;
+  color: #777;
+}
+
+.fee-waiver-progress, .fee-waiver-progress-evidence { font-size: 16px; }
+
+.fee-waiver-progress-evidence-container { padding-bottom: 10px; }
+.fee-waiver-progress-evidence-spacer { height: 5px; width: calc(100% + 30px); background-color: white; margin: 20px -15px 20px -15px; }
+
+.fee-waiver-progress-label { width: 315px; display: inline-block; }
+
+.fee-waiver-consent-label { margin-top:10px; padding-left:5px; }
+
+.fee-waiver-consent-label span { padding-left: 10px; }
+
+.fee-waiver-progress-value { font-weight: bold; }
+
+.fee-waiver-step1-header,
+.fee-waiver-step2-header,
+.fee-waiver-step3-header { font-size: 17px; }
+
+.expenses-evidence .checkbox { display: none; }
+
+.fee-waiver-error-container { max-width:900px; min-height: 40px; margin-bottom:15px; }
+.fee-waiver-error { height: 40px; display: table-cell; vertical-align: middle; }
+
+
+.income-evidence .evidence-item-container .help-icon { display: none; }
+
+/* Desktop-only css */
+@media (min-width: 769px) {
+  #p1-TenancyStartDate .input-group-container,
+  #p1-MonthlyRent .input-group-container,
+  #p1-SecurityDeposit .input-group-container,
+  #p1-PetDeposit .input-group-container,
+  #p1-TenancyEndDate .input-group-container,
+  #p1-CounterDisputeNumber .input-group-container { max-width: 325px; }
+
+  #p1-RentalInterval .component-double-selector-input-container { max-width: 410px; }
+  #p1-RentalInterval .second-dropdown-container,
+  #p1-RentalInterval .other-input-container { max-width: 250px; }
+
+  .fee-waiver-step2 .evidence-action-selected { margin-left: 0; }
+  .income-evidence .evidence-item { padding-left: 65px; }
+  .fee-waiver-consent-label,
+  .fee-waiver-progress-value,
+  .fee-waiver-consent-label span { font-size: 17px; }
+}
+
+/* Tablet breakpoint */
+@media (max-width: 991px) {
+
+  .dispute-list-mobile-buttons {
+    display: block;
+    left: -5px;
+    position: relative;
+  }
+
+  .dispute-list-status-block {
+    max-width: 600px;
+    width: auto;
+  }
+
+  .application-list-table tr {
+    height: initial;
+    float: none;
+  }
+
+  .intake-claim .notice-method select { max-width: 260px; }
+}
+
+/* Mobile css */
+@media (max-width: 767px) {
+  #menu {
+    position: absolute;
+    padding: 4px;
+    top: -4px;
+    right: 10px;
+    left: auto;
+    width: 215px;
+    background-color: #284a67;
+    display: none;
+    bottom: auto;
+    z-index: 11;
+  }
+
+  #menu .step.logout {
+    margin: 3px 0px 0 0;
+  }
+
+  #menu .step.disputelist {
+    margin: 5px 0 0 0;
+  }
+
+  #menu.mobile-render {
+    display: block;
+  }
+
+  #menu .menu-container {
+    margin: 0;
+    padding: 4px 4px 0 4px;
+  }
+
+  #intake-content {
+    position: absolute;
+    bottom: 0;
+    left: 0px;
+    right: 0;
+    overflow: auto;
+    padding:0 15px 0 10px;
+    width: 100%;
+  }
+
+  .page-view {
+    padding: 0;
+  }
+
+  #header .sub-banner .mobile-menu-container {
+    display: inline-block;
+    float: right;
+    width: 40px;
+    height: 32px;
+    margin-top: 3px;
+    margin-right: 10px;
+  }
+
+  #header .sub-banner .mobile-menu-container.menu-open {
+    background-color: #284a67;
+  }
+
+  #header .sub-banner .mobile-menu {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    background: 0 0 url("../static/Icon_MobileMenu.png") transparent no-repeat;
+    margin-top: 5px;
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  .sub-banner .mobile-sub-banner {
+    display: none !important;
+  }
+
+  .floatingHeader {
+    left: 0;
+  }
+
+  .review-information-body {
+    margin-left: 0;
+  }
+
+  .modal-withdraw-body .sublist{
+    padding-left: 20px;
+  }
+
+  #p1-RentalInterval .second-dropdown-container select { width: auto; }
+
+  .fee-waiver-progress-label { width: 170px; }
+
+  .intake-receipt-footer .footer-logout-container { margin-left: 15px; }
+  .intake-receipt-footer .receipt-logout-btn { padding: 0 10px; }
+
+  .dispute-list-page { padding: 30px 5px 30px 10px; }
+  .dispute-list-info-block { max-width: unset; white-space: normal; }
+  
+  .dispute-list-container > table > tr,
+  .dispute-list-info-block,
+  .dispute-list-evidence-block,
+  .dispute-list-hearing-block { min-width: 280px; }
+
+  .direct-request-claims .intake-claim-checkbox-component .intake-dropdown-component {
+    margin-left: 0;
+  }
+}
+
+
+/* Small screen breakpoint */
+@media (max-width: 600px) {
+  .application-list-table td {
+    width: 100% !important;
+  }
+
+  .application-list-table td:nth-child(2) {
+    height: 70px;
+  }
+
+  .dispute-list-login-name {
+    display:block;
+  }
+
+  .dispute-list-start, .dispute-list-start:hover, .dispute-list-start:focus {
+    margin-top:20px;
+    float:left;
+  }
+
+
+  .intake-claim-checkbox-component .intake-dropdown-component {
+    margin-left: 0;
+  }
+
+}
+
+
+/* Extra small screen breakpoint */
+@media (max-width: 440px) {
+  #header .subbannertext > span:first-child { margin-left: 5px; }
+
+  .dispute-list-hearing-block { margin-top:20px }
+
+  #p1-RentalInterval .second-dropdown-container,
+  #p1-RentalInterval .other-input-container { width: 100%; }
+}
+

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+  <link rel='shortcut icon' type='image/x-icon' href='<%= require("../core/static/favicon.ico") %>' />
+  <link rel='shortcut icon' type='image/x-icon' href='<%= require("../core/static/favicon.icon") %>' />
+
+  <% _.each(htmlWebpackPlugin.files.css, function(stylesheet) { %>
+    <link rel="stylesheet" href="<%= stylesheet %>" />
+  
+  <% }) %>
+
+  <title>DMS Admin: Residential Tenancy Case Management System</title>
+  <script type="text/javascript">
+    var __loaderData = {
+      minimumTimerComplete: false
+    };
+    var __errorsToSuppress = [ 'ResizeObserver loop limit exceeded' ];
+    setTimeout(function() {
+      __loaderData.minimumTimerComplete = true;
+    }, 2000);
+  </script>
+
+</head>
+<body style="background-color: #f1f1f1!important;">
+  <div id="root" style="text-align:center;">
+    <div style="margin-top: 100px!important;">
+      <img src="<%= require('../core/static/DMSLoader_SML.gif') %>" height="85px" width="75px" />
+    </div>
+    <div style='color:#b9b9b9; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important; font-size: 14px!important;line-height:1.42857143!important;'>
+      Loading Admin
+    </div>
+  </div>
+
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      message = message || '';
+      console.trace();
+      console.log(message, source, lineno, colno, error);
+
+      let suppressError = false;
+      (__errorsToSuppress || []).forEach(function(_error) {
+        if (suppressError || message.indexOf(_error) !== -1) {
+          suppressError = true;
+          return;
+        }
+      });
+
+      if (suppressError) {
+        return;
+      }
+      alert('There was an unexpected application error.  Please try again using the latest version of the Google Chrome browser.  If you continue to experience issues, contact the Residential Tenancy Branch.');
+    };
+  </script>
+  <% _.each(htmlWebpackPlugin.files.js, function(filename) { %>
+    <script type="text/javascript" src="<%= filename %>"></script>
+  <% }) %>
+</body>
+</html>

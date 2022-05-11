@@ -1,0 +1,160 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: ${NAME}
+  annotations:
+    openshift.io/display-name: RTB (Persistent)
+    description: ${NAME} template
+    tags: cm, rtb, dotnet
+    iconClass: icon-dotnet
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+labels:
+  template: ${NAME}
+  app: "${NAME}"
+objects:
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: file-repository-data
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: "${VOLUME_CAPACITY}"
+- kind: Secret
+  apiVersion: v1
+  data:
+    appsettings.json: >-
+      ewogICAgIkNvbm5lY3Rpb25TdHJpbmdzIjogewogICAgICAgICJEYkNvbm5lY3Rpb24iOiAKICAgICAgICAiSG9zdD1wb3N0Z3Jlc3FsOyBQb3J0PTU0MzI7RGF0YWJhc2U9Y2FzZW1hbmFnZW1lbnQ7VXNlcm5hbWU9cG9zdGdyZXM7UGFzc3dvcmQ9cG9zdGdyZXM7SW50ZWdyYXRlZCBTZWN1cml0eT1mYWxzZTsiCiAgICB9LAoKICAgICJTY2hlZHVsZXIiOiB7CiAgICAgICAgIkhlYXJpbmdSZW1pbmRlckNyb25TY2hlZHVsZSIgOiAiMCAwIDAvNCAqICogPyIsCiAgICAgICAgIk1haWxOb3RpZmljYXRpb25Dcm9uU2NoZWR1bGUiOiAiMCAwLzIgKiAqICogPyIsCiAgICAgICAgIlBheW1lbnRDb25maXJtYXRpb25Dcm9uU2NoZWR1bGUiOiAiMCAwLzIgKiAqICogPyIgCiAgICB9LAoKICAgICJNUSI6IHsKICAgICAgIkNsdXN0ZXIiOiAiaG9zdD1yYWJiaXRtcS1jbHVzdGVyO3VzZXJuYW1lPWd1ZXN0O3Bhc3N3b3JkPWd1ZXN0O3B1Ymxpc2hlckNvbmZpcm1zPXRydWU7dGltZW91dD0xMCIKICAgIH0KfQ==
+  metadata:
+    name: secret-appsettings
+  type: Opaque
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Exposes and load balances the application pods
+      service.alpha.openshift.io/dependencies: '[{"name": "${DATABASE_SERVICE_NAME}", "kind": "Service"}]'
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: "${NAME}"
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+  spec:
+    host: "${APPLICATION_DOMAIN}"
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: "${NAME}"
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to deploy the application server
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+      resources: {}
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}:${TAG}"
+          namespace: "${TOOLS_NAMESPACE}"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}"
+    template:
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        containers:
+        - name: ${NAME}
+          ports:
+          - containerPort: 80
+          image: >-
+            docker-registry.default.svc:5000/${TOOLS_NAMESPACE}/${NAME}:${TAG}
+          env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: "Staging"
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT}"
+          volumeMounts:
+          - name: secrets
+            mountPath: /app/secrets
+            readOnly: true
+          - name: file-repository-data
+            mountPath: "/data"
+        volumes:
+        - name: secrets
+          secret:
+            secretName: secret-appsettings
+        - name: file-repository-data
+          persistentVolumeClaim:
+            claimName: file-repository-data
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: case-management
+- name: TAG
+  displayName: Tag
+  description: Specify tag name.
+  required: true
+  value: latest
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  required: true
+  description: Maximum amount of memory the .NET Core container can use.
+  value: 2Gi
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the .NET builder ImageStream resides.
+  value: openshift
+- name: TOOLS_NAMESPACE
+  displayName: Namespace
+  description: The RTB Namespace where the ImageStream resides.
+  required: true
+  value: rtb-dms-tools
+- name: APPLICATION_DOMAIN
+  displayName: Application Hostname
+  description: The exposed hostname that will route to the .NET Core service, if left blank a value will be defaulted.
+  value: ''
+- name: DATABASE_SERVICE_NAME
+  required: true
+  displayName: Database Service Name
+  value: postgresql
+- name: VOLUME_CAPACITY
+  displayName: Volume Capacity
+  description: Volume space available for data, e.g. 512Mi, 2Gi
+  value: 30Gi
+  required: true
+

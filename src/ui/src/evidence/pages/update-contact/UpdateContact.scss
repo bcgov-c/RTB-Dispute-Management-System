@@ -1,0 +1,59 @@
+@import "../../styles/variables";
+
+.da-update-contact-page { font-size: $DAC-FONT-SIZE-CONTENT; }
+
+.da-update-contact-form-groups > div { display: flex; margin-bottom: 15px; }
+
+.da-update-contact-email-address,
+.da-update-contact-confirm-email,
+.da-update-contact-preferred-contact-method { width: 300px; }
+
+.da-update-contact-daytime-phone, 
+.da-update-contact-other-phone, 
+.da-update-contact-fax { width: 200px; }
+
+.da-update-contact-email-address .component-email-input { margin-right: 0; }
+
+.da-update-contact-message-text { display: flex; flex-direction: row; margin: 27px 0 0 25px; white-space: nowrap; }
+
+.da-update-contact-method-container { margin-bottom: 40px; }
+
+.da-update-contact-remove-other-phone,
+.da-update-contact-remove-fax,
+.da-update-contact-remove-email { cursor: pointer; height: fit-content; position: relative; }
+
+.dac {
+  &__contact {
+    &__page-instructions {
+      font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+      margin-bottom: 10px;
+    }
+
+    &__tou {
+      margin: 25px 0;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .da-update-contact-form-groups > div { flex-wrap: wrap; margin-bottom: 20px; }
+  .da-update-contact-message-text { margin: 0; width: 100%; white-space: pre-wrap; }
+
+  .da-update-contact-fax-sub-container,
+  .da-update-contact-other-phone-sub-container { display: flex; }
+
+  .da-update-contact-remove-other-phone .dac__icons__trash,
+  .da-update-contact-remove-fax .dac__icons__trash,
+  .da-update-contact-remove-email .dac__icons__trash { position: absolute; top: 25px; left: 10px }
+
+  .da-update-contact-preferred-contact-method select { width: auto; }
+}
+
+/* Very small screen styles */
+@media (max-width: 440px) {
+  .da-update-contact-email-address,
+  .da-update-contact-confirm-email { flex-direction: column; }
+
+  .da-update-contact-email-address,
+  .da-update-contact-confirm-email { width: 280px; }
+}

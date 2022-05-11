@@ -1,0 +1,64 @@
+#myScheduleRequest_modal {
+  .modal-dialog {
+    min-width: 1200px;
+  }
+}
+.schedule-request-modal {
+  &__top-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    &__dates {
+      margin-right: 387px;
+    }
+  }
+
+  &__type {
+    width: 200px;
+  }
+
+  &__request-time {
+    display: flex;
+    margin-top: 10px;
+  }
+
+  &__start-date {
+    width: 170px;
+    margin-right: 5px;
+  }
+
+  &__start-time {
+    width: 150px;
+    margin-right: 5px;
+  }
+
+  &__end-date {
+    width: 170px;
+    margin: 0 5px;
+  }
+
+  &__end-time {
+    width: 150px;
+    margin-right: 5px;
+  }
+
+  &__to {
+    position: relative;
+    top: 30px;
+  }
+
+  &__duration {
+    margin-left: 10px;
+    position: relative;
+    top: 28px;
+  }
+
+  &__edit-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__processing-note {
+    margin: 15px 0;
+  }
+}

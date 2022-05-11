@@ -1,0 +1,1246 @@
+{
+  "ceu_issues_config": {
+
+    "EREP": {
+      "id": 1,
+      "selectionTitle": "The landlord is not completing emergency repairs that were ordered by the Residential Tenancy Branch or other BC Authority (i.e., Local Government, Fire Department, etc.) or after the landlord has been made aware of the required emergency repairs",
+      "issueTitle": "The landlord is not completing emergency repairs that were ordered by the Residential Tenancy Branch or other BC Authority (i.e., Local Government, Fire Department, etc.) or after the landlord has been made aware of the required emergency repairs",
+      "selectionHelp": "Emergency repairs are repairs that are necessary for the health and safety of anyone in the residential property or park.<br/><br/>Emergency repairs include:<ul><li>Majors leaks in pipes or the roof,</li><li>Damaged or blocked water or sewer pipes,</li><li>The primary heating system (only under the Residential Tenancy Act),</li><li>Damaged or defective locks that give access to the rental unit (only under the Residential Tenancy Act), and</li><li>The electrical systems.</li></ul><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance'>emergency repairs and maintenance</a>.",
+      "issueHelp": "Emergency repairs are repairs that are necessary for the health and safety of anyone in the residential property or park.<br/><br/>Emergency repairs include:<ul><li>Majors leaks in pipes or the roof,</li><li>Damaged or blocked water or sewer pipes,</li><li>The primary heating system (only under the Residential Tenancy Act),</li><li>Damaged or defective locks that give access to the rental unit (only under the Residential Tenancy Act), and</li><li>The electrical systems.</li></ul><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance'>emergency repairs and maintenance</a>.",
+      "textDescriptionTitle": "Please describe the emergency repairs and attempts to contact the landlord to report the emergency issue and have it repaired",
+      "order": 1,
+      "severity": 5,
+
+
+      "showInputEntry": {
+        "estimatedAmount": "optional",
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+
+      "associatedEvidence": [
+        {
+          "id": "E001001",
+          "required": true
+        },
+        {
+          "id": "E001002",
+          "required": true
+        },
+        {
+          "id": "E001003",
+          "required": true
+        },
+        {
+          "id": "E001005",
+          "required": true
+        },
+        {
+          "id": "E001004",
+          "required": false
+        },
+        {
+          "id": "E001006",
+          "required": false
+        }
+      ]
+    },
+
+    "RREP": {
+      "id": 2,
+      "selectionTitle": "The landlord is not completing non-emergency repairs that were ordered by the Residential Tenancy Branch or other BC Authority (i.e., Local Government, Fire Department, etc.) or after the landlord has been made aware of the required emergency repairs",
+      "issueTitle": "The landlord is not completing non-emergency repairs that were ordered by the Residential Tenancy Branch or other BC Authority (i.e., Local Government, Fire Department, etc.) or after the landlord has been made aware of the required emergency repairs",
+      "selectionHelp": "Landlords are responsible for maintenance of the rental property and completing repairs after receiving a written request from the tenant. If a landlord does not complete the repair, the tenant can <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance'>repairs and maintenance</a>.",
+      "issueHelp": "Landlords are responsible for maintenance of the rental property and completing repairs after receiving a written request from the tenant. If a landlord does not complete the repair, the tenant can <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance'>repairs and maintenance</a>.",
+      "textDescriptionTitle": "Please describe the repairs and any attempts to request repairs from the landlord",
+      "order": 3,
+      "severity": null,
+
+
+      "showInputEntry": {
+        "estimatedAmount": "optional",
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+
+      "associatedEvidence": [
+        {
+          "id": "E002001",
+          "required": true
+        },
+        {
+          "id": "E002002",
+          "required": true
+        },
+        {
+          "id": "E002003",
+          "required": true
+        },
+        {
+          "id": "E002005",
+          "required": true
+        },
+        {
+          "id": "E002004",
+          "required": false
+        }
+      ]
+    },
+
+    "NCOD-L": {
+      "id": 3,
+      "selectionTitle": "The landlord is failing to comply with a decision or order of the Residential Tenancy Branch",
+      "issueTitle": "The landlord is failing to comply with a decision or order of the Residential Tenancy Branch",
+      "selectionHelp": "Failure to comply with a decision or order of the Residential Tenancy Branch is a contravention of the law. The Compliance and Enforcement Unit does not enforce Residential Tenancy Branch orders.<br/><br/>Residential Tenancy Branch orders are enforced through the Provincial Courts. Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/serving-and-enforcing-orders'>enforcing orders</a>.",
+      "issueHelp": "Failure to comply with a decision or order of the Residential Tenancy Branch is a contravention of the law. The Compliance and Enforcement Unit does not enforce Residential Tenancy Branch orders.<br/><br/>Residential Tenancy Branch orders are enforced through the Provincial Courts. Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/serving-and-enforcing-orders'>enforcing orders</a>.",
+      "textDescriptionTitle": "Please describe the decision or order and any attempts to request the landlords to comply with the decision or order",
+      "order": 3,
+      "severity": null,
+  
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E003001",
+          "required": true
+        },
+        {
+          "id": "E003002",
+          "required": true
+        },
+        {
+          "id": "E003003",
+          "required": false
+        }
+      ]
+    },
+
+    "MNTE": {
+      "id": 4,
+      "selectionTitle": "The landlord has served multiple notices to end tenancy or has made multiple threats of eviction",
+      "issueTitle": "The landlord has served multiple notices to end tenancy or has made multiple threats of eviction",
+      "selectionHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Landlords serving multiple eviction notices without cause can violate a tenant's right to quiet enjoyment. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "issueHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Landlords serving multiple eviction notices without cause can violate a tenant's right to quiet enjoyment. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please describe the repetitive notices or threats to end tenancy and any attempts made to resolve the situation",
+      "order": 1,
+      "severity": 3,
+  
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": true
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E004001",
+          "required": true
+        },
+        {
+          "id": "E004002",
+          "required": false
+        },
+        {
+          "id": "E004003",
+          "required": false
+        }
+      ]
+    },
+    "HARR": {
+      "id": 5,
+      "selectionTitle": "The landlord is repeatedly harassing the tenants or guests",
+      "issueTitle": "The landlord is repeatedly harassing the tenants or guests",
+      "selectionHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "issueHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please describe the repetitive harassments and any attempts made to address the unreasonable disturbances",
+      "order": 2,
+      "severity": 3,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E005001",
+          "required": true
+        },
+        {
+          "id": "E005002",
+          "required": false
+        },
+        {
+          "id": "E005003",
+          "required": false
+        }
+      ]
+    },
+    "RTQE": {
+      "id": 6,
+      "selectionTitle": "The landlord is not protecting the tenant's right to quiet enjoyment",
+      "issueTitle": "The landlord is not protecting the tenant's right to quiet enjoyment",
+      "selectionHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "issueHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please describe how and when the landlord was made aware of the situation, and how the landlord failed to resolve the issues",
+      "order": 3,
+      "severity": 3,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E006001",
+          "required": true
+        },
+        {
+          "id": "E006002",
+          "required": false
+        }
+      ]
+    },
+    "ILRI": {
+      "id": 7,
+      "selectionTitle": "The landlord is charging illegal rent increases",
+      "issueTitle": "The landlord is charging illegal rent increases",
+      "selectionHelp": "Landlords can increase rent once in a 12-month period by the maximum allowable amount or an amount approved by a Residential Tenancy Branch arbitrator. Landlords must provide three months' notice of a rent increase. Landlords cannot raise rent above the allowable amount between fixed term tenancies with the same tenant. For more information on what rent increases are allowed, see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/rent-increases'>Residential Tenancy Branch website</a>.",
+      "issueHelp": "Landlords can increase rent once in a 12-month period by the maximum allowable amount or an amount approved by a Residential Tenancy Branch arbitrator. Landlords must provide three months' notice of a rent increase. Landlords cannot raise rent above the allowable amount between fixed term tenancies with the same tenant. For more information on what rent increases are allowed, see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/rent-increases'>Residential Tenancy Branch website</a>.",
+      "textDescriptionTitle": "Please describe how and when you were notified of the rent increase and steps you took to resolve this issue (i.e., filed for Dispute Resolution, wrote to your landlord)",
+      "order": 1,
+      "severity": 1,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": true,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": true
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E007001",
+          "required": true
+        },
+        {
+          "id": "E007002",
+          "required": false
+        },
+        {
+          "id": "E007003",
+          "required": false
+        }
+      ]
+    },
+    "CHFE": {
+      "id": 8,
+      "selectionTitle": "The landlord is charging unlawful fees, such as application fees or fees for assignment or sublet",
+      "issueTitle": "The landlord is charging unlawful fees, such as application fees or fees for assignment or sublet",
+      "selectionHelp": "Landlords cannot charge fees for accepting, reviewing, or processing a tenancy application, keys, having guests, or costs related to returning a deposit.",
+      "issueHelp": "Landlords cannot charge fees for accepting, reviewing, or processing a tenancy application, keys, having guests, or costs related to returning a deposit.",
+      "textDescriptionTitle": "Please describe the unlawful fees that were charged and why they are illegal",
+      "order": 2,
+      "severity": 1,
+  
+      "showInputEntry": {
+        "estimatedAmount": "optional",
+        "largestAmount": true,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E008001",
+          "required": true
+        },
+        {
+          "id": "E008002",
+          "required": false
+        }
+      ]
+    },
+    "LOCK": {
+      "id": 9,
+      "selectionTitle": "The landlord has locked a tenant out of their unit or the park",
+      "issueTitle": "The landlord has locked a tenant out of their unit or the park",
+      "selectionHelp": "Landlords cannot change locks unless the tenant agrees, and the landlord provides new keys to the unit. The Compliance and Enforcement Unit cannot issue an order of possession for a rental unit. Tenants can apply for an order of possession if their landlord locks them out of their unit by <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>filing for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/possession-of-the-unit'>possession of a rental unit or site</a>.",
+      "issueHelp": "Landlords cannot change locks unless the tenant agrees, and the landlord provides new keys to the unit. The Compliance and Enforcement Unit cannot issue an order of possession for a rental unit. Tenants can apply for an order of possession if their landlord locks them out of their unit by <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>filing for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/possession-of-the-unit'>possession of a rental unit or site</a>.",
+      "textDescriptionTitle": "Please describe the dates and durations of the lockout(s) and indicate if you want the tenancy to continue",
+      "order": 1,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": "optional"
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E009001",
+          "required": true
+        },
+        {
+          "id": "E009002",
+          "required": true
+        }
+      ]
+    },
+    "TESR": {
+      "id": 10,
+      "selectionTitle": "The landlord is denying access to essential services (e.g., power, water)",
+      "issueTitle": "The landlord is denying access to essential services (e.g., power, water)",
+      "selectionHelp": "Landlords must provide and maintain services that are essential to the health and safety of the tenant or are necessary to make the rental unit liveable. These services include heat, water, and electricity. You may be entitled to compensation or a rent reduction if your landlord has restricted an essential service. To obtain a monetary order or a rent reduction, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/changes-to-the-agreement'>changes to the agreement</a>.",
+      "issueHelp": "Landlords must provide and maintain services that are essential to the health and safety of the tenant or are necessary to make the rental unit liveable. These services include heat, water, and electricity. You may be entitled to compensation or a rent reduction if your landlord has restricted an essential service. To obtain a monetary order or a rent reduction, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/changes-to-the-agreement'>changes to the agreement</a>.",
+      "textDescriptionTitle": "Please describe which services are being restricted, who holds the account with the service provider, how the services were restricted, and for how long they were/have been restricted",
+      "order": 2,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E010001",
+          "required": true
+        },
+        {
+          "id": "E010002",
+          "required": false
+        },
+        {
+          "id": "E010003",
+          "required": false
+        }
+      ]
+    },
+    "LEWN": {
+      "id": 11,
+      "selectionTitle": "The landlord is repeatedly entering the rental unit/site without proper notice",
+      "issueTitle": "The landlord is repeatedly entering the rental unit/site without proper notice",
+      "selectionHelp": "Landlords must provide proper notice to the tenant to enter the rental unit or site. Proper notice means a tenant is given written notice of the date, time, and purpose for entering the property. The tenant must receive this notice at least 24 hours before the landlord enters the unit or site. For more information, see <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl07.pdf'>Policy Guideline 7</a>. Tenants can request an order for the landlord to comply with the law and to allow the tenant to change the locks on a rental unit or set conditions on a landlord's right to enter a manufactured home site. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/landlord-s-access'>unlawful access</a>.",
+      "issueHelp": "Landlords must provide proper notice to the tenant to enter the rental unit or site. Proper notice means a tenant is given written notice of the date, time, and purpose for entering the property. The tenant must receive this notice at least 24 hours before the landlord enters the unit or site. For more information, see <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl07.pdf'>Policy Guideline 7</a>. Tenants can request an order for the landlord to comply with the law and to allow the tenant to change the locks on a rental unit or set conditions on a landlord's right to enter a manufactured home site. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/landlord-s-access'>unlawful access</a>.",
+      "textDescriptionTitle": "Please provide dates and times the landlord entered the rental unit or site without proper notice, and any steps you have taken to resolve the situation",
+      "order": 3,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E011001",
+          "required": true
+        },
+        {
+          "id": "E011002",
+          "required": false
+        }
+      ]
+    },
+    "RESG": {
+      "id": 12,
+      "selectionTitle": "The landlord is unreasonably restricting guest access to the rental unit, manufactured home site, or common areas",
+      "issueTitle": "The landlord is unreasonably restricting guest access to the rental unit, manufactured home site, or common areas",
+      "selectionHelp": "A landlord cannot stop tenants from having guests under reasonable circumstances. A landlord cannot impose restrictions on guests or require a fee for guests to stay overnight. Under BC tenancy law, tenants can request an order for the landlord to comply with the law. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/guests-during-tenancies'>guests during tenancies</a>.",
+      "issueHelp": "A landlord cannot stop tenants from having guests under reasonable circumstances. A landlord cannot impose restrictions on guests or require a fee for guests to stay overnight. Under BC tenancy law, tenants can request an order for the landlord to comply with the law. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/guests-during-tenancies'>guests during tenancies</a>.",
+      "textDescriptionTitle": "Please provide dates and times the landlord denied guest access and any steps you have taken to resolve the situation",
+      "order": 4,
+      "severity": 3,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E012001",
+          "required": true
+        },
+        {
+          "id": "E012002",
+          "required": false
+        }
+      ]
+    },
+    "SIPP": {
+      "id": 13,
+      "selectionTitle": "The landlord is withholding, seizing, or blocking access to the tenant's belongings",
+      "issueTitle": "The landlord is withholding, seizing, or blocking access to the tenant's belongings",
+      "selectionHelp": "Landlords cannot seize a tenant's personal property or prevent or interfere with a tenant's access to their personal property, even if a tenant has not paid their rent. Tenants can request an order for the landlord to return their belonging. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.",
+      "issueHelp": "Landlords cannot seize a tenant's personal property or prevent or interfere with a tenant's access to their personal property, even if a tenant has not paid their rent. Tenants can request an order for the landlord to return their belonging. To do this, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please provide dates and times the landlord seized,  withheld, or blocked access to a tenant's belongings and any steps you have taken to resolve the situation",
+      "order": 3,
+      "severity": null,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E013001",
+          "required": true
+        },
+        {
+          "id": "E013002",
+          "required": false
+        }
+      ]
+    },
+    "FRAU-L": {
+      "id": 14,
+      "selectionTitle": "The landlord has given false or misleading information to the Residential Tenancy Branch",
+      "issueTitle": "The landlord has given false or misleading information to the Residential Tenancy Branch",
+      "selectionHelp": "The Compliance and Enforcement Unit may investigate allegations of landlords providing false or misleading information submitted in a dispute resolution proceeding or an investigation. The Compliance and Enforcement Unit can issue warnings and administrative monetary penalties to have landlords comply with BC tenancy laws. The Compliance and Enforcement Unit is not an alternative to dispute resolution and cannot change or modify a decision. If you feel the arbitrator's decision was based on fraud, you must <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision'>apply for review</a> with the Residential Tenancy Branch.",
+      "issueHelp": "The Compliance and Enforcement Unit may investigate allegations of landlords providing false or misleading information submitted in a dispute resolution proceeding or an investigation. The Compliance and Enforcement Unit can issue warnings and administrative monetary penalties to have landlords comply with BC tenancy laws. The Compliance and Enforcement Unit is not an alternative to dispute resolution and cannot change or modify a decision. If you feel the arbitrator's decision was based on fraud, you must <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision'>apply for review</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please describe the fraud or misleading information and how it may have affected the outcome of the proceeding or investigation. Statements alone may be insufficient to prove fraud. You may need to provide documentary evidence or other supporting evidence",
+      "order": 1,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E014001",
+          "required": true
+        },
+        {
+          "id": "E014002",
+          "required": true
+        },
+        {
+          "id": "E014003",
+          "required": true
+        },
+        {
+          "id": "E014004",
+          "required": false
+        },
+        {
+          "id": "E014005",
+          "required": false
+        },
+        {
+          "id": "E014006",
+          "required": false
+        }
+      ]
+    },
+    "BFNO": {
+      "id": 15,
+      "selectionTitle": "The landlord is attempting to end a tenancy in ways not allowed under BC tenancy laws, repeatedly or for numerous tenants",
+      "issueTitle": "The landlord is attempting to end a tenancy in ways not allowed under BC tenancy laws, repeatedly or for numerous tenants",
+      "selectionHelp": "The Compliance and Enforcement Unit cannot cancel a Notice to End Tenancy. For more information on how a tenancy can end, see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy'>Residential Tenancy Branch</a>. Tenants can dispute a Notice to End Tenancy by <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>applying for dispute resolution</a> with the Residential Tenancy Branch.",
+      "issueHelp": "The Compliance and Enforcement Unit cannot cancel a Notice to End Tenancy. For more information on how a tenancy can end, see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy'>Residential Tenancy Branch</a>. Tenants can dispute a Notice to End Tenancy by <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>applying for dispute resolution</a> with the Residential Tenancy Branch.",
+      "textDescriptionTitle": "Please describe:<ul><li>The number of impacted people</li><li>The number of impacted units or sites</li><li>How the landlord has tried to end the tenancy</li><li>The reason(s) the landlord is trying to end the tenancy</li><li>The number of times the landlord has served a notice to end tenancy</li></ul>",
+      "order": 2,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": true
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E015001",
+          "required": true
+        },
+        {
+          "id": "E015002",
+          "required": false
+        }
+      ]
+    },
+    "CHPR": {
+      "id": 16,
+      "selectionTitle": "The landlord is changing Park Rules in a manner that contravenes BC tenancy laws",
+      "issueTitle": "The landlord is changing Park Rules in a manner that contravenes BC tenancy laws",
+      "selectionHelp": "A park committee or a landlord (if there is no park committee) can establish, change or repeal manufactured home park rules. Park rules must be consistent with the <i>Manufactured Home Park Tenancy Act</i> or a term in a tenancy agreement. If park rules contravene the Act, tenants may <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> through the Residential Tenancy Branch</a>.",
+      "issueHelp": "A park committee or a landlord (if there is no park committee) can establish, change or repeal manufactured home park rules. Park rules must be consistent with the <i>Manufactured Home Park Tenancy Act</i> or a term in a tenancy agreement. If park rules contravene the Act, tenants may <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> through the Residential Tenancy Branch</a>.",
+      "textDescriptionTitle": "Please describe why the park rules that do not comply with the Manufactured Home Park Tenancy Act and/or tenancy agreement",
+      "order": 3,
+      "severity": 1,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E016001",
+          "required": true
+        },
+        {
+          "id": "E016002",
+          "required": true
+        },
+        {
+          "id": "E016003",
+          "required": false
+        }
+      ]
+    },
+    "LOCA": {
+      "id": 17,
+      "selectionTitle": "The landlord has engaged in other activities contrary to the BC tenancy laws",
+      "issueTitle": "The landlord has engaged in other activities contrary to the BC tenancy laws",
+      "selectionHelp": "BC tenancy law includes the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/02078_01'>Residential Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/10_477_2003'>Regulation</a>, the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/00_02077_01'>Manufactured Home Park Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/481_2003'>Regulation</a>, and the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/rop.pdf'>Rules of Procedure</a>. Many contraventions can be dealt with through the Residential Tenancy Branch's dispute resolution process. For more information on your rights and responsibilities under the tenancy legislation, please see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies'>Residential Tenancy Branch website</a>. You can also <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch'>contact the Residential Tenancy Branch</a>.",
+      "issueHelp": "BC tenancy law includes the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/02078_01'>Residential Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/10_477_2003'>Regulation</a>, the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/00_02077_01'>Manufactured Home Park Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/481_2003'>Regulation</a>, and the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/rop.pdf'>Rules of Procedure</a>. Many contraventions can be dealt with through the Residential Tenancy Branch's dispute resolution process. For more information on your rights and responsibilities under the tenancy legislation, please see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies'>Residential Tenancy Branch website</a>. You can also <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch'>contact the Residential Tenancy Branch</a>.",
+      "textDescriptionTitle": "Please describe the actions of the landlord and why you think BC tenancy laws are not being followed",
+      "order": 4,
+      "severity": 1,
+  
+      "showInputEntry": {
+        "estimatedAmount": "optional",
+        "largestAmount": "optional",
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": "optional",
+        "latestNoticeDate": "optional"
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E017001",
+          "required": true
+        },
+        {
+          "id": "E017002",
+          "required": false
+        }
+      ]
+    },
+
+    "NPOR": {
+      "id": 100,
+      "selectionTitle": "The tenant has repeatedly not paid rent",
+      "issueTitle": "The tenant has repeatedly not paid rent",
+      "selectionHelp": "Tenants must pay rent in full when it is due.<br/><br/>Landlords can serve a 10 Day Notice to End Tenancy when tenants do not pay their rent on time. Submitting a complaint through the Compliance and Enforcement Unit is not a substitute for the dispute resolution process.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy/landlord-notice/10-day-notice'>ending a tenancy</a>.",
+      "issueHelp": "Tenants must pay rent in full when it is due.<br/><br/>Landlords can serve a 10 Day Notice to End Tenancy when tenants do not pay their rent on time. Submitting a complaint through the Compliance and Enforcement Unit is not a substitute for the dispute resolution process.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy/landlord-notice/10-day-notice'>ending a tenancy</a>.",
+      "textDescriptionTitle": "Please describe how many times the tenant has not paid rent and, if known, across how many different tenancies has the tenant not paid rent",
+      "order": 1,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": true,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": true
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E100001",
+          "required": true
+        },
+        {
+          "id": "E100002",
+          "required": true
+        },
+        {
+          "id": "E100003",
+          "required": false
+        },
+        {
+          "id": "E100005",
+          "required": false
+        },
+        {
+          "id": "E100006",
+          "required": false
+        },
+        {
+          "id": "E100007",
+          "required": false
+        }
+      ]
+    },
+    "DAPR": {
+      "id": 101,
+      "selectionTitle": "The tenant has caused serious or repeated damage to the rental unit/site, or common areas",
+      "issueTitle": "The tenant has caused serious or repeated damage to the rental unit/site, or common areas",
+      "selectionHelp": "Landlords can end a tenancy for cause if a tenant has caused significant damage to the rental unit or site, or the landlord's property. Landlords can apply for an expedited hearing if tenants are causing significant damage to the property.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/expedited-hearings'>expedited hearings</a>.<br/><br/>The Compliance and Enforcement Unit does not enforce orders for possession or money. For more information on enforcing orders see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/serving-and-enforcing-orders'>Residential Tenancy Branch website</a>",
+      "issueHelp": "Landlords can end a tenancy for cause if a tenant has caused significant damage to the rental unit or site, or the landlord's property. Landlords can apply for an expedited hearing if tenants are causing significant damage to the property.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/expedited-hearings'>expedited hearings</a>.<br/><br/>The Compliance and Enforcement Unit does not enforce orders for possession or money. For more information on enforcing orders see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/serving-and-enforcing-orders'>Residential Tenancy Branch website</a>",
+      "textDescriptionTitle": "Please describe the damages to the rental unit, site or common area",
+      "order": 2,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": true,
+        "largestAmount": true,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": true
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E101001",
+          "required": true
+        },
+        {
+          "id": "E101002",
+          "required": true
+        },
+        {
+          "id": "E101003",
+          "required": true
+        },
+        {
+          "id": "E101004",
+          "required": true
+        },
+        {
+          "id": "E101005",
+          "required": false
+        },
+        {
+          "id": "E101006",
+          "required": false
+        },
+        {
+          "id": "E101007",
+          "required": false
+        }
+      ]
+    },
+    "ASWP": {
+      "id": 102,
+      "selectionTitle": "The tenant is deliberately assigning or subletting without permission",
+      "issueTitle": "The tenant is deliberately assigning or subletting without permission", 
+      "selectionHelp": "Tenants cannot assign a tenancy agreement or sublet a rental unit or site without permission from the landlord. If a tenant assigns or sublets without permission, the landlord can serve a Notice to End Tenancy for cause.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/sublet-and-assignment'>sublets and assignments</a>.",
+      "issueHelp": "Tenants cannot assign a tenancy agreement or sublet a rental unit or site without permission from the landlord. If a tenant assigns or sublets without permission, the landlord can serve a Notice to End Tenancy for cause.<br/><br/>Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/sublet-and-assignment'>sublets and assignments</a>.",
+      "textDescriptionTitle": "Please describe the assignment or sublet and how this is significantly impacting the landlord",
+      "order": 5,
+      "severity": 1,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": true,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E102001",
+          "required": true
+        },
+        {
+          "id": "E102002",
+          "required": false
+        },
+        {
+          "id": "E102003",
+          "required": false
+        }
+      ]
+    },
+    "NCOD-T": {
+      "id": 103,
+      "selectionTitle": "The tenant is failing to comply with a decision or order of the Residential Tenancy Branch",
+      "issueTitle": "The tenant is failing to comply with a decision or order of the Residential Tenancy Branch",
+      "selectionHelp": "The Compliance and Enforcement Unit may investigate allegations of tenants not complying with orders of the Residential Tenancy Branch.<br/><br/>The Compliance and Enforcement Unit does not enforce orders for possession or money.<br/><br/>Residential Tenancy Branch orders are enforced through the Provincial Courts. Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online'>enforcing orders</a>.",
+      "issueHelp": "The Compliance and Enforcement Unit may investigate allegations of tenants not complying with orders of the Residential Tenancy Branch.<br/><br/>The Compliance and Enforcement Unit does not enforce orders for possession or money.<br/><br/>Residential Tenancy Branch orders are enforced through the Provincial Courts. Learn more about <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online'>enforcing orders</a>.",
+      "textDescriptionTitle": "Please describe the associated decision or order and the failure to comply",
+      "order": 3,
+      "severity": 2,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E103001",
+          "required": true
+        },
+        {
+          "id": "E103002",
+          "required": true
+        },
+        {
+          "id": "E103003",
+          "required": false
+        }
+      ]
+    },
+    "FRAU-T": {
+      "id": 104,
+      "selectionTitle": "The tenant has given false or misleading information to the Residential Tenancy Branch",
+      "issueTitle": "The tenant has given false or misleading information to the Residential Tenancy Branch",
+      "selectionHelp": "The Compliance and Enforcement Unit may investigate allegations of tenants providing false or misleading information as part of a dispute resolution proceeding or investigation.<br/><br/>The Compliance and Enforcement Unit may issue warnings or administrative penalties to tenants who do not comply with the BC tenancy laws but is not an alternative to dispute resolution.<br/><br/>      You may <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online'>apply for a review</a> of a Residential Tenancy Branch decision if you can proof if was based on fraud.",
+      "issueHelp": "The Compliance and Enforcement Unit may investigate allegations of tenants providing false or misleading information as part of a dispute resolution proceeding or investigation.<br/><br/>The Compliance and Enforcement Unit may issue warnings or administrative penalties to tenants who do not comply with the BC tenancy laws but is not an alternative to dispute resolution.<br/><br/>      You may <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online'>apply for a review</a> of a Residential Tenancy Branch decision if you can proof if was based on fraud.",
+      "textDescriptionTitle": "Please describe the false or misleading information and how it may have affected the outcome of the proceeding or investigation. Statements alone may be insufficient to prove fraud. You may need to provide documentary evidence or other supporting evidence",
+      "order": 4,
+      "severity": 5,
+  
+      "showInputEntry": {
+        "estimatedAmount": false,
+        "largestAmount": false,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": false,
+        "latestNoticeDate": false
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E104001",
+          "required": true
+        },
+        {
+          "id": "E104002",
+          "required": true
+        },
+        {
+          "id": "E104003",
+          "required": true
+        },
+        {
+          "id": "E104004",
+          "required": false
+        },
+        {
+          "id": "E104005",
+          "required": false
+        },
+        {
+          "id": "E104006",
+          "required": false
+        }
+      ]
+    },
+    "TOCA": {
+      "id": 105,
+      "selectionTitle": "The tenant has engaged in other activities contrary to the BC tenancy laws",
+      "issueTitle": "The tenant has engaged in other activities contrary to the BC tenancy laws",
+      "selectionHelp": "BC tenancy law includes the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/02078_01'>Residential Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/10_477_2003'>Regulation</a>, the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/00_02077_01'>Manufactured Home Park Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/481_2003'>Regulation</a>, and the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/rop.pdf'>Rules of Procedure</a>. Many contraventions can be dealt with through the Residential Tenancy Branch's dispute resolution process. For more information on your rights and responsibilities under the tenancy legislation, please see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies'>Residential Tenancy Branch website</a>. You can also <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch'>contact the Residential Tenancy Branch</a>.",
+      "issueHelp": "BC tenancy law includes the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/02078_01'>Residential Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/10_477_2003'>Regulation</a>, the <i><a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/00_02077_01'>Manufactured Home Park Tenancy Act</a></i> and its <a class='static-external-link' href='javascript:;' url='https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/481_2003'>Regulation</a>, and the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/rop.pdf'>Rules of Procedure</a>. Many contraventions can be dealt with through the Residential Tenancy Branch's dispute resolution process. For more information on your rights and responsibilities under the tenancy legislation, please see the <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies'>Residential Tenancy Branch website</a>. You can also <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch'>contact the Residential Tenancy Branch</a>.",
+      "textDescriptionTitle": "Please describe the actions of the tenant and why you think BC tenancy laws are not being followed",
+      "order": 6,
+      "severity": null,
+  
+      "showInputEntry": {
+        "estimatedAmount": true,
+        "largestAmount": true,
+        "numOccurrences": true,
+        "latestViolationDate": true,
+        "latestViolationDuration": "optional",
+        "latestNoticeDate": "optional"
+      },
+  
+      "associatedEvidence": [
+        {
+          "id": "E105001",
+          "required": true
+        },
+        {
+          "id": "E105002",
+          "required": false
+        }
+      ]
+    }
+  },
+
+  "ceu_evidence_config": {
+    "E001001": {
+      "title": "Order for repairs",
+      "helpHtml": "Provide a copy of the order from the Residential Tenancy Branch, Local Government, Fire Department, or any other similar authority that repairs are required.",
+      "responses": false
+    },
+    "E001002": {
+      "title": "Proof the repairs were not made",
+      "helpHtml": "Examples could include pictures or any other documented proof that the installation, repair or replacement is required and still outstanding.",
+      "responses": true
+    },
+    "E001003": {
+      "title": "Proof landlord was made aware",
+      "helpHtml": "Provide evidence to support that you attempted to contact the landlord to request the emergency repairs be done.",
+      "responses": true
+    },
+    "E001004": {
+      "title": "Tenancy agreements",
+      "helpHtml": null,
+      "responses": false
+    },
+    "E001005": {
+      "title": "Contractor repair reports, assessments, quotes, or invoices",
+      "helpHtml": "Provide a copy of any qualified contractor (carpenter, plumber, electrician, general contractor, etc.) or architect/engineer reports, assessments, quotes or invoices. If you have completed any repair work yourself, third party verification may be required.",
+      "responses": true
+    },
+    "E001006": {
+      "title": "Building or Fire report(s)",
+      "helpHtml": "Provide a copy of any building inspection reports, fire reports, WorkSafe BC reports or other local Government reports.",
+      "responses": false
+    },
+
+    "E002001": {
+      "title": "Order for repairs",
+      "helpHtml": "Provide a copy of the order from the Residential Tenancy Branch, lLocal Government, Fire Department, or any other similar authority that repairs are required.",
+      "responses": false
+    },
+    "E002002": {
+      "title": "Proof the repairs were not made",
+      "helpHtml": "Examples could include pictures or any other documented proof that the installation, repair or replacement is required and still outstanding.",
+      "responses": true
+    },
+    "E002003": {
+      "title": "Proof landlord was made aware",
+      "helpHtml": "Provide evidence to support that you attempted to contact the landlord to request the emergency repairs be done.",
+      "responses": true
+    },
+    "E002004": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+    "E002005": {
+      "title": "Contractor repair reports, assessments, quotes, or invoices",
+      "helpHtml": "Provide a copy of any qualified contractor (carpenter, plumber, electrician, general contractor, etc.) or architect/engineer reports, assessments, quotes or invoices. If you have completed any repair work yourself, third party verification may be required.",
+      "responses": true
+    },
+
+    "E003001": {
+      "title": "Decision(s) or order(s)",
+      "helpHtml": "Provide a copy of the decision and/or order from the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E003002": {
+      "title": "Proof the landlord has not followed the decision/order",
+      "helpHtml": "Provide a copy of any written letter, email, or other communication you gave the landlord informing them that all or parts of a decision or order are outstanding. The Compliance and Enforcement Unit does not enforce orders for possession or money.",
+      "responses": true
+    },
+    "E003003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E004001": {
+      "title": "Notices to end tenancy",
+      "helpHtml": "Provide a copy of all the notices received.",
+      "responses": true
+    },
+    "E004002": {
+      "title": "Supporting communications",
+      "helpHtml": "Provide a copy of any letters, emails, texts or other communications that the landlord sent the tenant regarding notices to end tenancy.",
+      "responses": false
+    },
+    "E004003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E005001": {
+      "title": "Proof of harassment",
+      "helpHtml": "Provide a copy of any letters, emails, texts or other communications that the landlord sent the tenant harassing or threatening the tenant, other occupants or guests. Provide any witness statements, and/or video or audio recording of any harassment.",
+      "responses": true
+    },
+    "E005002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+    "E005003": {
+      "title": "Police reports",
+      "helpHtml": "Provide a police file number, a copy of the report (you can request this) and any information about the attending officer (Name, phone number etc.).",
+      "responses": false
+    },
+
+    "E006001": {
+      "title": "Proof of violations",
+      "helpHtml": "Provide a copy of any letters, emails, texts, video, audio or other communications that the landlord sent the tenant violating the tenant's rights to quiet enjoyment.",
+      "responses": true
+    },
+    "E006002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E007001": {
+      "title": "Proof of current rent amount",
+      "helpHtml": "Provide most recent rent receipts or statements of most recent rent amount.",
+      "responses": true
+    },
+    "E007002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+    "E007003": {
+      "title": "Notices of rent increase",
+      "helpHtml": "Provide a copy of the landlord's Notice of Rent Increase. This could be a form, text, email or other communication statement of rent increase.",
+      "responses": true
+    },
+
+    "E008001": {
+      "title": "Proof of fees charged",
+      "helpHtml": "Provide a copy of the request or requirement for fees. Provide a statement page if it was a verbal request or requirement.",
+      "responses": true
+    },
+    "E008002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E009001": {
+      "title": "Proof tenant is locked out or has been denied access",
+      "helpHtml": "Provide evidence that the tenant cannot access the rental unit or site. Evidence could be a statement, photos, video, email/text or other communications that the landlord has changed the locks, passcode or other means for the tenant to access the rental unit.",
+      "responses": true
+    },
+    "E009002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E010001": {
+      "title": "Proof of denied services",
+      "helpHtml": "Provide a copy of any letters, emails, texts or other communication from the landlord indicating that services will be or have been restricted.",
+      "responses": true
+    },
+    "E010002": {
+      "title": "Proof any associated bills were paid",
+      "helpHtml": "If the accounts are in the tenant's name, provide the most recent bill and a receipt that the bill has been paid.",
+      "responses": false
+    },
+    "E010003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E011001": {
+      "title": "Proof landlord entering without notice",
+      "helpHtml": "Provide photos or video recordings of the landlord entering the unit or site, or letters, emails, text or other communications that the landlord is giving less than 24 hours notice.",
+      "responses": true
+    },
+    "E011002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E012001": {
+      "title": "Proof of blocked access to unit",
+      "helpHtml": "Provide proof that the landlord is preventing access to the rental unit or site.  This could include photos, audio or video recordings, witness statements or any other evidence to show that the landlord is preventing access.",
+      "responses": true
+    },
+    "E012002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E013001": {
+      "title": "Proof of blocked access to property",
+      "helpHtml": "Provide proof that the landlord is preventing access to the tenants personal belongings. Supporting documents could include letters, email, text, photos, audio or video recordings, witness statements or any other evidence to show that the landlord is preventing access.",
+      "responses": true
+    },
+    "E013002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E014001": {
+      "title": "Proof of false or misleading information",
+      "helpHtml": "Provide copies of the original and false/fraudulent documents. Provide documents or statements that contradict the false/fraudulent evidence provided to the Residential Tenancy Branch.",
+      "responses": true
+    },
+    "E014002": {
+      "title": "Proof of false or misleading information was relevant to the decision",
+      "helpHtml": "Provide a statement of how the false or misleading information negatively impacted the decision or the Compliance and Enforcement Unit investigation.",
+      "responses": true
+    },
+    "E014003": {
+      "title": "Proof of fraudulent intentions",
+      "helpHtml": "Provide copies of documents (emails, text, letters, etc.) where the landlord is stating something contrary to the evidence or statement provided to the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E014004": {
+      "title": "Decision(s) or order(s)",
+      "helpHtml": "Provide a copy of the decision and/or order from the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E014005": {
+      "title": "RTB dispute documents",
+      "helpHtml": "Provide copies of evidence uploaded to the Residential Tenancy Branch Dispute File that is relevant to the false or misleading information.",
+      "responses": false
+    },
+    "E014006": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E015001": {
+      "title": "Notice(s) to end tenancy",
+      "helpHtml": "Provide a copy of the notice, or communication given by the landlord or agent.",
+      "responses": true
+    },
+    "E015002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E016001": {
+      "title": "Original rules",
+      "helpHtml": "Provide a copy of the original park rules.",
+      "responses": true
+    },
+    "E016002": {
+      "title": "Revised rules",
+      "helpHtml": "Provide a copy of the revised park rules, letters, email, or texts stating new  park rules.",
+      "responses": true
+    },
+    "E016003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E017001": {
+      "title": "Proof of violation of tenancy laws",
+      "helpHtml": "Provide copies of documents (letters, emails, texts, etc.), statements, photos, video or voice recording of how the landlord is violating the BC tenancy laws.",
+      "responses": true
+    },
+    "E017002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E100001": {
+      "title": "Proof of non-payment(s)",
+      "helpHtml": "Provide proof of rent owing. This may include rent ledgers, account statements, written communications with the tenant about unpaid rent, or any other evidence to show the amount of rent owing.",
+      "responses": true
+    },
+    "E100002": {
+      "title": "Requests for payment(s)",
+      "helpHtml": "Provide any documents requesting rent payment. This could be a letter, email text, or other communications.",
+      "responses": true
+    },
+    "E100003": {
+      "title": "Utility payment demand letter(s)",
+      "helpHtml": "Provide a copy of the 30 Day Written Demand Letter that was served to the tenant requesting the tenant pay utilities or both rent and utilities. Provide a copy of unpaid utility bills.",
+      "responses": false
+    },
+    "E100005": {
+      "title": "Payment plan(s)",
+      "helpHtml": "Provide a copy of the Rent Repayment Plan issued to the tenant.",
+      "responses": false
+    },
+    "E100006": {
+      "title": "Witness statement/Info",
+      "helpHtml": "Provide any previous landlord history, contact info, or evidence that the tenant did not move out after being ordered to do so",
+      "responses": false
+    },
+    "E100007": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E101001": {
+      "title": "Proof of damage",
+      "helpHtml": "Provide evidence to prove that the damage was caused by the tenant, their pets, or their guests. Evidence may include proof of the age and original price/cost of items damaged, photos or video recordings of the unit or site before and after damage occurred, receipts or estimates for repairs (receipts are better), expert reports showing repairs were not regular wear and tear, or proof of age of item to be repaired.",
+      "responses": true
+    },
+    "E101002": {
+      "title": "Contractor repair reports, assessments, quotes or invoices",
+      "helpHtml": "Provide a copy of any qualified contractor (carpenter, plumber, electrician, general contractor, etc.) or architect/engineer reports, assessments, quotes or invoices. If you have completed any repair work yourself, third party verification may be required.",
+      "responses": true
+    },
+    "E101003": {
+      "title": "Warning letter(s)",
+      "helpHtml": "Provide a copy of any records (documents, letters, emails, texts, etc.) requesting repairs be made before the tenancy ends or ended.",
+      "responses": true
+    },
+    "E101004": {
+      "title": "Repair Receipts",
+      "helpHtml": "Provide a copy of any receipts or proof of payment costs incurred as a result of the damage. Receipts should have the company name, date and amount paid visible. If you have completed any repair work yourself, third party verification may be required. ",
+      "responses": true
+    },
+    "E101005": {
+      "title": "Condition Inspection Report",
+      "helpHtml": "Provide documentation to verify the condition of the rental unit at the start of the tenancy which may include the Condition Inspection Report (form RTB-27) and, if applicable, at the end of the tenancy.",
+      "responses": false
+    },
+    "E101006": {
+      "title": "Witness statement/Info",
+      "helpHtml": "Provide any previous landlord history, contact info, or evidence that the tenant did not move out after being ordered to do so",
+      "responses": false
+    },
+    "E101007": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E102001": {
+      "title": "Proof of assignment or sublet",
+      "helpHtml": "Provide a copy of any evidence that the tenant has sublet or assigned the rental unit or site.",
+      "responses": true
+    },
+    "E102002": {
+      "title": "Sublet or assignment agreements",
+      "helpHtml": "Provide a copy of any requests to sublet or assign the tenancy, or any communications regarding assigning or subletting the tenancy.",
+      "responses": false
+    },
+    "E102003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E103001": {
+      "title": "Decision(s) or order(s)",
+      "helpHtml": "Provide a copy of the decision and/or order from the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E103002": {
+      "title": "Proof the tenant has not followed the decision/order",
+      "helpHtml": "Provide a copy of any written letter, email, or other communication you gave the tenant informing them that all or parts of a decision or order are outstanding. The Compliance and Enforcement Unit does not enforce orders for possession or money.",
+      "responses": true
+    },
+    "E103003": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E104001": {
+      "title": "Proof of false or misleading information",
+      "helpHtml": "Provide copies of the original and false/fraudulent documents. Provide documents or statements that contradict the false/fraudulent evidence provided to the Residential Tenancy Branch.",
+      "responses": true
+    },
+    "E104002": {
+      "title": "Proof of false or misleading information was relevant to the decision",
+      "helpHtml": "Provide a statement of how the false or misleading information negatively impacted the decision or the Compliance and Enforcement Unit investigation.",
+      "responses": true
+    },
+    "E104003": {
+      "title": "Proof of fraudulent intentions",
+      "helpHtml": "Provide copies of documents (emails, text, letters, etc.) where the tenant is stating something contrary to the evidence or statement provided to the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E104004": {
+      "title": "Decision(s) or order(s)",
+      "helpHtml": "Provide a copy of the decision and/or order from the Residential Tenancy Branch.",
+      "responses": false
+    },
+    "E104005": {
+      "title": "RTB dispute documents",
+      "helpHtml": "Provide copies of evidence uploaded to the Residential Tenancy Branch Dispute File, relevant to the false or misleading information.",
+      "responses": false
+    },
+    "E104006": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    },
+
+    "E105001": {
+      "title": "Proof of violation to tenancy laws",
+      "helpHtml": "Provide copies of documents (letters, emails, texts, etc.), statements, photos, video or voice recording of how the landlord is violating the BC tenancy laws.",
+      "responses": true
+    },
+    "E105002": {
+      "title": "Tenancy agreements",
+      "helpHtml": "Provide a copy of the most recent Tenancy Agreement outlining the terms of the tenancy. Include any addendums.",
+      "responses": false
+    }
+  }
+}

@@ -1,0 +1,346 @@
+
+$COLOR-BOX-BORDER: #a9a9a9;
+$COLOR-DISABLED: #b3b3b3;
+$COLOR-HEAR: #2a9240;
+$COLOR-DUTY: #f5c626;
+$COLOR-WRIT: #666;
+$COLOR-VAC: #9d5786;
+$COLOR-BLK: #333;
+$COLOR-OTH: #4e96bb;
+$COLOR-EDIT: #2872bd;
+$COLOR-EDIT-TITLE: #1e1566;
+$COLOR-REMOVE: #b92429;
+$COLOR-REMOVE-TITLE: #86252b;
+$COLOR-MULTI-BUTTON-TITLE: #1b6934;
+
+$HEIGHT-EDIT-TOOLS: 73px;
+
+.working-sched {
+  max-width: unset !important;
+
+  // Main top row for inputs
+  &__inputs-row {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    justify-content: space-between;
+  }
+
+  &__week-input .input-model-custom-link-container { float: right; }
+
+  &__legend-period-container {
+    display: flex;
+    flex-direction: column;
+    margin-right: 25px;
+  }
+
+  // PeriodStatus area
+  &__period-status {
+    display: flex;
+    color: $COLOR-BOX-BORDER;
+    width: fit-content;
+    white-space: nowrap;
+    font-size: 18px;
+    margin-bottom: 5px;
+
+    > div:first-child {
+      display: flex;
+      flex-wrap: nowrap;
+
+    }
+    > div:nth-child(2) {
+      margin-left: 10px;
+    }
+  }
+      
+  // DayLegend component
+  &__day-legend {
+    padding: 2px 4px 4px 4px;
+    border: 1px solid $COLOR-BOX-BORDER;
+    font-size: 14px;
+    height: 53px;
+    width: 176px;
+    margin-right: 50px;
+
+    &__top-row {
+      display: flex;
+      justify-content: space-between;
+      color: $COLOR-BOX-BORDER;
+    }
+
+    &__content-row {
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    &__block {
+      min-width: 30px;
+      margin-right:4px;
+      height: 27px;
+      line-height: 27px;
+      text-align: center;
+      overflow:hidden;
+      background-color: #e6e6e6;
+
+      &:last-child { margin-right: 0; }
+      &--dark {
+        @extend .working-sched__day-legend__block;
+        background-color: #ccc;
+      }
+    }
+  }
+
+  &__tools { align-self: end; }
+
+
+  // EditTools component
+  &__edit-tools {
+    padding: 3px;
+    border: 1px solid $COLOR-BOX-BORDER;
+    display: flex;
+    color: #fff;
+    height: $HEIGHT-EDIT-TOOLS;
+    
+    &__button {
+      width: 70px;
+      height: 65px;
+      cursor: pointer;
+      margin-right: 5px;
+      background-color: #f2f2f2;      
+
+      &__title {
+        font-size: 13px;
+        width: 100%;
+        background-color: $COLOR-DISABLED;
+        text-align: center;
+        height: 15px;
+        color: #fff;
+      }
+
+      &__icon {
+        height: 45px;
+        width: 50px;
+        min-width: 50px;
+        margin: 5px auto 0 auto;
+        background-repeat: no-repeat;
+        background-size: 44px 40px;
+      }
+
+
+      &--small {
+        @extend .working-sched__edit-tools__button;
+        width: 60px;
+        height: 20px;
+        font-size: 16px;
+        text-align: center;
+        color: #fff;
+      }
+
+      &--large {
+        @extend .working-sched__edit-tools__button;
+        width: 200px;
+        height: 50px;
+        display: flex;
+        cursor: auto;
+
+        .working-sched__edit-tools__button__icon {
+          background-image: url('../../../static/Icon_WS_Paint_GRY.png');
+          background-repeat: no-repeat;
+          margin-right: 4px;
+          margin-left: 6px;
+        }
+
+        .working-sched__edit-tools__button-title {
+          margin-top: 8px;
+        }
+      }
+
+      &.selected {
+      
+        > .working-sched__edit-tools__button__title {
+          background-color: #666;
+        }
+        > .working-sched__edit-tools__button-group {
+          color: #fff;
+        }
+
+        .working-sched__edit-tools__button__icon {
+          background-repeat: no-repeat;
+        }
+      }
+    }
+
+    &__button-title {
+      font-size: 16px;
+      line-height: 16px;
+    }
+
+    &__button-subtitle {
+      font-size: 14px;
+    }
+
+    &__multi-button-area {
+      &__content {
+        display: flex;
+      }
+
+      &.selected {
+        > .working-sched__edit-tools__button__title {
+          background-color: $COLOR-MULTI-BUTTON-TITLE;
+        }
+        .working-sched__edit-tools__button__icon {
+          background-image: url('../../../static/Icon_WS_Paint_WHT.png');
+        }
+      }
+      &:not(.selected) {
+        color: $COLOR-DISABLED;
+      }
+    }
+
+    &__button-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: space-between;
+      padding-top: 5px;
+      margin-right: -5px;
+      width: 195px;
+    }
+
+    // Button colours
+    &--hear { background-color: $COLOR-HEAR; }
+    &--duty { background-color: $COLOR-DUTY; }
+    &--writ { background-color: $COLOR-WRIT; }
+    &--vac { background-color: $COLOR-VAC; }
+    &--blk { background-color: $COLOR-BLK; }
+    &--oth { background-color: $COLOR-OTH; }
+    
+    &--edit .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Edit_GRY.png'); }
+    &--edit.selected {
+      background-color: $COLOR-EDIT;
+
+      > .working-sched__edit-tools__button__title {
+        background-color: $COLOR-EDIT-TITLE;
+      }
+
+      .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Edit_WHT.png'); }
+    }
+
+    &--remove .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Erase_GRY.png'); }
+    &--remove.selected {
+      background-color: $COLOR-REMOVE;      
+
+      > .working-sched__edit-tools__button__title {
+        background-color: $COLOR-REMOVE-TITLE;
+      }
+
+      .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Erase_WHT.png'); }
+    }
+
+    &--undo {
+      cursor: default;
+
+      .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Undo_GRY.png'); cursor: default; }
+      .working-sched__edit-tools__button__title { cursor: default; }
+
+      .working-sched__edit-tools__button__icon__badge {
+        color: #7f7f7f;
+        position: relative;
+        top: -18px;
+        left: 52px;
+        font-weight: bold;
+      }
+    }
+    &--undo.selected {
+      cursor: pointer;
+      .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Undo_CLR.png'); cursor: pointer; }
+      .working-sched__edit-tools__button__title { cursor: pointer; }
+    }
+
+
+    &--disabled {
+      background-color: #f2f2f2;
+      border: 1px solid $COLOR-BOX-BORDER;
+      height: $HEIGHT-EDIT-TOOLS;
+      color: #808080;
+      font-style: italic;
+      display: flex;
+      flex-direction: column;
+      justify-content:center;
+      align-content: center;
+      text-align: center;
+      min-width: 600px;
+      width: 628px;
+      justify-content: center;
+    }
+  }
+
+  // Block calendar
+  &__calendar:not(.disabled).--hear .block-calendar__block,
+  &__calendar:not(.disabled).--hear .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerHearing.png'), auto;
+  }
+
+  &__calendar:not(.disabled).--duty .block-calendar__block,
+  &__calendar:not(.disabled).--duty .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerDuty.png'), auto;
+  }
+  
+  &__calendar:not(.disabled).--writ .block-calendar__block,
+  &__calendar:not(.disabled).--writ .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerWriting.png'), auto;
+  }
+  &__calendar:not(.disabled).--vac .block-calendar__block,
+  &__calendar:not(.disabled).--vac .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerVacation.png'), auto;
+  }
+  
+  &__calendar:not(.disabled).--blk .block-calendar__block,
+  &__calendar:not(.disabled).--blk .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerBlocked.png'), auto;
+  }
+  
+  &__calendar:not(.disabled).--oth .block-calendar__block,
+  &__calendar:not(.disabled).--oth .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerOther.png'), auto;
+  }
+  
+  &__calendar.--edit .block-calendar__block { cursor: auto; }
+  &__calendar.--remove .block-calendar__block { cursor: auto; }
+  
+  &__calendar:not(.disabled).--edit .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerEdit.png'), auto;
+  }
+  
+  &__calendar:not(.disabled).--remove .block-calendar__saved-block {
+    cursor: url('../../../static/Cursor_PointerErase.png'), auto;
+  }
+  // Default cursor when a row is disabled
+  &__calendar .--disabled .block-calendar__block { cursor: default !important; }
+
+  .calendar-header-label-container, .calendar-header-time-flex, .calendar-header-time-item {
+    height: 80px;
+  }
+
+  // Schedule overrides
+  .schedule-calendar-year-month-dropdown-container {
+    min-width: 450px;
+    margin-top:0;
+    width: unset;
+  }
+  .schedule-calendar-next {
+    margin-left: 10px;
+    margin-right: 35px;
+  }
+
+  .block-calendar .calendar-grid-time-item {
+    background-color: #fff;
+  }
+
+  /* Edit/remove modal */
+  &__edit-warning-modal .modal-dialog {
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .not-visible { visibility: hidden; }
+}

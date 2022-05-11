@@ -1,0 +1,96 @@
+@import "../../styles/variables";
+
+$ICON-HAND-PAPER-LIGHT-URL: url('../../static/DA_MenuIcon_NoticeService.png');
+$ICON-HAND-PAPER-URL: url('../../static/DA_MenuIcon_NoticeService_Drk.png');
+$ICON-PAYMENT-URL: url('../../static/DA_MenuIcon_MakePayment.png');
+$ICON-EVIDENCE-URL: url('../../static/DA_MenuIcon_Evidence.png');
+$ICON-CONTACT-URL: url('../../static/DA_MenuIcon_UpdateContact.png');
+
+.dac {
+  &__access-menu {
+    font-size: 22px;
+    margin-top: 50px;
+    margin: 40px 0 20px 0;
+
+    &__help {
+      margin-top: 80px;
+      font-size: 19px;
+      font-style: italic;
+    }
+
+    &__items {
+      margin: 20px 0 20px 0;
+    }
+
+    &__item {
+      padding: 10px 0 10px 0;
+      cursor: pointer;
+      border-bottom: 1px solid #d2d2d2;
+
+      &:first-child {
+        border-top: 1px solid #d2d2d2;
+      }
+
+      &__icon {
+        height: 40px;
+        width: 40px;
+        float: left;
+        background-size: 40px 40px;
+        background-repeat: no-repeat;
+        margin-right: 10px;
+        top: 0;
+        position: relative;
+      }
+
+      &__content {
+        display: inline-block;
+        width: calc(100% - 50px);
+      }
+
+      &__title {
+        font-size: 22px;
+        color: #3f6d99;
+      }
+
+      &__subtitle {
+        font-size: 15px;
+        color: #b1b1b1;
+      }
+
+      &--payment .dac__access-menu__item__icon { background-image: $ICON-PAYMENT-URL }
+      &--evidence .dac__access-menu__item__icon { background-image: $ICON-EVIDENCE-URL }
+      &--update-contact .dac__access-menu__item__icon { background-image: $ICON-CONTACT-URL; }
+      &--service .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+      &--correction .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+      &--clarification .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+      &--review .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+      &--review-payment .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+      &--sub-serv .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
+    }
+  }
+
+}
+
+
+@media (max-width: 767px) {
+  .dac {
+    &__access-menu {
+
+      &__info {
+        line-height: 25px;
+      }
+
+
+      &__item {
+        &__title {
+          line-height: 24px;
+          margin: 2px 0px 5px 0px;
+        }
+
+        &__subtitle {
+          line-height: 17px;
+        }
+      }
+    }
+  }
+}

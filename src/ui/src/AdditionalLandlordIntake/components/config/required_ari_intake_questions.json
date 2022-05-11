@@ -1,0 +1,82 @@
+{
+  "ari_intake_questions": [
+    {
+      "question_name": "ARI_S1_HomeOrTrailer",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S1_OwnerOfMH",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S1_Repairs18monthInPast",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S1_RepairsAllowedQuestion",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S1_ExpectedRepairsQuestion",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S2_ApplicantCount",
+      "answer": null,
+      "group_id": 21
+    },
+    {
+      "question_name": "ARI_S2_HasAgent",
+      "answer": null,
+      "group_id": 21
+    },
+    {
+      "question_name": "ARI_S2_AssistantCount",
+      "answer": null,
+      "group_id": 21
+    }
+  ],
+
+  "pfr_intake_questions": [
+    {
+      "question_name": "ARI_S1_HomeOrTrailer",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S1_OwnerOfMH",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "PFR_S1_HavePermits",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "PFR_S1_EvictionsRequired",
+      "answer": null,
+      "group_id": 11
+    },
+    {
+      "question_name": "ARI_S2_ApplicantCount",
+      "answer": null,
+      "group_id": 21
+    },
+    {
+      "question_name": "ARI_S2_HasAgent",
+      "answer": null,
+      "group_id": 21
+    },
+    {
+      "question_name": "ARI_S2_AssistantCount",
+      "answer": null,
+      "group_id": 21
+    }
+  ]
+}

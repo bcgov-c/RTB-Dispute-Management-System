@@ -1,0 +1,23 @@
+@import '../../../styles/variables';
+@import '../../../../core/styles/index.scss';
+
+.dar-step-two {
+  &__question-one {
+    @extend .dms__step-description;
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+
+    .request-item {
+      margin-top: 20px;
+    }
+  }
+
+  &__question-two{
+    @extend .dms__step-description;
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+  }
+
+  &__question-three {
+    @extend .dms__step-description;
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+  }
+}

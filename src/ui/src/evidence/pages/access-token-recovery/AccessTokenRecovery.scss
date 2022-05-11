@@ -1,0 +1,106 @@
+
+@import '../../styles/variables';
+
+$_LARGE-TEXT-FONT-SIZE: 22px;
+
+.recovery {
+  font-size: $DAC-FONT-SIZE-CONTENT;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    color: #a3a3a3;
+    font-size: $_LARGE-TEXT-FONT-SIZE;
+    margin-bottom: 10px;
+
+    img { margin-right: 8px; }
+  }
+
+  &__wrapper {
+    margin-bottom: 40px;
+  }
+
+  &__inputs {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+
+    &__file-number {
+      margin-right: 10px;
+    }
+
+    &__email {
+      width: 300px;
+    }
+  }
+
+  &__submit-button {
+    background-color: #7bbf6a;
+    border-color: #7bbf6a;
+    padding: 8px 12px 6px 12px!important;
+
+    &:hover, &:active, &:focus, &:hover:active {
+      @extend .recovery__submit-button;
+    }
+
+    &__img {
+      margin-right: 3px;
+    }
+  }
+
+  &__back-button {
+    padding: 8px 12px 6px 12px!important;
+    margin: 40px 0 20px 0;
+    display: flex;
+    align-items: center;
+
+    &__img {
+      width: 28px;
+    }
+
+    &:hover, &:active, &:focus, &:hover:active {
+      @extend .recovery__back-button;
+    }
+  }
+
+  &__info-title {
+    color: #a3a3a3;
+    font-size: $_LARGE-TEXT-FONT-SIZE;
+
+    &__img {
+      margin-bottom: 5px;
+    }
+  }
+
+  &__submitted {
+    font-weight: bold;
+    color: #019147;
+
+    &__img {
+      margin-bottom: 1px;
+    }
+  }
+
+  &__reset {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: $_LARGE-TEXT-FONT-SIZE;
+    color:  #a3a3a3;
+    margin: 20px 0 40px 0;
+
+    &__img {
+      width: 24px;
+    }
+  }
+
+  &__contact-text {
+    margin-top: 30px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .recovery {
+    padding-top: 40px;
+  }
+}

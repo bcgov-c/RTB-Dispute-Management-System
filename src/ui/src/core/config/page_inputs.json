@@ -1,0 +1,73 @@
+{
+  "page-intake-general": [
+    {
+      "type": "question",
+      "name": "S1_PropertyType",
+      "options": {
+        "optionData": [
+          {
+            "name": "property-type",
+            "value": 0,
+            "cssClass": "option-button yes-no",
+            "text": "NO"
+          },
+          {
+            "name": "property-type-type",
+            "value": 1,
+            "cssClass": "option-button yes-no",
+            "text": "YES"
+          }
+        ],
+        "answer": null
+      }
+    },
+    {
+      "type": "question",
+      "mapping": "dispute",
+      "name": "tenancy_ended",
+      "options": {
+        "group_id": 0,
+        "optionData": [
+          {
+            "name": "tenancy-status-current",
+            "value": 0,
+            "cssClass": "option-button tenancy-status-current",
+            "text": "Yes, the tenant is in the unit"
+          },
+          {
+            "name": "tenancy-status-past",
+            "value": 1,
+            "cssClass": "option-button tenancy-status-past",
+            "text": "No, the tenant has moved out"
+          }
+        ],
+        "answer": null
+      }
+    },
+    {
+      "type": "question",
+      "mapping": "question",
+      "name": "S1_TenancyEndedAccept",
+      "options": {
+        "group_id": 0,
+        "optionData": [
+          {
+            "name": "tenancy-end-date-legacy-accept",
+            "value": 1,
+            "cssClass": "option-button accept-confirm",
+            "text": "Accept and Continue"
+          }
+        ],
+        "answer": null
+      }
+    },
+    {
+      "type": "address",
+      "name": "S1_TenancyAddress",
+      "required": true,
+      "useDefaultProvince": true,
+      "showValidate": true,
+      "enableGeocoder": false
+    }
+  ]
+}

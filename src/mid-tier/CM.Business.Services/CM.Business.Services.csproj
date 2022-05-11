@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;DevServer;StagingServer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'StagingServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="StyleCop.Analyzers.Error" Version="1.0.2" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="MailKit" Version="3.1.1" />
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="EasyNetQ" Version="6.3.1" />
+    <PackageReference Include="EasyNetQ.DI.Microsoft" Version="6.3.1" />
+    <PackageReference Include="Quartz" Version="3.3.3" />
+    <PackageReference Include="Validation" Version="2.5.51" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\CM.Business.Entities\CM.Business.Entities.csproj" />
+    <ProjectReference Include="..\CM.Business.Services.Interfaces\CM.Business.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\CM.Data.Model\CM.Data.Model.csproj" />
+    <ProjectReference Include="..\CM.Data.Repositories\CM.Data.Repositories.csproj" />
+    <ProjectReference Include="..\CM.Common.Utilities\CM.Common.Utilities.csproj" />
+    <ProjectReference Include="..\CM.Business.Services.IntegrationEvents\CM.Business.Services.IntegrationEvents.csproj" />
+    <ProjectReference Include="..\CM.FileSystem.Service\CM.FileSystem.Service.csproj" />
+    <ProjectReference Include="..\CM.FTP\CM.FTP.csproj" />
+    <ProjectReference Include="..\CM.SFTP\CM.SFTP.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="ScheduledHearingReminder\" />
+  </ItemGroup>
+</Project>

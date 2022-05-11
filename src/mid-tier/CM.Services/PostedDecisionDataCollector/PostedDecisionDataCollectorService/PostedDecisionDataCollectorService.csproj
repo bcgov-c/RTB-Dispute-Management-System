@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\..\..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
+    <RootNamespace>CM.Services.PostedDecisionDataCollector.PostedDecisionDataCollectorService</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;DevServer;StagingServer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'StagingServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="secrets\appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="secrets\appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CM.Common.Utilities\CM.Common.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Model\CM.Data.Model.csproj" />
+    <ProjectReference Include="..\..\..\CM.Data.Repositories\CM.Data.Repositories.csproj" />
+    <ProjectReference Include="..\..\..\CM.FileSystem.Service\CM.FileSystem.Service.csproj" />
+    <ProjectReference Include="..\..\..\CM.Messages\CM.Messages.csproj" />
+    <ProjectReference Include="..\..\..\CM.Services\CM.ServiceBase\CM.ServiceBase.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PdfPig" Version="0.1.5" />
+  </ItemGroup>
+</Project>

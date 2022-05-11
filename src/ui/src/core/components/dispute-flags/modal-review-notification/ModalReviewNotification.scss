@@ -1,0 +1,9 @@
+#reviewNotification_modal {
+  .modal-dialog { min-width: 991px; }
+  .modal-header { background-color: #aa2f2e; }
+  .modal-content { border-color: #aa2f2e; }
+}
+
+@media (max-width: 991px) {
+  #reviewNotification_modal .modal-dialog { min-width: auto; }
+}

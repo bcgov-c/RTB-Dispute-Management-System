@@ -1,0 +1,91 @@
+
+/* Trumbo overrides */
+.trumbowyg-editor { font-size: 16px; color: #414141; }
+
+.trumbowyg-editor table.editor-ignore td { padding: 0; }
+
+.trumbowyg-disabled { opacity: 0.6; }
+
+/* Email style overrides */
+.trumbowyg-emailable table.ep-single-column-pairs td { border: none !important; }
+.trumbowyg-emailable .trumbowyg-button-pane .trumbowyg-button-group::after { background: #bfcdd1; }
+
+/* "Insert Link" should hide title and target input fields */
+.trumbowyg-modal .trumbowyg-modal-box form > label:nth-child(3),
+.trumbowyg-modal .trumbowyg-modal-box form > label:nth-child(4) { display: none; }
+
+
+/* Theme = Default */
+.trumbowyg--default .trumbowyg-box { border: 3px solid #ECF0F1; }
+.trumbowyg--default .trumbowyg-box svg { fill: #000; }
+.trumbowyg--default .trumbowyg-box .trumbowyg-button-group:nth-last-child(2) { background-color: #ECF0F1; }
+.trumbowyg--default .trumbowyg-box .trumbowyg-button-group:nth-last-child(2):after { display: none; }
+.trumbowyg--default .trumbowyg-button-pane { background-color: #ECF0F1; color: #000; }
+.trumbowyg--default .trumbowyg-button-pane .trumbowyg-open-dropdown::after { border-top-color: #000; }
+
+.trumbowyg--default .trumbowyg-button-pane button:not(.trumbowyg-disable):focus,
+.trumbowyg--default .trumbowyg-button-pane button:not(.trumbowyg-disable):hover,
+.trumbowyg--default .trumbowyg-dropdown button:hover { background-color: #ffffff; }
+
+
+.trumbowyg--default .trumbowyg-button-pane button.trumbowyg-active { background-color: #fff; }
+.trumbowyg--default .trumbowyg-button-pane button.trumbowyg-active.trumbowyg-DMS_formatting-button { background-color: #ffffff; }
+
+.trumbowyg--default .trumbowyg-dropdown,
+.trumbowyg--default .trumbowyg-dropdown button { color: #000 !important; background-color: #ECF0F1; }
+
+.trumbowyg--default .dms-trumbowyg-btn-pane-autotext::after { display: none; }
+
+.trumbowyg--default .dms-trumbowyg-save-controls {
+  display:flex;
+  justify-content: space-between;
+  float: right;
+  color: #000;
+  background-color: #ECF0F1;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 200px;
+  height: 27px;
+  margin-right: -3px;
+}
+.trumbowyg--default .dms-trumbowyg-save-controls-separator { height: 16px; width: 1px; background-color: #000; margin-top: 5px; }
+.trumbowyg--default .dms-trumbowyg-save, .dms-trumbowyg-cancel { user-select: none !important; cursor: pointer; line-height: 27px; }
+.trumbowyg--default table.editor-table td { border: 1px solid #000000; }
+
+/* Theme = Blue */
+.trumbowyg--blue .trumbowyg-box { border: 3px solid #1a6dc0; }
+.trumbowyg--blue .trumbowyg-box svg { fill: #fff; }
+.trumbowyg--blue .trumbowyg-box .trumbowyg-button-group:last-child { float: right; background-color: #1a6dc0; }
+.trumbowyg--blue .trumbowyg-box .trumbowyg-button-group:nth-last-child(2) { background-color: #1a6dc0; }
+.trumbowyg--blue .trumbowyg-box .trumbowyg-button-group:nth-last-child(2):after { display: none; }
+.trumbowyg--blue .trumbowyg-button-pane { background-color: #1a6dc0; color: #fff; }
+.trumbowyg--blue .trumbowyg-button-pane .trumbowyg-open-dropdown::after { border-top-color: #fff; }
+
+.trumbowyg--blue .trumbowyg-button-pane button:not(.trumbowyg-disable):focus,
+.trumbowyg--blue .trumbowyg-button-pane button:not(.trumbowyg-disable):hover,
+.trumbowyg--blue .trumbowyg-dropdown button:hover { background-color: #0958a5; }
+
+.trumbowyg--blue .trumbowyg-button-pane button.trumbowyg-active { background-color: #1876d1; }
+.trumbowyg--blue .trumbowyg-button-pane button.trumbowyg-active.trumbowyg-DMS_formatting-button { background-color: #0958a5; }
+
+.trumbowyg--blue .trumbowyg-dropdown,
+.trumbowyg--blue .trumbowyg-dropdown button { color: #fff !important; background-color: #1a6dc0; }
+
+.trumbowyg--blue .dms-trumbowyg-btn-pane-autotext::after { display: none; }
+
+.trumbowyg--blue .dms-trumbowyg-save-controls {
+  display:flex;
+  justify-content: space-between;
+  float: right;
+  color: #fff;
+  background-color: #1a6dc0;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 200px;
+  height: 27px;
+  margin-right: -3px;
+}
+.trumbowyg--blue .dms-trumbowyg-save-controls-separator { height: 16px; width: 1px; background-color: #fff; margin-top: 5px; }
+.trumbowyg--blue .dms-trumbowyg-save, .dms-trumbowyg-cancel { user-select: none !important; cursor: pointer; line-height: 27px; }
+
+.trumbowyg--blue table.editor-table td { border: 1px solid #000000; }

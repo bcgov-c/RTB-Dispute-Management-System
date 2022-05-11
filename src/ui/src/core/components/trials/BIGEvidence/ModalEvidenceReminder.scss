@@ -1,0 +1,44 @@
+.evidence-reminder-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  &__title {
+    color: #335c85;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 34px;
+    text-align: center;
+  }
+
+  &__description {
+    color: #4c4c4c;
+    line-height: 23px;
+    font-size: 19px;
+  }
+
+  &__list-items {
+    color: #4c4c4c;
+    line-height: 23px;
+    font-size: 19px;
+    padding-left: 20px;
+  }
+
+  &__img {
+    width: fit-content;
+  }
+
+  &__checkboxes {
+    width: 100%;
+  }
+
+  &__button {
+    margin-top: 20px;
+  }
+
+  .animation-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}

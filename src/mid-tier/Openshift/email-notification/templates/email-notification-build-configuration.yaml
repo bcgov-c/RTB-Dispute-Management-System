@@ -1,0 +1,189 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: ${NAME}
+  annotations:
+    openshift.io/display-name: Email Notification
+    description: ${NAME} template
+    tags: cm, rtb, dotnet, email
+    iconClass: icon-dotnet
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+message: |-
+  The following service(s) have been created in your project: ${NAME}.
+labels:
+  app: "${NAME}"
+  template: ${NAME}
+objects:
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Keeps track of changes in the application image
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}"
+    annotations:
+      description: Defines how to build the application
+  spec:
+    source:
+      type: Git
+      git:
+        uri: "${SOURCE_REPOSITORY_URL}"
+        ref: "${SOURCE_REPOSITORY_REF}"
+      contextDir: "${CONTEXT_DIR}"
+      sourceSecret:
+        name: git-secret
+
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile.EmailNotification
+    resources:
+      limits:
+        memory: "${MEMORY_LIMIT}"
+        cpu: "${CPU_LIMIT}"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:${TAG}"
+    triggers:
+    - type: ImageChange
+    - type: ConfigChange
+    - type: GitHub
+      github:
+        secret: "${GITHUB_WEBHOOK_SECRET}"
+    postCommit: {}
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-release"
+    annotations:
+      description: Defines how to build the application
+  spec:
+    source:
+      type: Git
+      git:
+        uri: "${SOURCE_REPOSITORY_URL}"
+        ref: "master"
+      contextDir: "${CONTEXT_DIR}"
+      sourceSecret:
+        name: git-secret
+    strategy:
+      dockerStrategy:
+        dockerfilePath: Dockerfile.EmailNotification
+    resources:
+      limits:
+        memory: "${MEMORY_LIMIT}"
+        cpu: "${CPU_LIMIT}"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:${RELEASE_TAG}"
+    triggers:
+    - type: ImageChange
+    - type: ConfigChange
+    - type: GitHub
+      github:
+        secret: "${GITHUB_WEBHOOK_SECRET}"
+    postCommit: {}
+- kind: Secret
+  apiVersion: v1 
+  data:
+    ssh-privatekey: >-
+      LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS1FJQkFBS0NBZ0VBdy9LYWVOVjljR0Nsc2dJTmFEdjMySFBGdGNRRldNeXNUZ1A3ajcreFhacENuUkR3CmR3dU9qS1cvUUhuN1ROYlhIdVkveWgyQW55UlFQRU1sTnFHK2k1d2tWTnZyUEF1MlZFQTl4SU5rYSsrUlYzVjIKc05vVlVmVDV5OW4ycTZybGlPN0xyUlN2Z1l0UzNCOUhvb3JKTi82NmpveHcyeFpCaFZBTFJ3Q3BiVGVCMi8vSQpNbVptRlg2ak9Lb1ZFK05aNzJKWDl1SkJUSWlGZzlIaUpESElzZy9WWnkzS1BoMGlBUXovV3RRTWhYemh5bkgwCm1sYWxhMkhMQ3RQNy9iWG80dlByU2dBdEh1elFYWXJPU0tyYkY2aUlsRUtYeHZBVlp4ang0c2R2UXBGZlRzeSsKZWUwcFlsWlJoQ2lFeU9IV0E5elIvVTZlbFBWVjlCVy9YTkRjU2tOOXM1SGdxODN6eENpOVhaZENKSXN2cU15VQpFNVRRZ0t5WHovemNuZmNpUERBYVh1YnkwUllPT2ZzR054V1hzZ1RYdW9rMkdhQzE0Y1dBR3p0c0w2a1NKb0ZnCllTV3RUaVorZTc3NkRnSjR3am5nYi9FNXc2WnBsY0xnQWNjZUJqSDVWOXM0WG5QVVVHTlNXVkM3dGx4MDB0d2QKb2tlK1o5ZW1QalBxUVNReFlCY0UyYVAyNXU5cGtWQTJ4VHpuRG9DNEhJMXNNa2dZdUp2djlGeS9YUXNocEV2YgpXQ3ZZUTFTRjJIL3FqYy9TRVFxR0hvNW0xVURqc2UrUWYrdEtZZS9lWHREWCs3NjhxWCtkOG5wVFlGUlRueDFNCjBqL1NHRzg4TTJUcTdoTzQvOVMrVEEzQnRXM1ZhQTdXc3RTVkpDZG9VbmRUWmpWWnhmV2ZXZzhMRDRzQ0F3RUEKQVFLQ0FnRUFwdGRaQSszejRzM0lCK3VMY3Vjc3YxYkVUMkpha3lPaXlzTEZYYjZBelF4ZUQ5S3VqUTZBRCszSgpES05RZ0RxbDdKOXNUVElWcEd1TkRlSzJPdkE1aURJcEZVQXo2V3Fua3RFb1JyMEJzbzNIbVVwaEIzQ0ptc0VXCk9LYWNTOHMxcWdSNTFDTzYxSGpHMHJxbmloVFdCQ0dXdzIxOVltNXUxNDR5TEFDNlFrNXkrZG11b290aC9JZFoKZnhRQzRtNUEwMzFQSE4zRmI5OEdvQmtEam9IOU92QVVhc2dvWGY3OFJ4ekVDSmhwR1BnZVlQdnFvOGVIRGdtMAprc0d3M0hRWm1iVEs4TFY1dGMwNkZZdnMzUjd0Y2hXRVJZajJKdU9odGFrZHZGVEh2VXgrZEdBTkIxQVNYckxVCnNjeTJVejFIdHY0OHBveGNwc1RHclJBZlltNU1Ra24yR0lFU1RUUnZlWFI5aW5XN0NVOE1na044dmhwMHB0ZlIKZjJtdnRxbHJESnMyM25oWER5OXBuOEM1YXF2VmV6cGlCbDdwUi9kZU1NYzRCbjU4OUJhcmM3SDBEZG5hNmZxZwpOTnp1eGNBaGpjYnNrREtvcjlsVStwQ0ZISVRSRVdtTGd5L2owd3d1UVl5Snc0SVlTUkZ3S25jSEsxTWpoOUpMCkovWXlpSFZNbGc0aVNuYll6Y1J6TS9JN3d5OXo4WHFDNkRIT0I4VWc5ZWtNWldIdjM0eS9sZVZvaWNydGNuUDIKcmU4bXBIcEZiT1FnQlRaL1d5L1dqcGVPcTJGQW9FS09xTjE3STVKdnRGYk9oM215bWhQekZGUjBqNCtoWFZZUgprbVBTYy9RUVVNanh6bDJlQ2h1ZHVObzNuZjNxNS9PeWoxNi81UHJ5OVphcStXR0l4M0VDZ2dFQkFPVkN3U0VECnBPN21lU3k3TlJxUHg5MmtXUUZZajRvSEpDZUN2SHJ4WHRnSVFXSGdGT1d4anFRUjlIZVEvMjZURnBvdldoeW0KTC9CR0dCTXh1MCtsRlptMnNVeGhQakZIMUNVZ2VabXRFdk1HUXIyYWF4aTNFelZzRzYxU1QwcUFWRVk1U2ZqbAp1cHRGdDlsK1VxYkM4SUp4K09odm1LNGhnY1gyeDN1YzhBWWVCRWpYR2c4SUdKVS9SSDNEYk1rcDkwb0F1MWFBCkcyR2FzcjJkNGwyZlE1RXpOd0hDV05JeFRUVE5QTndSbUVVOGsraDhlRmFLV2NwZUNxMmM2bjBjWWdHYzBtSmQKdnlkSFRkWGpEQ2c3OG1DbHh6YXJpa0FqbnpRcUlKcmpNOWFVbzBBSzVsVjZXZzBUS0FSa1RvTmdpcVQ4b0VXTApvbnhiMWNKNFFYSGFESDhDZ2dFQkFOck5NS0tHakdNSkZQcVFOd1lzS3lQY1NXOTNPS2xjR3V4cHVNdUpUczVaCjI2ZDdtYTE2T05QUENvaDRyZU9FNnpTbGF6TmtlUlBxSHhmK0J5WExzaXQ0OUdxRWJVL01GYTlMRjF6cDh0WEsKK2M3dXBZYnlmT2RVVC9qTXN3QTh6OTNEUjlRdDFXYlZGMFhzekpObXg0TjdmM0QyQm5oSXhuRlFwM3I5aXpkYgpvcW0wanV1QlVIMG54bXBzSUpHbmMzZ2lhbUNkSHA3aWlKYkFlWVViUkRpZHlwdGFJdlpFMDBVSUtJU3gyTGV3CnJkWm15bkNkOXBjS1h6L1YzRkd3dTB0RllKZGhoZFN3UW9ubitnVGMyS1BFSHFVRGE0K3pzdlNFZnhhSHF6d2YKVWcwUFEzcnkvY2hHZVNYc3VhUDBENnFLdXpCOWI4clVPWk9PRkZoZDV2VUNnZ0VBZmErNEkzcFUvS2didkhzeApwTXM0Zm5sd1ZqMlFDOUxZYmxUTk1mV0wwcEhNRG5XRDMxMFZYenQ4cytRcE5SeXNZb0VkUE9HYkhIWEJFeHpMCm5PRmJVemNHUW1KNWJ4ajY1QlBHdG9wYy9pRHJpL2pSUis1dU9IWjVRZThEQzB3Slo2cFd0SDUxYkZTdmN5dysKOGEram5WQVFicFZudGVjbXR6b1FxT01qNzZhYklMZlVVSE5XenRPdG4rajRoZHhjOXhRcG9FV0JQV1JMSTRzZwpJOFdCakdQd2Z5VmwvbTRLN3F5cDlkZ3JpNkduVU9pVUxKV1NubEFxT0gzelMvMjRlVHZaVnhZZ0NzK2JpMnY3CktUK2NKSUllRWdtL05HU1REazBlTE92c2FuSjRnVTY0Y2hvdXJrWlhSUGtjMWdlaVdzc29ycGZiejZPbE1BVXYKazlRL3p3S0NBUUJxV1AxZ29hRXVxY1ZtbkI0Q2hBbGIzc0JheTBuaEY0R0drMFJjdVpweU5iN0x3d25KQmZVRgpEa2NDV2hXNjFtbzBKb3JhYWVWbnhvM2liWGd2NkxmcTVWbDNSSEtWTEk4RnFxdnFYMVBHa21lbEt0Mk5uK01SCjFTc2h0T3owR3BxMklTcVNlTXlXdE5BaERwM0lyMVllRkRLM1J2MlNEVjFXeW1yOUhxdEI5dW96TGkyaFRqTS8KQWN3eEFlazZvbmMvVndyNWRxVGhlUjRHbC9yNHRXNE5UclNobWNnUWh4ZGhJRHdCY3lmdzhKRXQrcncrektpRQpkV2dpY09JcldvbE9acVF5TUJhS2NEbUhLaGVkc1hJaTl6b2wzbW16YVJaOFBzSSt3eVo1akllbkRWb3hNbFlqCnVBMCtYN2REZDJiOTczeFlieitkQ0ZZTDRDMEhYbXpaQW9JQkFRRFE0cGJORlBPTEg3MjNRVkVKenQ3ZUFWcDIKVkJ4Q3hTMWY1N01iTnM3d0lTSU9kdXVjWHpRWVgrcFVGRWhaQ0tRTmJVeURBazhWU3U0Qkpla01ib1IvMGYwTAp0dWJNYlpDWUo4Z1g1eHF1a3BoTVltRlZ1K0N2RXVqUVFqKzBDdG5NbFdvbHR0TzlwNzdONmlmYVZyRXlCdHRqCm1rdFZBd0ttcllPdHplcE5mdEJTMVFEbW01VlhwWnBZOTRsNCtJK0l6dXNXWkVCelduQ2Q3ZnFSUVYvV3p4Z2wKZ2taQ2NKY2c0ZnZ1MWhoUE11QTY2OTF0eFIwNFBhTzBhd0JXc1pOdGdoTUg0SWZZdURNamJheTR2c3cxTVJjcQpYK0dQTmZsR0txVHhnSm1jV0dza3VEZWVTSldSSm1lSmxyTnlXSWcrWDZkQWFTTW9UUytxTTdadXRubWMKLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K
+  metadata:
+    name: git-secret
+  type: Opaque
+parameters:
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: email-notification
+- name: ENV
+  displayName: Env
+  description: Specify env name.
+  required: true
+  value: dev
+- name: TAG
+  displayName: Tag
+  description: Specify tag name.
+  required: true
+  value: latest
+- name: RELEASE_TAG
+  displayName: Release Tag
+  description: Specify release tag name.
+  required: true
+  value: release
+- name: MEMORY_LIMIT
+  displayName: Memory Limit
+  required: true
+  description: Maximum amount of memory the .NET Core container can use.
+  value: 2Gi
+- name: CPU_LIMIT
+  displayName: Cpu Limit
+  required: true
+  description: Maximum amount of cpu the .NET Core container can use.
+  value: '2'
+- name: DOTNET_IMAGE_STREAM_TAG
+  displayName: ".NET builder"
+  required: true
+  description: The image stream tag which is used to build the code.
+  value: dotnet:2.2
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the .NET builder ImageStream resides.
+  value: openshift
+- name: SOURCE_REPOSITORY_URL
+  displayName: Git Repository URL
+  required: true
+  description: The URL of the repository with your application source code.
+  value: git@github.com:HiveOne/dispute-cm-mid-tier.git
+- name: SOURCE_REPOSITORY_REF
+  displayName: Git Reference
+  description: Set this to a branch name, tag or other ref of your repository if you
+    are not using the default branch.
+  value: dev
+- name: CONTEXT_DIR
+  displayName: Context Directory
+  description: Set this to the relative path to your project if it is not in the root
+    of your repository.
+- name: DOTNET_STARTUP_PROJECT
+  displayName: Startup Project
+  description: Set this to a project file (e.g. csproj) or a folder containing a single
+    project file.
+  value: EmailNotificationService
+- name: DOTNET_SDK_VERSION
+  displayName: SDK Version
+  description: Set this to configure the default SDK version. This can be set to a
+    specific version, '' (lowest version) or 'latest' (highest version).
+  value: ''
+- name: DOTNET_ASSEMBLY_NAME
+  displayName: Startup Assembly
+  description: Set this when the assembly name is overridden in the project file.
+- name: DOTNET_TOOLS
+  displayName: ".NET Tools"
+  description: Set this to a space separated list of .NET tools needed to publish.
+- name: DOTNET_NPM_TOOLS
+  displayName: Npm Tools
+  description: Set this to a space separated list of npm tools needed to publish.
+- name: DOTNET_TEST_PROJECTS
+  displayName: Test projects
+  description: Set this to a space separated list of test projects to run before publishing.
+- name: DOTNET_CONFIGURATION
+  displayName: Configuration
+  description: Set this to configuration (Release/Debug).
+  value: Release
+- name: DOTNET_RESTORE_SOURCES
+  displayName: NuGet package sources
+  description: Set this to override the NuGet.config sources.
+- name: GITHUB_WEBHOOK_SECRET
+  displayName: GitHub Webhook Secret
+  description: A secret string used to configure the GitHub webhook.
+  generate: expression
+  from: "[a-zA-Z0-9]{40}"
+- name: BUILD_LOGLEVEL
+  displayName: Build log level
+  value: '5'

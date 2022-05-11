@@ -1,0 +1,13 @@
+version: "3.6"
+
+services:
+  frontend:
+    container_name: dispute-cm-frontend
+    restart: always
+    build:
+      context: .
+    ports:
+      - 8080:8080
+    volumes:
+      - ./env-dev.json:/app/config/env.json
+

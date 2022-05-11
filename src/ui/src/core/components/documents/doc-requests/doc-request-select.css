@@ -1,0 +1,10 @@
+.doc-request-select__dropdown-container { display: flex; }
+.doc-request-select__dropdown select { width: 320px; }
+.doc-request-select__opt-out { margin-top: 23px; margin-left: 20px; }
+.doc-request-select__checkboxes .intake-checkboxes-component { display: flex; flex-wrap: wrap; }
+.doc-request-select__checkboxes .form-group { margin-right: 15px; }
+.doc-request-select__checkboxes .error-block { width: 100%; }
+
+@media (max-width: 440px) {
+  .doc-request-select select { width:100%; }
+}

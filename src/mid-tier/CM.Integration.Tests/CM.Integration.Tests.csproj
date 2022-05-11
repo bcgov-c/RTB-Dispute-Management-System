@@ -1,0 +1,196 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;DevServer;StagingServer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'StagingServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevServer|AnyCPU' ">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+	  <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.16.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="EasyNetQ.Management.Client" Version="1.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.2" />
+    <PackageReference Include="FluentAssertions" Version="6.5.1" />
+    <PackageReference Include="Bogus" Version="34.0.1" />
+    <PackageReference Include="Respawn" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="EmailTemplates\01_Submit-OfficePaymentRequired.html" />
+    <None Remove="EmailTemplates\02_Submit-FeeWaiverPaymentRequired.html" />
+    <None Remove="EmailTemplates\03_Participatory-SubmittedPaid.html" />
+    <None Remove="EmailTemplates\04_PaymentReceipt.html" />
+    <None Remove="EmailTemplates\05_ApplicantEvidenceReminder.html" />
+    <None Remove="EmailTemplates\06_RespondentEvidenceReminder.html" />
+    <None Remove="EmailTemplates\07_HearingReminder.html" />
+    <None Remove="EmailTemplates\08_DisputeWithdrawn.html" />
+    <None Remove="EmailTemplates\09_DisputeCancelled.html" />
+    <None Remove="EmailTemplates\10_IntakeAbandonedNoPayment.html" />
+    <None Remove="EmailTemplates\11_Participatory-UpdateSubmitted.html" />
+    <None Remove="EmailTemplates\14_NonParticipatory-SubmittedPaid.html" />
+    <None Remove="EmailTemplates\15_Submit-NonPartOfficePaymentRequired.html" />
+    <None Remove="EmailTemplates\16_NonParticipatory-UpdateSubmitted.html" />
+    <None Remove="secrets\appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmailTemplates\08_DisputeWithdrawn.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\09_DisputeCancelled.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="secrets\appsettings.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <None Remove="EmailTemplates\10_DisputeAbandonedForNoPaymentWithEmail.html" />
+    <EmbeddedResource Include="EmailTemplates\10_DisputeAbandonedForNoPaymentWithEmail.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\11_ParticipatoryUpdateSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\11_ParticipatoryUpdateSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\14_DirectRequestApplicationSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\12_EmergencyParticipatoryRespondentReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\14_DirectRequestApplicationSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\15_DirectRequestOfficePaymentRequired.html" />
+    <EmbeddedResource Include="EmailTemplates\15_DirectRequestOfficePaymentRequired.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\16_DirectRequestUpdateSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\16_DirectRequestUpdateSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\21_DisputeAbandonedDueToApplicantInaction.html" />
+    <EmbeddedResource Include="EmailTemplates\21_DisputeAbandonedDueToApplicantInaction.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\22_DisputeAbandonedDueToApplicantServiceInaction.html" />
+    <EmbeddedResource Include="EmailTemplates\22_DisputeAbandonedDueToApplicantServiceInaction.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\23_AccessCodeRecovery.html" />
+    <EmbeddedResource Include="EmailTemplates\23_AccessCodeRecovery.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\24_AricParticipatoryApplicationSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\24_AricParticipatoryApplicationSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\25_PfrParticipatoryApplicationSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\25_PfrParticipatoryApplicationSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\26_AricParticipatoryDisputeWaitingForOfficePayment.html" />
+    <EmbeddedResource Include="EmailTemplates\26_AricParticipatoryDisputeWaitingForOfficePayment.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\27_PfrParticipatoryDisputeWaitingForOfficePayment.html" />
+    <EmbeddedResource Include="EmailTemplates\27_PfrParticipatoryDisputeWaitingForOfficePayment.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\28_AricParticipatoryUpdateSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\28_AricParticipatoryUpdateSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\29_PfrParticipatoryUpdateSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\29_PfrParticipatoryUpdateSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\30_AricParticipatoryApplicantEvidenceReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\30_AricParticipatoryApplicantEvidenceReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\31_PfrParticipatoryApplicantEvidenceReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\31_PfrParticipatoryApplicantEvidenceReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+	</ItemGroup>
+  <ItemGroup>
+    <None Update="TestData\Files\OtherFile1.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Files\SampleSchedule_Jan2019.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CM.Services\CM.ServiceBase\CM.ServiceBase.csproj" />
+    <ProjectReference Include="..\CM.WebAPI\CM.WebAPI.csproj" />
+    <ProjectReference Include="..\CM.Services\EmailGenerator\EmailGeneratorService\EmailGeneratorService.csproj" />
+    <ProjectReference Include="..\CM.Services\EmailNotification\EmailNotificationService\EmailNotificationService.csproj" />
+    <ProjectReference Include="..\CM.Services\PdfConvertor\PdfService\PdfService.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestData\" />
+    <Folder Include="TestData\Files\" />
+    <Folder Include="Scenarios\Messaging\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="EmailTemplates\22_Abandoned-ApplicantServiceInaction.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="EmailTemplates\01_ParticipatoryDisputeWaitingForOfficePayment.html" />
+    <EmbeddedResource Include="EmailTemplates\01_ParticipatoryDisputeWaitingForOfficePayment.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\02_ParticipatoryDisputePaymentWaitingForFeeWaiverProof.html" />
+    <EmbeddedResource Include="EmailTemplates\02_ParticipatoryDisputePaymentWaitingForFeeWaiverProof.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\03_ParticipatoryApplicationSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\03_ParticipatoryApplicationSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\04_PaymentSubmitted.html" />
+    <EmbeddedResource Include="EmailTemplates\04_PaymentSubmitted.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\05_ParticipatoryApplicantEvidenceReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\05_ParticipatoryApplicantEvidenceReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\06_ParticipatoryRespondentEvidenceReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\06_ParticipatoryRespondentEvidenceReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\07_ParticipatoryHearingReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\07_ParticipatoryHearingReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

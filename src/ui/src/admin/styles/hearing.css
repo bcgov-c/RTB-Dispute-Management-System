@@ -1,0 +1,556 @@
+
+
+/* Remove hearing modal*/
+.modalBaseDeleteHearing .modal-dialog { width: 950px; }
+.modalBaseDeleteHearing-date-owner-container { display: flex; justify-content: space-between; }
+.modalBaseDeleteHearing-date-owner-container > div:first-child { display:flex; flex-direction: column; }
+.modalBaseDeleteHearing-owner-info { margin: 0 auto; }
+.modalBaseDeleteHearing-owner-info > .hearing-display-owner-container { margin-top: 15px; }
+.modalBaseDeleteHearing-link-info { flex-grow: 1; }
+.modalBaseDeleteHearing p.modal-body-description { margin: 30px 0; }
+
+/* End Remove hearing disputes modal */
+
+/* Reassign hearing modal */
+#reassignHearing_modal .modal-dialog { width: 1100px; }
+#reassignHearing_modal .modal-body-description { margin-top: 30px; }
+
+.modalHearingReassignConfirm-date { width: fit-content; }
+
+.reassignHearing-search-results .standard-list-header { margin-top: 20px; display: flex; justify-content: flex-start; }
+.reassignHearing-search-results { margin-bottom: 30px; }
+
+.reassignHearing-search-result { display: flex; justify-content: flex-start; font-size: 17px; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(1),
+.reassignHearing-search-result > div:nth-child(1) { width: 100px; min-width: 100px; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(2),
+.reassignHearing-search-result > div:nth-child(2) { width: 220px; min-width: 220px; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(3),
+.reassignHearing-search-result > div:nth-child(3) { flex-grow: 1; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(4),
+.reassignHearing-search-result > div:nth-child(4) { width: 100px; min-width: 100px; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(5),
+.reassignHearing-search-result > div:nth-child(5) { width: 160px; min-width: 160px; }
+
+.reassignHearing-search-results .standard-list-header > div:nth-child(6),
+.reassignHearing-search-result > div:nth-child(6) { width: 230px; min-width: 230px; }
+
+.reassignHearing-search-result.standard-list-item { border-bottom: 1px solid #e5e5e5; min-height: 35px; margin: 10px 0 0 0; }
+
+.reassignHearing-search-result-select > div {
+  display: inline-block;
+  background-image: url('../static/Icon_AdminBar_Hearing.png');
+  background-repeat: no-repeat;
+  padding-left: 40px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0 auto;
+  color: #46628b;
+  position: relative;
+  top: -3px;
+}
+
+/* End Reassign hearing modal */
+
+
+/* Reschedule hearing modal */
+#rescheduleHearingDisputes_modal .modal-dialog { width: 1100px; }
+#rescheduleHearingDisputes_modal p.modal-body-description { margin-top: 30px; }
+/* End Reschedule hearing modal */
+
+/* Reassign Confirmation hearing modal */
+#modalHearingReassignConfirm .modal-dialog { width: 1100px; }
+.modalHearingReassignConfirm-hearing-item { display: flex; flex-wrap: wrap; margin-bottom: 20px; }
+.modalHearingReassignConfirm-hearing-item > div:nth-child(1) { margin-bottom: 10px; }
+
+.modalHearingReassignConfirm-hearing-item > div:nth-child(2),
+.modalHearingReassignConfirm-hearing-item > div:nth-child(3) { width: 50%; }
+
+#modalHearingReassignConfirm .hearing-link-info { margin-top: 20px; }
+/* End Reassign Confirmation hearing modal */
+
+/* Reschedule Confirmation hearing modal */
+#modalHearingRescheduleConfirm .modal-dialog { width: 1100px; }
+#modalHearingRescheduleConfirm .hearing-display-date-container { border-top: none; }
+
+.modalHearingRescheduleConfirm-current-hearing,
+.modalHearingRescheduleConfirm-new-hearing { display: flex; justify-content: flex-start; margin: 10px 0 30px 0; }
+
+
+.modalHearingRescheduleConfirm-current-hearing > div:nth-child(2),
+.modalHearingRescheduleConfirm-new-hearing > div:nth-child(2) { flex-grow:1; display:flex; justify-content: flex-end; }
+
+.modalHearingRescheduleConfirm-current-hearing > div:nth-child(2) .hearing-owner-info,
+.modalHearingRescheduleConfirm-new-hearing > div:nth-child(2) .hearing-owner-info { width: 420px; }
+
+/* End Reschedule Confirmation hearing modal */
+
+/* Create Hearing Modal */
+#createHearing_modal .modal-dialog { width: 1200px; }
+#createHearing_modal .modal-body { min-height: 800px; }
+
+.createHearingModal-step1 > div:first-child { display: flex; }
+.create-hearing-type { width: 300px; margin-right: 15px; }
+.create-hearing-priority { width: 200px; margin-right: 20px; }
+.create-hearing-priority select { width: auto; min-width: 150px; }
+.create-hearing-note { flex-grow: 1; }
+
+.create-hearing-date-container { display: flex; width: 708px; }
+.create-hearing-date-container > div { margin-right: 20px; }
+
+.create-hearing-step1-btn { position: relative; top: 23px; height: fit-content; }
+
+.createHearingModal-step2 { margin-top: 30px; }
+.create-hearing-arbs-container { display: flex; justify-content: flex-start; }
+.create-hearing-arbs { width: 256px; min-width: 256px; }
+.create-hearing-arbs select { width: 240px; }
+.create-hearing-step2-btn { margin-right: 25px; height: fit-content; position: relative; top: 23px; }
+.create-hearing-arbs-info { color: #888888; padding-top: 29px; }
+
+.createHearingModal-step3 { margin-top: 30px; margin-bottom: 5px; }
+
+.create-hearing-bridges-container { display: flex; justify-content: flex-start; }
+.create-hearing-bridges { width: 250px; min-width: 250px; margin-right: 25px; }
+.create-hearing-bridges-info { color: #888888; padding-top: 29px; }
+
+.create-hearing-other-location { width: 708px; }
+
+
+.create-hearing-display-container { background-color: #f2f2f2; padding: 15px; color: #888888; margin: 10px 0 40px 0; }
+
+.create-hearing-schedule-error { padding-top: 15px!important; padding-bottom: 15px!important; }
+
+.create-hearing-conference-info { display: flex; }
+
+.create-hearing-primary-dialin,
+.create-hearing-secondary-dialin { margin-right: 10px; min-width: 140px; width: 140px; }
+
+.create-hearing-participant-code { margin-right: 10px; min-width: 120px; width: 120px; }
+.create-hearing-moderator-code { margin-right: 25px; min-width: 120px; width: 120px; }
+
+.create-hearing-primary-title,
+.create-hearing-secondary-title { margin-right: 25px; min-width: 260px; width: 260px; }
+
+.create-hearing-conference-details { margin: 10px 0 40px 0; background-color: #f2f2f2; padding: 15px; }
+
+
+#createHearing_modal .modal-button-container { padding: 0 20px 30px 0; }
+
+/* End Create Hearing Modal */
+
+/* Hearing Linking History modal */
+#linkingHistory_modal .modal-dialog { width: 1000px; }
+.linkingHistory-hearing-info { margin-top: 30px; }
+
+.linkingHistory-results-container { margin-top: 30px; }
+
+#linkingHistory_modal .standard-list-item > div { padding-left: 0; }
+
+#linkingHistory_modal .standard-list-header,
+#linkingHistory_modal .standard-list-item { display: flex; justify-content: flex-start; }
+
+#linkingHistory_modal .standard-list-item { border-bottom: 1px solid #e5e5e5; min-height: 35px; margin: 10px 0 0 0; }
+#linkingHistory_modal .standard-list-empty { margin-top: 30px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(1),
+#linkingHistory_modal .standard-list-item > div:nth-child(1) { min-width: 140px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(2),
+#linkingHistory_modal .standard-list-item > div:nth-child(2) { min-width: 120px; width: 120px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(3),
+#linkingHistory_modal .standard-list-item > div:nth-child(3) { min-width: 120px; width: 120px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(4),
+#linkingHistory_modal .standard-list-item > div:nth-child(4) { min-width: 160px; width: 160px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(5),
+#linkingHistory_modal .standard-list-item > div:nth-child(5) { flex-grow: 1; min-width: 200px; }
+
+#linkingHistory_modal .standard-list-header > div:nth-child(6),
+#linkingHistory_modal .standard-list-item > div:nth-child(6) { min-width: 160px; width: 160px; }
+
+#linkingHistory_modal .modal-button-container { margin-top: 30px; }
+
+/* End Hearing Linking History modal */
+
+
+/* Edit heaing modal */
+#editHearing_modal .modal-dialog { width: 1100px; }
+
+/* End edit hearing modal */
+
+
+/* Add hearing modal */
+#addHearing_modal .modal-dialog { width: 1100px; }
+
+.addHearing-filter-priority-container { display: flex; margin-top: 20px; }
+.addHearing-filter-priority-container > span { margin-right: 15px; line-height: 35px; }
+.addHearing-filter-arbLevels-container > span { margin-right: 31px; line-height: 20px; }
+.addHearing-filter-priority .intake-checkboxes-component, .addHearing-filter-arbLevels .intake-checkboxes-component { display: flex; flex-wrap: wrap; }
+.addHearing-filter-priority .checkboxes-error-block, .addHearing-filter-arbLevels .checkboxes-error-block { width: 100%; }
+.addHearing-filter-priority .form-group, .addHearing-filter-arbLevels .form-group { margin-right: 15px; }
+
+.addHearing-filter-arbLevels-container { display: flex; margin-top: 5px; }
+
+
+.addHearing-filters-row { display: flex; }
+.addHearing-filters-row > div { margin-right: 15px; }
+
+.addHearing-search-btn {
+  background: url('../static/Icon_Admin_Search.png') no-repeat;
+  height: 35px;
+  width: 35px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  margin-top: 23px;
+}
+
+.addHearing-search-results .standard-list-header  { margin-top: 20px; display: flex; justify-content: flex-start; }
+.addHearing-search-result { display: flex; justify-content: flex-start; }
+.addHearing-search-result.standard-list-item { border-bottom: 1px solid #e5e5e5; min-height: 35px; margin: 10px 0 0 0; }
+
+.editHearingLink-linked-applications .addHearing-search-results .standard-list-header { margin-top: 5px; }
+
+.addHearing-search-results .standard-list-header > div:nth-child(1),
+.addHearing-search-result > div:nth-child(1) { width: 320px; min-width: 320px; }
+
+.addHearing-search-results .standard-list-header > div:nth-child(2),
+.addHearing-search-result > div:nth-child(2) { width: 200px; min-width: 200px; }
+
+.addHearing-search-results .standard-list-header > div:nth-child(3),
+.addHearing-search-result > div:nth-child(3) { width: 130px; min-width: 130px; }
+
+.addHearing-search-results .standard-list-header > div:nth-child(4),
+.addHearing-search-result > div:nth-child(4) { flex-grow: 1; }
+
+.addHearing-search-result-day > span { color: #8e8e8e; }
+.addHearing-search-result-select > div {
+  display: inline-block;
+  background-image: url('../static/Icon_AdminBar_Hearing.png');
+  background-repeat: no-repeat;
+  padding-left: 40px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0 auto;
+  color: #46628b;
+  position: relative;
+  top: -3px;
+}
+
+
+#editHearingLink_modal .modal-dialog,
+#assignHearingLink_modal .modal-dialog { width: 900px; }
+
+#editHearingLink_modal .modal-button-container,
+#assignHearingLink_modal .modal-button-container,
+#addHearing_modal .modal-button-container,
+#rescheduleHearingDisputes_modal .modal-button-container { margin-top: 20px; }
+
+#assignHearingLink_modal .editHearingLink-inputs-container { justify-content: flex-start; }
+#assignHearingLink_modal .addHearing-search-results .standard-list-header { margin-top: 0; }
+
+.editHearingLink-inputs-container { display: flex; justify-content: space-between; margin-top: 20px; }
+.editHearingLink-inputs-container .error-block { white-space: nowrap; }
+
+.editHearingLink-type-dropdown { margin-right: 20px; }
+.editHearingLink-type-dropdown select { width: 200px; }
+#editHearingLink_modal .editHearingLink-type-dropdown { display:flex; min-height: 94px; }
+
+.editHearingLink-add-dms,
+.editHearingLink-add-external { min-height: 94px; }
+
+.editHearingLink-add-container { display: flex; align-items: flex-end; width: 550px; }
+.editHearingLink-add-container .intake-input-component { max-width: 180px; }
+
+.editHearingLink-link-type { width: 240px; margin-right: 20px; }
+.editHearingLink-file-link-type { width: 200px; }
+
+.editHearingLink-add-dms-container,
+.editHearingLink-add-external-container { display: flex; width: 260px; }
+
+.editHearingLink-add-dms-container { margin-right: 30px; }
+
+.editHearingLink-add-dms,
+.editHearingLink-add-external { margin-right: 15px; }
+
+.editHearingLink-add-btn {
+  cursor: pointer;
+  color: #46628b;
+  background-image: url('../static/Icon_AddNote.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding-left: 30px;
+  margin-top: 28px;
+  padding-top: 1px;
+}
+
+.editHearingLink-primary > span {
+  display: inline-block;
+  background: url('../../core/static/Icon_UploadDA.png') no-repeat;
+  padding-left: 30px;
+  color: #46628b;
+}
+.editHearingLink-remove { text-align: right; font-size: 21px; }
+
+/* Hearing page styles */
+.hearing-page .header-page-title { background: url('../static/Icon_Header_Hearings.png') no-repeat !important; }
+
+.hearing-page .dispute-overview-header-right { margin-top: 0; }
+
+.parent-application-active-hearing-message { padding: 10px; font-style: italic; color: #8e8e8e; }
+
+.hearing-page-add-new-container, .hearing-page-add-notice-container {
+  display: inline-block;
+  font-size: 15px;
+  height: 32px;
+  cursor: pointer;
+  margin-right: 30px;
+}
+
+.hearing-page .hearing-info-display-container { width: 640px; }
+.hearing-page .file-display-name { margin-left: 0; }
+
+.hearing-unlinked-recordings { margin-bottom: 20px; }
+.hearing-unlinked-recordings-header { 
+  border-bottom-color: #3d4244;
+  font-size: 19px;
+  border-bottom: 2px solid #d2d2d2;
+  margin-bottom: 5px;
+}
+
+.hearing-recording-file { position: relative; bottom: 4px; }
+.hearing-recording { display: flex; }
+
+.hearings-title-container--empty {
+  height: 48px;
+  font-size: 20px;
+  background-color: #e6e6e6;
+  padding: 12px 10px 8px 10px;
+  display: flex; 
+  align-items: center;
+}
+
+.hearing-page .review-information-body {
+  margin-top: 25px;
+}
+
+
+/* Hearing overview item edit styles */
+.active-edit .hearing-end-time { display: inline-block; }
+
+.active-edit .hearing-priority-edit { margin-top: 20px; display: inline-block; }
+
+.active-edit .hearing-arbitrator-info-container > div:nth-child(3) { visibility: hidden; }
+
+
+.hearing-on-hold-view { margin-left: 20px; background: url('../static/Icon_HearingHold_LRG.png') no-repeat; width: 20px; height: 20px; background-size: 20px 19px; padding-left: 25px; color: #666666; }
+.active-edit .hearing-on-hold-view { display: none; }
+
+.hearing-on-hold-edit { display: none; }
+.active-edit .hearing-on-hold-edit { display: inline-block; margin-left: 20px; top: -3px; position: relative; }
+
+.hearing-on-hold-edit input + span { padding-left: 35px !important; }
+
+/* hearing action items */
+.view .hearing-participations .rtb-editable-component-value { display: block; font-size: 16px; margin-top: 5px; }
+
+.hearing-participations-title-container {
+  position: relative;
+  font-size: 19px;
+  border-bottom: 2px solid #d2d2d2;
+  color: #8e8e8e;
+  margin-bottom: 5px;
+}
+
+.hearing-list .view .left-column { min-width: 500px; }
+.hearing-list .view .right-column { max-width: 400px; }
+
+/* Hearing tools */
+.hearing-tools-enabled .hearing-participation-view-container { display: none; }
+.hearing-tools-enabled .hearing-participations-hearing-tools { display: block; }
+
+.hearing-tools-enabled .hearing-result-display { display: none; }
+.hearing-tools-enabled .hearing-result-hearing-tools { display: inline-block; }
+
+.hearing-result-container { display: flex; padding-left: 10px; padding-right: 10px; }
+.hearing-result-complexity { min-width: 180px; margin-right: 10px; }
+.hearing-result-method { min-width: 150px; margin-right: 10px; }
+.hearing-result-duration { min-width: 150px; }
+
+.hearing-participations-warning.error-block.warning {
+  max-width: unset;
+  padding-top: 12px;
+  padding-bottom: 10px;
+  margin: 0 5px;
+}
+
+.hearing-page .hearing-call-info { margin-top: 20px; }
+.hearing-page .hearing-instructions { margin-top: 15px; }
+.hearing-page .hearing-participant-code { margin-top: 20px; }
+.hearing-page .hearing-note { margin: 20px 0; }
+.hearing-page .dispute-overview-claims-hearing-tools { position: relative; bottom: 2px; }
+
+.participation-edit .delivery-time-icon { display: none; }
+.hearing-participation-input-container, .hearing-participation-group-one, .hearing-participation-group-two { display: flex; }
+.hearing-participations-hearing-tools .hearing-participation-input-container { padding-left: 15px;}
+.hearing-participation-input-container { padding: 10px 0; border-bottom: 1px solid #d2d2d2; }
+.hearing-participation-group-one { margin-right: 40px; }
+
+.hearing-participation-preparation, .hearing-participation-duration, .hearing-participation-method { margin-right: 20px; }
+.participation-edit .hearing-participation-preparation, .participation-edit .hearing-participation-duration, .participation-edit .hearing-participation-method { min-width: 250px; width: 250px; }
+.hearing-participation-complexity { min-width: 300px; width: 300px; }
+.participation-edit .hearing-participation-preparation, .participation-edit .hearing-participation-duration, .participation-edit .hearing-participation-method, .participation-edit .hearing-participation-complexity { min-width: 200px; width: 200px; }
+.participation-edit .hearing-participation-preparation, .participation-edit .hearing-participation-method { margin-right: 10px; }
+
+.hearing-participation-view .hearing-participations-warning.error-block.warning { margin: 0; }
+
+.hearing-participation-container.participation-view:not(.no-hearing-participations) { cursor: pointer; }
+
+.participation-edit .hearing-tools-edit { display: none; }
+.participation-edit .hearing-tools-edit-mode-buttons { display: inline; }
+
+.hearing-participations-hearing-tools .hearing-participant { padding-left: 15px; padding-right: 10px; }
+
+.participation-edit .hearing-participant { padding-top: 15px; padding-bottom: 10px; }
+.hearing-participations-hearing-tools .hearing-participant:last-child { border-bottom: none; }
+
+/* End hearing tools */
+
+
+/* Hearing participation */
+
+.participation-view.hearing-tools-save-controls { display: none; }
+.participation-edit .hearing-tools-edit { display: none; }
+.participation-edit .hearing-tools-edit-mode-buttons { display: inline; }
+
+.participations-container { margin-top: 40px; }
+.participations-container > .title-underline { border-width: 2px; margin-bottom: 0; }
+
+.add-hearing-participation {
+  float: right;
+  cursor: pointer;
+  margin-right: 15px;
+  user-select: none;
+  -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+  color: #46628b;
+  padding: 0;
+  position: relative;
+  top: -4px;
+}
+
+.add-hearing-participation-icon {
+  background-image: url('../static/Icon_AdminPage_AddParticipant.png');
+  height: 26px;
+  width: 27px;
+  float: left;
+  margin-right:5px;
+  position: relative;
+  top: -3px;
+}
+
+.hearing-participant {
+  display: table;
+  width: 100%;
+  border-top: 1px solid #d2d2d2;
+  font-size: 18px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  min-height: 30px;
+  position: relative;
+  bottom: 2px;
+}
+
+.hearing-participant:last-child { border-bottom: 1px solid #d2d2d2; }
+
+
+.hearing-participant:first-child { border-top: none; }
+
+.hearing-participant-name-container,
+.hearing-participant-participated-container,
+.hearing-participant-note-container {
+  display: table-cell;
+  padding-right:15px;
+}
+
+.hearing-participant-name-container { position:relative; top: -15px; width: 400px; }
+.hearing-participant-name-sub-container { float: left; width: 100%; }
+.hearing-participant-name-other-note { float: left; }
+.hearing-participant-participated-container { position: relative; top: -10px; width: 145px; }
+
+.hearing-participant-participated,
+.hearing-participant-note,
+.hearing-participant-other-party-association,
+.hearing-participant-other-name,
+.hearing-participant-other-title {
+  float: left;
+}
+
+.hearing-participant-other-party-association,
+.hearing-participant-other-name { margin-right: 15px; }
+
+.hearing-participant-other-party-association { width: 215px; }
+
+.hearing-participant-participated,
+.hearing-participant-note,
+.hearing-participant-other-name {
+  width: 100%;
+}
+
+.hearing-participant.view > div { display: inline-block; }
+.hearing-participant.view .hearing-participant-name { width: 25%; }
+.hearing-participant.view .hearing-participant-type { width: 20%; }
+.hearing-participant.view .hearing-participant-participation-icon-container { width: 10%; position: absolute; bottom: 5px; }
+.hearing-participant.view .hearing-participant-comment { position:relative; left: 10%; max-width: 45%; }
+
+.hearing-participant-name { font-size: 18px; font-weight: bold; }
+.hearing-participant-name-type { font-weight: normal; }
+
+.hearing-participant-sub-info {
+  font-size: 16px;
+  color: #a2a2a2;
+}
+
+.hearing-participant-other-name {
+  max-width: 30%;
+  display: inline-block;
+}
+
+.hearing-participant-other-title { max-width: 25%; }
+
+.hearing-participant-other-name-delete-icon {
+  background: 0 0 url("../static/Icon_AdminPage_DeleteLRG.png") transparent no-repeat;
+  display: inline-block;
+  width: 28px;
+  height: 32px;
+  cursor: pointer;
+  position: relative;
+  top: -3px;
+}
+
+.hearing-participant-participation-icons { display: inline-block; width: fit-content; white-space: nowrap; }
+.hearing-participant-participation-icon-no.disabled:not(.selected) { visibility: hidden; }
+
+.hearing-participant-participation-icon-yes,
+.hearing-participant-participation-icon-no,
+.hearing-participant-participation-icon-unknown {
+  display: inline-block;
+  width: 43px;
+  height: 34px;
+}
+
+.hearing-participant-participation-icon-unknown { background: 0 0 url("../static/Icon_HearingNoAttendanceInfo.png") transparent no-repeat; }
+.hearing-participant-participation-icon-no { background: 0 0 url("../static/Icon_HearingNotAttended_DIS.png") transparent no-repeat; }
+.hearing-participant-participation-icon-yes { background: 0 0 url("../static/Icon_HearingAttended_DIS.png") transparent no-repeat; }
+
+.hearing-participant-participation-icon-no.selected { background: 0 0 url("../static/Icon_HearingNotAttended.png") transparent no-repeat; }
+.hearing-participant-participation-icon-yes.selected { background: 0 0 url("../static/Icon_HearingAttended.png") transparent no-repeat; }
+
+.hearing-participations .rtb-editable-component-viewstate { width: 100%; }

@@ -1,0 +1,32 @@
+.ceu-participant {
+
+  &__name-warning.warning { padding-top:15px; padding-bottom:12px; margin-right:10px; }
+
+  &__contact-type select { width: fit-content; }
+
+  &__birthday-container { display:flex; flex-wrap: nowrap; }
+
+  &__birthday { margin-right: 15px; white-space: nowrap; max-width: 370px; }
+  
+  &__birthday-label {
+    font-size: 18px;
+    color: #c9c9c9;
+    min-width: fit-content;
+    margin-top: 25px;
+  }
+
+  &__birthday-warning {
+    background-color: #fff6e5;
+    background-image: url("../../../../core/static/Icon_Warning.png");
+    background-position: left 5px center;
+    background-repeat: no-repeat;
+    color: #666;
+    padding: 12px 5px 12px 50px;
+    line-height: 22px;
+    font-size: 16px;
+  }
+
+
+  .participant-type .radio label { margin-left:0; margin-right: 20px; }
+  .participant-type .radio label:last-child { margin-left:0 }
+}

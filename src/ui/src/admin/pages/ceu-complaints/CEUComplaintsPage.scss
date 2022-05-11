@@ -1,0 +1,44 @@
+.ceu-complaints {
+  &__list {
+    position: relative;
+    top: 6px;
+    display: inline-flex;
+    align-items: center;
+
+    &__text {
+      font-size: 18px;
+      position: relative;
+      top: 2px;
+    }
+  }
+  &__filters { 
+    display: flex; 
+    justify-content: space-between;
+
+    &__left, &__right { display: flex; align-items: center;}
+
+    &__total-count {
+      @extend .ceu-complaints__filters;
+      height: 42px !important;
+      align-items: center;
+      font-size: 17px;
+      color: #888;
+    }
+  }
+  
+  &__close-file { cursor: pointer; }
+  
+  &__status { display: flex; align-items: center; }
+
+  &__date { 
+    display: flex; 
+    align-items: center; 
+    margin-right: 20px;
+  }
+
+  &__label { font-weight: bold; font-size: 20px; margin-right: 10px; }
+
+  &__results-count { display: flex; align-items: center; position: relative; top: 3px; margin-right: 40px; }
+
+  &__table { margin-top: 25px; }
+}

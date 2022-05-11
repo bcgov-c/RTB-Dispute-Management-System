@@ -1,0 +1,31 @@
+.ccr {
+  &__item-list {
+    margin: 0 0 25px 0;
+
+    &__title {
+      margin: 0 10px 10px 0;
+    }
+
+    &__description {
+      margin-top: 10px;
+    }
+  }
+
+  &__receipt-container {
+    margin-bottom: 30px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .ccr__item-list {
+    margin-top: 15px;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .ccr__page {
+    .emailable-content td.ep-single-column-right {
+      width: 100% !important;
+    }
+  }
+}

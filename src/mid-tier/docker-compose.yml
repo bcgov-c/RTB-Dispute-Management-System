@@ -1,0 +1,84 @@
+version: '3.4'
+
+services:
+  rabbit:
+    image: "rabbitmq:3-management"
+    hostname: rabbit
+    container_name: rabbit
+    environment:
+      RABBITMQ_DEFAULT_VHOST: "rtb-dms"
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - "4368:4368"
+      - "5671:5671"
+      - "5672:5672"
+      - "15671:15671"
+      - "15672:15672"
+      - "25672:25672"
+    volumes:
+      - "./CM.Services/RabbitMQ/config/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+    networks:
+      - cmnetwork
+  
+  db:
+    hostname: db
+    container_name: 'postgres'
+    image: postgres:11.3
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: casemanagement
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - cmnetwork
+  
+  elasticsearch:
+    hostname: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - cmnetwork
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - /Users/tigranarakelyan/Documents/data/upload:/home/foo/upload
+      - "./id_rsa_stest_sftp_dms/ssh_host_ed25519_key:/home/foo/.ssh/keys/id_ed25519:ro"
+      - "./id_rsa_stest_sftp_dms/ssh_host_ed25519_key.pub:/home/foo/.ssh/keys/id_ed25519.pub:ro"
+    ports:
+      - "2222:22"
+    command: foo:pass:1001
+    networks:
+      - cmnetwork
+
+volumes:
+  elasticsearch-data:
+    driver: local
+  pgdata:
+    driver: local
+  sftp-data:
+    driver: local
+networks:
+  cmnetwork:
+    driver: bridge

@@ -1,0 +1,65 @@
+
+.user-management-page .header-print-icon { margin-right: 0; }
+.user-management-page { padding-top: 0; }
+.user-management-page .header-page-title-container { padding: 0 0 5px 0; }
+
+.usr-management-section-list-header { border-bottom: 1px solid #d2d2d2; color: #7f7f7f; margin-top: 15px;}
+
+#editUser-modal .btn-cancel { margin-right: 10px; }
+
+#editUser-modal .modal-dialog { min-height: 800px; width: 1200px; }
+#editUser-modal .modal-body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.42857143; color: #7f7f7f ; background-color: white; }
+#editUser-modal .admin-access .form-control { max-width: 150px; }
+
+#editUser-modal .admin-row .admin-warning-label { font-size: 16px; color: #bc3c3c; padding-top: 10px; }
+#editUser-modal .admin-row .admin-access { padding-bottom: 10px; }
+
+#user-management-sort-by-filters { margin-left: auto; }
+
+#usr-management-list .user-list-item { margin-top: 10px; }
+
+#usr-management-list { font-size: 16px;}
+
+.user-management-page { margin-right: 10px;}
+
+#usr-management-list .standard-list-item { border-bottom: 1px solid #e5e5e5; }
+
+#usr-management-list .standard-list-header, #usr-management-list .standard-list-item { display: flex; overflow: hidden;}
+
+#usr-management-list .mobile-column { max-width: 115px; min-width: 115px; }
+
+#usr-management-list .user-active-column { max-width: 50px; min-width: 50px; padding-left: 0;}
+
+#usr-management-list .user-admin-column { width: 80px; min-width: 80px; }
+
+#usr-management-list .rolegrop-column { min-width: 160px; max-width: 160px; }
+
+#usr-management-list .roletype-column { max-width: 100px; min-width: 100px; }
+
+#usr-management-list .managedby-column { width: 270px; min-width: 270px;}
+
+#usr-management-list .created-date-column { width: 200px; min-width: 200px;}
+
+#usr-management-list .edit-link-column { width: 45px; min-width: 45px; }
+
+#usr-management-list .name-column { display: flex; min-width: 220px; width: 100%;}
+
+#usr-management-list .username-column { min-width: 110px; max-width: 110px; }
+
+#usr-management-list .user-scheduler-column { min-width: 95px; }
+
+#usr-management-list .user-id-column { min-width: 55px; max-width: 55px; padding-left: 8px; overflow: visible; }
+
+#usr-management-list .email-column { max-width: 220px; min-width: 220px; }
+
+#usr-management-list .standard-list-header > div { padding: 3px; }
+
+#editUser-modal .btn-update { background-color: #335c85; color: white; }
+
+#editUser-modal .modal-header { display: flex; }
+
+#editUser-modal .modal-title { line-height: 2.428571; }
+
+/* #editUser-modal . */
+
+.user-management-page .user-is-active-checkbox { position: relative; top: -4px }

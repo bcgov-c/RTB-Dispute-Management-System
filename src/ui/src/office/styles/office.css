@@ -1,0 +1,541 @@
+
+
+#root { padding-bottom: 50px; height: 100vh; overflow: auto;}
+#root.root-rendered { background-color: #e5e5e5; }
+
+#floating-header #header { position:relative; }
+
+#floating-main-content { max-width: 767px; min-width: 767px; overflow: auto; margin: 0 auto; position:relative; top: 20px; border: 3px solid #f1f1f1; background-color: #fff; }
+
+#header .bannerlogo,
+#header .subbannertext,
+#footer .footer-inner { max-width: 1280px; margin: 0 auto; }
+
+#header .subbannertext-mobile { display: inline; }
+
+#main-content { background-color: #f1f1f1; }
+
+#content-container { margin: 0 auto; height: 100%; width: 100%; max-width:1280px; overflow: auto; }
+
+#content { height: 100%; }
+
+/* Overwrite the page view for DA */
+.page-view { padding: 0; max-width: unset; overflow: auto; min-width: 1280px; }
+.office-page-receipt { padding: 0 20px!important }
+
+/* General button styles */
+#content-container .btn-lg {
+  padding: 8px 16px 6px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 0px;
+}
+
+
+/* General office file display */
+.dms__file__comma { margin-right: 5px; color:#333; }
+.office-file-evidence-comma { margin-right: 6px; }
+.dms__file-display__sizes { color: #8b8b8b; }
+
+
+/* Dispute Login styles */
+.da-site-icon {
+  top: 2px;
+  position: relative;
+  float: left;
+  min-width: 125px;
+  width: 125px;
+  height: 125px;
+  background: url('../static/OS_DMSLogo_125.png') 0 0 no-repeat;
+  background-size: 125px 125px;
+  margin: 0 20px 0 0;
+}
+
+.da-access-logout,
+.da-access-login { user-select: none; display: inline-block; color: #337ab7; cursor: pointer; text-decoration: none; }
+
+.da-access-login { font-size: 22px; }
+.da-access-logout { font-size: 22px; background: url('../static/DA_LogoutIcon.png') 2px 5px no-repeat; padding-left: 30px; }
+
+.da-login-large-banner { height: 150px; background-color: #f2f2f2; color: #222; font-size: 20px; padding: 10px 0 0 0; }
+
+.da-login-large-banner-content { max-width: 455px; margin: 0 auto; width: 100%; text-align: center; }
+
+.da-login-large-banner-text {
+  display: inline-block;
+  width: 300px;
+  font-size: 30px;
+  line-height: 31px;
+  text-align: left;
+  padding-top: 40px;
+  font-weight: 500;
+  color: #003366;
+}
+
+.office-login-entry-container { margin: 0 auto; max-width: 400px; }
+.da-login-button-container { margin-top: 50px; text-align: right; }
+
+.da-login-content,
+.da-logout-content { width: 100%; padding: 60px 45px 20px 45px; }
+
+.da-logout-content { text-align: center; }
+.da-logout-content span { font-size: 19px; color: #333; }
+.da-logout-content .da-access-login { margin-top: 40px; }
+
+.da-access-dispute-overview { display: flex; align-items: center;}
+.da-access-dispute-info-container { display: inline-block; width: 100%; }
+.da-access-dispute-info { margin-top: 5px; font-size: 17px; }
+.da-access-dispute-info .review-label { font-size: 17px; }
+.da-access-dispute-info-title-container { font-size: 22px; color: #333; border-bottom: 2px solid #d2d2d2; margin-top: 10px;}
+.da-access-dispute-info-title-container .da-access-logout { float: right; margin-bottom: 3px; }
+
+.da-access-dispute-info { display: flex; }
+.da-access-dispute-info-column { flex-grow: 1; }
+
+.da-access-dispute-info-mobile { margin: 15px 0 0 0; border-top: 2px solid #d2d2d2; }
+.da-access-dispute-info-mobile .da-access-dispute-info { display: block; line-height: 23px; }
+
+.da-access-overview-container { padding: 20px 20px 0 10px; }
+.office-top-search-container { padding: 0px 20px; min-height: 110px; }
+.office-view-access-code:hover { text-decoration: underline;}
+
+.office-top-main-instructions { padding: 20px 20px 0 20px; font-size: 20px;  }
+
+.da-access-actions-container { font-size: 22px; margin: 20px 20px 20px 20px; }
+
+
+.da-access-menu-container { margin: 10px 0 }
+.da-access-menu-item { padding: 10px 0 10px 0; cursor: pointer; border-bottom: 1px solid #d2d2d2; }
+.da-access-menu-item:first-child { border-top: 1px solid #d2d2d2; }
+
+.da-access-menu-icon {
+  height: 40px;
+  width: 40px;
+  float: left;
+  background-size: 40px 40px;
+  background-repeat: no-repeat;
+  background-image: url('../static/DA_MenuIcon_Evidence.png');
+  margin-right: 10px;
+  top: 0;
+  position: relative;
+}
+
+.da-access-menu-icon > span,
+.da-access-actions-info .external-link { background-repeat: no-repeat; background-image: url('../static/Icon_DALinkArrow.png'); }
+
+.da-access-menu-icon > span {
+  position:absolute;
+  top: -1px;
+  left: -9px;
+  width: 34px;
+  height: 31px;
+}
+
+.da-access-actions-info .external-link {
+  background-size: 26px;
+  width: 26px;
+  height: 22px;
+  display: inline-block;
+  position: relative;
+  top: 2px;
+  margin-left: 5px;
+}
+
+.da-access-actions-info { font-size: 20px; }
+
+.da-access-menu--da-contact .da-access-menu-icon { background-image: url('../static/DA_MenuIcon_UpdateContact.png'); }
+.da-access-menu--da-notice-pos .da-access-menu-icon { background-image: url('../static/DA_MenuIcon_NoticeService.png'); }
+
+.da-access-menu-item-inner { display: inline-block; width: calc(100% - 50px); }
+
+.da-access-menu-title { font-size: 22px; color: #3f6d99; }
+.da-access-menu-subtitle { font-size: 15px; color: #b1b1b1; }
+
+.da-access-menu-option-help { margin-top: 80px;font-size: 19px;font-style: italic; }
+
+#accessCodeExternal_modal .modal-dialog { width: 760px; }
+
+
+/* Office Main top level search */
+.office-top-search-logout-container { position: relative; }
+.office-top-search-logout-container .office-top-search-logout { position:absolute; right: 40px; top: 35px; }
+
+.office-top-search-container > div { display: flex; justify-content: flex-start; align-items: center; padding: 10px 40px 5px 20px; background-color: #f6f6f6; min-height: 90px; }
+
+.office-top-search-inputs { display: flex; flex-wrap: wrap; }
+.office-top-search-inputs > div { margin-right: 10px; }
+
+.office-top-search-input-file-type { min-width: 120px; width: 120px; }
+
+.office-top-search-input-file-identifier,
+.office-top-search-input-file-identifier select { min-width: 215px; width: 215px; }
+
+.office-top-search-input-file-number input { max-width: unset!important;}
+
+.office-top-search-input-file-number,
+.office-top-search-input-file-code,
+.office-top-search-input-file-number input,
+.office-top-search-input-file-code input { width: 200px; }
+
+.office-top-search-input-file-code-type { min-width: 130px; width: 130px; }
+
+
+.office-top-search-input-btn { margin-top: 20px; }
+.office-top-search-input-btn > button {
+  border-radius: 0;
+  line-height: 1.3333333333;
+  padding: 6px 16px 4px 16px;
+  font-size: 18px;
+  height: auto;
+  margin: 0;
+  background-color: #7bbf6a;
+  border-color: #7bbf6a;
+  color: #fff;
+  font-weight: 300 !important;
+  outline: none!important;
+}
+.office-top-search-input-btn > button:active,
+.office-top-search-input-btn > button:hover,
+.office-top-search-input-btn > button:focus { color: #fff; border-color: #7bbf6a; }
+
+/* End Office Main top level search */
+
+
+/* Office tweaks to standard styles */
+.da-access-dispute-info > span { font-style: italic; }
+/* */
+
+
+/* Office sub pages */
+
+.office-page-flex-container { display: flex; }
+
+.office-sub-page-view { margin-top: 20px; font-size: 17px; padding: 0 20px 20px 20px; }
+.office-sub-page-buttons { margin-top: 60px; margin-bottom: 10px; }
+
+.office-sub-page-buttons > button,
+.office-sub-page-buttons > div > button { margin-right: 15px; }
+
+.office-sub-page-buttons > button:last-child,
+.office-sub-page-buttons > div > button:last-child { margin-right: 0; }
+
+
+.office-page-error-block {
+  background-image: url('../static/Icon_FeedbackReminderRed.png');
+  background-repeat: no-repeat;
+  background-position: left;
+  max-width: 1000px;
+  padding-left: 59px;
+  padding-right: 10px;
+  margin-top: 40px;
+  margin-bottom: 15px;
+}
+
+
+/* Payment pages */
+.office-page-payment-contents { margin-top: 20px; }
+.office-page-payment-instructions { margin-bottom: 20px; }
+.office-page-payment-details { margin: 15px 0; }
+
+.office-payment-name,
+.office-payment-method { max-width: 500px; }
+
+.office-payment-name input,
+.office-payment-method select { max-width: 250px; }
+
+.office-payment-amount, .office-payment-method { margin-top: 15px; }
+
+/* Office receipts */
+.office-page-receipt-data { margin-top: 20px; }
+.office-page-receipt-data > div { margin-bottom: 8px; }
+
+.office-receipt-top-email-buttons { margin-left: auto; }
+
+.office-receipt-logout{ display: inline-block; cursor: pointer; font-size: 18px; margin-left: 25px; line-height: 40px; text-decoration: none; color: #337ab7 }
+
+/* Office receipts */
+
+/* Office Fee Waiver */
+
+.office-fee-waiver-component .step-description { margin-top: 30px; }
+
+.office-page-step-container { margin: 10px 0 15px 0; display: flex; align-items: center; }
+.office-page-step-icon {
+  display: inline-block;
+  background: url('../static/DA_TargetIcon.png') no-repeat;
+  height: 35px;
+  min-height: 35px;
+  width:35px;
+  min-width:35px;
+  margin-right: 5px;
+}
+
+.office-fee-waiver-family,
+.office-fee-waiver-city { max-width: 500px; }
+
+.office-fee-waiver-family input { width: 50px; }
+.office-fee-waiver-city select { width: 205px; }
+
+.office-fee-waiver-confirm { margin-top: 30px; }
+
+.office-page-fee-waiver-step2 { margin-top: 60px; }
+
+.office-upload-page .file-container { background-color: #fff6e5; }
+.office-upload-page .da-upload-evidence-item { padding-top: 15px; padding-bottom: 5px; }
+
+/* End office fee waiver */
+
+
+/* Office new dispute styles */
+
+.office-new-dispute-date-received { margin-right: 15px; }
+
+.office-page-new-dispute-section { margin-top: 30px; }
+
+.office-page-new-dispute-section-title { color: #828282; border-bottom: 1px solid #c8c8c8; margin-bottom: 15px; }
+
+
+.office-new-dispute-applicant-type, .office-new-dispute-current-tenancy { margin-right: 10px; }
+
+.office-page-new-dispute-general-section { flex-wrap: wrap; justify-content: space-between;}
+
+.office-new-dispute-direct-request { min-width: 170px; width: 170px; }
+.office-new-dispute-is-emergency label,
+.office-new-dispute-rtb-form-used label { white-space: nowrap; overflow-x: visible; }
+
+.office-new-dispute-applicant-type,
+.office-new-dispute-current-tenancy,
+.office-new-dispute-rtb-dropdown-container select { min-width: 150px; width: 150px; }
+
+.office-new-dispute-rtb-dropdown-container { margin-top: 10px; }
+
+.office-new-dispute-date-received + div,
+.office-new-dispute-rtb-dropdown-container > div:nth-child(2) { margin-top: 30px; line-height: 19px; }
+
+.office-new-dispute-rtb-dropdown-container > div:first-child { min-width:190px; width: 190px; margin-right: 10px; }
+.office-new-dispute-rtb-dropdown-container > div:first-child .error-block { white-space: pre; margin-top: 10px; }
+
+.office-page-new-dispute-site-section > div:first-child { flex-wrap: wrap; }
+.office-page-new-dispute-site-section.office-page-new-dispute-is-tenant { max-width: 1000px; }
+
+.office-new-dispute-rental-type { min-width: 320px; width: 320px; margin-right: 10px; }
+
+.office-new-dispute-owns-home { min-width: 190px; width: 190px; }
+.office-new-dispute-owns-home select { width: 80px; }
+
+.office-page-new-dispute .warning-sm { padding: 12px 50px 12px 50px; }
+
+.office-page-new-dispute-address-container { flex-wrap: wrap; }
+
+.office-new-dispute-street,
+.office-new-dispute-city { margin-right: 15px; }
+
+.office-new-dispute-street { min-width: 500px; width: 500px; }
+.office-new-dispute-city { min-width: 200px; width: 200px; }
+.office-new-dispute-postal-code { min-width: 120px; width: 120px; }
+
+.office-page-new-dispute-applicant-container { flex-wrap: wrap; justify-content: space-between; }
+
+.office-page-new-dispute-applicant-name-container { margin-right: 20px; }
+.office-page-new-dispute-applicant-name-container > div { margin-right: 10px; }
+.office-page-new-dispute-applicant-name-container > div:last-child { margin-right: 0; }
+
+.office-page-new-dispute-contact-container { margin-right: 20px; }
+.office-page-new-dispute-contact-container > div:first-child { margin-right: 10px; }
+
+.office-new-dispute-business-name { min-width: 200px; width: 200px; }
+.office-new-dispute-first-name { min-width: 200px; width: 200px; }
+.office-new-dispute-last-name { min-width: 200px; width: 200px; }
+.office-clarification-street { min-width: 200px; width: 200px; }
+.office-new-dispute-package-method { min-width: 200px; width: 200px; }
+
+.office-new-dispute-phone { min-width: 200px; width: 200px; }
+.office-new-dispute-email { min-width: 240px; width: 240px; }
+.office-new-dispute-email .input-model-custom-link-container { float:right; }
+.office-new-dispute-rent-increase-information-label { display: flex; align-items: center; }
+
+
+.office-new-dispute-applicant-forms-container { margin-top: 20px; }
+
+
+/* New Dispute step 2 */
+.modal-office-new-dispute-upload-later .modal-blank-buttons { margin-top: 30px; }
+
+.office-page-new-dispute-static-info-general { max-width: 700px; flex-wrap: wrap; }
+.office-page-new-dispute-static-info-general > div { width: 50%; min-width: 310px; }
+
+.office-page-new-dispute-static-info-address { }
+
+.office-new-dispute-previous-info { padding-bottom: 40px; }
+.office-page-new-dispute-uploads .da-upload-evidence-item { padding-top: 0; }
+
+/* New Disptue step 3 */
+.office-page-new-dispute-payments-files { margin-top: 10px; }
+.office-page-new-dispute-bulk-files-section .office-page-new-dispute-payments-files { margin-top: 0; }
+
+.office-page-new-dispute-pay-options-container { margin-top: 30px; flex-wrap: wrap; }
+.office-page-new-dispute-pay-now { width: 150px; margin-right: 25px; margin-bottom: 10px; }
+.office-page-new-dispute-payment-type { margin-top: 15px; }
+
+.office-page-new-dispute-payment-type .radio label { display: inline !important; }
+
+/* End office new dispute styles */
+.office-sub-page-view .info-help-container { width: 100%; }
+
+/* Clarification/Correction styles */
+.office-clarification-access-code-container { margin-top: 10px; }
+.office-clarification-access-code-container > div:first-child { margin-top: 15px; margin-bottom: 10px; }
+
+.office-clarification-access-code .col-xs-12 { max-width: 220px; }
+.office-clarification-access-code input { max-width: 200px; }
+
+.office-clarification-participant-container { flex-wrap: wrap; }
+
+.office-clarification-participant-container > .office-new-dispute-first-name { margin-right: 10px; }
+.office-clarification-participant-container > .office-new-dispute-last-name { margin-right: 30px; }
+.office-clarification-participant-container > .office-new-dispute-phone { margin-right: 10px; }
+.office-clarification-participant-container > .office-new-dispute-email { margin-right: 30px; }
+
+.office-clarification-address .intake-address-component { display: flex; flex-wrap: wrap; }
+.office-clarification-address .streetContainer { width: 410px; min-width: 410px; margin-right: 30px; }
+.office-clarification-address .cityContainer { width: 200px; min-width: 200px; margin-right: 10px; }
+.office-clarification-address .provinceContainer  { width: 200px; min-width: 200px; margin-right: 15px; }
+.office-clarification-address .countryDropdownContainer { width: 115px; min-width: 115px; margin-right: 15px; }
+.office-clarification-address .countryTextContainer .intake-input-component { width: 200px; min-width: 200px; margin-right: 15px; }
+
+.office-clarification-address .streetContainer,
+.office-clarification-address .cityContainer,
+.office-clarification-address .countryTextContainer,
+.office-clarification-address .countryDropdownContainer,
+.office-clarification-address .provinceContainer,
+.office-clarification-address .postalCodeContainer { display: inline-block; }
+
+.office-clarification-forms-section { margin-bottom: 0; }
+.office-page-clarification .office-new-dispute-rtb-dropdown-container > div:first-child { width: 220px; min-width: 220px; }
+
+.office-page-clarification-date-warning-container { padding: 0 0 30px 0; }
+.office-page-clarification-date-warning { line-height: 23px; padding-right:20px !important; }
+.office-page-clarification-date-warning-dropdown select { max-width: 50px; }
+
+.office-page-clarification-date-warning-container .office-new-dispute-rtb-dropdown-container,
+.office-page-clarification-bulk-evidence-warning-container .office-new-dispute-rtb-dropdown-container { background-color: #fff6e5; position: relative; top: -12px; padding: 10px; }
+
+
+.office-page-clarification-bulk-evidence-warning-container { padding: 30px 0; }
+.office-page-clarification-bulk-evidence-warning-dropdown select { max-width: 50px; }
+.office-page-clarification-bulk-evidence-warning-container 
+
+/* Review */
+
+.office-page-clarification .upload .office-page-fee-waiver-step2 { margin-top: 0; }
+
+.office-page-clarification .office-fee-waiver-component .da-upload-instructions { display: none!important; }
+.office-page-clarification .office-fee-waiver-declined-controls { display: none!important; }
+
+/* End clarification/correction styles */
+
+/* Amendment page */
+.office-amendment-form-used-label {
+  margin-top: 10px;
+  margin-right: 10px;
+  min-width: 110px;
+  width:110px;
+}
+
+/* Substituted service page */
+.office-substitute-documents-being-served { margin-top: 20px; width: 500px; }
+.office-substitute-participant-being-served { width: 500px; margin-bottom: 25px; }
+.office-substitute-docs-header { margin-top: 10px; }
+.office-correct-documents-used { width: 150px; margin: 0 40px 10px 0; }
+.office-documents-described { margin-right: 40px; }
+.office-documents-described .form-control { width: 150px; }
+.office-documents-described-label, .office-correct-documents-used-label { margin-top: 30px; line-height: 19px; }
+.office-documents-described-error { margin-bottom: 10px; }
+.office-substitute-for-section { margin-top: 20px; }
+.office-documents-described-wrapper { display: flex; }
+
+/* End office sub pages */
+
+.btn-validate:focus { outline: none !important; border: none !important; }
+
+.standard-list-item { border-bottom: 1px solid #d2d2d2; }
+.standard-list-item:last-child { border-bottom: none; }
+
+.office-page-receipt .da-page-header-title { margin-top: 20px; }
+.da-page-header-title {
+  font-size: 19px;
+  line-height: 22px;
+  color: #333;
+  padding-bottom: 2px;
+  border-bottom: 2px solid #f1f1f1;
+  display: flex;
+}
+.da-page-header-title-text { margin-top: 8px; }
+.da-page-header-icon {
+  height: 32px;
+  width: 32px;
+  display: inline-block;
+  background-size: 32px 32px;
+  margin-right: 5px;
+  background-repeat: no-repeat;
+}
+
+.submission-cancel-button-container { margin-top: 40px; }
+
+.btn-office-continue, .btn-office-continue:hover, .btn-office-continue:focus, .btn-office-reset, .btn-office-reset:hover, .btn-office-reset:focus {
+  background-color: #7abd6a;
+  color: white;
+}
+
+.btn-office-increase-submit {
+  max-height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-office-continue:disabled, .btn-office-reset:disabled, .btn-office-increase-submit:disabled {
+  background-color: #e2e2e2;
+  color: white;
+}
+
+.office-rent-increase-label {
+  color: #8e8e8e;
+  font-size: 15px;
+}
+
+.office-rent-increase-container {
+  display: flex;
+  flex-direction: column;
+  width: 325px;
+}
+
+.office-rent-increase-input {
+  display: flex;
+  width: 285px;
+  margin-bottom: 20px;
+}
+
+.office-new-dispute-rent-increase-units {
+  margin-right: 10px;
+}
+
+.rent-increase-fee-calculation { width: 400px; }
+.rent-increase-fee-calculation tr:last-child { border-top: 2px solid #000; }
+.rent-increase-fee-calculation td:first-child { width: 220px; }
+.rent-increase-fee-calculation td:last-child { text-align: right; }
+
+.office-page-new-dispute-section .intake-checkboxes-component { display: flex; flex-wrap: wrap; width: 800px; min-width: 800px; }
+.office-page-new-dispute-section .intake-checkboxes-component .form-group { margin-right: 15px; }
+.office-page-new-dispute-section .office-review-question-one, .office-page-new-dispute-section .office-review-question-two { width: 230px; min-width: 230px; }
+.office-page-new-dispute-section .office-review-question-one .form-control, .office-page-new-dispute-section .office-review-question-two .form-control { min-width: 150px; width: 150px; }
+.office-page-new-dispute-section .office-review-questions-container { margin-top: 20px; }
+.office-page-new-dispute-section .office-review-question-text { line-height: 22px; position: relative; top: -4px; }
+.office-page-new-dispute-section .office-review-question-one-container { margin-bottom: 10px; }
+.office-page-new-dispute-section .error-block.warning { line-height: 22px; }
+.office-page-new-dispute-section .office-review-late-request { min-width: 230px; width: 230px; }
+.office-page-new-dispute-section .office-review-late-request .form-control { min-width: 150px; width: 150px; }
+.office-page-new-dispute-section .office-late-request-text { position: relative; top: 10px; }
+.office-page-new-dispute-section .office-review-late-filing { margin-bottom: 40px; }
+.office-page-new-dispute-section .office-doc-request { margin-top: 20px; }
+.office-page-new-dispute-section .office-doc-request .checkboxes-error-block { width: 100%; }
+.office-page-new-dispute-section .office-doc-request-item { margin: 20px 0; }

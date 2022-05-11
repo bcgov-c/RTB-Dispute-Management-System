@@ -1,0 +1,28 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Build Image') {
+      steps {
+        openshiftBuild(bldCfg: 'case-management-ui', namespace: 'rtb-dms-tools', waitTime: '12000000')
+      }
+    }
+    stage('Deliver to Test') {
+      steps {
+        timeout(time:5, unit:'HOURS') {
+          input message: 'Deploy to test?', ok: 'Deploy!'
+        }
+        openshiftDeploy(depCfg: 'case-management-ui', namespace: 'rtb-dms-test', waitTime: '12000000')
+      }
+    }
+
+    stage('Deliver to Prod') {
+      steps {
+        timeout(time:5, unit:'HOURS') {
+          input message: 'Deploy to prod?', ok: 'Deploy!'
+        }
+        openshiftDeploy(depCfg: 'case-management-ui', namespace: 'rtb-dms-prod', waitTime: '12000000')
+      }
+    }
+  }
+}

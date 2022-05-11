@@ -1,0 +1,238 @@
+
+.advanced-search-page { margin-right: 10px; }
+.advanced-search-page .header-page-title { background: url('../static/Icon_Header_Search.png') no-repeat !important; }
+.advanced-search-page #search-type-filters { border-top: 2px solid #d2d2d2; background-color: #e6e6e6; padding: 0 5px 1px 15px; margin-bottom: 5px; }
+#search-type-filters .intake-radio-component { margin: 0; }
+
+.advanced-search-page #search-general-criteria {
+  background-color: #f6f6f6;
+  padding: 0 15px 10px 15px;
+  height: auto;
+  position: relative;
+  top: -2px;
+}
+
+.advanced-search-page .toggle-exclude-active-hearings { margin-right: 5px; }
+.advanced-search-page .advanced-search-button { padding-top: 20px; margin-left: 15px; }
+.advanced-search-page .exclude-active-hearings-amount { margin-right: 0; }
+.advanced-search-page .exclude-active-hearings-amount .intake-input-component { width: 75px; }
+.advanced-search-page .crossapp-min-threshold .intake-input-component { width: 135px; }
+.advanced-search-page .exclude-active-hearings-amount .error-block, .advanced-search-page .crossapp-min-threshold .error-block { white-space: nowrap; }
+.advanced-search-page .exclude-active-hearings-amount-text { position: relative; top: 7px; font-size: 17px; color: #585858; margin-right: 25px; }
+.advanced-search-page .crossapp-min-threshold, .advanced-search-page .exclude-active-hearings-amount { position: relative; bottom: 17px; }
+.advanced-search-page .crossapp-min-threshold .form-control, .advanced-search-page .exclude-active-hearings-amount .form-control { width: 75px; }
+.advanced-search-page .advanced-search-page-search-icon {
+  background: url('../static/Icon_Admin_Search.png') no-repeat;
+  height: 35px;
+  width: 35px;
+  cursor: pointer;
+  position: relative;
+  top: -2px;
+}
+
+.advanced-search-page .search-results { margin-top: 10px; }
+
+.advanced-search-page .search-tenancy-address { width: 200px; }
+.advanced-search-page .search-tenancy-address .error-block { white-space: nowrap; }
+
+.search-tenancy-address, .dispute-type { margin-right: 15px; }
+
+.postal-code { margin-right: 25px; }
+
+.advanced-search-page .search-title {
+  width: 200px;
+  padding-top: 22px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.advanced-search-page .search-title-claim { width: 250px; }
+
+.advanced-search-page .search-option-row {
+  display: flex;
+  padding: 12px 0px;
+  border-bottom: 1px solid #d2d2d2;
+}
+
+.advanced-search-page .dispute-info-row,
+.advanced-search-page .contact-info-row { border-bottom: none; }
+
+.dispute-info-row-header { margin: 20px 0 5px 0; font-size: 16px; }
+
+.advanced-search-page .name-type { margin-top: 21px; margin-right: 15px; }
+
+.search-participant-first-name { margin-right: 15px; width: 200px; }
+.search-participant-first-name .error-block { white-space: nowrap; }
+
+.advanced-search-page .contact-type { margin-top: 21px; margin-right: 15px; }
+
+.advanced-search-page .status-row-top,
+.advanced-search-page .status-row-bottom,
+.advanced-search-page .hearing-row-top { border-bottom: none; }
+
+.advanced-search-page .search-option-stage,
+.advanced-search-page .search-option-status,
+.advanced-search-page .search-option-process,
+.include-owner, .search-option-owner-group { margin-right: 15px; }
+
+.search-option-owner { width: 230px; }
+.search-option-owner-group { width: 200px; }
+
+.include-owner { margin-top: 21px; }
+
+.search-option-hearing-date { width: 260px; margin-right: 15px; }
+
+.search-option-hearing-type,
+.search-option-hearing-owner { margin-right: 15px; }
+
+.restrict-filters-row,
+.sort-results-row { display: flex; margin: 5px 0 0 10px; }
+
+.restrict-filters-row { width: 840px; }
+
+.sort-results-row { padding-top: 10px; margin-top: 0px; }
+
+.sort-results-row-sorts { display: flex; align-self: flex-start; width: 840px; }
+.sort-results-row-active-count { align-self: flex-end; display: flex; }
+
+.sort-results-row-active-count--next-row { position: absolute; left: 420px; top: 114px; }
+
+.restrict-created-method-checkbox { padding-top: 20px; width: 180px; }
+.restrict-created-methods { width: 220px; }
+
+.restrict-dates-starting-date { margin-right: 20px; min-width: 160px; width: 160px; }
+.restrict-dates-ending-date { min-width: 160px; width: 160px; }
+
+.restrict-dates-field-box,
+.restrict-dates-type-box { width: 125px; margin-right: 20px; }
+
+.restrict-dates-field-box select,
+.restrict-dates-type-box select { margin-bottom: 0; }
+
+.restrict-dates-type-box { padding-top: 20px; }
+.include-active-disputes { margin-left: auto; }
+
+.sort-by { margin-right: 20px; }
+.sort-type {  }
+
+.restrict-dates-check-box,
+.sort-results-check-box { min-width: 170px; max-width: 170px; }
+
+.restrict-created-method-checkbox { min-width: 160px; width: 160px; }
+
+.restrict-dates-check-box { padding-top: 20px; }
+.sort-results-check-box { margin-top: 2px; }
+
+.restrict-status-check-box,
+.restrict-cms-status-check-box {
+  width: 18rem;
+}
+
+.restrict-cms-status-check-box { padding-top: 20px; }
+.restrict-status-check-box { padding-top: 20px; }
+
+.restrict-status-row {display: flex; margin: 5px 0 0 10px; }
+.restrict-status-row { padding-top: 10px; margin-top: 0px; }
+
+.initial-results-title { font-size: 17px; margin: 0 10px 0 60px; padding: 5px 0 0 0; }
+
+.search-header {
+  background-color: #e6e6e6;
+  padding: 12px 10px 3px 30px;
+  margin-bottom: 5px;
+  font-size: 18px;
+  border-bottom: 2px solid #d2d2d2;
+}
+
+
+/* Search result item styles */
+.search-result-item { display: flex; border-left: 15px solid #f1f1f1; margin: 7px 0 0 0; padding: 5px 5px 5px 15px; }
+.search-result-item > div { flex-direction: column; padding-right: 3px; }
+
+.search-result-item > div:first-child { width: 260px; flex-grow:3; }
+.search-result-item > div:nth-child(2) { width: 220px; flex-grow:2; }
+.search-result-item > div:nth-child(3) { width: 170px; flex-grow:1; }
+.search-result-item > div:nth-child(4) { width: 230px; flex-grow:2; }
+.search-result-item > div:nth-child(5) { width: 275px; flex-grow:3; }
+.search-result-item > div:nth-child(6) { width: 190px; flex-grow:1; }
+
+.search-result-item-header { border-bottom: 1px solid #f1f1f1; font-size: 17px; }
+
+.search-result-item-body { font-size: 15px; color: #999 }
+.search-result-item-body > div { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; margin-top: 1px; }
+
+.search-result-item-header > div { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+
+.advanced-search-page .cross-app-search { padding-left: 5px; }
+
+.search-claims-dispute-type { width: 100px; }
+.search-claims-dispute-sub-type { margin-left: 15px; width: 150px; }
+.search-claims-tenancy-status { margin-left: 15px; width: 170px; }
+.search-claims-dropdown select { margin-left: 25px; max-width: 70%; }
+
+.search-claims-btn-container { display: flex; align-items: center; justify-content: flex-start; }
+.search-claims-add {
+  cursor: pointer;
+  color: #46628b;
+  background-image: url('../static/Icon_AddNote.png');
+  background-repeat: no-repeat;
+  line-height: 26px;
+  padding-left: 35px;
+  font-size: 18px;
+}
+
+.search-claims-btn-search { margin-left: 25px; }
+
+.cross-app-file-number { width: 200px; }
+.cross-app-file-number .error-block { white-space: nowrap; }
+
+.cross-app-populate-results > .standard-list-empty { margin: 10px 0; padding: 0; }
+
+.populate-cross-app-search .file-number-title { display: flex; align-self: start; margin-top: 16px; margin-right: 15px; }
+
+.populate-cross-app-search .tenancy-address-geo { display: flex; align-self: start; margin-top: 27px; font-size: 16px; }
+.populate-search-params { font-size: 17px; }
+.cross-app-populate-results { display: block!important; }
+.populate-results-inputs { display: flex; }
+.populate-results-inputs > div { margin-right: 15px; }
+.cross-app-dispute-sub-type { width: 120px; }
+.populate-search-params { margin-top: 10px; }
+.populate-search-tools { margin-top: 15px; display: flex; }
+.populate-search-tools > div { margin-right: 15px; }
+
+.cross-app-tenancy-address-search-info {
+  background: url('../../core/static/Icon_Warning.png') no-repeat;
+  margin-left: 50px;
+  padding-left: 45px;
+  font-size: 17px;
+  padding-top: 7px;
+  margin-top: 17px;
+}
+
+.contact-email-phone .intake-input-component.input-component-email input { max-width: unset; }
+
+/*  */
+.all-disputes,
+.max-disputes { margin: 20px 0 30px 0; color: #8e8e8e; font-size: 20px; }
+
+.all-disputes {
+  padding-left: 32px;
+  background: url('../static/Icon_ShowingAll.png') 0 0 no-repeat;
+}
+
+.show-more-disputes {
+  display: inline-block;
+  font-size: 20px;
+  margin: 15px 0 15px 0;
+  color: #8e8e8e;
+  padding-left: 31px;
+  background: url('../static/Icon_ShowMore.png') 0 0 no-repeat;
+  cursor: pointer;
+}
+
+
+.urgency-expedited { color: #ff0000; }
+
+.urgency-regular { color: #339966; }
+
+.urgency-deferred { color: #0075ff; }

@@ -1,0 +1,14 @@
+
+#editPeriod-modal {
+ 
+  .modal-dialog { width: 600px; }
+
+  .editPeriod-modal {
+    &__warning { margin: 10px 0 15px 0; }
+    &__status > div { display: inline; }
+    &__dropdown {
+      margin-top: 15px;
+      select { width: fit-content; }
+    }
+  }
+}

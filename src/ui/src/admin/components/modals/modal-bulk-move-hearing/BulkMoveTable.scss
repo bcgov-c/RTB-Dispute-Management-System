@@ -1,0 +1,92 @@
+.bulk-move {
+
+  &__list {
+    overflow-y: auto;
+    border: 1px solid #333;
+    max-height: 241px;
+
+    &__header {
+      display: flex;
+      border: 1px solid #333;
+      border-bottom: none;
+      font-weight: bold;
+      border-top-color: rgb(123, 114, 101);
+      border-right-color: rgb(123, 114, 101);
+      border-left-color: rgb(123, 114, 101);
+      border-bottom-color: initial;
+  
+      > div {
+        padding: 2px 4px;
+      }
+    }
+
+    &__item {
+      display: flex;
+      border-bottom: 1px solid #333;
+      
+      > div {
+        padding: 2px 4px;
+      }
+
+      &--active {
+        @extend .bulk-move__list__item;
+        background-color: #dbeaf6;
+
+        > div {
+          padding: 2px 4px;
+          background-color: #dbeaf6;
+        }
+      }
+    }
+  }
+
+  &__hearing-id {
+    width: 100px;
+    background-color: #8e8e8e;
+    border-right: 1px solid #333;
+  }
+
+  &__date-assigned {
+    width: 150px;
+    border-right: 1px solid #333;
+  }
+
+  &__start-time {
+    width: 125px;
+    border-right: 1px solid #333;
+  }
+
+  &__end-time {
+    width: 125px;
+    border-right: 1px solid #333;
+  }
+
+  &__duration {
+    width: 90px;
+    border-right: 1px solid #333;
+  }
+
+  &__priority {
+    width: 100px;
+    border-right: 1px solid #333;
+  }
+
+  &__files {
+    width: 80px;
+    border-right: 1px solid #333;
+  }
+
+  &__primary-file {
+    width: 120px;
+    border-right: 1px solid #333;
+  }
+
+  &__link {
+    width: 100px;
+    border-right: 1px solid #333;
+  }
+
+  &__result {
+    width: 240px;
+  }
+}
