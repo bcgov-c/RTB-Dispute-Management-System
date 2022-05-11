@@ -2,7 +2,7 @@
 
 [![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
 
-The DMS is a full-featured Dispute Management System based on .NET core 6.x engine. It can be compiled for x64 processors on Linux, macOS and Windows.  This readme is for the DMS mid-tier.  A Readme document and architecture diagram is also available in the [full DMS solution readme.md](../../README.MD) and separate documentation is available in the [DMS UI (User Interface) readme.md](../../src/ui/README.MD)
+The DMS is a full-featured Dispute Management System based on .NET core 6.x engine. It can be compiled for x64 processors on Linux, macOS and Windows.  This readme is for the DMS mid-tier.  A Readme document and architecture diagram is also available in the [full DMS solution readme.md](../../README.md) and separate documentation is available in the [DMS UI (User Interface) readme.md](../../src/ui/README.md)
 
 ![DMS System](../../DMS_Devices.jpg)
 
