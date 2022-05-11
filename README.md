@@ -30,6 +30,8 @@ The DMS is a large production system that has been in high-volume production use
 | Data volumes | 20,000,000+ rows of data, 100+ tables in 4 Postgres Databases |
 | Uploaded files | 1,800,000+ files (2.5TB+), 500,000+ structured evidence files uploaded per year | 
 | Case volumes | 40,000+ case files initiated per year, 20,000+ case files processed per year |
+| Email volumes | 190,000+ email deliveries, notifications and communications per year |
+| Decision volumes | 25,000+ decisions, settlement agreements and orders per year |
 | External users | 85,000+ users per year |
 | External workers | 400 users (Service BC) |
 | Internal staff | 100 users |
