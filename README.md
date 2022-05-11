@@ -28,10 +28,11 @@ The DMS is a large production system that has been in high-volume production use
 | API's | 300+ RESTful API’s + 1 complex GraphQL API (all with security and access rights) |
 | API interactions | 1,200,000+ API calls per month, 25,000+ user logins per month |
 | Data volumes | 20,000,000+ rows of data, 100+ tables in 4 Postgres Databases |
-| Uploaded files | 1,800,000+ files (2.5TB+), 500,000+ structured evidence files uploaded per year | 
 | Case volumes | 40,000+ case files initiated per year, 20,000+ case files processed per year |
-| Email volumes | 190,000+ email deliveries, notifications and communications per year |
+| Uploaded files | 1,800,000+ files (2.5TB+), 500,000+ structured evidence files uploaded per year | 
+| Email volumes | 190,000+ automated deliveries, notifications and reminders per year |
 | Decision volumes | 25,000+ decisions, settlement agreements and orders per year |
+| schedule volumes | 12,500+ scheduled hearings and resolution events per year |
 | External users | 85,000+ users per year |
 | External workers | 400 users (Service BC) |
 | Internal staff | 100 users |
