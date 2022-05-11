@@ -17,7 +17,7 @@ The version of this code is from the DMS production Release 1.03.02.01.  This is
 
 ## DMS Suitability
 
-To determine if this solution is suitable for your development team and expected system volumes we have provided the following general information.  The DMS is a large production system that has been in high-volume production use in British Columbia, Canada for 2+ years. Over this timeframe the DMS has proven to be high performing, accessible, and reliable.
+To determine if this solution is suitable for your development team and expected production volumes we have provided the following general information.  The DMS is a large production system that has been in high-volume production use in British Columbia, Canada for 2+ years. Over this timeframe the DMS has proven to be high performing, accessible, and reliable.
 
 | Item   | Production Statistic(s) | 
 | ------- | ------------ |
