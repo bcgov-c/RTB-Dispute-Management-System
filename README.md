@@ -3,9 +3,9 @@ May 11, 2022
 
 [![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
 
-Tribunal, appeal, dispute resolution and complaint organizations face numerous challenges.  They are separated from related business sectors for judicial fairness reasons and have unique domains of legislative authority and responsibility.  Most of these organizations exist in a space that is largely devoid of available technology solutions that both align with available budgets and address their core needs.  These organizations are also facing increasing caseloads, increasing case complexity, and common global challenges like labour shortages that other industries are able to address through bespoke technology and sector-based innovation.
+Tribunal, appeal, dispute resolution and complaint organizations face numerous challenges.  They are separated from related business sectors for judicial fairness reasons and have unique domains of legislative authority and responsibility.  Most of these organizations exist in a space that is largely devoid of available technology solutions that can be implemented within available budgets and that address their specific needs.  These organizations are facing increasing caseloads, increasing case complexity, and labour shortages that other industries are addressing through bespoke technology and sector-based innovation.
 
-The DMS (Dispute Management System) was designed as a solution for these specific sector problems.  It is an advanced case management system that combines an extensive array of open-source tools and custom software to transform dispute resolution and digital service delivery for justice organizations.  This is a complete ground-up dispute resolution platform with extensive industry-leading features and capabilities.
+The DMS (Dispute Management System) was designed as a solution for these specific sector problems.  It is an advanced case management system that combines an extensive array of open-source tools and custom software to transform dispute resolution and digital service delivery for these organizations.  The DMS is a complete ground-up dispute resolution platform with extensive industry-leading features and capabilities designed specifically for this sector.
 
 ![DMS System](DMS_Devices.jpg)
 
