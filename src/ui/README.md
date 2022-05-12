@@ -24,7 +24,7 @@ This project uses `npm` and `yarn` for package dependency management.
 
 ## DMS UI Installation Dependencies
 
-A list of dependent packages and their licensing is available in the [dependentpackage_licenses](dependentpackage_licenses.txt) document.
+A list of dependent packages and their licensing is available in the [dependentpackage_licenses](dependentpackage_licenses.txt) text document.
 
 First install yarn packages.
 ```shell
@@ -95,7 +95,7 @@ $ yarn lint
 
 ![MIT License](../../DMS_MIT_Permissions_Conditions_Limitations.png)
 
-MIT: with a license and copyright notice, and a promotion and advertising notice.  See the [LICENSE.txt](../../LICENSE) for details.
+MIT: with a license and copyright notice, and a promotion and advertising notice.  See the [LICENSE](../../LICENSE) for details.
 
 ## DMS UI Contributions and Contact
 
