@@ -2,7 +2,7 @@
 
 [![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
 
-The DMS is a full-featured Dispute Management System with a UI that is based on JavaScript and JavaScript frameworks.  This readme is for the DMS UI (User Interface).  A Readme document and architecture diagram is also available in the [main DMS solution readme.md](../../README.md) and separate mid-tier documentation is available in the [DMS mid-tier readme.md](../../src/mid-tier/README.md)
+The DMS is a full-featured Dispute Management System with a UI that is based on JavaScript and JavaScript frameworks.  This readme is for the DMS UI (User Interface).  A Readme document and architecture diagram is also available in the [main DMS solution readme](../../README.md) and separate mid-tier documentation is available in the [DMS mid-tier readme](../../src/mid-tier/README.md)
 
 ![DMS System](../../DMS_Devices.jpg)
 
@@ -24,7 +24,7 @@ This project uses `npm` and `yarn` for package dependency management.
 
 ## DMS UI Installation Dependencies
 
-A list of dependent packages and their licensing is available in the [dependentpackage_licenses.txt](dependentpackage_licenses.txt) document.
+A list of dependent packages and their licensing is available in the [dependentpackage_licenses](dependentpackage_licenses.txt) document.
 
 First install yarn packages.
 ```shell
