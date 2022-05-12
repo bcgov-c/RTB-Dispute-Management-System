@@ -15,11 +15,11 @@ The DMS project still has a year of funded development that will further expand 
 
 The version of this code is from the DMS production Release 1.03.02.01.  This is an unsupported open-source repository that was published to share the code base with those that may benefit from its public availability.  We are initiating engagement with the broader dispute resolution marketplace to seek open-source sharing and contribution opportunities.  Our intent is to create a community of suitable co-investors and contributors that will achieve significant cost savings and technological innovation through open-source sharing.   If you are a resolution organization interested in leveraging the DMS solution, please contact Hive One through our justice services web site www.hive1-js.com and we will add you to our list that we are vetting for suitability as the second and third movers (that will be critical to the establishment a viable and sustainable community).
 
-## DMS Suitability
+## DMS Production Volumes
 
-We are providing the following general information to help you assess the DMS as suitable for your development teams and service volumes.  
+The DMS has been in high-volume production use in British Columbia, Canada for 2+ years. Over this timeframe the DMS has proven to be high performing, accessible, and reliable.
 
-The DMS is a large production system that has been in high-volume production use in British Columbia, Canada for 2+ years. Over this timeframe the DMS has proven to be high performing, accessible, and reliable.
+The following general information was provided to help describe the size and scale of the current production deployment.
 
 
 | Item   | Production Statistic(s) | 
