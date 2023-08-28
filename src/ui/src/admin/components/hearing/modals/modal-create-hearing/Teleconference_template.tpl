@@ -1,21 +1,32 @@
-
-<div class="hearing-instructions-preset">
-  <p>This hearing will be conducted by TELEPHONE CONFERENCE CALL.  Please use one of the following phone numbers and access code below to join the Telephone Conference Call.</p>
-  <p>Do not call more than 5 minutes prior to start time</p>
-
-  <ol>
-    <li>
-      <div>Phone a number below at the time of the conference start:</div>
-      <% _.escape.each(conference_data_items, function(conference_data) { %>
-        <% if (!conference_data || !conference_data.phone_number) { return; } %>
-        <div class="">
-          <span class="hearing-phone-number"><%= Formatter.toPhoneDisplay(conference_data.phone_number) %></span><span><%= conference_data.title %></span>
-        </div>
-      <% }) %>
-
-    </li>
-    <li>Enter the Access Code: <%= access_code %></li>
-    <li>Say your FULL NAME and press #</li>
-  </ol>
-
+<div>
+  <table style="width:100%;">
+    <thead></thead>
+    <tbody>
+      <tr>
+        <td class="hearing-details" width="250px" style="width:250px;vertical-align:top;">
+          Teleconference Number:
+        </td>
+        <td>
+          <% if (primary_conf_data && primary_conf_data.phone_number) { %>
+            <b><%= primary_conf_data.phone_number %></b>
+            <% if (secondary_conf_data && secondary_conf_data.phone_number) { %>
+              or<br/><%= secondary_conf_data.phone_number %>
+            <% } %>
+          <% } else if (secondary_conf_data && secondary_conf_data.phone_number) { %>
+            <%= secondary_conf_data.phone_number %>
+          <% } %>
+        </td>
+      </tr>
+      <tr>
+        <td class="hearing-details" width="250px" style="width:250px;vertical-align:top;">
+          Teleconference Access Code:
+        </td>
+        <td>
+          <b><%= access_code %></b>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
+<br/>
+<p>Please call into your hearing using the teleconference access code above.</p>

@@ -103,6 +103,10 @@
 
 .da-access-actions-container { font-size: 22px; margin: 20px 20px 20px 20px; }
 
+.office-file-search-warning { 
+  max-width: none !important;
+  margin-bottom: 5px;
+ }
 
 .da-access-menu-container { margin: 10px 0 }
 .da-access-menu-item { padding: 10px 0 10px 0; cursor: pointer; border-bottom: 1px solid #d2d2d2; }
@@ -145,6 +149,7 @@
 
 .da-access-menu--da-contact .da-access-menu-icon { background-image: url('../static/DA_MenuIcon_UpdateContact.png'); }
 .da-access-menu--da-notice-pos .da-access-menu-icon { background-image: url('../static/DA_MenuIcon_NoticeService.png'); }
+.da-access-menu--da--reinstatement .da-access-menu-icon { background-image: url('../static/DA_MenuIcon_NoticeService.png'); }
 
 .da-access-menu-item-inner { display: inline-block; width: calc(100% - 50px); }
 

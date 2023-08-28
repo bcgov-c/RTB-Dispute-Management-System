@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +43,17 @@ public class ScheduleBlockRepository : CmRepository<Model.ScheduleBlock>, ISched
             .ToListAsync();
 
         return dates?.FirstOrDefault();
+    }
+
+    public async Task<(int totalCount, List<Model.ScheduleBlock> pageBlocks)> GetScheduleBlocks(Expression<Func<Model.ScheduleBlock, bool>> predicate, int count, int index)
+    {
+        var blocks = await Context.ScheduleBlocks
+            .Where(predicate)
+            .ToListAsync();
+
+        var pageBlocks = blocks.AsQueryable().ApplyPaging(count, index).ToList();
+
+        return (blocks.Count, pageBlocks);
     }
 
     public async Task<bool> IsOverlapped(int? blockId, int userId, DateTime blockStart, DateTime blockEnd)

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - A menu item containing an Input that allows for file number searches
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';

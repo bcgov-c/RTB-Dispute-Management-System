@@ -131,7 +131,7 @@ public class SearchRepository : CmRepository<SearchResult>, ISearchRepository
         foreach (var item in disputes)
         {
             var outcomeDocFile = await Context.OutcomeDocFiles.FirstOrDefaultAsync(x => x.OutcomeDocFileId == item.OutcomeDocFileId);
-            item.FileCreatedDate = outcomeDocFile.CreatedDate;
+            item.FileCreatedDate = outcomeDocFile?.CreatedDate;
         }
 
         disputes = disputes.OrderByDescending(x => x.FileCreatedDate).ToList();

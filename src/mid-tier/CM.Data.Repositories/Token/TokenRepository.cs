@@ -41,4 +41,17 @@ public class TokenRepository : CmRepository<UserToken>, ITokenRepository
         var token = Context.UserTokens.SingleOrDefault(t => t.AuthToken == authToken && t.ExpiresOn > DateTime.Now);
         return token;
     }
+
+    public async Task<List<UserToken>> GetRecentRecords(int userId, int topRecentRecordsCount)
+    {
+        var tokens = await Context
+            .UserTokens
+            .Where(x => x.SystemUserId == userId)
+            .OrderByDescending(x => x.IssuedOn)
+            .Skip(1)
+            .Take(topRecentRecordsCount)
+            .ToListAsync();
+
+        return tokens;
+    }
 }

@@ -1,7 +1,7 @@
 export default {
   generalDisputeItems: ['futureHearings', 'missingKeyFileInfo', 'missingDisputeNotice', 'noticeNotProvided', 'emailWithErrors', 'incompleteTasks', 'unpaidFees', 'evidenceOverrideOn'],
   documentAndDeliveryItems: ['incompleteOutcomeDocuments', 'notReadyDeliveredDocuments', 'undeliveredDocuments', 'incompleteDocumentRequests', 'incompleteSubServiceRequests', 'documentsMissingDeliveries'],
-  hearingOutcomeItems: ['missingIssueOutcomes', 'missingHearingParticipations', 'missingHearingDetails', 'missingNoticeService','missingDocumentWritingTime', 'missingEvidenceService'],
+  hearingOutcomeItems: ['missingIssueOutcomes', 'missingHearingParticipations', 'missingHearingDetails', 'missingNoticeService', 'missingNoticeServiceConfirmations', 'missingDocumentWritingTime', 'missingEvidenceService'],
   /* General Dispute Completeness Items */
   futureHearings: {
     title: 'Future hearing',
@@ -168,9 +168,18 @@ export default {
     show_adjudicator: true,
     show_arb: true,
   },
+  missingNoticeServiceConfirmations: {
+    title: 'Missing notice service confirmations',
+    help: 'A count of all served and not served notice service records that have not been confirmed.',
+    link: 'notice_item',
+    show_io: false,
+    show_office: false,
+    show_adjudicator: true,
+    show_arb: false,
+  },
   missingDocumentWritingTime: {
     title: 'Missing document writing time',
-    help: 'A count of outcome document sets that are missing writing time or other required processing information. ',
+    help: 'A count of outcome document sets that are missing writing time or other required processing information.',
     link: 'document_item',
     show_io: false,
     show_office: false,
@@ -179,7 +188,7 @@ export default {
   },
   missingEvidenceService: {
     title: 'Missing evidence service',
-    help: 'A count of evidence service records that are missing service information',
+    help: 'A count of evidence service records that are missing service information.',
     link: 'notice_item',
     show_io: false,
     show_office: false,

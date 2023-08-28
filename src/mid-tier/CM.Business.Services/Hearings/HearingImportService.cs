@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.Hearing;
+using CM.Business.Entities.Models.HearingReporting;
 using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Model;
@@ -150,168 +152,104 @@ public class HearingImportService : CmServiceBase, IHearingImportService
         }
     }
 
+    private static Data.Model.ConferenceBridge GetRandom(ref IList<Data.Model.ConferenceBridge> bridges)
+    {
+        var rnd = new Random();
+        var index = rnd.Next(0, bridges.Count);
+        var bridge = bridges[index];
+        bridges.RemoveAt(index);
+        return bridge;
+    }
+
     private async Task<ImportStatus> StartImport(int fileId, ImportLogging importLogging)
     {
         Log.Information("StartImport");
-        var loop1Count = 0;
+        var totalCount = 0;
         try
         {
-            var loop2Data = new List<ScheduleCsv>();
             importLogging.AddLog("Starting hearing import process");
             var scheduleDataList = await GetScheduleDataListAsync(await GetRootFileFolderAsync(), fileId);
 
-            importLogging.AddLog("Creating hearings with preferred conference bridges");
-            foreach (var scheduleData in scheduleDataList)
+            var groupedData = scheduleDataList.GroupBy(x => x.DateAssigned);
+            foreach (var day in groupedData)
             {
-                LogHearingVerbose(scheduleData.RowNumber.ToString());
-                var systemUserId = GetUserId(scheduleData);
+                var dayCount = 0;
+                var availableConferenceBridges = await UnitOfWork
+                                                .ConferenceBridgeRepository
+                                                .GetAvailableBridges(Convert.ToDateTime(day.Key));
 
-                LogHearingVerbose(Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).ToString(CultureInfo.InvariantCulture));
-                LogHearingVerbose((scheduleData.EndTime.HasValue ? Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
-                    Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1)).ToString(CultureInfo.InvariantCulture));
-                var existedHearing = await UnitOfWork.HearingRepository.IsHearingExist(
-                    systemUserId,
-                    Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time),
-                    scheduleData.EndTime.HasValue ? Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
-                        Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1));
-                if (existedHearing)
+                foreach (var scheduleData in day)
                 {
-                    Log.Warning("{RowNumber}", scheduleData.RowNumber.ToString());
-                    importLogging.AddLog($"Error, duplicate hearing on row - {scheduleData.RowNumber}");
-                    continue;
-                }
+                    var systemUserId = GetUserId(scheduleData);
+                    var startDate = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time);
+                    var endDate = scheduleData.EndTime.HasValue ? Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
+                                    Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1);
 
-                Data.Model.ConferenceBridge bridge;
+                    var existedHearing = await UnitOfWork.HearingRepository.IsHearingExist(
+                        systemUserId,
+                        startDate.ToUniversalTime(),
+                        endDate.ToUniversalTime());
 
-                LogHearingVerbose(systemUserId + "; " + scheduleData.Time);
-
-                var accordingConferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetAccordingSchedule(systemUserId, scheduleData.Time);
-
-                if (accordingConferenceBridges.Count > 0)
-                {
-                    bridge = accordingConferenceBridges[0];
-                }
-                else
-                {
-                    accordingConferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetAccordingSchedule(systemUserId, null);
-                    if (accordingConferenceBridges.Count > 0)
+                    if (existedHearing)
                     {
-                        bridge = accordingConferenceBridges[0];
-                    }
-                    else
-                    {
-                        accordingConferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetAccordingSchedule(null, null);
-
-                        if (accordingConferenceBridges == null || accordingConferenceBridges.Count < 1)
-                        {
-                            loop2Data.Add(scheduleData);
-                            continue;
-                        }
-
-                        bridge = accordingConferenceBridges[0];
-                    }
-                }
-
-                Log.Information("Start to create hearing - loop-1");
-                var hearing = new Hearing
-                {
-                    HearingOwner = systemUserId,
-                    HearingPriority = (byte)Enum.Parse(typeof(HearingPriority), scheduleData.Priority, true),
-                    LocalStartDateTime = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time),
-                    LocalEndDateTime = scheduleData.EndTime.HasValue ?
-                        Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
-                        Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1),
-                    HearingStartDateTime = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).ToUniversalTime(),
-                    HearingEndDateTime = scheduleData.EndTime.HasValue ?
-                        Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime).ToUniversalTime() :
-                        Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1).ToUniversalTime(),
-                    ConferenceBridgeId = bridge.ConferenceBridgeId,
-                    HearingType = (byte)HearingType.ConferenceCall,
-                    CreatedDate = DateTime.Now.ToUniversalTime(),
-                    CreatedBy = Constants.UndefinedUserId,
-                    IsDeleted = false,
-                    HearingDetails = await GetHearingDetailsAsync(bridge.ConferenceBridgeId)
-                };
-
-                await UnitOfWork.HearingRepository.InsertAsync(hearing);
-                Log.Information("hearing inserted- loop-1");
-                var result = await UnitOfWork.Complete();
-                Log.Information("hearing sent to complete - loop-1");
-                if (result.CheckSuccess())
-                {
-                    await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.CreateHearingFromSchedule, hearing, null);
-                    loop1Count += 1;
-                }
-                else
-                {
-                    Log.Information("add to loop-2");
-                    loop2Data.Add(scheduleData);
-                }
-            }
-
-            importLogging.AddLog($"Total count of hearings created with preferred conference bridges is {loop1Count}");
-
-            if (loop2Data.Count > 0)
-            {
-                importLogging.AddLog("Creating hearings that cannot use preferred conference bridges");
-                var groupedLoop2Data = loop2Data.OrderBy(x => x.UserId.Split('-')[1]).GroupBy(x => x.DateAssigned).ToList();
-                var openConferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetOpenConferenceBridges();
-                var openBridgesCounts = openConferenceBridges.Count;
-                var loop2Count = 0;
-
-                foreach (var loop2List in groupedLoop2Data)
-                {
-                    if (loop2List.Count() > openBridgesCounts)
-                    {
-                        foreach (var loop in loop2List)
-                        {
-                            importLogging.AddLog($"Not enough conference bridges to create hearing for Row {loop.RowNumber} for User ID {loop.UserId} on {loop.DateAssigned} {loop.Time}");
-                        }
-
+                        Log.Warning("{RowNumber}", scheduleData.RowNumber.ToString());
+                        importLogging.AddLog($"Error, duplicate hearing on row - {scheduleData.RowNumber}");
                         continue;
                     }
 
-                    var userId = UserResolver.GetUserId();
+                    Data.Model.ConferenceBridge bridge;
 
-                    var loop2ListCount = 0;
-
-                    foreach (var loop in loop2List.ToList())
+                    if (availableConferenceBridges.Count > 0)
                     {
-                        var hearing = new Hearing
-                        {
-                            HearingType = (byte)HearingType.ConferenceCall,
-                            HearingOwner = userId,
-                            HearingPriority = (byte)Enum.Parse(typeof(HearingPriority), loop.Priority, true),
-                            LocalStartDateTime = Convert.ToDateTime(loop.DateAssigned + " " + loop.Time),
-                            LocalEndDateTime = loop.EndTime.HasValue ?
-                                Convert.ToDateTime(loop.DateAssigned + " " + loop.EndTime) :
-                                Convert.ToDateTime(loop.DateAssigned + " " + loop.Time).AddHours(1),
-                            HearingStartDateTime = Convert.ToDateTime(loop.DateAssigned + " " + loop.Time).ToUniversalTime(),
-                            HearingEndDateTime = loop.EndTime.HasValue ?
-                                Convert.ToDateTime(loop.DateAssigned + " " + loop.EndTime).ToUniversalTime() :
-                                Convert.ToDateTime(loop.DateAssigned + " " + loop.Time).AddHours(1).ToUniversalTime(),
-                            ConferenceBridgeId = openConferenceBridges[loop2List.ToList().IndexOf(loop)].ConferenceBridgeId,
-                            CreatedBy = Constants.UndefinedUserId,
-                            IsDeleted = false,
-                            HearingDetails = await GetHearingDetailsAsync(openConferenceBridges[loop2List.ToList().IndexOf(loop)].ConferenceBridgeId)
-                        };
-
-                        await UnitOfWork.HearingRepository.InsertAsync(hearing);
-                        var result = await UnitOfWork.Complete();
-                        if (result.CheckSuccess())
-                        {
-                            await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.CreateHearingFromSchedule, hearing, null);
-                            loop2ListCount += 1;
-                        }
+                        bridge = GetRandom(ref availableConferenceBridges);
+                    }
+                    else
+                    {
+                        importLogging.AddLog($"Not enough open conference bridges to create hearing for Row {scheduleData.RowNumber} for User ID {scheduleData.UserId} on {scheduleData.DateAssigned + ":" + scheduleData.Time}");
+                        continue;
                     }
 
-                    loop2Count += loop2ListCount;
-                    openBridgesCounts -= loop2Count;
-                    importLogging.AddLog($"{loop2ListCount} hearings created for {loop2List.Key} without preferred conference bridges");
+                    Log.Information("Start to create hearing");
+                    var hearing = new Hearing
+                    {
+                        HearingOwner = systemUserId,
+                        HearingPriority = (byte)Enum.Parse(typeof(HearingPriority), scheduleData.Priority, true),
+                        LocalStartDateTime = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time),
+                        LocalEndDateTime = scheduleData.EndTime.HasValue ?
+                            Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
+                            Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1),
+                        HearingStartDateTime = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).ToUniversalTime(),
+                        HearingEndDateTime = scheduleData.EndTime.HasValue ?
+                            Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime).ToUniversalTime() :
+                            Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1).ToUniversalTime(),
+                        ConferenceBridgeId = bridge.ConferenceBridgeId,
+                        HearingType = (byte)HearingType.ConferenceCall,
+                        CreatedDate = DateTime.Now.ToUniversalTime(),
+                        CreatedBy = Constants.UndefinedUserId,
+                        IsDeleted = false,
+                        HearingDetails = await GetHearingDetailsAsync(bridge.ConferenceBridgeId)
+                    };
+
+                    await UnitOfWork.HearingRepository.InsertAsync(hearing);
+                    Log.Information("hearing inserted");
+                    var result = await UnitOfWork.Complete();
+                    Log.Information("hearing sent to complete");
+                    if (result.CheckSuccess())
+                    {
+                        await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.CreateHearingFromSchedule, hearing, null);
+                        totalCount += 1;
+                        dayCount += 1;
+                    }
+                    else
+                    {
+                        Log.Information("Error when save hearing.");
+                    }
                 }
 
-                importLogging.AddLog($"Total count of hearings created with open conference bridges is {loop2Count}");
+                importLogging.AddLog($"{dayCount} hearings created for {day.Key}");
             }
+
+            importLogging.AddLog($"Totally {totalCount} hearings created.");
 
             importLogging.AddLog("Process ended successfully - no errors");
             importLogging.Status = ImportStatus.Complete;
@@ -331,32 +269,44 @@ public class HearingImportService : CmServiceBase, IHearingImportService
         var conferenceBridge = await UnitOfWork.ConferenceBridgeRepository.GetByIdAsync(conferenceBridgeId);
 
         var hearingDetails = new StringBuilder();
-        hearingDetails.AppendLine("<div class=\"hearing - instructions - preset\">");
-        hearingDetails.AppendLine("<p class=\"body-text\" style=\"font-size: 16px; line-height: 21px; text-align: left; color: #666;padding: 20px 0px 0px 0px;margin: 0px 0px 0px 0px;\">This hearing will be conducted by TELEPHONE CONFERENCE CALL. Please use one of the following phone numbers and your conference call participant code below to join the Telephone Conference Call. <b>Do not call more than 5 minutes prior to start time.</b></p>");
-        hearingDetails.AppendLine("<ol class=\"sublist\" style=\"padding: 0px 0px 10px 0px; margin: 5px 0px 10px 30px; font-size:16px; line-height: 21px;\" >");
-        hearingDetails.AppendLine("<li style=\"padding: 4px 0px 0px 0px; margin: 0px; color: #727272; font-size:16px; line-height: 21px;\">");
-        hearingDetails.AppendLine("Phone a number below at the time of the conference start:");
+        hearingDetails.AppendLine("<div>");
+        hearingDetails.AppendLine("<table style=\"width:100%;\">");
+        hearingDetails.AppendLine("<thead></thead>");
+        hearingDetails.AppendLine("<tbody>");
+        hearingDetails.AppendLine("<tr>");
+        hearingDetails.AppendLine("<td class=\"hearing-details\" width=\"250px\" style=\"width:250px; vertical-align:top;\">");
+        hearingDetails.AppendLine("Teleconference Number:");
+        hearingDetails.AppendLine("</td>");
+        hearingDetails.AppendLine("<td>");
 
-        if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber1))
+        if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber1) && !string.IsNullOrEmpty(conferenceBridge.DialInNumber2))
         {
-            hearingDetails.AppendLine("<br><span style=\"padding - left:10px;\">" + conferenceBridge.DialInNumber1 + " " + conferenceBridge.DialInDescription1 + "</span>");
+            hearingDetails.AppendLine("<b>" + conferenceBridge.DialInNumber1 + "</b> or<br/>" + conferenceBridge.DialInNumber2);
+        }
+        else if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber1))
+        {
+            hearingDetails.AppendLine("<b>" + conferenceBridge.DialInNumber1 + "</b>");
+        }
+        else if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber2))
+        {
+            hearingDetails.AppendLine(conferenceBridge.DialInNumber2);
         }
 
-        if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber2))
-        {
-            hearingDetails.AppendLine("<br><span style=\"padding-left:10px;\">" + conferenceBridge.DialInNumber2 + " " + conferenceBridge.DialInDescription2 + "</span>");
-        }
-
-        if (!string.IsNullOrEmpty(conferenceBridge.DialInNumber3))
-        {
-            hearingDetails.AppendLine("<br><span style=\"padding-left:10px;\">" + conferenceBridge.DialInNumber3 + " " + conferenceBridge.DialInDescription3 + "</span>");
-        }
-
-        hearingDetails.AppendLine("</li>");
-        hearingDetails.AppendLine("<li style=\"padding: 4px 0px 0px 0px; margin: 0px; color: #727272; font-size:16px; line-height: 21px;\">Enter your participant access code from your notice of hearing " + conferenceBridge.ParticipantCode + "</li>");
-        hearingDetails.AppendLine("<li style=\"padding: 4px 0px 0px 0px; margin: 0px; color: #727272; font-size:16px; line-height: 21px;\">Say your FULL NAME and press #</li>");
-        hearingDetails.AppendLine("</ol>");
+        hearingDetails.AppendLine("</td>");
+        hearingDetails.AppendLine("</tr>");
+        hearingDetails.AppendLine("<tr>");
+        hearingDetails.AppendLine("<td class=\"hearing-details\" width=\"250px\" style=\"width:250px;vertical-align:top;\">");
+        hearingDetails.AppendLine("Teleconference Access Code:");
+        hearingDetails.AppendLine("</td>");
+        hearingDetails.AppendLine("<td>");
+        hearingDetails.AppendLine("<b>" + conferenceBridge.ParticipantCode + "</b>");
+        hearingDetails.AppendLine("</td>");
+        hearingDetails.AppendLine("</tr>");
+        hearingDetails.AppendLine("</tbody>");
+        hearingDetails.AppendLine("</table>");
         hearingDetails.AppendLine("</div>");
+        hearingDetails.AppendLine("<br/>");
+        hearingDetails.AppendLine("<p>Please call into your hearing using the teleconference access code above.</p>");
 
         return hearingDetails.ToString();
     }
@@ -379,8 +329,16 @@ public class HearingImportService : CmServiceBase, IHearingImportService
         foreach (var scheduleData in scheduleDataList)
         {
             var systemUserId = GetUserId(scheduleData);
-            var accordingConferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetAccordingScheduleForCheck(systemUserId, scheduleData.Time);
-            if (accordingConferenceBridges?.Count > 1)
+            var startDate = Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time);
+            var endDate = scheduleData.EndTime.HasValue ? Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.EndTime) :
+                            Convert.ToDateTime(scheduleData.DateAssigned + " " + scheduleData.Time).AddHours(1);
+
+            var existedHearing = await UnitOfWork.HearingRepository.IsHearingExist(
+                        systemUserId,
+                        startDate.ToUniversalTime(),
+                        endDate.ToUniversalTime());
+
+            if (existedHearing)
             {
                 duplicatesExist = true;
                 importLogging.AddLog($"Error, duplicate hearing on row - {scheduleData.RowNumber}");
@@ -393,7 +351,7 @@ public class HearingImportService : CmServiceBase, IHearingImportService
             return false;
         }
 
-        importLogging.AddLog("No duplicate hearings found, all hearings are new and unique");
+        importLogging.AddLog("No duplicate conference bridge found, all hearings are new and unique");
         importLogging.Status = ImportStatus.Complete;
 
         return true;
@@ -426,10 +384,5 @@ public class HearingImportService : CmServiceBase, IHearingImportService
             });
 
         return result.ToList();
-    }
-
-    private void LogHearingVerbose(string message)
-    {
-        Log.Information("{Message}", message);
     }
 }

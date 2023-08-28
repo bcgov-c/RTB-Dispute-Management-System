@@ -183,6 +183,11 @@ export default CMModel.extend({
         Object.assign(paymentUpdateData, { payment_status: newPaymentStatus });
       }
 
+      const feeModel = paymentsChannel.request('get:fees').filter(f => f.get('dispute_fee_id') === this.get('dispute_fee_id'))?.[0];
+      if (nowApproved && !feeModel.isPaid()) {
+        feeModel.set({ is_paid: true }, { silent: true });
+      }
+
       if (extraSaveNeeded) {
         if (options.update_status_only) {
           this.save(paymentUpdateData).done(dfd.resolve).fail(dfd.reject);

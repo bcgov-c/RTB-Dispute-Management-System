@@ -115,6 +115,11 @@ export default CMModel.extend({
     return participantChannel.request(requestString, this.get(requestModelAttr));
   },
 
+  isAssociatedToRespondent() {
+    const participantModel = this.getPackageCreatorParticipantModel();
+    return participantModel?.isRespondent();
+  },
+
   isPackageCreatorDeleted() {
     const model = this.getPackageCreatorParticipantModel();
     return model && model.isDeleted();

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
+using CM.Services.DataWarehouse.DataWarehouseDataModel.Models;
+using CM.Services.DataWarehouse.DataWarehouseRepository.RequestResponseModels;
+using CM.Services.DataWarehouse.DataWarehouseRepository.UnitOfWork;
 using CM.Services.DataWarehouse.FactDisputeService.Helper;
 
 namespace CM.Services.DataWarehouse.FactDisputeService.Common;
@@ -29,7 +32,7 @@ public static class CommonFieldsLoader
     public static decimal GetLinkedEvidenceFilesMb(IUnitOfWork unitOfWork, List<LinkedFile> linkedFiles, ICollection<File> associatedFiles)
     {
         var linkedEvidenceFilesMb = associatedFiles != null ?
-            Utils.ConvertBytesToMegabytes(associatedFiles.Sum(x => x.FileSize)) : 0;
+            FileUtils.ConvertBytesToMegabytes(associatedFiles.Sum(x => x.FileSize)) : 0;
         return linkedEvidenceFilesMb;
     }
 
@@ -171,5 +174,51 @@ public static class CommonFieldsLoader
         var utcEnd = TimeZoneInfo.ConvertTimeToUtc(end, timezone);
 
         return (utcStart, utcEnd);
+    }
+
+    public static async Task<List<Dispute>> GetDisputes(IUnitOfWork unitOfWork, IUnitOfWorkDataWarehouse dwUnitOfWork, int dateDelay)
+    {
+        var lastLoadedDateTime = await dwUnitOfWork.LoadingHistoryRepository.GetLastLoadStartDateTime((int)FactTable.FDisputeSummary);
+
+        var disputes = await unitOfWork.DisputeRepository.GetDisputesWithLastModify(dateDelay);
+        var dwAllDisputesGuid = await dwUnitOfWork.FactDisputeSummaryRepository.GetAllDisputes();
+        var newDisputes = disputes.Where(x => !dwAllDisputesGuid.Contains(x.DisputeGuid)).ToList();
+
+        var finalDisputes = newDisputes;
+
+        if (lastLoadedDateTime.HasValue)
+        {
+            var dwChanged = disputes
+            .Where(x => dwAllDisputesGuid.Contains(x.DisputeGuid)
+                        && x.DisputeLastModified != null && x.DisputeLastModified.LastModifiedDate > lastLoadedDateTime)
+            .ToList();
+
+            finalDisputes = newDisputes.Union(dwChanged).ToList();
+        }
+
+        return finalDisputes;
+    }
+
+    public static async Task<List<Dispute>> GetIssueOutcomeDisputes(IUnitOfWork unitOfWork, IUnitOfWorkDataWarehouse dwUnitOfWork, int dateDelay)
+    {
+        var lastLoadedDateTime = await dwUnitOfWork.LoadingHistoryRepository.GetLastLoadStartDateTime((int)FactTable.FDisputeSummary);
+
+        var disputes = await unitOfWork.DisputeRepository.GetDisputesWithLastModify(dateDelay);
+        var dwAllDisputesGuid = await dwUnitOfWork.FactIssueOutcomeRepository.GetAllDisputes();
+        var newDisputes = disputes.Where(x => !dwAllDisputesGuid.Contains(x.DisputeGuid)).ToList();
+
+        var finalDisputes = newDisputes;
+
+        if (lastLoadedDateTime.HasValue)
+        {
+            var dwChanged = disputes
+            .Where(x => dwAllDisputesGuid.Contains(x.DisputeGuid)
+                        && x.DisputeLastModified != null && x.DisputeLastModified.LastModifiedDate > lastLoadedDateTime)
+            .ToList();
+
+            finalDisputes = newDisputes.Union(dwChanged).ToList();
+        }
+
+        return finalDisputes;
     }
 }

@@ -21,6 +21,6 @@ export default Backbone.Collection.extend({
   },
 
   isAnyServiceUnknown() {
-    return this.any(model => model.isServiceUnkown());
+    return this.any(model => model.isServiceUnknown());
   }
 });

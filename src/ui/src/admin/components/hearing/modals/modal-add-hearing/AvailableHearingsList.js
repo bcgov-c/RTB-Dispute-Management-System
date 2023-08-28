@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays selectable list of HearingModels to attach to a dispute
+ */
 import Marionette from 'backbone.marionette';
 import AvailableHearingsListItem from './AvailableHearingsListItem';
 import template from './AvailableHearingsList_template.tpl';

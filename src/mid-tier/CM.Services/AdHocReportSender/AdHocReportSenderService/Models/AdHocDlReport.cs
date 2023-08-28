@@ -1,8 +1,9 @@
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using CM.Common.Utilities;
 
 namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Models;
 
-public class AdHocDlReport
+public class AdHocDlReport : CommonModel
 {
     public long AdHocDlReportId { get; set; }
 
@@ -11,6 +12,8 @@ public class AdHocDlReport
     public string Description { get; set; }
 
     public string HtmlDataDictionary { get; set; }
+
+    public TargetDatabase? TargetDatabase { get; set; }
 
     public ReportType Type { get; set; }
 
@@ -28,5 +31,8 @@ public class AdHocDlReport
 
     public bool IsActive { get; set; }
 
-    public DateTime CreatedDate { get; set; }
+    public bool? IsDeleted { get; set; }
+
+    [Column(TypeName = "json")]
+    public string ParameterConfig { get; set; }
 }

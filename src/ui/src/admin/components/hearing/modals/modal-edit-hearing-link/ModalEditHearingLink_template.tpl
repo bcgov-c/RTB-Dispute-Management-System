@@ -15,6 +15,14 @@
         <div>
           <label class="review-label">Priority:</label>&nbsp;<span><%= Formatter.toUrgencyDisplay(hearing_priority, { urgencyColor: true }) %></span>
         </div>
+        <div>
+          <label class="review-label">Hearing Notice:</label>&nbsp;
+          <% if (hasHearingNotice) { %>
+            <span class="error-red"><b>Yes </b> - Changing this linking may create errors in the hearing notice</span>
+          <% } else { %>
+            <span class="">No</span>
+          <% } %>
+        </div>
       </div>
 
       <div class="editHearingLink-inputs-container <%= hasPrimary ? '' : 'hidden'  %>">

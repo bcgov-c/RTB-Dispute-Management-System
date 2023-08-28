@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.5'
 
 services:
   rabbit:
@@ -36,7 +36,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - cmnetwork
-  
+
   elasticsearch:
     hostname: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
@@ -69,6 +69,90 @@ services:
     ports:
       - "2222:22"
     command: foo:pass:1001
+    networks:
+      - cmnetwork
+  
+  dms-api:
+    image: dms-api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-api.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-pdf:
+    image: dms-pdf
+    build:
+      context: .
+      dockerfile: ./Dockerfile.PdfConvertor
+    ports:
+      - 8081:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-pdf.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-email-generation:
+    image: dms-email-generation
+    build:
+      context: .
+      dockerfile: ./Dockerfile.EmailGenerator
+    ports:
+      - 8082:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-email-generation.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-email-notification:
+    image: dms-email-notification
+    build:
+      context: .
+      dockerfile: ./Dockerfile.EmailNotification
+    ports:
+      - 8083:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-email-notification.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-reconciliation-generator:
+    image: dms-reconciliation-generator
+    build:
+      context: .
+      dockerfile: ./Dockerfile.ReconciliationReportGenerator
+    ports:
+      - 8084:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-reconciliation-generator.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-reconciliation-sender:
+    image: dms-reconciliation-sender
+    build:
+      context: .
+      dockerfile: ./Dockerfile.ReconciliationReportSender
+    ports:
+      - 8085:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-reconciliation-sender.json:/app/secrets/appsettings.json
+    networks:
+      - cmnetwork
+
+  dms-adhoc-reporting:
+    image: dms-adhoc-reporting
+    build:
+      context: .
+      dockerfile: ./Dockerfile.AdHocReportSender
+    ports:
+      - 8086:80
+    volumes: 
+      - ./DockerSettings/appsettings.dms-adhoc-reporting.json:/app/secrets/appsettings.json
     networks:
       - cmnetwork
 

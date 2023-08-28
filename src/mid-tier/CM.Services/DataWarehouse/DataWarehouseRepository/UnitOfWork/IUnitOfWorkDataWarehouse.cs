@@ -4,6 +4,8 @@ using CM.Services.DataWarehouse.DataWarehouseRepository.DimTime;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactDisputeSummary;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactHearingSummary;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactIntakeProcessing;
+using CM.Services.DataWarehouse.DataWarehouseRepository.FactIssueOutcome;
+using CM.Services.DataWarehouse.DataWarehouseRepository.FactResolutionService;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactTimeStatistic;
 using CM.Services.DataWarehouse.DataWarehouseRepository.LoadingHistory;
 
@@ -18,6 +20,10 @@ public interface IUnitOfWorkDataWarehouse
     IFactHearingSummaryRepository FactHearingSummaryRepository { get; }
 
     IFactIntakeProcessingRepository FactIntakeProcessingRepository { get; }
+
+    IFactResolutionServiceRepository FactResolutionServiceRepository { get; }
+
+    IFactIssueOutcomeRepository FactIssueOutcomeRepository { get; }
 
     IDimTimeRepository DimTimeRepository { get; }
 

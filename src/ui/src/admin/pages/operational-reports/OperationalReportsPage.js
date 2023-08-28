@@ -38,7 +38,7 @@ const OperationalReportsPage = PageView.extend({
     Backbone.history.loadUrl(Backbone.history.fragment);
   },
 
-  loadReports(initialLoad = false) {
+  loadReports(initialLoad=false) {
     if (!initialLoad) loaderChannel.trigger('page:load');
     this.isLoaded = false;
     
@@ -56,22 +56,31 @@ const OperationalReportsPage = PageView.extend({
     this.template = this.template.bind(this);
     this.isLoaded = true;
     this.reports = new ReportCollection([]);
-    this.loadReports({ initialLoad: true });
+    this.loadReports(true);
   },
 
   onRender() {
     if (!this.isLoaded) return;
 
     this.showChildView('operationalReportsRegion', new ReportDownloadSection({
-      headerTitle: TITLE_OPERATIONAL_REPORTS, availableReports: this.reports.filter(r => r.isTypeOperational()) }));
+      headerTitle: TITLE_OPERATIONAL_REPORTS,
+      availableReports: this.reports.filter(r => r.isTypeOperational()),
+      enableParamEntry: true,
+    }));
 
     this.showChildView('exceptionReportsRegion', new ReportDownloadSection({
-      headerTitle: TITLE_EXCEPTION_REPORTS, availableReports: this.reports.filter(r => r.isTypeException()) }));
+      headerTitle: TITLE_EXCEPTION_REPORTS,
+      availableReports: this.reports.filter(r => r.isTypeException()),
+      enableParamEntry: true,
+    }));
 
     this.showChildView('otherReportsRegion', new ReportDownloadSection({
-      headerTitle: TITLE_OTHER_REPORTS, availableReports: this.reports.filter(r => r.isTypeOther()) }));
+      headerTitle: TITLE_OTHER_REPORTS,
+      availableReports: this.reports.filter(r => r.isTypeOther()),
+      enableParamEntry: true,
+    }));
     
-    loaderChannel.trigger('page:load:complete');    
+    loaderChannel.trigger('page:load:complete');
   },
 
   template() {

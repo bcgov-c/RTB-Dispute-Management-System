@@ -1,7 +1,7 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import DisputeFilePackageClaimView from './DisputeFilePackageClaim';
-import PackageServiceView from '../../../components/service/PackageService';
+import DisputeService from '../../../components/service/DisputeService';
 import HearingToolsServiceView from '../../../components/service/HearingToolsService';
 import template from './DisputeFilePackage_template.tpl';
 import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
@@ -93,22 +93,24 @@ export default Marionette.View.extend({
         const participantId = serviceModel.get('participant_id');
         return {
           mode: 'service-view',
-          matchingUnit: this.unitCollection.find(unit => unit.hasParticipantId(participantId))
+          matchingUnit: this.unitCollection.find(unit => unit.hasParticipantId(participantId)),
+          isNoticeService: false
         };
       },
-      childView: PackageServiceView,
+      childView: DisputeService,
       collection: filePackageModel.getServices()
     }));
     
     this.showChildView('serviceHearingToolsRegion', new HearingToolsServiceView({
       model: filePackageModel,
-      childView: PackageServiceView,
+      childView: DisputeService,
       containerTitle: 'Evidence Service',
       unitCollection: this.unitCollection,
       resetServicesFn() { filesChannel.request('update:filepackage:service', this.model); },
       saveAllNotServedModalBottomText: `<p>This will mark all evidence files in this file package to not considered.</p>
         <p>Are you sure you want to change the service information for the affected respondent(s)?</p>`,
       saveAllNotServedButtonText: 'Mark All Not Served and Evidence Not Considered',
+      saveAllAcknowledgedServedButtonText: 'Mark All Acknowledged Served',
       onSaveAllNotServedFn() {
         const allFilesInPackage = filesChannel.request('get:files').where({ file_package_id: this.model.id });
         loaderChannel.trigger('page:load');

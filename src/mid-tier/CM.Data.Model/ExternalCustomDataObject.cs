@@ -18,7 +18,7 @@ public class ExternalCustomDataObject : BaseEntity
     [StringLength(50)]
     public string RefreshToken { get; set; }
 
-    public DateTime Expiry { get; set; }
+    public DateTime? Expiry { get; set; }
 
     public int? OwnerId { get; set; }
 

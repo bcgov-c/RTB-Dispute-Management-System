@@ -2,7 +2,7 @@
   <div class="<%= cssClass %>" style="display: inline-block;">
     <% _.escape.each(optionData, function(option) { %>
       <div data-val="<%= option.value %>" class="radio-icon
-            <%= disabled ? 'disabled' : ''%>
+            <%= disabled || isValueDisabledFn(option.value) ? 'disabled' : ''%>
             <%= option.iconClass %>
             <%= value === option.value ? 'selected' : ''%>
             <%= isSingleViewMode && value !== option.value ? 'hidden' : ''%>

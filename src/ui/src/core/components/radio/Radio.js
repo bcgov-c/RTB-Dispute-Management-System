@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - Customizable View that displays radio buttons
  * @class core.components.radio.RadioModel
  * @memberof core.components.radio
  */
@@ -31,6 +32,11 @@ export default ViewMixin.extend({
       this.hideErrorMessage();
     }
   },
+
+  /**
+   * @param {RadioModel} model
+   * @param {String} [displayTitle] - Text to display above radio buttons
+   */
 
   initialize(options) {
     this.mergeOptions(options, ['displayTitle']);

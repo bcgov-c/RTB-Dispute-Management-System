@@ -48,4 +48,10 @@ public class ExternalUpdateParticipantResponse
 
     [JsonProperty("modified_date")]
     public string ModifiedDate { get; set; }
+
+    [JsonProperty("address_is_validated")]
+    public bool AddressIsValidated { get; set; }
+
+    [JsonProperty("mail_address_is_validated")]
+    public bool MailAddressIsValidated { get; set; }
 }

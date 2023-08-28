@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CM.Business.Services.Base;
 using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Model;
@@ -7,7 +8,6 @@ using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using CM.UserResolverService;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.AbandonedDisputesNotification;
 
@@ -65,27 +65,10 @@ public class DisputeAbandonedDueToApplicantInactionService : CmServiceBase, IDis
 
             if (result.CheckSuccess())
             {
-                Publish(message);
+                message.Publish(_bus);
             }
         }
 
         return true;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        _bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"CorrelationGuid = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

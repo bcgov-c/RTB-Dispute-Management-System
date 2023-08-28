@@ -67,6 +67,17 @@ export default CMModel.extend({
     return `${configChannel.request('get', 'API_ROOT_URL')}${api_name}` + (this.isNew() ? `/${this.get('outcome_doc_group_id')}` : '');
   },
 
+  initialize() {
+    CMModel.prototype.initialize.call(this, arguments);
+
+    this.setConfig();
+    this.on('change:file_type', () => this.setConfig());
+  },
+
+  setConfig() {
+    this.config = documentsChannel.request('config:file', this.get('file_type')) || {};
+  },
+
   /* Methods related to OutcomeDocDeliveries associated to this OutcomeDocFile  */
 
   getDeliveries() {
@@ -177,7 +188,9 @@ export default CMModel.extend({
   },
 
   getFileTitleDisplay(withAcronym=true) {
-    return `${withAcronym ? `${this.get('file_acronym')} - `:''}${this.get('file_title')}`;
+    const isPublic = this.isPublic();
+    return `${!isPublic && withAcronym ? `${this.get('file_acronym')} - `:''}${this.get('file_title')}${
+      isPublic ? ` (${this.toAnonymousDocId()})` : ''}`;
   },
 
   /* Status for this OutcomeDocFile */
@@ -202,8 +215,20 @@ export default CMModel.extend({
     return this.isFileTypeInRangesForConfigCode('outcome_doc_type_order_of_possession_ranges');
   },
 
-  isActive() {
-    return this.get('file_status') === configChannel.request('get', 'OUTCOME_DOC_FILE_STATUS_ACTIVE');
+  isDirectRequest() {
+    return this.config?.is_direct_request;
+  },
+
+  isCrossed() {
+    return this.config?.is_crossed;
+  },
+
+  canBeAnonymized() {
+    return this.config?.can_be_anonymized;
+  },
+
+  isPublicSearchable() {
+    return this.config?.public_searchable;
   },
 
   isPublic() {
@@ -215,13 +240,19 @@ export default CMModel.extend({
   },
 
   isOther() {
-    const typeValue = this.get('file_type');
-    const docConfig = documentsChannel.request('config:file', typeValue);
-    return docConfig && docConfig.code === configChannel.request('get', 'OUTCOME_DOC_OTHER_CODE');
+    return this.config?.code === configChannel.request('get', 'OUTCOME_DOC_OTHER_CODE');
+  },
+
+  hasPublicError() {
+    return this.get('file_status') && this.get('file_status') === configChannel.request('get', 'OUTCOME_DOC_FILE_STATUS_PD_ERROR');
   },
 
   hasUploadedFile() {
     return !!this.get('file_id');
-  }
+  },
+
+  toAnonymousDocId() {
+    return this.isPublic() && !this.isNew() ? `AnonDec-${this.id}` : '';
+  },
   
 });

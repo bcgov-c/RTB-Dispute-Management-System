@@ -1,6 +1,7 @@
 /**
  * @namespace core.components.files.FilesManager
  * @memberof core.components.files
+ * @fileoverview - Manager that handles file related functionality. This includes handling of Files, LinkFiles, FileDescription, FilePackages, and file downloads
  */
 
 import Marionette from 'backbone.marionette';
@@ -23,11 +24,10 @@ const api_load_files = 'disputefiles';
 const api_load_file_descriptions = 'disputefiledescriptions';
 const api_load_link_files = 'disputelinkfiles';
 const api_load_file_packages = 'disputefilepackages';
-
 const api_save_file = 'file-upload';
-
 const api_upload_pdf = 'file/PDFfromhtml';
 const api_common_files = 'commonfiles';
+const api_external_load_common_files = 'externalcommonfiles';
 
 const loaderChannel = Radio.channel('loader');
 const configChannel = Radio.channel('config');
@@ -105,13 +105,13 @@ const FilesManager = Marionette.Object.extend({
     'add:filedescription': 'addFileDescription',
 
     load: 'loadFullDisputeFiles',
-    'load:full': 'loadFullDisputeFiles',
     'load:files': 'loadDisputeFiles',
     'load:filedescriptions': 'loadDisputeFileDescriptions',
     'load:linkfiles': 'loadDisputeLinkFiles',
     'load:filepackages': 'loadDisputeFilePackages',
     'load:disputeaccess': 'loadFromDisputeAccessResponse',
     'load:commonfiles': 'loadCommonFiles',
+    'load:commonfiles:external': 'loadExternalCommonFiles',
 
     'get:fileupload:url': 'getFileUploadUrl',
     'get:commonfileupload:url': 'getCommonFileUrl',
@@ -142,7 +142,7 @@ const FilesManager = Marionette.Object.extend({
     'delete:file': 'deleteFileAndLinkFiles',
     'delete:filedescription:full': 'deleteFilesAndLinksAndFileDescription',
 
-    'download:files': 'downloadFiles',
+    'download:files': 'downloadBulkFiles',
     'show:download:modal': 'showDownloadModal',
     'show:upload:error:modal': 'showUploadErrorModal',
     'show:preview:modal': 'showPreviewModal',
@@ -150,6 +150,7 @@ const FilesManager = Marionette.Object.extend({
     'click:filename:preview': 'clickPreviewableFilename',
     'download:html': 'downloadHtmlAsFile',
     'download:csv': 'downloadCsvFile',
+    'download:file': 'downloadFile',
 
     'update:filepackage:service': 'fillFilePackageService',
     'has:duplicate:file': 'checkForDuplicateFiles',
@@ -222,30 +223,34 @@ const FilesManager = Marionette.Object.extend({
   },
 
 
-  loadFullDisputeFiles(dispute_guid) {
+  loadFullDisputeFiles(dispute_guid, options={}) {
     return $.whenAll(
-      this.loadDisputeFiles(dispute_guid),
-      this.loadDisputeFileDescriptions(dispute_guid),
-      this.loadDisputeLinkFiles(dispute_guid),
-      this.loadDisputeFilePackages(dispute_guid)
+      this.loadDisputeFiles(dispute_guid, options),
+      this.loadDisputeFileDescriptions(dispute_guid, options),
+      this.loadDisputeLinkFiles(dispute_guid, options),
+      this.loadDisputeFilePackages(dispute_guid, options)
     );
   },
 
-  loadDisputeFilePackages(dispute_guid) {
+  loadDisputeFilePackages(dispute_guid, options={}) {
     const dfd = $.Deferred();
     
     apiChannel.request('call', {
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_file_packages}/${dispute_guid}?${default_large_query_params}`
     }).done(response => {
-      this.disputeFilePackages = new FilePackageCollection(response);
-      // Filter out any removed participants
-      this.disputeFilePackages.each(filePackage => {
-        const services = filePackage.getServices();
-        const servicesToRemove = services.filter(model => !participantsChannel.request('check:id', model.get('participant_id')));
-        services.remove(servicesToRemove, { silent: true });
-      });
-      dfd.resolve(this.disputeFilePackages);
+      if (options.no_cache) {
+        return dfd.resolve(new FilePackageCollection(response));
+      } else {
+        this.disputeFilePackages = new FilePackageCollection(response);
+        // Filter out any removed participants
+        this.disputeFilePackages.each(filePackage => {
+          const services = filePackage.getServices();
+          const servicesToRemove = services.filter(model => !participantsChannel.request('check:id', model.get('participant_id')));
+          services.remove(servicesToRemove, { silent: true });
+        });
+        dfd.resolve(this.disputeFilePackages);
+      }
     }).fail(dfd.reject);
 
     return dfd.promise();
@@ -266,12 +271,9 @@ const FilesManager = Marionette.Object.extend({
       const fileCollection = new FileCollection(_.map(response.files, function(file_response) {
         return _.extend(file_response, { upload_status: 'uploaded' });
       }));
-
       if (!options.no_cache) this.disputeFiles = fileCollection;
-      
-      dfd.resolve(!options.no_cache ? this.disputeFiles : fileCollection);
+      dfd.resolve(fileCollection);
     }).fail(dfd.reject);
-
     return dfd.promise();
   },
 
@@ -378,20 +380,32 @@ const FilesManager = Marionette.Object.extend({
       parseFilesFn(file_description);
     });
 
-    this.disputeDeficientDocuments = new FileDescriptionCollection(); // Deficient documents should never come back for DA or OS, so use empty collection
-    this.disputeFileDescriptions = new FileDescriptionCollection(file_descriptions);
+    this.disputeDeficientDocuments = new FileDescriptionCollection(file_descriptions.filter(fileDescription => fileDescription.is_deficient));
+    this.disputeFileDescriptions = new FileDescriptionCollection(file_descriptions.filter(fileDescription => !fileDescription.is_deficient));
     this.disputeFiles = new FileCollection(files);
     this.disputeLinkFiles = new LinkFileCollection(link_files);
   },
 
   loadCommonFiles() {
-    const url = `${configChannel.request('get', 'API_ROOT_URL')}${api_common_files}`;
     return apiChannel.request('call', {
       type: 'GET',
-      url,
+      url: `${configChannel.request('get', 'API_ROOT_URL')}${api_common_files}`,
     }).done((commonFiles) => {
       this.commonFiles = new CommonFileCollection(commonFiles);
-    })
+    });
+  },
+
+  loadExternalCommonFiles(fileTypes=[]) {
+    const params = $.param({ FileTypes: fileTypes });
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_load_common_files}?${params}`
+      }).done(response => {
+        this.commonFiles = new CommonFileCollection(response?.external_common_files);
+        res(this.commonFiles);
+      }).fail(rej);
+    });
   },
 
   getDisputeFiles() {
@@ -449,9 +463,9 @@ const FilesManager = Marionette.Object.extend({
     return this.disputeFileDescriptions.filter(fileD => _.find(matchingLinkFiles, linkFile => linkFile.get('file_description_id') === fileD.id));
   },
 
-  getDisputeFileDescriptionsForClaim(claim_id, remedy_id) {
+  getDisputeFileDescriptionsForClaim(claim_id, remedy_id, dataContext={}) {
     const search_params = _.extend({ claim_id }, remedy_id ? { remedy_id } : {});
-    return this.disputeFileDescriptions.where(search_params);
+    return (dataContext?.fileDescriptions || this.disputeFileDescriptions).where(search_params);
   },
 
   getDeficientFileDescriptions() {
@@ -625,12 +639,12 @@ const FilesManager = Marionette.Object.extend({
       dfd.resolve(matchingLinkFile);
     } else {
       const newLinkFile = new LinkFileModel({
-          file_id,
-          file_description_id
-        }),
-        disputeLinkFiles = this.disputeLinkFiles;
-      newLinkFile.save().done(function() {
-        disputeLinkFiles.add(newLinkFile);
+        file_id,
+        file_description_id
+      });
+
+      newLinkFile.save().done(() => {
+        this.disputeLinkFiles.add(newLinkFile);
         dfd.resolve(newLinkFile);
       }).fail(dfd.reject);
     }
@@ -678,18 +692,18 @@ const FilesManager = Marionette.Object.extend({
     }
   },
 
-  getFilesForFileDescription(file_description_model) {
+  getFilesForFileDescription(file_description_model, dataContext={}) {
     const matching_files = new FileCollection();
     if (!file_description_model || file_description_model.isNew()) {
       return matching_files;
     }
 
-    const matching_link_files = this.disputeLinkFiles.where({
+    const matching_link_files = (dataContext?.linkFiles || this.disputeLinkFiles).where({
       file_description_id: file_description_model ? file_description_model.get(file_description_model.idAttribute) : -1
     });
 
     _.each(matching_link_files, function(link_file_model) {
-      const matching_file = this.disputeFiles.findWhere({ file_id: link_file_model.get('file_id') });
+      const matching_file = (dataContext?.files || this.disputeFiles).findWhere({ file_id: link_file_model.get('file_id') });
       if (!matching_file) {
         console.log(`[Error] Couldn't find a real file ID for link file`, link_file_model);
         return;
@@ -701,11 +715,11 @@ const FilesManager = Marionette.Object.extend({
     return matching_files;
   },
 
-  deleteFileAndLinkFiles(file_model) {
+  deleteFileAndLinkFiles(file_model, deleteAttrs={}) {
     const dfd = $.Deferred();
     // If a file is being deleted, clean up all links to it
     const matchingLinkFiles = this.disputeLinkFiles.where({ file_id: file_model.get('file_id') });
-    Promise.all([file_model.destroy(), ..._.map(matchingLinkFiles, function(matchingLinkFile) { return matchingLinkFile.destroy(); })])
+    Promise.all([file_model.destroy(deleteAttrs), ..._.map(matchingLinkFiles, function(matchingLinkFile) { return matchingLinkFile.destroy(deleteAttrs); })])
       .then(dfd.resolve, dfd.reject);
     return dfd.promise();
   },
@@ -776,7 +790,7 @@ const FilesManager = Marionette.Object.extend({
   },
   /* end snippet */
 
-  downloadFiles(fileModels) {
+  downloadBulkFiles(fileModels) {
     const preparedFilesDataForDownload = _.filter(_.map(fileModels, 
       function(fileModel) {
         return {
@@ -791,26 +805,58 @@ const FilesManager = Marionette.Object.extend({
     this._browserDownloadAllFiles(preparedFilesDataForDownload);
   },
 
-  downloadHtmlAsFile(html, filename) {
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = (window.URL || window.webkitURL).createObjectURL(blob);
-    
-    $('<a />', {
-      'href': url,
-      'download': filename,
-      'text': "click"
-    }).hide().appendTo("body")[0].click();
+  async downloadHtmlAsFile(html, filename, options={}) {
+    const blob = new Blob([html], { type: 'text/html;charset=utf8' });
+    return this.downloadFile(blob, filename, options);
   },
 
-  downloadCsvFile(csvFilename, csvFileLines) {
-    const csvContent = csvFileLines.map(line => line.join(",")).join("\r\n");
-    const csvFileContents = `data:text/csv;charset=utf-8,${encodeURIComponent(csvContent)}`;
-    const link = document.createElement("a");
-    link.setAttribute("href", csvFileContents);
-    link.setAttribute("download", csvFilename);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+  /**
+   * 
+   * @param {String[][]} csvFileLines - File contents to save, line by line
+   * @param {String} csvFilename - Filename to use for save, including the file extension 
+   * @param {Boolean} options.forceDialog - Whether the save opens a "Save As" browser dialog 
+   * @param {Boolean} options.noColumnQuotes - Controls whether double quotes are wrapped around each column in each csv file line
+   * @param {String} options.separator - Character to use for the CSV column separator, defaults to comma ","
+   */
+  async downloadCsvFile(csvFileLines, csvFilename, options={}) {
+    const separator = options?.separator || ',';
+    const csvContent = csvFileLines.map(line => line.map(col => (
+      !options?.noColumnQuotes ?
+        // Surround column content in double quotes to support commas/spaces in the column
+        // Escape any double quotes inside the string (with a doublequote according to RFC 4180
+        `${col?.slice(0, 1) !== `"` ? `"` : ''}${col?.replace(/([^"])"/g, '$1""')}${col?.slice(-1) !== `"` ? `"` : ''}`
+      : col
+    )).join(separator)).join("\r\n");
+    const csvFileContents = new Blob([csvContent], { type: 'text/csv;charset=utf8' });
+    return this.downloadFile(csvFileContents, csvFilename, options);
+  },
+
+  async downloadFile(dataBlob, filename, options={}) {
+    let isDownloadSuccess = false;
+    if (options.forceDialog && window.showSaveFilePicker) {
+      // NOTE: File type restrictions can be added to the save file picker - to be explored later
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          startIn: 'downloads',
+        });
+        const writableStream = await handle?.createWritable();
+        await writableStream.write(dataBlob);
+        await writableStream.close();
+        isDownloadSuccess = true;
+      } catch (err) {
+        isDownloadSuccess = false;
+      }
+    } else {
+      const link = document.createElement("a");
+      link.setAttribute("href", (window.URL || window.webkitURL).createObjectURL(dataBlob));
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      isDownloadSuccess = true;
+    }
+    return isDownloadSuccess;
   },
 
   showDownloadModal(onContinueFn, options) {

@@ -11,7 +11,10 @@
  * it will clean pasted content of microsoft word document tags and classes.
  * 
  * Updated Mar 12, 2018: https://github.com/Alex-D/Trumbowyg/pull/737/files
+ * 
  */
+
+// DMS UPDATED Feb 22, 2023: Add setTimeout in cleanPaste body to resolve double pasting bug
 
 (function ($) {
     'use strict';
@@ -101,6 +104,9 @@
             cleanPaste: {
                 init: function (t) {
                     t.pasteHandlers.push(function (pasteEvent) {
+                      // DMS NOTE: Wrap in a timeout to allow other paste handlers/paste behaviour to finish
+                      // Otherwise, double-paste bug seems to occur
+                      setTimeout(() => {
                         try {
                           t.saveRange();
 
@@ -140,6 +146,7 @@
                           t.syncCode();
                         } catch (c) {
                         }
+                      }, 0);
                     });
                 }
             }

@@ -23,6 +23,7 @@ const IntakeCeuDataParser = CustomDataParser.extend({
     g_complaint_sub_type: 
     g_complaint_is_emergency: 
     g_owns_home:
+    g_contact_email:
     
     g_accepted_tou: 
     g_complaint_rtb_matter: 

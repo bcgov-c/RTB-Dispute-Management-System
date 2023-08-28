@@ -1,0 +1,96 @@
+.address-validator {
+  width: 712px;
+
+  .modal-body { min-height: 250px; }
+
+  &__modal-title {
+    margin-right: 20px;
+  }
+
+  &__dropdown {
+    width: 680px;
+
+    &__option {
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      padding: 5px;
+      border: 1px solid #d2d2d2;
+    }
+  }
+
+  &__cancel-button {
+    margin-left: auto;
+    border-color: #b92429;
+    color: #b92429;
+      &:hover, &:active, &:focus, &:hover:active {
+        color: #b92429;
+        border-color: #b92429;
+      }
+  }
+
+  &__exit-button {
+    margin-left: auto;
+    background-color: #b92429;
+    color: white;
+    max-height: 40px;
+
+      &:hover, &:active, &:focus, &:hover:active {
+        background-color: #b92429;
+        color: white;
+      }
+  }
+
+  &__retry-button { 
+    margin-left: 10px;
+  }
+
+  &__reset-button {
+    @extend .address-validator__exit-button;
+    height: 34px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__top-wrapper {
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 5px 5px 5px;
+    background-color: #f1f1f1;
+    box-shadow: 0px 8px 16px 0px black;
+    border: 1px solid gray;
+  }
+
+  &__input-wrapper {
+    display: flex;
+  }
+
+  &__input {
+    width: 100%;
+    margin-right: 5px;
+  }
+
+  &__exit-text {
+    font-size: 16px;
+  }
+
+  &__exit-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 991px) {
+  .address-validator { width: 100%; height: fit-content; }
+  .address-validator__dropdown { position: relative; width: 100%; }
+
+  .modal { padding-left: 0 !important;}
+  .modal-dialog { margin: 0 !important; padding: 10px;}
+}
+
+@media (max-width: 767px) {
+  .address-validator { height: 98% !important; }
+  .address-validator .modal-body { height: 100% !important; }
+}

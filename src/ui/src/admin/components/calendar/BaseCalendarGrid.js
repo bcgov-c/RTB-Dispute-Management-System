@@ -1,5 +1,5 @@
 /**
- * Defines some base functionality for the Calendar component UI
+ * @fileoverview - Defines some base functionality for the Calendar component UI
  *
  * Used by CalendarGrid and TodayCalendarGrid
  *

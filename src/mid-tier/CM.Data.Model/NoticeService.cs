@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CM.Data.Model;
 
@@ -15,7 +17,10 @@ public class NoticeService : BaseEntity
 
     public int ParticipantId { get; set; }
 
+    [ForeignKey("Served")]
     public int? ServedBy { get; set; }
+
+    public Participant Served { get; set; }
 
     public bool? IsServed { get; set; }
 
@@ -35,33 +40,21 @@ public class NoticeService : BaseEntity
     [StringLength(255)]
     public string OtherParticipantTitle { get; set; }
 
-    public File File1 { get; set; }
-
-    public int? NoticeServiceFile1Id { get; set; }
-
-    public File File2 { get; set; }
-
-    public int? NoticeServiceFile2Id { get; set; }
-
-    public File File3 { get; set; }
-
-    public int? NoticeServiceFile3Id { get; set; }
-
-    public File File4 { get; set; }
-
-    public int? NoticeServiceFile4Id { get; set; }
-
-    public File File5 { get; set; }
-
-    public int? NoticeServiceFile5Id { get; set; }
-
+    [ForeignKey("ProofFileDescription")]
     public int? ProofFileDescriptionId { get; set; }
 
     public FileDescription ProofFileDescription { get; set; }
 
+    [ForeignKey("OtherProofFileDescription")]
+    public int? OtherProofFileDescriptionId { get; set; }
+
+    public FileDescription OtherProofFileDescription { get; set; }
+
     public byte? ValidationStatus { get; set; }
 
     public int? ArchivedBy { get; set; }
+
+    public SystemUser Archived { get; set; }
 
     public byte? ArchiveServiceMethod { get; set; }
 
@@ -71,7 +64,21 @@ public class NoticeService : BaseEntity
 
     public byte? ArchiveServiceDateUsed { get; set; }
 
+    [ForeignKey("ArchiveServedParticipant")]
     public int? ArchiveServedBy { get; set; }
 
+    public Participant ArchiveServedParticipant { get; set; }
+
+    [StringLength(255)]
+    public string ArchiveServiceComment { get; set; }
+
+    [StringLength(500)]
+    public string ServiceDescription { get; set; }
+
+    [StringLength(500)]
+    public string ArchiveServiceDescription { get; set; }
+
     public bool? IsDeleted { get; set; }
+
+    public virtual ICollection<ServiceAuditLog> ServiceAuditLogs { get; set; }
 }

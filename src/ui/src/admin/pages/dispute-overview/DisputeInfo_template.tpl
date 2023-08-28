@@ -15,6 +15,7 @@
     <div class="review-dispute-rent-unit"></div>
 
     <div class="review-dispute-address"></div>
+    <div class="review-dispute-address-warning error-block warning warning-sm hidden">We were not able to confirm your address with the Canada Post system. Please update the address then press the&nbsp;<b>Retry</b>&nbsp;link above. If no corrections need to be made, you may continue without changes.</div>
 
     <div class="review-primary-applicant">
       <label class="review-label">Primary applicant:</label>&nbsp;<span><b><%= primaryApplicant ? primaryApplicant : 'None selected' %></b></span>

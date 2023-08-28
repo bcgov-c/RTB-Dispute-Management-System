@@ -3,7 +3,7 @@ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import CheckboxModel from '../../../core/components/checkbox/Checkbox_model';
 import CheckboxView from '../../../core/components/checkbox/Checkbox';
-import ModalViewEmail from '../../components/modals/modal-view-email/ModalViewEmail';
+import ModalViewEmail from '../../pages/communication/modals/ModalViewCommunicationEmail';
 import ModalEditTask from './modals/ModalEditTask';
 import ModalAssignTask from './modals/ModalAssignTask';
 import { routeParse } from '../../routers/mainview_router';

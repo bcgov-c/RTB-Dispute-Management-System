@@ -1,3 +1,4 @@
+/** @fileoverview - Modal that displays hearing information and deletes hearing upon continue click*/
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ModalDeleteHearingViewMixin from './ModalBaseDeleteHearingMixin';

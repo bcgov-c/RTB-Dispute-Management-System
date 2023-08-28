@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all SSPO and quick status related functionality 
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../utilities/UtilityMixin';
@@ -6,6 +9,7 @@ import DisputeModel from '../dispute/Dispute_model';
 import ProcessDetailCollection from '../process-detail/ProcessDetail_collection';
 import { generalErrorFactory } from '../api/ApiLayer';
 import { routeParse } from '../../../admin/routers/mainview_router';
+import ModalCompletenessCheck from '../modals/modal-completeness-check/ModalCompletenessCheck';
 
 const api_status_load_name = 'dispute/disputestatuses';
 const api_process_detail_load_name = 'dispute/disputeprocessdetails';
@@ -18,6 +22,7 @@ const modalChannel = Radio.channel('modals');
 const hearingChannel = Radio.channel('hearings');
 const flagsChannel = Radio.channel('flags');
 const loaderChannel = Radio.channel('loader');
+const documentsChannel = Radio.channel('documents');
 
 const StatusManager = Marionette.Object.extend({
   channelName: 'status',
@@ -43,7 +48,7 @@ const StatusManager = Marionette.Object.extend({
 
     'check:sspo:changed': 'applyAdminStatusChangedCheck',
     'check:sspo:status': 'applyAdminStatusCheck',
-    'apply:sspo:flags': 'applyFlagUpdatesForStatusChange',
+    'apply:sspo:after:actions': 'applyUpdatesAfterStatusChange',
 
     refresh: 'loadStatusData',
     load: 'loadStatusData',
@@ -320,90 +325,126 @@ const StatusManager = Marionette.Object.extend({
     });
   },
 
-  applyAdminStatusCheck(disputeModel, newStatus, newEvidenceOverride=false) {
-    return new Promise((resolve, reject) => {
-      // Only warn users if the status is one of the defined warning statuses
-      const STATUS_WARN_INCOMPLETE = configChannel.request('get', 'STATUS_WARN_INCOMPLETE') || [];
-      if (!(_.isArray(STATUS_WARN_INCOMPLETE) && STATUS_WARN_INCOMPLETE.length)) {
-        console.log("[Warning] Status warnings are not configured properly.");
-        resolve();
-        return;
-      }
+  async applyAdminStatusCheck(disputeModel, newSSPOData={}) {
+    const statusHasNotChanged = disputeModel.getStatus() === newSSPOData.status;
 
-      const statusHasNotChanged = disputeModel.getStatus() === newStatus;
-      
-      // Only run the check when the status has been changed to one of the incomplete changes
-      if (statusHasNotChanged || (!_.contains(STATUS_WARN_INCOMPLETE, newStatus))) {
-        resolve();
-        return;
-      }
+    // Only run the check when the status has been changed to one of the incomplete changes
+    if (statusHasNotChanged) return Promise.resolve();
 
-      disputeChannel.request('incomplete:dispute:check', disputeModel)
-        .done(response => {
-          response = response || {};
+    const completenessChecksConfig = configChannel.request('get', 'completenessChecks');
+    const isMatch = (matchSet, toBeMatched) => matchSet?.includes?.(toBeMatched) || matchSet === toBeMatched;
+    const includesSSPO = (data={}) => (
+      (data.stage ? isMatch(data.stage, newSSPOData.stage) : true) &&
+      (data.status ? isMatch(data.status, newSSPOData.status) : true) &&
+      (data.process ? isMatch(data.process, newSSPOData.process) : true) &&
+      (data.evidence_override ? isMatch(data.evidence_override, newSSPOData.evidence_override) : true)
+    );
+    const isArbWarnStatus = completenessChecksConfig?.arbSSPO?.some(includesSSPO);
+    const isIoWarnStatus = completenessChecksConfig?.ioSSPO?.some(includesSSPO);
 
-         // missingProcessOutcomes and undeliveredDocs counts are not displayed, don't include in total
-          const totalIncompleteItemsCount = response.totalIncompleteItems - response.missingProcessOutcomes - response.undeliveredDocuments;
-          // Don't show a warning when no incomplete pending items
-          if (!totalIncompleteItemsCount || totalIncompleteItemsCount<0) return resolve();
-          loaderChannel.trigger('page:load:complete');
-
-          const newArbItemsCount = response.missingDocumentWritingTime + response.missingHearingDetails + response.incompleteDocumentRequests;
-          const lineFormatter = (linkText, routeName, value) => {
-            // Don't show completed areas line(i.e. 0 incomplete items)
-            if (!value) return '';
-            const text = value ? `<a href="#${routeParse(routeName, disputeModel.id)}">${linkText}</a>` : linkText;
-            return `<li>${text}: <b>${value}</b></li>`;
-          };
-          const modalView = modalChannel.request('show:standard', {
-            title: 'Incomplete Items Warning',
-            bodyHtml: `<p>This file contains items that are not complete that should be completed before this file is closed:</p>
-            <p>
-              <b>Total incomplete items: ${(totalIncompleteItemsCount - newArbItemsCount) || '-'}</b>
-              <ul>
-                ${lineFormatter('Future hearings still assigned', 'hearing_item', response.futureHearings)}
-                ${lineFormatter('Incomplete tasks', 'task_item', response.incompleteTasks)}
-                ${lineFormatter('Incomplete outcome documents', 'document_item', response.incompleteOutcomeDocuments)}
-                ${lineFormatter('Missing issue outcomes', 'overview_item', response.missingIssueOutcomes)}
-                ${disputeModel.isNonParticipatory() ? '' : lineFormatter('Missing hearing participation', 'hearing_item', response.missingHearingParticipations)}
-                ${lineFormatter('Missing notice service', 'notice_item', response.missingNoticeService)}
-              </ul>
-              ${newArbItemsCount ? `
-                <b>New Arb Outcomes (July 1, 2021): ${newArbItemsCount || '-'}</b>
-                <ul>
-                  ${lineFormatter('Missing outcome document writing times', 'document_item', response.missingDocumentWritingTime)}
-                  ${lineFormatter('Missing hearing durations and info', 'hearing_item', response.missingHearingDetails)}
-                  ${lineFormatter('Missing outcome document request statuses', 'document_item', response.incompleteDocumentRequests)}
-                </ul>
-              ` : ''}
-            </p>
-            ${newEvidenceOverride ? `<p style="margin: 20px 0;" class="error-block warning">WARNING: "Enable All Uploads" is on.  This means that evidence can be submitted through the Dispute Access site on a closed file.</p>` : '' }
-            <p>Are you sure you want to close this file without completing these items?  This action will be recorded as a status set by your user account.</p>
-            <p>To continue without completing these items, press "Close Anyway", to leave the file open press "Cancel"</p>
-            `,
-            modalCssClasses: 'modal-status-change-warning',
-            cancelButtonText: 'Cancel',
-            primaryButtonText: 'Close Anyway',
-            onContinueFn: ((_modalView) => {
-              _modalView.close();
-              resolve();
-            }).bind(this)
+    if (isArbWarnStatus || isIoWarnStatus) {
+      const response = await disputeChannel.request('incomplete:dispute:check', disputeModel).fail(err => {
+        const handler = generalErrorFactory.createHandler('ADMIN.DIPSUTE.INCOMPLETE.CHECK', () => Promise.reject());
+        handler(err);
+      })
+      if (!response) return Promise.reject();
+      loaderChannel.trigger('page:load:complete');
+      if (isIoWarnStatus) {
+        return new Promise((resolve, reject) => {
+          // Any links from the completeness view will trigger the "edit in progress" check here unless it is disabled
+          disputeModel.stopEditInProgress();
+          const completenessModalView = new ModalCompletenessCheck({ model: disputeModel, incompleteItems: response,
+            closeButtonText: `Cancel`, submitButtonText: `Continue, Change Status`, })
+          let isSubmitted = false;
+          this.listenTo(completenessModalView, 'removed:modal', () => {
+            if (!isSubmitted) reject();
           });
-          
-          modalView.$('a').off('click.rtb');
-          modalView.$('a').on('click.rtb', () => {
-            disputeModel.trigger('incomplete:items:nav');
-            modalView.close();
+          this.listenTo(completenessModalView, 'submit', () => {
+            isSubmitted = true;
+            completenessModalView.close();
+            resolve();
           });
-          this.listenTo(modalView, 'removed:modal', reject);
-        }).fail(err => {
-          const handler = generalErrorFactory.createHandler('ADMIN.DIPSUTE.INCOMPLETE.CHECK', () => reject());
-          handler(err);
+          modalChannel.request('add', completenessModalView);
         });
+      } else if (isArbWarnStatus) {
+        const userSubmit = await this.showArbCompletenessModal(disputeModel, response, newSSPOData?.evidence_override);
+        if (userSubmit) return Promise.resolve();
+        else return Promise.reject();
+      }
+    } else {
+      return Promise.resolve();
+    }
+  },
+
+  async showArbCompletenessModal(disputeModel, response={}, newEvidenceOverride) {
+    const removedArbItemsCount = (response?.missingEvidenceService || 0) + (response?.missingProcessOutcomes || 0) + (response?.undeliveredDocuments || 0);
+    const actualIncompleteItemsCount = (response.totalIncompleteItems || 0)  - removedArbItemsCount;
+    if (!actualIncompleteItemsCount || actualIncompleteItemsCount < 0) return true;
+
+    const newArbItemsCount = (response?.missingDocumentWritingTime || 0) + (response?.missingHearingDetails || 0) + (response?.incompleteDocumentRequests || 0);
+    const lineFormatter = (linkText, routeName, value) => {
+      // Don't show completed areas line(i.e. 0 incomplete items)
+      if (!value) return '';
+      const text = value ? `<a href="#${routeParse(routeName, disputeModel.id)}">${linkText}</a>` : linkText;
+      return `<li>${text}: <b>${value}</b></li>`;
+    };
+
+    loaderChannel.trigger('page:load:complete');
+    return new Promise(resolve => {
+      const modalView = modalChannel.request('show:standard', {
+        title: 'Incomplete Items Warning',
+        bodyHtml: `<p>This file contains items that are not complete that should be completed before this file is closed:</p>
+        <p>
+          <b>Total incomplete items: ${(actualIncompleteItemsCount) || '-'}</b>
+          <ul>
+            ${lineFormatter('Future hearings still assigned', 'hearing_item', response.futureHearings)}
+            ${lineFormatter('Incomplete tasks', 'task_item', response.incompleteTasks)}
+            ${lineFormatter('Incomplete outcome documents', 'document_item', response.incompleteOutcomeDocuments)}
+            ${lineFormatter('Missing issue outcomes', 'overview_item', response.missingIssueOutcomes)}
+            ${disputeModel.isNonParticipatory() ? '' : lineFormatter('Missing hearing participation', 'hearing_item', response.missingHearingParticipations)}
+            ${lineFormatter('Missing notice service', 'notice_item', response.missingNoticeService)}
+            ${lineFormatter('Missing notice service confirmations', 'notice_item', response.missingNoticeServiceConfirmations)}
+          </ul>
+          ${newArbItemsCount ? `
+            <b>New Arb Outcomes (July 1, 2021): ${newArbItemsCount || '-'}</b>
+            <ul>
+              ${lineFormatter('Missing outcome document writing times', 'document_item', response.missingDocumentWritingTime)}
+              ${lineFormatter('Missing hearing durations and info', 'hearing_item', response.missingHearingDetails)}
+              ${lineFormatter('Missing outcome document request statuses', 'document_item', response.incompleteDocumentRequests)}
+            </ul>
+          ` : ''}
+        </p>
+        ${newEvidenceOverride ? `<p style="margin: 20px 0;" class="error-block warning">WARNING: "Enable All Uploads" is on.  This means that evidence can be submitted through the Dispute Access site on a closed file.</p>` : '' }
+        <p>Are you sure you want to close this file without completing these items?  This action will be recorded as a status set by your user account.</p>
+        <p>To continue without completing these items, press "Close Anyway", to leave the file open press "Cancel"</p>
+        `,
+        modalCssClasses: 'modal-status-change-warning',
+        cancelButtonText: 'Cancel',
+        primaryButtonText: 'Close Anyway',
+        onContinueFn: ((_modalView) => {
+          _modalView.close();
+          resolve(true);
+        }).bind(this)
+      });
+      
+      modalView.$('a').off('click.rtb');
+      modalView.$('a').on('click.rtb', () => {
+        disputeModel.trigger('incomplete:items:nav');
+        modalView.close();
+      });
+      this.listenTo(modalView, 'removed:modal', () => resolve(false));
     });
   },
 
-  applyFlagUpdatesForStatusChange(disputeStatusChanges={}, disputeModel) {
+  async applyUpdatesAfterStatusChange(disputeStatusChanges={}, disputeModel) {
+    return Promise.all([
+      this.applyDisputeFlagsAfterStatusChange(disputeStatusChanges, disputeModel),
+      // NOTE: This only can set the outcome docs that are loaded - only an active doc will have this handling
+      this.applyDocRequestsAfterStatusChange(disputeStatusChanges)
+    ]);
+  },
+
+  async applyDisputeFlagsAfterStatusChange(disputeStatusChanges={}, disputeModel) {
     const STATUS_ADJOURNED = configChannel.request('get', 'STATUS_ADJOURNED');
     const STATUS_CLOSED = configChannel.request('get', 'STATUS_CLOSED');
     const PROCESS_REVIEW_HEARING = configChannel.request('get', 'PROCESS_REVIEW_HEARING');
@@ -419,28 +460,35 @@ const StatusManager = Marionette.Object.extend({
     const shouldClosePrelimFlags = disputeStatusChanges.dispute_status === STATUS_ADJOURNED;
     const shouldCreateReviewHearingFlag = disputeStatusChanges.process === PROCESS_REVIEW_HEARING && !hasReviewHearingFlag;
 
-    return new Promise((res, rej) => {
-      const flagSavePromises = [];
-      if (shouldCreateAdjourmentFlag) {
-        flagSavePromises.push(() => flagsChannel.request('create:adjournment').save());
-      }
-      if (shouldCloseAssociatedFlags) {
-        flagSavePromises.push(() => flagsChannel.request('close:adjournments'), () => flagsChannel.request('close:subservice:approved'));
-      }
-      if (shouldClosePrelimFlags) {
-        flagSavePromises.push(() => flagsChannel.request('close:prelim'));
-      }
+    const flagSavePromises = [];
+    if (shouldCreateAdjourmentFlag) {
+      flagSavePromises.push(() => flagsChannel.request('create:adjournment').save());
+    }
+    if (shouldCloseAssociatedFlags) {
+      flagSavePromises.push(() => flagsChannel.request('close:adjournments'), () => flagsChannel.request('close:subservice:approved'));
+    }
+    if (shouldClosePrelimFlags) {
+      flagSavePromises.push(() => flagsChannel.request('close:prelim'));
+    }
 
-      if (shouldCreateReviewHearingFlag) {
-        flagSavePromises.push(() => flagsChannel.request('create:review:hearing').save());
-      }
+    if (shouldCreateReviewHearingFlag) {
+      flagSavePromises.push(() => flagsChannel.request('create:review:hearing').save());
+    }
 
-      if (!flagSavePromises) return res();
-
-      Promise.all(flagSavePromises.map(p=>p())).then(res, generalErrorFactory.createHandler('DISPUTE.FLAG.SAVE', rej));
-    });
+    return Promise.all(flagSavePromises.map(p => p()))
+      .catch(generalErrorFactory.createHandler('DISPUTE.FLAG.SAVE'));
   },
 
+  // NOTE: This only can set the outcome docs that are loaded - only an active doc will have this handling
+  async applyDocRequestsAfterStatusChange(disputeStatusChanges={}) {
+    // On process change, set all doc requests to being flagged as "past"
+    if (!disputeStatusChanges.process) return;
+    const OUTCOME_DOC_REQUEST_SUB_STATUS_PAST_PROCESS = configChannel.request('get', 'OUTCOME_DOC_REQUEST_SUB_STATUS_PAST_PROCESS');
+    return Promise.all(documentsChannel.request('get:requests').map(request => {
+      request.set({ request_sub_status: OUTCOME_DOC_REQUEST_SUB_STATUS_PAST_PROCESS });
+      return request.save(request.getApiChangesOnly());
+    })).catch(generalErrorFactory.createHandler('OUTCOME.DOC.REQUEST.SAVE'));
+  },
 
   getProcessDetail(process) {
     return this.processDetails.findWhere({ associated_process: Number(process) });
@@ -468,7 +516,7 @@ const StatusManager = Marionette.Object.extend({
   },
 
 
-  getRoleTypeStatusConfig(role_type, check_owner_blank = false, initialStagesData = null) {
+  getRoleTypeStatusConfig(role_type, check_owner_blank=false, initialStagesData=null) {
     initialStagesData = initialStagesData || [];
     
     const status_rules = this._getAllStageStatusRules();

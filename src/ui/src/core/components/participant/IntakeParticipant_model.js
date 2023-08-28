@@ -27,6 +27,8 @@ export default Backbone.Model.extend({
     noPackageProvision: false,
     noEmailOptOut: null,
     isRespondent: false,
+    useAddressValidation: false,
+    useMailAddressValidation: false,
   },
 
   initialize() {
@@ -49,7 +51,7 @@ export default Backbone.Model.extend({
 
     this.listenTo(this.get('participantModel'), 'sync:complete', this.setupFrontendData, this);
 
-    if ((this.collection && this.collection.isRespondent) || this.get('isRespondent')) {
+    if (this?.collection?.collectionOptions?.isRespondent || this.get('isRespondent')) {
       this.set('optionalEmail', true);
       this.set('optionalPhone', true);
     }
@@ -239,6 +241,7 @@ export default Backbone.Model.extend({
     }));
 
     this.set('firstNameModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       name: name + '-firstname',
       labelText: 'First Name',
@@ -250,6 +253,7 @@ export default Backbone.Model.extend({
     }));
 
     this.set('lastNameModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       name: name + '-lastname',
       labelText: 'Last Name',
@@ -306,14 +310,19 @@ export default Backbone.Model.extend({
       postalCode: 'postal_zip',
       country: 'country',
       province: 'province_state',
+      addressIsValidated: 'address_is_validated'
     };
 
     this.set('addressModel', new AddressModel({
       json: _.mapObject(participantAddressApiMappings, function(val) { return this.get('participantModel').get(val); }, this),
       apiMapping: participantAddressApiMappings,
       name: name + '-address',
-      useDefaultProvince: false,
-      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX')
+      useSubLabel: false,
+      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX'),
+      showUpdateControls: false,
+      useAddressValidation: this.get('useAddressValidation'),
+      useCPToolBackup: this.get('useAddressValidation'),
+      selectProvinceAndCountry: true,
     }));
 
     this.set('useMailModel', new DropdownModel({
@@ -323,18 +332,23 @@ export default Backbone.Model.extend({
     }));
 
 
-    const participantMailingAddressApiMappings = {
+    let participantMailingAddressApiMappings = {
       street: 'mail_address',
       city: 'mail_city',
       postalCode: 'mail_postal_zip',
       country: 'mail_country',
-      province: 'mail_province_state'
+      province: 'mail_province_state',
+      addressIsValidated: 'mail_address_is_validated'
     };
+
     const mailingAddressModel = new AddressModel({
       name: name + '-mailing-address',
-      useDefaultProvince: false,
       json: _.mapObject(participantMailingAddressApiMappings, function(val) { return this.get('participantModel').get(val); }, this),
       apiMapping: participantMailingAddressApiMappings,
+      showUpdateControls: false,
+      useAddressValidation: this.get('useMailAddressValidation') || false,
+      useCPToolBackup: this.get('useMailAddressValidation') || false,
+      selectProvinceAndCountry: true,
     });
     // Add text 'Mail' to each model with a labelText on address
     _.each(_.keys(mailingAddressModel.attributes), function(attr) {
@@ -417,16 +431,56 @@ export default Backbone.Model.extend({
     }));
   },
 
+  enableAddress(options={}) {
+    this.get('addressModel').enableInputs(options);
+    this.get('unitTypeRadioModel')?.set({ disabled: false, });
+    this.get('unitTypeModel')?.updateCurrentValue(this.get('participantModel').get('unit_text') || this.get('participantModel').get('unit_type'));
+    this.get('unitTypeModel')?.set({ disabled: false });
+    if (options.render) {
+      this.get('unitTypeRadioModel')?.trigger('render');
+      this.get('unitTypeModel')?.trigger('render');
+    }
+  },
+
+  disableAddress(options={}) {
+    // Re-set the address values to API defaults, then disable all inputs
+    const participantAddressApiMappings = {
+      street: 'address',
+      city: 'city',
+      postalCode: 'postal_zip',
+      country: 'country',
+      province: 'province_state',
+    };
+    this.get('addressModel')?.updateValues(_.mapObject(participantAddressApiMappings, val => this.get('participantModel').get(val)));
+    this.get('unitTypeRadioModel')?.set({
+      value: this.get('participantModel').isNew() ? null : (this.get('participantModel').get('unit_type') ? 1 : 0),
+      disabled: true,
+    });
+    
+    this.get('addressModel').disableInputs(options);
+    this.get('unitTypeModel')?.updateCurrentValue(this.get('participantModel').get('unit_text') || this.get('participantModel').get('unit_type'));
+    this.get('unitTypeModel')?.set('disabled', true);
+
+    if (options.disableMail) {
+      this.get('useMailModel')?.set('disabled', true);
+    }
+
+    if (options.render) {
+      this.get('useMailModel')?.trigger('render');
+      this.get('unitTypeRadioModel')?.trigger('render');
+      this.get('unitTypeModel')?.trigger('render');
+    }
+  },
+
   // Get the parsed attributes from the UI
   getUIDataAttrs() {
     const return_obj = {};
-
     _.each(this.get('apiMapping'), function(mapping_name, modelName) {
       return_obj[mapping_name] = this.get(modelName).getData({ parse: true });
     }, this);
     return_obj.no_email = this.get('optionalEmail') ? this.get('optionalEmail') : false;
-    _.extend(return_obj, this.get('addressModel').getPageApiDataAttrs());
-
+    if (!this.get('addressModel').isEmpty()) _.extend(return_obj, this.get('addressModel').getPageApiDataAttrs());
+    
     if (this.isBusiness()) {
       return_obj.bus_contact_first_name = this.get('firstNameModel').getData();
       return_obj.bus_contact_last_name = this.get('lastNameModel').getData();
@@ -447,6 +501,7 @@ export default Backbone.Model.extend({
     if ($.trim(this.get('useMailModel').getData()) === '1') {
       // Clear out mailingAddress if using same mailing address
       _.extend(return_obj, _.mapObject(mailing_address_api_attrs, function() { return null; }));
+      return_obj.mail_address_is_validated = false;
     } else { // Otherwise, add the mail model
       _.extend(return_obj, mailing_address_api_attrs);
     }

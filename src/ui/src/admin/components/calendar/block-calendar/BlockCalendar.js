@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Top level container for the working schedule calendar
+ */
 import Marionette from 'backbone.marionette';
 import React from 'react';
 import ReactDOM from 'react-dom';

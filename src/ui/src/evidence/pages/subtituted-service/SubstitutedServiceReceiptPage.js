@@ -8,6 +8,7 @@ import AccessDisputeOverview from '../../components/access-dispute/AccessDispute
 import { ReceiptContainer } from '../../../core/components/receipt-container/ReceiptContainer';
 import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
 import './SubstitutedServicePage.scss';
+import ApplicantViewDispute from '../../../core/components/ivd/ApplicantViewDispute';
 
 const loaderChannel = Radio.channel('loader');
 const disputeChannel = Radio.channel('dispute');
@@ -64,13 +65,14 @@ const SubstitutedServiceReceiptPage = PageView.extend({
     const isLandlord = !this.participant || this.participant.isLandlord();
     const isApplicant = this.participant && this.participant.isApplicant();
     const participantInitials = this.participant && this.participant.getInitialsDisplay() ? this.participant.getInitialsDisplay()  : '-';
+    const showIVDReceiptLanguage = ApplicantViewDispute.isIvdEnabled();
     const { substitutedServiceModel, serviceTo, hasEmailServiceAgreement } = this.receiptData;
 
     return renderToString(<>
       <h4 className="er-title visible-email" style={{ fontWeight: 'bold', padding: '0px', margin: '25px 0px 10px 0px' }}>Receipt: Request for substituted service</h4>
 
       <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 10px 0px' }}>
-        The following was submitted to the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
+        The following was submitted to the Residential Tenancy Branch.{showIVDReceiptLanguage ? <span> You can view your submitted request and outcome by <a href={configChannel.request('get', 'INTAKE_URL')} target="_blank" rel="noopener noreferrer">logging in online with the BceID that was used to create this application</a>.</span> : ''} For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
 	    </p>
 
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>File number: </span> <b>{this.dispute.get('file_number')}</b></p>

@@ -48,7 +48,9 @@ const CEUItemView = Marionette.View.extend({
     const owner = this.model.get('owner_id') ? userChannel.request('get:user:name', this.model.get('owner_id')) || '-' : '-';
     const status = this.model.get('object_status') ? this.CEU_STATUS_DISPLAY[this.model.get('object_status')] || '-' : '-';
     const urgency = this.model.get('object_sub_status') ? this.CEU_URGENCY_DISPLAY[this.model.get('object_sub_status')] || '-' : '-';
-    const submitter = this.primaryApplicant ? `${this.primaryApplicant.getTypeDisplay()}: ${this.primaryApplicant.getDisplayName()}` : '-';
+    const submitter = this.primaryApplicant?.getDisplayName() || '-';
+    const firstRespondent = this.ceuData.respondents?.length ? new CeuParticipant_model(this.ceuData.respondents[0]) : null;
+    const respondentDisplay = firstRespondent?.getDisplayName() || '-';
     const units = this.ceuData.units || [];
     const contraventions = this.ceuData.contraventions || [];
     let uploads = [];
@@ -69,11 +71,14 @@ const CEUItemView = Marionette.View.extend({
         <div className="ceu-table__status-column">{status}</div>
         <div className="ceu-table__created-column">{Formatter.toDateDisplay(this.model.get('created_date'))}</div>
         <div className="ceu-table__submitter-column">{submitter}</div>
+        <div className="ceu-table__respondent-column">{respondentDisplay}</div>
         <div className={`ceu-table__urgency-column${this.getUrgencyClass()}`}>{urgency}</div>
         <div className="ceu-table__units-column">{units.length}</div>
+        {/*
         <div className="ceu-table__contraventions-column">{contraventions.length}</div>
         <div className="ceu-table__uploads-column">{uploads.length}</div>
         <div className="ceu-table__files-column">{dmsFiles.length}</div>
+        */}
         <div className="ceu-table__owner-column">{owner}</div>
       </div>
     )
@@ -115,11 +120,14 @@ const CEUComplaintsTable = Marionette.View.extend({
           <div className="ceu-table__status-column">Intake Status</div>
           <div className="ceu-table__created-column">Intake Started</div>
           <div className="ceu-table__submitter-column">Submitted By</div>
+          <div className="ceu-table__respondent-column">Respondent</div>
           <div className="ceu-table__urgency-column">Urgency</div>
           <div className="ceu-table__units-column">Units</div>
+          {/*
           <div className="ceu-table__contraventions-column">Contraventions</div>
           <div className="ceu-table__uploads-column">Uploads</div>
           <div className="ceu-table__files-column">DMS Files</div>
+          */}
           <div className="ceu-table__owner-column">CEU Owner</div>
         </div>
         <div className="standard-list-items"></div>

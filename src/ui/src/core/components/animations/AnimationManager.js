@@ -1,6 +1,6 @@
 
 /**
- * AnimationManager manages creation of AnimationQueues, and items, and also manages the global animation queue.
+ * @fileoverview - Manager that handles creation of AnimationQueues, items, and the global animation queue.
  * @namespace core.components.animations.AnimationManager
  * @memberof core.components.animations
  */

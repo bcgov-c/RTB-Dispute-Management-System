@@ -133,6 +133,9 @@ export default CMModel.extend({
   },
 
   getAwardedAmount() {
+    // An amount is only considered awarded if it is in a status
+    // TODO: We should remove this status check, and be clearing awarded_amount on status changes that invalidate it instead.
+    if (!this.isOutcomeAwarded() && !this.isOutcomeSettled()) return 0;
     return this.get('awarded_amount') || 0;
   },
 
@@ -166,6 +169,10 @@ export default CMModel.extend({
     return !!this.get('is_reviewed');
   },
 
+  hasOutcome() {
+    return ![null, configChannel.request('get', 'REMEDY_STATUS_NOT_SET')].includes(this.get('remedy_status'));
+  },
+
   _checkRemedyStatus(configCodes, options={}) {
     if (!configCodes) {
       console.log("[Info] Passed empty config value to remedy status check");
@@ -177,10 +184,6 @@ export default CMModel.extend({
     
     const remedy_status = this.get(options.use_prev ? 'prev_remedy_status' : 'remedy_status') || null;
     return configCodes.map(code => configChannel.request('get', code)).includes(remedy_status);
-  },
-
-  hasOutcome() {
-    return this.get('remedy_status');
   },
 
   isOutcomeRemoved(options={}) {
@@ -208,15 +211,22 @@ export default CMModel.extend({
 
   isOutcomeAwardedSpecificDate(options={}) {
     return this._checkRemedyStatus(['REMEDY_STATUS_POSSESSION_GRANTED_SPECIFIC_DATE', 'REMEDY_STATUS_SETTLED_POSSESSION_SPECIFIC_DATE'], options);
-
   },
 
   isOutcomeAwardedOtherDate(options={}) {
     return this._checkRemedyStatus(['REMEDY_STATUS_POSSESSION_GRANTED_OTHER_DATE', 'REMEDY_STATUS_SETTLED_POSSESSION_OTHER_DATE'], options);
   },
 
+  isOutcomeAwardedOther(options={}) {
+    return this._checkRemedyStatus(['REMEDY_STATUS_OTHER_ISSUE_GRANTED'], options);
+  },
+
   isOutcomeDismissed(options={}) {
     return this._checkRemedyStatus(['REMEDY_STATUS_DISMISSED_WITH_LEAVE', 'REMEDY_STATUS_DISMISSED_NO_LEAVE'], options);
+  },
+
+  isOutcomeDismissedWithLeave(options={}) {
+    return this._checkRemedyStatus('REMEDY_STATUS_DISMISSED_WITH_LEAVE', options);
   },
 
   isOutcomeDismissedWithoutLeave(options={}) {
@@ -248,6 +258,7 @@ export default CMModel.extend({
   isOutcomeSever(options={}) {
     return this._checkRemedyStatus('REMEDY_STATUS_REMOVE_SEVER', options);
   },
+  
 
   getOutcomeDisplay(disputeClaimModel, options={}) {
     const isAmend = this.isOutcomeAmend(options);
@@ -259,7 +270,7 @@ export default CMModel.extend({
     const isOutcomeIncludedAndNotDecided = this.isOutcomeIncludedAndNotDecided(options);
     const isMonetaryOutcomeIssue = disputeClaimModel && disputeClaimModel.isMonetaryOutcomeIssue();
     const isLandlordMoveOutIssue = disputeClaimModel && disputeClaimModel.isLandlordMoveOutIssue();
-    const withLeaveToReapply = this._checkRemedyStatus('REMEDY_STATUS_DISMISSED_WITH_LEAVE');
+    const isOutcomeDismissedWithLeave = this.isOutcomeDismissedWithLeave();
     const usePrev = options.use_prev;
     const statusReason = this.get(usePrev ? 'prev_remedy_status_reason_code' : 'remedy_status_reason_code');
     const statusReasonDisplay = statusReason && (configChannel.request('get', 'REMEDY_STATUS_REASONS_DISPLAY') || {})[statusReason];
@@ -272,7 +283,7 @@ export default CMModel.extend({
       if (isMonetaryOutcomeIssue && awardedAmount !== null) outcomeDisplay += ` - ${Formatter.toAmountDisplayWithNegative(awardedAmount)}`;
       if (isLandlordMoveOutIssue) outcomeDisplay += ` - ${this.getGrantedMoveOutOutcomeDateDisplay(disputeClaimModel, options)}`;
     } else if (isDismiss) {
-      outcomeDisplay = `Dismissed - ${withLeaveToReapply ? 'With Leave To Re-Apply' : 'Without Leave To Re-Apply'}`;
+      outcomeDisplay = `Dismissed - ${isOutcomeDismissedWithLeave ? 'With Leave To Re-Apply' : 'Without Leave To Re-Apply'}`;
     } else if (isOutcomeNoJurisdiction) {
       outcomeDisplay = 'No Jurisdiction';
     } else if (isSever) {
@@ -355,10 +366,6 @@ export default CMModel.extend({
     const user = userChannel.request('get:user', this.get('modified_by'));
     // If the model was changed since it was created, and if it was last changed by an internal staff
     return user && user.isSystemUser() && this.get('modified_date') !== this.get('created_date');
-  },
-
-  hasOutcome() {
-    return ![null, configChannel.request('get', 'REMEDY_STATUS_NOT_SET')].includes(this.get('remedy_status'));
   },
 
   destroy(options) {

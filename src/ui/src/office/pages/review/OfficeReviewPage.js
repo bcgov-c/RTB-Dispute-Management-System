@@ -11,8 +11,9 @@ export default OfficeRequestPageView.extend({
   initialize() {
     const dispute = disputeChannel.request('get');
     const loggedInParticipantId = dispute && dispute.get('tokenParticipantId');
-    const reviewFees = paymentsChannel.request('get:fees').filter(f => f.isReviewFee() && f.get('payor_id') === loggedInParticipantId && loggedInParticipantId);
-    this.disputeFeeModel = reviewFees.length ? reviewFees[0] : new DisputeFeeModel({
+    const paidReviewFees = paymentsChannel.request('get:fees').filter(f => f.isPaid() && f.isReviewFee() && f.get('payor_id') === loggedInParticipantId && loggedInParticipantId);
+    const latestPaidReviewFee = paidReviewFees.slice(-1)?.[0];
+    this.disputeFeeModel = latestPaidReviewFee ? latestPaidReviewFee : new DisputeFeeModel({
       fee_type: configChannel.request('get', 'PAYMENT_FEE_TYPE_REVIEW'),
       due_date: Moment().toISOString(),
       is_active: true,

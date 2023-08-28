@@ -32,7 +32,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/theme.css';
 import 'jquery-ui/themes/base/datepicker.css';
 import 'jquery-timepicker/jquery.timepicker.css';
-import 'trumbowyg/dist/ui/trumbowyg.min.css';
+import 'trumbowyg/dist/ui/trumbowyg.css';
 import 'trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 import 'trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
 import 'trumbowyg/dist/plugins/history/trumbowyg.history.min.js';
@@ -48,7 +48,6 @@ import './styles/tasks.css';
 import './styles/history.css';
 import './styles/notice.css';
 import './styles/payments.css';
-import './styles/landing.css';
 import './styles/search.css';
 import './styles/documents.css';
 import './styles/dashboarddisputes.css';
@@ -59,6 +58,7 @@ import './styles/calendar.css';
 import './styles/schedule.css';
 import './styles/evidence.css';
 import './styles/dms-editor.css'
+import './styles/upload-table.scss';
 
 // Print styles
 import '../core/styles/index-print.css';
@@ -123,6 +123,10 @@ import { ApplicationBaseModelMixin } from '../core/components/app/ApplicationBas
 import ModalBaseView from '../core/components/modals/ModalBase';
 import InputView from '../core/components/input/Input';
 import InputModel from '../core/components/input/Input_model';
+
+import LoaderSvg from '../core/static/loader.svg';
+import LoaderGif from '../core/static/DMSLoader_SML.gif';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 // Add site name
 var g = window || global;
@@ -216,6 +220,7 @@ const config_paths = [
   // Admin-only configs
   require('../core/config/config_amendments.json'),
   require('../core/config/config_email_templates.json'),
+  require('../core/config/config_reports.json'),
 ];
 
 const HEADER_TITLE_TEXT = 'DMS Case - Residential Tenancies';
@@ -294,7 +299,7 @@ const AppModel = Backbone.Model.extend({
     amendmentsChannel.request('cache:load', disputeGuid);
     documentsChannel.request('cache:load', disputeGuid);
     userChannel.request('cache:load', disputeGuid);
-    customDataObjsChannel.request('cache:load');
+    customDataObjsChannel.request('cache:load', disputeGuid);
     flagsChannel.request('cache:load', disputeGuid);
     trialsChannel.request('cache:load', disputeGuid);
   },
@@ -341,6 +346,7 @@ const AppModel = Backbone.Model.extend({
     userChannel.request('clear:dispute', disputeGuid);
     customDataObjsChannel.request('clear:dispute', disputeGuid);
     flagsChannel.request('clear:dispute', disputeGuid);
+    trialsChannel.request('clear:dispute', disputeGuid);
   },
 
   clearSessionCookies() {
@@ -380,6 +386,31 @@ const AppModel = Backbone.Model.extend({
       () => userChannel.request('load:users'),
       () => filesChannel.request('load:commonfiles'),
     ];
+
+    // Setup login and logout listeners - they will be triggered when `mixin_checkSiteVersionAndLogin` runs
+    // NOTE: The login:complete handler will fire an extra even to enable routing from the App after login
+    this.listenTo(sessionChannel, 'logout:complete', () => {
+      localStorage.removeItem('authToken');
+      this.clearSessionCookies();
+      sessionChannel.request('clear:timers');
+      applicationChannel.request('clear');
+      disputeHistoryChannel.request('clear');
+    });
+
+    this.listenTo(sessionChannel, 'login:complete', (options={}) => {
+      this.processSessionCookies();
+      this.clearSessionCookies();
+
+      const user = sessionChannel.request('get:user');
+      if (user && !user.isSystemUser()) {
+        console.log(`[Warning] Login success, but user is not a Staff user. Logging out.`);
+        Backbone.history.navigate('logout', { trigger: true });
+        return;
+      }
+      sessionChannel.request('clear:timers');
+      sessionChannel.request('create:timers');
+      this.trigger('perform:routingActions', options);
+    });
 
     $.whenAll(
       this.loadConfigs().then(() => {
@@ -477,7 +508,7 @@ const AppModel = Backbone.Model.extend({
       this.loadDisputeNotes(disputeGuid),
       this.loadCustomDataObjs(disputeGuid),
       this.loadDisputeFlags(disputeGuid),
-      this.loadTrialsInfo(disputeGuid)
+      this.loadTrialsInfo(disputeGuid),
     ).done(() => {
       // Claim information needs the ClaimGroup set first, so we have to run it second
       // Hearing needs participant lookups as well
@@ -487,6 +518,7 @@ const AppModel = Backbone.Model.extend({
         this.loadDisputeNotices(disputeGuid),
         this.loadDisputeHearings(disputeGuid),
         this.loadClaimsInformation(disputeGuid),
+        this.loadOutcomeDocRequests(disputeGuid),
         ...extraPromiseFns.map(promiseFn => promiseFn())
       ])
         .then(disputeLoadFinishedFn, err => dfd.reject(err))
@@ -533,7 +565,8 @@ const AppModel = Backbone.Model.extend({
         this.loadDisputeSubServices(disputeGuid),
         this.loadDisputeHearings(disputeGuid),
         this.loadClaimsInformation(disputeGuid),
-        this.loadOutcomeDocuments(disputeGuid)
+        this.loadOutcomeDocuments(disputeGuid),
+        this.loadOutcomeDocRequests(disputeGuid)
       ).done(disputeLoadFinishedFn)
         .fail(
           generalErrorFactory.createHandler('DISPUTE.LOAD.FULL.2', () => {
@@ -554,7 +587,7 @@ const AppModel = Backbone.Model.extend({
       const currentUser = sessionChannel.request('get:user');
       const existingDispute = disputeHistoryChannel.request('get', disputeGuid);
 
-      if (currentUser.isArbitrator() && !existingDispute) {
+      if (currentUser.isArbitrator() && !currentUser.isAdjudicator() && !existingDispute) {
         dispute.set({ sessionSettings: {
           ...dispute.get('sessionSettings'),
           hearingToolsEnabled: true
@@ -645,6 +678,9 @@ const AppModel = Backbone.Model.extend({
   loadOutcomeDocuments(disputeGuid) {
     return documentsChannel.request('load', disputeGuid);
   },
+  loadOutcomeDocRequests(disputeGuid) {
+    return documentsChannel.request('load:requests', disputeGuid);
+  }
 });
 
 _.extend(AppModel.prototype, ApplicationBaseModelMixin);
@@ -670,22 +706,34 @@ const App = Marionette.Application.extend({
     });
   },
 
-  initializeCustomAnimations() {
+  initializeEventsAndAnimations() {
     $.initializeCustomAnimations({
       scrollableContainerSelector: '.page-view'
     });
+    $.initializeDatepickerScroll();
   },
 
   initializeSiteDependentData() {
     paymentsChannel.request('set:transaction:site:source', configChannel.request('get', 'PAYMENT_TRANSACTION_SITE_SOURCE_ADMIN'));
+
+    // Preload core loaders
+    [LoaderSvg, LoaderGif].forEach(url => new Image().src = url);
   },
 
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
-    this.initializeCustomAnimations();
+    this.initializeEventsAndAnimations();
     this.initializeViews(MainView);
     this.initializeRoutersAndRouteListeners();
     this.model.mixin_checkClientTimeSyncAndLogout();
+    AnalyticsUtil.initializeAnalyticsTracking();
+  },
+
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_ADMIN')
+    });
   },
 
   initializeViews(mainViewClass) {
@@ -819,7 +867,7 @@ const App = Marionette.Application.extend({
       if (options?.disableNav) return;
       Backbone.history.navigate(routeParse('landing_item'), { trigger: true });
     };
-    
+
     if (this.mainView &&_.isFunction(this.mainView.withMenuLoadUpdate)) {
       if (_.isFunction(this.mainView.clearRoutingData)) this.mainView.clearRoutingData();
       if (_.isFunction(this.mainView.checkAndUpdateMenuBasedOnLoginStatus)) this.mainView.checkAndUpdateMenuBasedOnLoginStatus();
@@ -827,36 +875,6 @@ const App = Marionette.Application.extend({
     } else {
       navigationFn();
     }
-  },
-
-  onLoginComplete(options={}) {
-    this.model.processSessionCookies();
-    this.model.clearSessionCookies();
-
-    const user = sessionChannel.request('get:user');
-    const currentToken = sessionChannel.request('token');
-    const userTokenWasAlreadyUsedInOverride = user && currentToken && user.get('_loginOverrideTokenUsed') === currentToken;
-
-    if (user && !user.isSystemUser()) {
-      console.log(`[Warning] Login success, but user is not a Staff user. Logging out.`);
-      Backbone.history.navigate('logout', { trigger: true });
-      return;
-    }
-
-    const isDevOrStaging = _.contains(['development', 'staging'], configChannel.request('get', 'RUN_MODE'));
-    if (isDevOrStaging && sessionChannel.request('is:login:siteminder')) {
-      if (!userTokenWasAlreadyUsedInOverride && this._checkAndShowLoginOverrides()) {
-        return;
-      }
-    }
-
-    // We didn't do a login override by this point, so clear token
-    if (user) user.set('_loginOverrideTokenUsed', null);
-
-    sessionChannel.request('clear:timers');
-    sessionChannel.request('create:timers');
-
-    this.performRoutingActionOnLoginComplete(options);
   },
 
   initializeAppRouter() {
@@ -867,16 +885,21 @@ const App = Marionette.Application.extend({
     this.initializeAppRouter();
     this.mainViewRouter = new MainViewRouter({ controller: this.mainView });
 
-    this.listenTo(sessionChannel, 'login:complete', this.onLoginComplete, this);
+    // Attach extra view actions to the end of the login complete handler - including login role override
+    this.listenTo(this.model, 'perform:routingActions', (options={}) => {
+      const user = sessionChannel.request('get:user');
+      const currentToken = sessionChannel.request('token');
+      const userTokenWasAlreadyUsedInOverride = user && currentToken && user.get('_loginOverrideTokenUsed') === currentToken;
+      const isDevOrStaging = _.contains(['development', 'staging'], configChannel.request('get', 'RUN_MODE'));
+      if (isDevOrStaging && sessionChannel.request('is:login:siteminder') && !userTokenWasAlreadyUsedInOverride && this._checkAndShowLoginOverrides()) {
+        return;
+      }
+      // We didn't do a login override by this point, so clear token
+      user?.set('_loginOverrideTokenUsed', null);
 
-    this.listenTo(sessionChannel, 'logout:complete', function() {
-      localStorage.removeItem('authToken');
-      this.model.clearSessionCookies();
-      sessionChannel.request('clear:timers');
-      applicationChannel.request('clear');
-      disputeHistoryChannel.request('clear');
-    }, this);
-
+      this.performRoutingActionOnLoginComplete(options);
+    });
+    
     this.listenTo(menuChannel, 'close:dispute', (disputeGuid) => {
       // When a dispute is removed from the left menu, make sure to remove it from history / cache
       this.model.clearLoadedInfoForDispute(disputeGuid);

@@ -16,7 +16,7 @@ public interface IParticipantService : IServiceBase, IDisputeResolver
 
     Task<int> RelatedEntity(int id);
 
-    Task<Participant> PatchAsync(Participant participant, PartyPatchType patchType = PartyPatchType.Null);
+    Task<Participant> PatchAsync(Participant participant, PartyPatchType patchType = PartyPatchType.Null, bool abbrUpdate = false);
 
     Task<ParticipantResponse> GetAsync(int id);
 
@@ -36,5 +36,7 @@ public interface IParticipantService : IServiceBase, IDisputeResolver
 
     Task<bool> IsPrimaryApplicant(int participantId);
 
-    Task<bool> IsActiveParticipantExists(int descriptionBy);
+    Task<bool> IsActiveParticipantExists(int participantId);
+
+    bool NeedAbbrUpdate(ParticipantRequest participantToPatch, Participant originalParty);
 }

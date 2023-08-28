@@ -54,4 +54,6 @@ public class OutcomeDocFile : BaseEntity
     public virtual ICollection<OutcomeDocContent> OutcomeDocContents { get; set; }
 
     public virtual ICollection<OutcomeDocDelivery> OutcomeDocDeliveries { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices { get; set; }
 }

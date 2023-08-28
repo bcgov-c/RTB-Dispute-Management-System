@@ -2,7 +2,7 @@ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import React from 'react';
 import DisputeEvidenceModel from '../../../../core/components/claim/DisputeEvidence_model';
-import { CcrRequestItem } from '../../../components/CcrRequestItem/CcrRequestItem';
+import { CcrRequestItem } from '../../../components/ccrRequestItem/CcrRequestItem';
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
 import { ParentViewMixin } from '../../../../core/utilities/ParentViewMixin';
 
@@ -35,7 +35,7 @@ const QUESTION_TWO_HELP_TEXT = `A review may be granted on this basis if the app
 
 const QUESTON_TWO_EVIDENCE_TITLE = "New and relevant evidence";
 const QUESTION_TWO_MODAL_BODY_HTML = `
-<p>You claim you have new and relevant evidence that was not available at the time of the hearing. You must provide this evidence or your claim may not be successful.</p>
+<p>You claim you have new and relevant evidence that was not available at the time of the hearing. You must provide this evidence or your claim may not be successful. <b>There is no opportunity to add any evidence after the application for review has been submitted.</b></p>
 <p>Are you sure you want to continue without providing the new and relevant evidence?  Press 'Cancel' to return to the form and upload evidence or press 'Continue without evidence' to proceed without uploading the new and relevant evidence.</p>
 `; 
 const QUESTION_THREE_QUESTION_LABEL = 'Do you have evidence that the decision was obtained by fraud?';
@@ -48,7 +48,7 @@ const QUESTION_THREE_HELP_TEXT = `There is evidence that the original decision w
 </ul>`;
 const QUESTON_THREE_EVIDENCE_TITLE = "Evidence of fraud";
 const QUESTION_THREE_MODAL_BODY_HTML = `
-<p>You claim this decision and/or order was obtained by fraud. You must provide evidence or your claim may not be successful.</p>
+<p>You claim this decision and/or order was obtained by fraud. You must provide evidence or your claim may not be successful. <b>There is no opportunity to add any evidence after the application for review has been submitted.</b></p>
 <p>Are you sure you want to continue without providing evidence of fraud? Press 'Cancel' to return to the form and upload evidence or press 'Continue without evidence' to proceed without uploading evidence of fraud.</p>
 `;
 const NOTHING_SELECTED_ERROR = "You must answer 'Yes' to at least one of the allowed grounds for review to submit a review request";

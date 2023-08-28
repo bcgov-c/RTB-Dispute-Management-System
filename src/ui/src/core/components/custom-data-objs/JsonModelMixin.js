@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Model that is extending core CM_Model adding additional helper functions for parsing, setting, and saving JSON
+ */
 import CM_model from "../model/CM_model";
 
 export default CM_model.extend({

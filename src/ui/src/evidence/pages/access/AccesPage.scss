@@ -57,9 +57,11 @@ $ICON-CONTACT-URL: url('../../static/DA_MenuIcon_UpdateContact.png');
         color: #b1b1b1;
       }
 
+      &--reinstatement .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
       &--payment .dac__access-menu__item__icon { background-image: $ICON-PAYMENT-URL }
       &--evidence .dac__access-menu__item__icon { background-image: $ICON-EVIDENCE-URL }
       &--update-contact .dac__access-menu__item__icon { background-image: $ICON-CONTACT-URL; }
+      &--amendment .dac__access-menu__item__icon { background-image: $ICON-EVIDENCE-URL; }
       &--service .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
       &--correction .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }
       &--clarification .dac__access-menu__item__icon { background-image: $ICON-HAND-PAPER-LIGHT-URL; }

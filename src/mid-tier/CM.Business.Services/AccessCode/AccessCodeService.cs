@@ -7,6 +7,7 @@ using AutoMapper;
 using CM.Business.Entities.Models.AccessCode;
 using CM.Business.Entities.Models.AuditLog;
 using CM.Business.Services.AuditLogs;
+using CM.Business.Services.Base;
 using CM.Business.Services.DisputeAccess;
 using CM.Business.Services.TokenServices;
 using CM.Common.Utilities;
@@ -14,7 +15,6 @@ using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.AccessCode;
 
@@ -120,7 +120,7 @@ public class AccessCodeService : CmServiceBase, IAccessCodeService
                         ParticipantId = participant.ParticipantId
                     };
 
-                    Publish(emailGenerateIntegrationEvent);
+                    emailGenerateIntegrationEvent.Publish(_bus);
                 }
             }
 
@@ -233,7 +233,6 @@ public class AccessCodeService : CmServiceBase, IAccessCodeService
             DisputeStatuses.Withdrawn,
             DisputeStatuses.CancelledByRtb,
             DisputeStatuses.AbandonedNoPayment,
-            DisputeStatuses.Dismissed,
             DisputeStatuses.AbandonedApplicantInaction,
             DisputeStatuses.Deleted
         };
@@ -285,23 +284,6 @@ public class AccessCodeService : CmServiceBase, IAccessCodeService
         }
 
         return null;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        _bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"CorrelationGuid = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 
     private async System.Threading.Tasks.Task AuditLogInfoAsync(Dispute dispute, string email, string reason)

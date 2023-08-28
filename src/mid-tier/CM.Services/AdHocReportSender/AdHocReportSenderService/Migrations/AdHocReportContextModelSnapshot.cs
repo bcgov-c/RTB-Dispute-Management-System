@@ -30,6 +30,9 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("AdHocDlReportId"));
 
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -46,7 +49,23 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("ParameterConfig")
+                        .HasColumnType("json");
 
                     b.Property<string>("QueryForName")
                         .HasColumnType("text");
@@ -59,6 +78,11 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
 
                     b.Property<byte>("SubType")
                         .HasColumnType("smallint");
+
+                    b.Property<byte?>("TargetDatabase")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((byte)1);
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
@@ -78,6 +102,9 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("AdHocReportId"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
@@ -101,7 +128,29 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte?>("ReportSubType")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ReportType")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ReportUserGroup")
+                        .HasColumnType("smallint");
 
                     b.HasKey("AdHocReportId");
 
@@ -119,20 +168,41 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
                     b.Property<long>("AdHocReportId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<bool?>("ExcelTemplateExists")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ExcelTemplateId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("QueryForAttachment")
                         .HasColumnType("text");
 
                     b.Property<string>("QueryForName")
                         .HasColumnType("text");
+
+                    b.Property<byte>("TargetDatabase")
+                        .HasColumnType("smallint");
 
                     b.HasKey("AdHocReportAttachmentId");
 
@@ -167,11 +237,13 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
 
             modelBuilder.Entity("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReportAttachment", b =>
                 {
-                    b.HasOne("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReport", null)
-                        .WithOne("AdHocReportAttachment")
-                        .HasForeignKey("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReportAttachment", "AdHocReportId")
+                    b.HasOne("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReport", "AdHocReport")
+                        .WithMany("AdHocReportAttachments")
+                        .HasForeignKey("AdHocReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AdHocReport");
                 });
 
             modelBuilder.Entity("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReportTracking", b =>
@@ -185,7 +257,7 @@ namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Migrations
 
             modelBuilder.Entity("CM.Services.AdHocReportSender.AdHocReportSenderService.Models.AdHocReport", b =>
                 {
-                    b.Navigation("AdHocReportAttachment");
+                    b.Navigation("AdHocReportAttachments");
 
                     b.Navigation("AdHocReportsTracking");
                 });

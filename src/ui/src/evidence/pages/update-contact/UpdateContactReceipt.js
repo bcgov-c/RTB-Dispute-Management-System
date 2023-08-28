@@ -7,6 +7,7 @@ import AccessDisputeOverview from '../../components/access-dispute/AccessDispute
 import ExternalParticipantModel from '../../../evidence/components/external-api/ExternalParticipant_model';
 import { ReceiptContainer } from '../../../core/components/receipt-container/ReceiptContainer';
 import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
+import ApplicantViewDispute from '../../../core/components/ivd/ApplicantViewDispute';
 
 const PAGE_TITLE = `Update Contact submitted`;
 const RECEIPT_TITLE = 'Update Contact';
@@ -166,7 +167,8 @@ const UpdateContactReceipt = PageView.extend({
       emailUpdateParticipantId: this.loggedInParticipant ? this.loggedInParticipant.id : null,
       autoSendEmail: true,
       participantSaveModel: ExternalParticipantModel,
-      messageSubType: configChannel.request('get', 'EMAIL_MESSAGE_SUB_TYPE_DA_CONTACT_UPDATE')
+      messageSubType: configChannel.request('get', 'EMAIL_MESSAGE_SUB_TYPE_DA_CONTACT_UPDATE'),
+      displayJunkMailMsg: true,
     }));
   },
 
@@ -211,14 +213,15 @@ const UpdateContactReceipt = PageView.extend({
     const isApplicant = this.loggedInParticipant.isApplicant();
     const isLandlord = this.loggedInParticipant.isLandlord();
     const valsAndClasses = this.getChangedAttributesObjects()
+    const showIVDReceiptLanguage = ApplicantViewDispute.isIvdEnabled();
 
     return (
       <>
         <h4 className="er-title visible-email" style={{ fontWeight: 'bold', padding: '0px', margin: '25px 0px 10px 0px' }}>Receipt: {RECEIPT_TITLE}</h4>
 
-        <p className="er-text" style={{ 'textAlign': 'left',  padding: '0px 0px 0px 0px', margin: '0px 0px 10px 0px' }}>
-          The following was submitted to the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
-        </p>
+        <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 10px 0px' }}>
+          The following was submitted to the Residential Tenancy Branch.{showIVDReceiptLanguage ? <span> You can view your submitted request and outcome by <a href={configChannel.request('get', 'INTAKE_URL')} target="_blank" rel="noopener noreferrer">logging in online with the BceID that was used to create this application</a>.</span> : ''} For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
+	      </p>
 
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px' }}> <span className="er-label" style={{ padding: '0px 5px 0px 0px', color: '#8d8d8d' }}>File number: </span>&nbsp; <b>{this.dispute.get('file_number')}</b></p>
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px' }}> <span className="er-label" style={{ padding: '0px 5px 0px 0px', color: '#8d8d8d' }}>Access code: </span>&nbsp; <b>{this.dispute.get('accessCode')}</b></p>

@@ -41,9 +41,9 @@
         </div>
       <% } %>
 
-      <div class="row participant-use-mail-container clearfix">
-        <div class="col-xs-12"><span>Is mail also sent to the above address?</span></div>
-        <div class="participant-use-mail col-xs-12"></div>
+      <div class="participant-use-mail-container clearfix">
+        <div class=""><span>Is mail also sent to the above address?</span></div>
+        <div class="participant-use-mail"></div>
       </div>
       <div class="participant-mailing-address <%= hasMailAddress ? '' : 'hidden-address' %>"></div>
     </div>

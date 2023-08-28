@@ -7,6 +7,7 @@ namespace CM.Data.Model.Context;
 
 public static class ModelBuilderExtension
 {
+    #region Default Values, IsDeleted Filter, Custom Sets
     public static void AddViewsAndCustomSets(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ArbitrationScheduleHearing>().HasNoKey().ToView("ArbitrationScheduleHearing");
@@ -36,6 +37,7 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<File>().Property(r => r.IsDeficient).HasDefaultValue(false);
         modelBuilder.Entity<File>().Property(r => r.PublicAccessAllowed).HasDefaultValue(false);
         modelBuilder.Entity<File>().Property(r => r.Storage).HasDefaultValue(StorageType.File);
+        modelBuilder.Entity<File>().Property(r => r.IsSourceFileDeleted).HasDefaultValue(false);
 
         modelBuilder.Entity<FileDescription>().Property(r => r.IsDeficient).HasDefaultValue(false);
 
@@ -51,6 +53,7 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<Participant>().Property(r => r.SecondaryPhoneVerified).HasDefaultValue(false);
         modelBuilder.Entity<Participant>().Property(r => r.IsSubService).HasDefaultValue(false);
         modelBuilder.Entity<Participant>().Property(r => r.AddressIsValidated).HasDefaultValue(false);
+        modelBuilder.Entity<Participant>().Property(r => r.MailAddressIsValidated).HasDefaultValue(false);
 
         modelBuilder.Entity<PaymentTransaction>().Property(r => r.ReconcileStatus).HasDefaultValue((byte)0);
 
@@ -79,7 +82,7 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<ServiceOffice>().Property(r => r.IsDeleted).HasDefaultValue(false);
 
         modelBuilder.Entity<Dispute>().Property(r => r.FilesStorageSetting).HasDefaultValue(DisputeStorageType.Hot);
-        modelBuilder.Entity<Dispute>().Property(r => r.TenancyAddressValidated).HasDefaultValue((byte)0);
+        modelBuilder.Entity<Dispute>().Property(r => r.TenancyAddressValidated).HasDefaultValue(false);
 
         modelBuilder.Entity<DisputeFee>().Property(r => r.IsActive).HasDefaultValue(true);
         modelBuilder.Entity<DisputeFee>().Property(r => r.IsPaid).HasDefaultValue(false);
@@ -98,6 +101,17 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<DisputeFlag>().Property(r => r.IsDeleted).HasDefaultValue(false);
         modelBuilder.Entity<DisputeFlag>().Property(r => r.IsPublic).HasDefaultValue(false);
         modelBuilder.Entity<DisputeFlag>().Property(r => r.FlagStatus).HasDefaultValue(true);
+
+        modelBuilder.Entity<Notice>().Property(r => r.HasServiceDeadline).HasDefaultValue(false);
+
+        modelBuilder.Entity<ExternalErrorLog>().Property(r => r.IsDeleted).HasDefaultValue(false);
+
+        modelBuilder.Entity<Poll>().Property(r => r.IsDeleted).HasDefaultValue(false);
+
+        modelBuilder.Entity<OnlineMeeting>().Property(r => r.IsDeleted).HasDefaultValue(false);
+        modelBuilder.Entity<DisputeLink>().Property(r => r.IsDeleted).HasDefaultValue(false);
+        modelBuilder.Entity<DisputeVerification>().Property(r => r.IsDeleted).HasDefaultValue(false);
+        modelBuilder.Entity<VerificationAttempt>().Property(r => r.IsDeleted).HasDefaultValue(false);
     }
 
     public static void ApplyIsDeletedFilter(this ModelBuilder modelBuilder)
@@ -151,6 +165,14 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<CustomConfigObject>().HasQueryFilter(r => r.IsDeleted == false);
         modelBuilder.Entity<ExternalCustomDataObject>().HasQueryFilter(r => r.IsDeleted == false);
         modelBuilder.Entity<ExternalFile>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<ExternalErrorLog>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<Poll>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<PollResponse>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<ParticipantIdentity>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<OnlineMeeting>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<DisputeLink>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<DisputeVerification>().HasQueryFilter(r => r.IsDeleted == false);
+        modelBuilder.Entity<VerificationAttempt>().HasQueryFilter(r => r.IsDeleted == false);
     }
 
     public static void ApplyColumnsCustomTypes(this ModelBuilder modelBuilder)
@@ -163,376 +185,33 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<PaymentTransaction>().Property(r => r.CardType).HasColumnType("char(2)");
         modelBuilder.Entity<CustomConfigObject>().Property(r => r.ObjectVersionId).HasColumnType("decimal(4,2)");
     }
+    #endregion
 
-    public static void ApplyDisputeRelations(this ModelBuilder modelBuilder)
+    #region Relations
+    public static void ApplyRelations(this ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DisputeStatus>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeStatuses)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<DisputeLastModified>()
-            .HasOne(d => d.Dispute)
-            .WithOne(dlm => dlm.DisputeLastModified)
-            .HasForeignKey<DisputeLastModified>(d => d.DisputeGuid)
-            .HasPrincipalKey<Dispute>(d => d.DisputeGuid);
-
-        modelBuilder.Entity<DisputeProcessDetail>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeProcessDetails)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<DisputeUser>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeUsers)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<IntakeQuestion>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.IntakeQuestions)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<ClaimGroup>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.ClaimGroups)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Participant>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Participants)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<ClaimGroupParticipant>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.ClaimGroupParticipants)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<DisputeFee>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeFees)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<EmailMessage>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.EmailMessages)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<File>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Files)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<FileDescription>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.FileDescriptions)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<LinkedFile>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.LinkedFiles)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Notices)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Note>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Notes)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Amendment>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Amendments)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Task>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.Tasks)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OutcomeDocGroup>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.OutcomeDocGroups)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OutcomeDocFile>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.OutcomeDocFiles)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OutcomeDocDelivery>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.OutcomeDocDocDeliveries)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<DisputeHearing>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeHearings)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<DisputeProcessDetail>()
-            .HasOne(ds => ds.DisputeStatus)
-            .WithMany(d => d.DisputeProcessDetails)
-            .HasForeignKey(ds => ds.StartDisputeStatusId)
-            .HasPrincipalKey(d => d.DisputeStatusId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<HearingParticipation>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.HearingParticipations)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<BulkEmailRecipient>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.BulkEmailRecipients)
-            .HasForeignKey(ds => ds.AssociatedDisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<HearingAuditLog>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.HearingAuditLogs)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<CustomDataObject>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.CustomDataObjects)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OutcomeDocRequest>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.OutcomeDocRequests)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<DisputeFlag>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.DisputeFlags)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<SubmissionReceipt>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.SubmissionReceipts)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
-
-        modelBuilder.Entity<TrialDispute>()
-            .HasOne(ds => ds.Dispute)
-            .WithMany(d => d.TrialDisputes)
-            .HasForeignKey(ds => ds.DisputeGuid)
-            .HasPrincipalKey(d => d.DisputeGuid);
+        modelBuilder.ApplyDisputeRelations();
+        modelBuilder.ApplyTrialRelations();
+        modelBuilder.ApplyParticipantRelations();
+        modelBuilder.ApplySystemUserRelations();
+        modelBuilder.ApplyFileRelations();
+        modelBuilder.ApplyCommonFileRelations();
+        modelBuilder.ApplySchedulePeriodRelations();
+        modelBuilder.ApplyHearingRelations();
+        modelBuilder.ApplySubstitutedServicesRelations();
+        modelBuilder.ApplyExternalCustomDataObjectRelations();
+        modelBuilder.ApplyHearingAuditLogRelations();
+        modelBuilder.ApplyNoticeRelations();
+        modelBuilder.ApplyServiceAuditLogsRelations();
+        modelBuilder.ApplyEmailRelations();
+        modelBuilder.ApplyOutcomeDocRelations();
+        modelBuilder.ApplyPollRelations();
+        modelBuilder.ApplyOnlineMeetingRelations();
+        modelBuilder.ApplyDisputeVerificationRelations();
     }
+    #endregion
 
-    public static void ApplyParticipantRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ClaimGroupParticipant>().HasOne(ds => ds.Participant).WithMany(d => d.ClaimGroupParticipants).HasForeignKey(ds => ds.ParticipantId).HasPrincipalKey(d => d.ParticipantId);
-
-        modelBuilder.Entity<ClaimDetail>().HasOne(ds => ds.Participant).WithMany(d => d.ClaimDetails).HasForeignKey(ds => ds.DescriptionBy).HasPrincipalKey(d => d.ParticipantId);
-
-        modelBuilder.Entity<RemedyDetail>().HasOne(ds => ds.Participant).WithMany(d => d.RemedyDetails).HasForeignKey(ds => ds.DescriptionBy).HasPrincipalKey(d => d.ParticipantId);
-
-        modelBuilder.Entity<FileDescription>().HasOne(ds => ds.Participant).WithMany(d => d.FileDescriptions).HasForeignKey(ds => ds.DescriptionBy).HasPrincipalKey(d => d.ParticipantId);
-
-        modelBuilder.Entity<PaymentTransaction>().HasOne(ds => ds.Participant).WithMany(d => d.PaymentTransactions).HasForeignKey(ds => ds.TransactionBy).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.Participant).WithMany(d => d.Notices).HasForeignKey(ds => ds.NoticeDeliveredTo).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.Participant).WithMany(d => d.NoticeServices).HasForeignKey(ds => ds.ParticipantId).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Amendment>().HasOne(ds => ds.Participant).WithMany(d => d.Amendments).HasForeignKey(ds => ds.AmendmentSubmitterId).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<AuditLog>().HasOne(ds => ds.SubmitterParticipant).WithMany(d => d.AuditLogs).HasForeignKey(ds => ds.SubmitterParticipantId).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<FilePackageService>().HasOne(ds => ds.Participant).WithMany(d => d.FilePackageServices).HasForeignKey(ds => ds.ParticipantId).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<FilePackageService>().HasOne(ds => ds.ServedParticipant).WithMany(d => d.ServedFilePackageServices).HasForeignKey(ds => ds.ServedBy).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<DisputeProcessDetail>().HasOne(ds => ds.Participant1).WithMany(d => d.DisputeProcessDetail1).HasForeignKey(ds => ds.ProcessApplicant1Id).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<DisputeProcessDetail>().HasOne(ds => ds.Participant2).WithMany(d => d.DisputeProcessDetail2).HasForeignKey(ds => ds.ProcessApplicant2Id).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<OutcomeDocRequest>().HasOne(ds => ds.Submitter).WithMany(d => d.OutcomeDocRequests).HasForeignKey(ds => ds.SubmitterId).HasPrincipalKey(d => d.ParticipantId).OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplyFileRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.File1).WithMany(d => d.Notices1).HasForeignKey(ds => ds.NoticeFile1Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.File2).WithMany(d => d.Notices2).HasForeignKey(ds => ds.NoticeFile2Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.File3).WithMany(d => d.Notices3).HasForeignKey(ds => ds.NoticeFile3Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.File4).WithMany(d => d.Notices4).HasForeignKey(ds => ds.NoticeFile4Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Notice>().HasOne(ds => ds.File5).WithMany(d => d.Notices5).HasForeignKey(ds => ds.NoticeFile5Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.File1).WithMany(d => d.NoticeServices1).HasForeignKey(ds => ds.NoticeServiceFile1Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.File2).WithMany(d => d.NoticeServices2).HasForeignKey(ds => ds.NoticeServiceFile2Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.File3).WithMany(d => d.NoticeServices3).HasForeignKey(ds => ds.NoticeServiceFile3Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.File4).WithMany(d => d.NoticeServices4).HasForeignKey(ds => ds.NoticeServiceFile4Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<NoticeService>().HasOne(ds => ds.File5).WithMany(d => d.NoticeServices5).HasForeignKey(ds => ds.NoticeServiceFile5Id).HasPrincipalKey(d => d.FileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<HearingImport>().HasOne(ds => ds.ImportFile).WithMany(d => d.HearingImports).HasForeignKey(ds => ds.ImportFileId).HasPrincipalKey(d => d.CommonFileId).OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplySystemUserRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Dispute>().HasOne(ds => ds.SystemUser).WithMany(d => d.Disputes).HasForeignKey(ds => ds.OwnerSystemUserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<InternalUserRole>().HasOne(ds => ds.SystemUser).WithMany(d => d.InternalUserRoles).HasForeignKey(ds => ds.UserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Task>().HasOne(ds => ds.SystemUser).WithMany(d => d.Tasks).HasForeignKey(ds => ds.TaskOwnerId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Task>().HasOne(ds => ds.LastOwner).WithMany(d => d.LastOwnerTasks).HasForeignKey(ds => ds.LastOwnerId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<AuditLog>().HasOne(ds => ds.SystemUser).WithMany(d => d.AuditLogs).HasForeignKey(ds => ds.SubmitterUserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<InternalUserProfile>().HasOne(ds => ds.SystemUser).WithMany(d => d.InternalUserProfiles).HasForeignKey(ds => ds.InternalUserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<AutoText>().HasOne(ds => ds.SystemUser).WithMany(d => d.AutoTexts).HasForeignKey(ds => ds.TextOwner).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<ConferenceBridge>().HasOne(ds => ds.SystemUser).WithMany(d => d.ConferenceBridges).HasForeignKey(ds => ds.PreferredOwner).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser1).WithMany(d => d.Hearings1).HasForeignKey(ds => ds.StaffParticipant1).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser2).WithMany(d => d.Hearings2).HasForeignKey(ds => ds.StaffParticipant2).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser3).WithMany(d => d.Hearings3).HasForeignKey(ds => ds.StaffParticipant3).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser4).WithMany(d => d.Hearings4).HasForeignKey(ds => ds.StaffParticipant4).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser5).WithMany(d => d.Hearings5).HasForeignKey(ds => ds.StaffParticipant5).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Hearing>().HasOne(ds => ds.SystemUser).WithMany(d => d.Hearings).HasForeignKey(ds => ds.HearingOwner).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<HearingAuditLog>().HasOne(ds => ds.SystemUser).WithMany(d => d.HearingAuditLogs).HasForeignKey(ds => ds.HearingOwner).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<ScheduleBlock>().HasOne(ds => ds.SystemUser).WithMany(d => d.ScheduleBlocks).HasForeignKey(ds => ds.SystemUserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<ScheduleRequest>().HasOne(ds => ds.RequestorSystemUser).WithMany(d => d.ScheduleRequests).HasForeignKey(ds => ds.RequestorSystemUserId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<ExternalCustomDataObject>().HasOne(ds => ds.OwnerSystemUser).WithMany(d => d.ExternalCustomDataObjects).HasForeignKey(ds => ds.OwnerId).HasPrincipalKey(d => d.SystemUserId).OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplyCommonFileRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<InternalUserProfile>().HasOne(ds => ds.CommonFileProfilePic).WithMany(d => d.InternalUserProfilesProfilePic).HasForeignKey(ds => ds.ProfilePictureId).HasPrincipalKey(d => d.CommonFileId).OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<InternalUserProfile>().HasOne(ds => ds.CommonFileSignature).WithMany(d => d.InternalUserProfilesSignature).HasForeignKey(ds => ds.SignatureFileId).HasPrincipalKey(d => d.CommonFileId).OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplyExternalCustomDataObjectRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ExternalFile>().HasOne(ds => ds.ExternalCustomDataObject).WithMany(d => d.ExternalFiles).HasForeignKey(ds => ds.ExternalCustomDataObjectId).HasPrincipalKey(d => d.ExternalCustomDataObjectId).OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplyTrialRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<TrialDispute>()
-            .HasOne(ds => ds.Trial)
-            .WithMany(d => d.TrialDisputes)
-            .HasForeignKey(ds => ds.TrialGuid)
-            .HasPrincipalKey(d => d.TrialGuid);
-
-        modelBuilder.Entity<TrialParticipant>()
-            .HasOne(ds => ds.Trial)
-            .WithMany(d => d.TrialParticipants)
-            .HasForeignKey(ds => ds.TrialGuid)
-            .HasPrincipalKey(d => d.TrialGuid);
-
-        modelBuilder.Entity<TrialIntervention>()
-            .HasOne(ds => ds.Trial)
-            .WithMany(d => d.TrialInterventions)
-            .HasForeignKey(ds => ds.TrialGuid)
-            .HasPrincipalKey(d => d.TrialGuid);
-
-        modelBuilder.Entity<TrialOutcome>()
-            .HasOne(ds => ds.Trial)
-            .WithMany(d => d.TrialOutcomes)
-            .HasForeignKey(ds => ds.TrialGuid)
-            .HasPrincipalKey(d => d.TrialGuid);
-    }
-
-    public static void ApplySchedulePeriodRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ScheduleBlock>()
-            .HasOne(ds => ds.SchedulePeriod)
-            .WithMany(d => d.ScheduleBlocks)
-            .HasForeignKey(ds => ds.SchedulePeriodId)
-            .HasPrincipalKey(d => d.SchedulePeriodId)
-            .OnDelete(DeleteBehavior.Restrict);
-    }
-
-    public static void ApplyHearingAuditLogRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<HearingAuditLog>()
-            .HasOne(ds => ds.Hearing)
-            .WithMany(d => d.HearingAuditLogs)
-            .HasForeignKey(ds => ds.HearingId)
-            .HasPrincipalKey(d => d.HearingId);
-
-        modelBuilder.Entity<HearingAuditLog>()
-            .HasOne(ds => ds.ConferenceBridge)
-            .WithMany(d => d.HearingAuditLogs)
-            .HasForeignKey(ds => ds.ConferenceBridgeId)
-            .HasPrincipalKey(d => d.ConferenceBridgeId);
-    }
-
-    public static void ApplyHearingRelations(this ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<DisputeHearing>()
-            .HasOne(ds => ds.Hearing)
-            .WithMany(d => d.DisputeHearings)
-            .HasForeignKey(ds => ds.HearingId)
-            .HasPrincipalKey(d => d.HearingId)
-            .OnDelete(DeleteBehavior.Restrict);
-    }
-
+    #region Indexes
     public static void ApplyIndexes(this ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserToken>().HasIndex(s => s.SystemUserId);
@@ -546,18 +225,139 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<Dispute>().HasIndex(s => s.FileNumber);
         modelBuilder.Entity<Dispute>().HasIndex(s => s.TenancyAddress);
         modelBuilder.Entity<Dispute>().HasIndex(s => s.TenancyZipPostal);
+        modelBuilder.Entity<Dispute>().HasIndex(s => s.OwnerSystemUserId);
+        modelBuilder.Entity<Dispute>().HasIndex(s => s.TenancyCity);
+        modelBuilder.Entity<Dispute>().HasIndex(s => s.InitialPaymentDate);
+
+        modelBuilder.Entity<DisputeLastModified>().HasIndex(s => s.LastModifiedDate);
 
         modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.DisputeGuid);
         modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.Status);
         modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.Stage);
         modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.Process);
         modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.Owner);
+        modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.DisputeStatusId);
+        modelBuilder.Entity<DisputeStatus>().HasIndex(s => s.IsActive);
 
         modelBuilder.Entity<Participant>().HasIndex(s => s.AccessCode);
+        modelBuilder.Entity<Participant>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<Participant>().HasIndex(s => s.ParticipantStatus);
 
         modelBuilder.Entity<Note>().HasIndex(s => s.NoteLinkedTo);
+        modelBuilder.Entity<Note>().HasIndex(s => s.DisputeGuid);
+
         modelBuilder.Entity<FilePackage>().HasIndex(s => s.DisputeGuid);
+
         modelBuilder.Entity<DisputeHearing>().HasIndex(s => s.DisputeHearingStatus);
+        modelBuilder.Entity<DisputeHearing>().HasIndex(s => s.HearingId);
+        modelBuilder.Entity<DisputeHearing>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<DisputeHearing>().HasIndex(s => s.DisputeHearingRole);
+
+        modelBuilder.Entity<AuditLog>()
+            .HasIndex(s => s.DisputeGuid)
+            .IncludeProperties(p => new { p.ApiResponse, p.ApiCallType });
+
+        modelBuilder.Entity<Hearing>().HasIndex(s => new { s.LocalStartDateTime, s.LocalEndDateTime });
+
+        modelBuilder.Entity<EmailMessage>()
+            .HasIndex(s => new { s.SendStatus, s.MessageType, s.IsActive });
+
+        modelBuilder.Entity<EmailMessage>().HasIndex(s => s.PreferredSendDate);
+        modelBuilder.Entity<EmailMessage>().HasIndex(s => s.CreatedDate);
+        modelBuilder.Entity<EmailMessage>().HasIndex(s => s.DisputeGuid);
+
+        modelBuilder.Entity<UserToken>()
+            .HasIndex(s => new { s.ExpiresOn, s.AuthToken });
+
+        modelBuilder.Entity<TrialIntervention>().HasIndex(s => s.TrialDisputeGuid);
+        modelBuilder.Entity<TrialIntervention>().HasIndex(s => s.TrialParticipantGuid);
+
+        modelBuilder.Entity<TrialParticipant>().HasIndex(s => s.DisputeGuid);
+
+        modelBuilder.Entity<TrialOutcome>().HasIndex(s => s.TrialDisputeGuid);
+
+        modelBuilder.Entity<SystemSettings>().HasIndex(s => s.Key);
+
+        modelBuilder.Entity<Task>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<Task>().HasIndex(s => s.TaskStatus);
+        modelBuilder.Entity<Task>().HasIndex(s => s.TaskOwnerId);
+        modelBuilder.Entity<Task>().HasIndex(s => s.TaskSubType);
+        modelBuilder.Entity<Task>().HasIndex(s => s.TaskActivityType);
+        modelBuilder.Entity<Task>().HasIndex(s => s.DateTaskCompleted);
+
+        modelBuilder.Entity<SubstitutedService>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<SubstitutedService>().HasIndex(s => s.RequestSource);
+
+        modelBuilder.Entity<CMSParticipant>().HasIndex(s => s.Request_ID);
+        modelBuilder.Entity<CMSParticipant>().HasIndex(s => s.Participant_Type);
+        modelBuilder.Entity<CMSParticipant>().HasIndex(s => s.CMS_Sequence_Number);
+
+        modelBuilder.Entity<OutcomeDocDelivery>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<OutcomeDocDelivery>().HasIndex(s => s.DeliveryMethod);
+        modelBuilder.Entity<OutcomeDocDelivery>().HasIndex(s => s.IsDelivered);
+        modelBuilder.Entity<OutcomeDocDelivery>().HasIndex(s => s.DeliveryDate);
+        modelBuilder.Entity<OutcomeDocDelivery>().HasIndex(s => s.ReadyForDelivery);
+
+        modelBuilder.Entity<ScheduleBlock>().HasIndex(s => s.SchedulePeriodId);
+        modelBuilder.Entity<ScheduleBlock>().HasIndex(s => s.SystemUserId);
+        modelBuilder.Entity<ScheduleBlock>().HasIndex(s => s.BlockStart);
+        modelBuilder.Entity<ScheduleBlock>().HasIndex(s => s.BlockEnd);
+        modelBuilder.Entity<ScheduleBlock>().HasIndex(s => s.BlockType);
+
+        modelBuilder.Entity<ConferenceBridge>().HasIndex(s => s.PreferredStartTime);
+        modelBuilder.Entity<ConferenceBridge>().HasIndex(s => s.PreferredEndTime);
+        modelBuilder.Entity<ConferenceBridge>().HasIndex(s => s.PreferredOwner);
+
+        modelBuilder.Entity<DataModel>().HasIndex(s => s.Request_ID);
+        modelBuilder.Entity<DataModel>().HasIndex(s => s.File_Number);
+
+        modelBuilder.Entity<Claim>().HasIndex(s => s.ClaimGroupId);
+        modelBuilder.Entity<Claim>().HasIndex(s => s.ClaimStatus);
+
+        modelBuilder.Entity<CMSFile>().HasIndex(s => s.File_Number);
+        modelBuilder.Entity<CMSFile>().HasIndex(s => s.File_Type);
+
+        modelBuilder.Entity<SystemUserRole>().HasIndex(s => s.RoleName);
+
+        modelBuilder.Entity<OutcomeDocFile>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<OutcomeDocFile>().HasIndex(s => s.OutcomeDocGroupId);
+        modelBuilder.Entity<OutcomeDocFile>().HasIndex(s => s.FileType);
+        modelBuilder.Entity<OutcomeDocFile>().HasIndex(s => s.FileId);
+
+        modelBuilder.Entity<ClaimGroup>().HasIndex(s => s.DisputeGuid);
+
+        modelBuilder.Entity<InternalUserRole>().HasIndex(s => s.RoleGroupId);
+        modelBuilder.Entity<InternalUserRole>().HasIndex(s => s.EngagementType);
+        modelBuilder.Entity<InternalUserRole>().HasIndex(s => s.RoleSubtypeId);
+
+        modelBuilder.Entity<ClaimGroupParticipant>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<ClaimGroupParticipant>().HasIndex(s => s.ClaimGroupId);
+        modelBuilder.Entity<ClaimGroupParticipant>().HasIndex(s => s.ParticipantId);
+        modelBuilder.Entity<ClaimGroupParticipant>().HasIndex(s => s.GroupParticipantRole);
+        modelBuilder.Entity<ClaimGroupParticipant>().HasIndex(s => s.GroupPrimaryContactId);
+
+        modelBuilder.Entity<DisputeFee>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<DisputeFee>().HasIndex(s => s.IsPaid);
+        modelBuilder.Entity<DisputeFee>().HasIndex(s => s.DatePaid);
+
+        modelBuilder.Entity<CommonFile>().HasIndex(s => s.FileType);
+
+        modelBuilder.Entity<EmailTemplate>().HasIndex(s => s.AssignedTemplateId);
+
+        modelBuilder.Entity<Notice>().HasIndex(s => s.DisputeGuid);
+        modelBuilder.Entity<Notice>().HasIndex(s => s.NoticeType);
+        modelBuilder.Entity<Notice>().HasIndex(s => s.HearingId);
+        modelBuilder.Entity<Notice>().HasIndex(s => s.NoticeAssociatedTo);
+
+        modelBuilder.Entity<NoticeService>().HasIndex(s => s.NoticeId);
+        modelBuilder.Entity<NoticeService>().HasIndex(s => s.IsServed);
+        modelBuilder.Entity<NoticeService>().HasIndex(s => s.ProofFileDescriptionId);
+
+        modelBuilder.Entity<Poll>().HasIndex(s => s.PollStatus);
+        modelBuilder.Entity<Poll>().HasIndex(s => s.PollSite);
+        modelBuilder.Entity<Poll>().HasIndex(s => s.PollType);
+
+        modelBuilder.Entity<DisputeLink>().HasIndex(s => s.DisputeGuid);
     }
 
     public static void ApplyUniqueIndexes(this ModelBuilder modelBuilder)
@@ -572,5 +372,7 @@ public static class ModelBuilderExtension
         modelBuilder.Entity<EmailTemplate>().HasIndex(e => e.AssignedTemplateId).IsUnique();
         modelBuilder.Entity<Trial>().HasIndex(e => e.TrialGuid).IsUnique();
         modelBuilder.Entity<CustomConfigObject>().HasIndex(e => e.ObjectTitle).IsUnique();
+        modelBuilder.Entity<Poll>().HasIndex(e => e.PollTitle).IsUnique();
     }
+    #endregion
 }

@@ -28,6 +28,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Quartz.AspNetCore" Version="3.3.3" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.3.3" />
     <PackageReference Include="StyleCop.Analyzers.Error" Version="1.0.2" />
     <PackageReference Include="Quartz" Version="3.3.3" />
   </ItemGroup>

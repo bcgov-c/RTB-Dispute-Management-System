@@ -6,15 +6,18 @@ using CM.Business.Entities.Models.AutoText;
 using CM.Business.Entities.Models.Claim;
 using CM.Business.Entities.Models.ClaimDetail;
 using CM.Business.Entities.Models.ConferenceBridge;
+using CM.Business.Entities.Models.CustomConfigObject;
 using CM.Business.Entities.Models.CustomDataObject;
 using CM.Business.Entities.Models.Dispute;
 using CM.Business.Entities.Models.DisputeFlag;
 using CM.Business.Entities.Models.DisputeHearing;
 using CM.Business.Entities.Models.DisputeProcessDetail;
+using CM.Business.Entities.Models.DisputeVerification;
 using CM.Business.Entities.Models.EmailAttachment;
 using CM.Business.Entities.Models.EmailMessage;
 using CM.Business.Entities.Models.EmailTemplate;
 using CM.Business.Entities.Models.ExternalCustomDataObject;
+using CM.Business.Entities.Models.ExternalErrorLog;
 using CM.Business.Entities.Models.ExternalFile;
 using CM.Business.Entities.Models.FilePackageService;
 using CM.Business.Entities.Models.Files;
@@ -24,10 +27,14 @@ using CM.Business.Entities.Models.InternalUserRole;
 using CM.Business.Entities.Models.Note;
 using CM.Business.Entities.Models.Notice;
 using CM.Business.Entities.Models.NoticeService;
+using CM.Business.Entities.Models.OnlineMeeting;
 using CM.Business.Entities.Models.OutcomeDocRequest;
 using CM.Business.Entities.Models.OutcomeDocument;
+using CM.Business.Entities.Models.ParticipantIdentity;
 using CM.Business.Entities.Models.Parties;
 using CM.Business.Entities.Models.Payment;
+using CM.Business.Entities.Models.Poll;
+using CM.Business.Entities.Models.PollResponse;
 using CM.Business.Entities.Models.Remedy;
 using CM.Business.Entities.Models.RemedyDetail;
 using CM.Business.Entities.Models.ScheduleBlock;
@@ -37,7 +44,9 @@ using CM.Business.Entities.Models.SubmissionReceipt;
 using CM.Business.Entities.Models.SubstitutedService;
 using CM.Business.Entities.Models.Task;
 using CM.Business.Entities.Models.User;
+using CM.Business.Entities.Models.VerificationAttempt;
 using CM.Common.Utilities;
+using CM.Data.Model;
 using CM.Integration.Tests.Fixtures;
 using CM.Integration.Tests.Helpers;
 using CM.Integration.Tests.Utils;
@@ -97,6 +106,7 @@ public class SecurityTestDataSeed
             CreateDisputeProcessDetails();
             CreateCommonFiles();
             CreateCustomDataObjects();
+            CreateCustomConfigObjects();
             CreateEmailTemplates();
             CreateEmailAttachments();
             CreateUser2EmailMessages();
@@ -107,7 +117,15 @@ public class SecurityTestDataSeed
             CreateSubmissionReceipts();
             CreateSubstitutedServices();
             CreateExternalCustomDataObjects();
+            CreateExternalErrorLogs();
             CreateExternalFiles();
+            CreatePolls();
+            CreatePollResponses();
+            CreateParticipantIdentities();
+            CreateOnlineMeetings();
+            CreateDisputeLinks();
+            CreateDisputeVerifications();
+            CreateVerificationAttempts();
         }
     }
 
@@ -205,6 +223,8 @@ public class SecurityTestDataSeed
 
     public List<CustomDataObjectResponse> CustomObjects { get; } = new();
 
+    public List<CustomConfigObjectResponse> CustomConfigObjects { get; } = new();
+
     public List<SchedulePeriodPostResponse> SchedulePeriods { get; } = new();
 
     public List<ScheduleBlockPostResponse> ScheduleBlocks { get; } = new();
@@ -217,7 +237,23 @@ public class SecurityTestDataSeed
 
     public List<ExternalCustomDataObjectResponse> ExternalCustomDataObjects { get; } = new();
 
+    public List<ExternalErrorLogResponse> ExternalErrorLogs { get; } = new();
+
     public List<ExternalFileResponse> ExternalFiles { get; } = new();
+
+    public List<Business.Entities.Models.Poll.PollResponse> Polls { get; } = new();
+
+    public List<PollRespResponse> PollResponses { get; } = new();
+
+    public List<ParticipantIdentityResponse> ParticipantIdentities { get; } = new();
+
+    public List<OnlineMeetingResponse> OnlineMeetings { get; } = new();
+
+    public List<DisputeLinkResponse> DisputeLinks { get; } = new();
+
+    public List<DisputeVerificationResponse> DisputeVerifications { get; } = new();
+
+    public List<VerificationAttemptResponse> VerificationAttempts { get; } = new();
 
     private bool CreateDispute()
     {
@@ -272,7 +308,7 @@ public class SecurityTestDataSeed
 
     private void CreateDisputes()
     {
-        for (var i = 0; i < 6; i++)
+        for (var i = 0; i < 8; i++)
         {
             var disputeRequest = new DisputeRequest
             {
@@ -981,6 +1017,18 @@ public class SecurityTestDataSeed
         }
     }
 
+    private void CreateCustomConfigObjects()
+    {
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 6; i++)
+        {
+            var customConfigObjectPostResponse = CustomConfigObjectManager.CreateCustomConfigObject(Client, new CustomConfigObjectPostRequest() { ObjectType = 1, ObjectTitle = $"Test Title {i}", IsActive = true, IsPublic = true, ObjectStorageType = (byte)CustomObjectStorageType.Text, ObjectText = "Test Object Text" });
+            customConfigObjectPostResponse.CheckStatusCode();
+            CustomConfigObjects.Add(customConfigObjectPostResponse.ResponseObject);
+        }
+    }
+
     private void CreateExternalCustomDataObjects()
     {
         Client.Authenticate(Users.Admin, Users.Admin);
@@ -991,6 +1039,19 @@ public class SecurityTestDataSeed
                 .CreateExternalCustomDataObject(Client, new ExternalCustomDataObjectRequest() { Description = "Test Desc", Status = 1, SubType = 1, Title = "Test Title", Type = ExternalCustomObjectType.AriUnits });
             externalCustomDataObjectPostResponse.CheckStatusCode();
             ExternalCustomDataObjects.Add(externalCustomDataObjectPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreateExternalErrorLogs()
+    {
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            var externalErrorLogPostResponse = ExternalErrorLogManager
+                .CreateExternalErrorLog(Client, new ExternalErrorLogRequest() { ErrorSite = 1, ErrorType = 2, ErrorTitle = "ErrorTitle" + i.ToString(), ErrorDetails = "ErrorDetails 0123456789 0123456789" + i.ToString() });
+            externalErrorLogPostResponse.CheckStatusCode();
+            ExternalErrorLogs.Add(externalErrorLogPostResponse.ResponseObject);
         }
     }
 
@@ -1011,5 +1072,206 @@ public class SecurityTestDataSeed
             externalFilePostResponse.CheckStatusCode();
             ExternalFiles.Add(externalFilePostResponse.ResponseObject);
         }
+    }
+
+    private void CreatePolls()
+    {
+        var request = new PollRequest
+        {
+             PollTitle = "Poll-Title",
+             PollType = 1
+        };
+
+        Client.Authenticate(HearingUsers[0].Username, "12345" + HearingUsers[0].Username);
+        ////Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            var pollPostResponse = PollManager
+                .CreatePoll(Client, new PollRequest
+                {
+                    PollTitle = "Poll-Title-" + i.ToString(),
+                    PollType = 1
+                });
+            pollPostResponse.CheckStatusCode();
+            Polls.Add(pollPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreatePollResponses()
+    {
+        var request = new PollRespRequest
+        {
+            DisputeGuid = Dispute.DisputeGuid,
+            ResponseJson = "{\"resp 1\": \"resp1\"}"
+        };
+
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            var pollRespPostResponse = PollManager
+                .CreatePollResp(Client, Polls[0].PollId, request);
+            pollRespPostResponse.CheckStatusCode();
+            PollResponses.Add(pollRespPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreateParticipantIdentities()
+    {
+        var participantRequest = new ParticipantRequest
+        {
+            ParticipantType = (byte)ParticipantType.Business,
+            ParticipantStatus = (byte)ParticipantStatus.ValidatedAndParticipating,
+            FirstName = "IntSched01",
+            LastName = "Participant01",
+            Address = "P01 Street",
+            City = "P01 City",
+            ProvinceState = "BC",
+            PostalZip = "P1P 1P1",
+            Country = "Canada",
+            AcceptedTou = true,
+            Email = "nomail_1@nomail.com"
+        };
+
+        var partyRequest = new List<ParticipantRequest> { participantRequest };
+        var participantResponse = ParticipantManager.CreateParticipant(Client, Disputes[0].DisputeGuid, partyRequest);
+        participantResponse.CheckStatusCode();
+        var identityParticipant = participantResponse.ResponseObject[0];
+
+        var request = new ParticipantIdentityPostRequest
+        {
+            ParticipantId = Participant.ParticipantId,
+            IdentityParticipantId = identityParticipant.ParticipantId
+        };
+
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            var participantIdentityResponse = ParticipantIdentityManager
+                .CreateParticipantIdentity(Client, request);
+            participantIdentityResponse.CheckStatusCode();
+            ParticipantIdentities.Add(participantIdentityResponse.ResponseObject);
+        }
+    }
+
+    private void CreateOnlineMeetings()
+    {
+        var request = new OnlineMeetingPostRequest
+        {
+            ConferenceType = ConferenceType.MsTeams,
+            ConferenceUrl = "QWERTY-123456789",
+            DialInDescription1 = "DialInDescription1;",
+            DialInNumber1 = "1234567890"
+        };
+
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            var onlineMeetingPostResponse = OnlineMeetingManager
+                .CreateOnlineMeeting(Client, request);
+            onlineMeetingPostResponse.CheckStatusCode();
+            OnlineMeetings.Add(onlineMeetingPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreateDisputeLinks()
+    {
+        var request = new DisputeLinkPostRequest();
+
+        Client.Authenticate(Users.Admin, Users.Admin);
+
+        for (var i = 0; i < 8; i++)
+        {
+            request = new DisputeLinkPostRequest
+            {
+                DisputeGuid = Disputes[i].DisputeGuid,
+                DisputeLinkRole = DisputeLinkRole.Primary,
+                DisputeLinkType = DisputeLinkType.Cross,
+                OnlineMeetingId = OnlineMeetings[i].OnlineMeetingId
+            };
+
+            var disputeLinkPostResponse = DisputeLinkManager
+                .CreateDisputeLink(Client, request);
+            disputeLinkPostResponse.CheckStatusCode();
+            DisputeLinks.Add(disputeLinkPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreateDisputeVerifications()
+    {
+        for (var i = 0; i < 5; i++)
+        {
+            Client.Authenticate(Users.Admin, Users.Admin);
+            var disputeFeePostResponse = DisputeFeeManager.CreateDisputeFee(Client, Disputes[i].DisputeGuid, new DisputeFeeRequest
+            {
+                PayorId = Participants[i].ParticipantId,
+                AmountDue = 3,
+                FeeType = (byte)DisputeFeeType.Other,
+                IsActive = true
+            });
+
+            var request = new DisputeVerificationPostRequest
+            {
+                DisputeFeeId = disputeFeePostResponse.ResponseObject.DisputeFeeId,
+                HearingId = DisputeHearings[i].HearingId
+            };
+
+            var disputeLinkPostResponse = DisputeVerificationManager
+                .CreateDisputeVerification(Client, Disputes[i].DisputeGuid, request);
+            disputeLinkPostResponse.CheckStatusCode();
+            DisputeVerifications.Add(disputeLinkPostResponse.ResponseObject);
+        }
+    }
+
+    private void CreateVerificationAttempts()
+    {
+        Client.Authenticate(Users.Admin, Users.Admin);
+        var participants = GetCustomParticipants();
+
+        for (var i = 0; i < 5; i++)
+        {
+            var request = new VerificationAttemptPostRequest
+            {
+                ParticipantId = participants[i].ParticipantId,
+                ParticipantRole = ParticipantRole.Applicant
+            };
+
+            var verificationAttemptPostResponse = DisputeVerificationManager
+                .CreateVerificationAttempt(Client, DisputeVerifications[i].VerificationId, request);
+            verificationAttemptPostResponse.CheckStatusCode();
+            VerificationAttempts.Add(verificationAttemptPostResponse.ResponseObject);
+        }
+    }
+
+    private List<ParticipantResponse> GetCustomParticipants()
+    {
+        var participants = new List<ParticipantResponse>();
+
+        var participantsRequest = new ParticipantRequest
+        {
+            ParticipantType = (byte)ParticipantType.Business,
+            ParticipantStatus = (byte)ParticipantStatus.ValidatedAndParticipating,
+            FirstName = "IntSched01",
+            LastName = "Participant01",
+            Address = "P01 Street",
+            City = "P01 City",
+            ProvinceState = "BC",
+            PostalZip = "P1P 1P1",
+            Country = "Canada",
+            AcceptedTou = true
+        };
+
+        for (int i = 0; i < 5; i++)
+        {
+            var partiesRequest = new List<ParticipantRequest> { participantsRequest };
+            var participantsResponse = ParticipantManager.CreateParticipant(Client, Disputes[i].DisputeGuid, partiesRequest);
+            participantsResponse.CheckStatusCode();
+            participants.Add(participantsResponse.ResponseObject[0]);
+        }
+
+        return participants;
     }
 }

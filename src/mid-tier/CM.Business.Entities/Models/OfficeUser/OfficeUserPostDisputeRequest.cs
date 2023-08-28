@@ -112,4 +112,7 @@ public class OfficeUserPostDisputeRequest
 
     [JsonProperty("amount_due")]
     public decimal? AmountDue { get; set; }
+
+    [JsonProperty("tenancy_address_validated")]
+    public bool? TenancyAddressValidated { get; set; }
 }

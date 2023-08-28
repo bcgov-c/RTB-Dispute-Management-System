@@ -138,7 +138,6 @@
 
 .create-hearing-conference-details { margin: 10px 0 40px 0; background-color: #f2f2f2; padding: 15px; }
 
-
 #createHearing_modal .modal-button-container { padding: 0 20px 30px 0; }
 
 /* End Create Hearing Modal */
@@ -182,6 +181,8 @@
 
 /* Edit heaing modal */
 #editHearing_modal .modal-dialog { width: 1100px; }
+
+.modal-ars-cleanup .modal-dialog { width: 800px; }
 
 /* End edit hearing modal */
 
@@ -301,7 +302,7 @@
 .editHearingLink-remove { text-align: right; font-size: 21px; }
 
 /* Hearing page styles */
-.hearing-page .header-page-title { background: url('../static/Icon_Header_Hearings.png') no-repeat !important; }
+.hearing-page .header-page-title { background: url('../static/Icon_Header_Hearings.png') no-repeat !important; margin-right: 10px; }
 
 .hearing-page .dispute-overview-header-right { margin-top: 0; }
 
@@ -326,8 +327,10 @@
   margin-bottom: 5px;
 }
 
-.hearing-recording-file { position: relative; bottom: 4px; }
 .hearing-recording { display: flex; }
+.hearing-recording .review-label { min-width: 85px; width: 85px; }
+.hearing-recording .file-display { margin: 0; }
+.hearing-recording .file-display { margin-right: 5px; }
 
 .hearings-title-container--empty {
   height: 48px;
@@ -342,6 +345,8 @@
   margin-top: 25px;
 }
 
+.hearing-notice-generated-files { display: inline-block; }
+.hearing-notice-generated-files .file-display-card-created-wrapper { display: none; }
 
 /* Hearing overview item edit styles */
 .active-edit .hearing-end-time { display: inline-block; }
@@ -351,8 +356,17 @@
 .active-edit .hearing-arbitrator-info-container > div:nth-child(3) { visibility: hidden; }
 
 
-.hearing-on-hold-view { margin-left: 20px; background: url('../static/Icon_HearingHold_LRG.png') no-repeat; width: 20px; height: 20px; background-size: 20px 19px; padding-left: 25px; color: #666666; }
+.hearing-on-hold-view { margin-left: 20px; background: url('../static/Icon_HearingHold_LRG.png') no-repeat; min-width: 91px; height: 20px; background-size: 20px 19px; padding-left: 25px; color: #666666; }
 .active-edit .hearing-on-hold-view { display: none; }
+
+.on-hold-item::after { 
+  display: inline-block;
+  content: ' ';
+  margin-left: 10px;
+  width: 1px;
+  height: 40%;
+  background-color: #fff;
+}
 
 .hearing-on-hold-edit { display: none; }
 .active-edit .hearing-on-hold-edit { display: inline-block; margin-left: 20px; top: -3px; position: relative; }

@@ -40,4 +40,9 @@ public static class OutcomeDocRequestManager
     {
         return client.GetAsync<List<OutcomeDocRequestGetResponse>>(RouteHelper.GetDisputeOutcomeDocRequests + disputeGuid);
     }
+
+    public static EntityWithStatus<List<ExternalOutcomeDocRequestGetResponse>> GetExternalDisputeOutcomeDocRequests(HttpClient client, Guid disputeGuid)
+    {
+        return client.GetAsync<List<ExternalOutcomeDocRequestGetResponse>>(RouteHelper.GetExternalDisputeOutcomeDocRequests + disputeGuid);
+    }
 }

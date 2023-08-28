@@ -89,7 +89,7 @@ public partial class SecurityTests
         disputeFeePostResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         disputeFeePatchResponse = DisputeFeeManager.UpdateDisputeFee(Client, Data.DisputeFees[0].DisputeFeeId, new PatchDisputeFeeRequest());
-        disputeFeePatchResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+        disputeFeePatchResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
 
         disputeFeeDeleteResponse = DisputeFeeManager.DeleteDisputeFee(Client, Data.DisputeFees[1].DisputeFeeId);
         disputeFeeDeleteResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal for selecting and uploading arb signature images. Supports file upload, and cropping using cropperjs npm package.
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../modals/ModalBase';
 import Cropper from 'cropperjs';
@@ -23,7 +26,7 @@ const MIN_CROPPER_ASPECT_RATIO = 1.5;
 const SIGNATURE_FILE_TYPE = 4;
 const CROPPER_ASPECT_RATIO_ERROR = `Warning: To ensure the signature file will fit into the available space in a decision or order, the aspect ration cannot be less than ${MIN_CROPPER_ASPECT_RATIO} to 1 or greater than ${MAX_CROPPER_ASPECT_RATIO} to 1`;
 const CROPPER_MIN_SIZE_ERROR = `Warning: Signature files cannot be resized smaller than ${MIN_IMAGE_WIDTH}px wide by ${MIN_IMAGE_HEIGHT}px tall.  To crop a smaller area you must upload a higher resolution signature file`
-const SIGNATURE_ALREADY_EXISTS_ERROR = 'A signature for this arbitrator already exists';
+const SIGNATURE_ALREADY_EXISTS_ERROR = 'A signature for this user already exists';
 const signatureImageclassSelector = '.file-cropper-image';
 const filesChannel = Radio.channel('files');
 const loaderChannel = Radio.channel('loader');
@@ -40,7 +43,7 @@ export default ModalBaseView.extend({
     closeBtn: '.close-x',
     fileDescription: '.file-description',
     signatureWrapper: '.signature-wrapper',
-    signatureArb: '.signature-arb',
+    signatureUser: '.signature-user',
     signatureCropButtons: '.signature-cropper-buttons',
     //cropper specific ui
     cropperInfo: '.signature-cropper-info',
@@ -60,7 +63,7 @@ export default ModalBaseView.extend({
     fileDescriptionRegion: '@ui.fileDescription',
     fileUploadRegion: '.file-upload',
     documentFileTitleRegion: '.signature-document-title',
-    associatedArbRegion: '@ui.signatureArb',
+    associatedUserRegion: '@ui.signatureUser',
   },
 
   events: {
@@ -137,10 +140,10 @@ export default ModalBaseView.extend({
     const fileUploader = this.getChildView('fileUploadRegion');
 
     fileUploader.uploadAddedFiles().done(() => {
-      const selectedArb = this.associatedArbModel.getSelectedOption()._arbModel;
-      const arbProfile = selectedArb.getProfile();
-      arbProfile.set({ signature_file_id: fileUploader.files.at(0).get('common_file_id') });
-      arbProfile.save(arbProfile.getApiChangesOnly());
+      const selectedUser = this.associatedUserModel.getSelectedOption()._userModel;
+      const profile = selectedUser.getProfile();
+      profile.set({ signature_file_id: fileUploader.files.at(0).get('common_file_id') });
+      profile.save(profile.getApiChangesOnly());
       this.trigger('save:complete');
       this.close();
     }).always(() => loaderChannel.trigger('page:load:complete'))
@@ -162,17 +165,20 @@ export default ModalBaseView.extend({
     }
   },
 
-  _getAllArbOptions() {
-    return _.sortBy(_.map(userChannel.request('get:arbs'), function(arbitrator) {
-        return { text: arbitrator.getDisplayName(), value: String(arbitrator.id), _arbModel: arbitrator};
-    }), function(option) { return option.text.toLowerCase(); });
+  _getAllUserOptions() {
+    const canUserAccessSignature = (user) => user.isArbitrator() || user.isInformationOfficerSupervisor() || user.isInformationOfficerLead();
+    // Get users this way to automatically filter out system and queue users
+    const signatureUsers = [...userChannel.request('get:arbs'), ...userChannel.request('get:ios')].filter(canUserAccessSignature);
+    return _.sortBy(
+      signatureUsers.map(user => ({ text: user.getDisplayName(), value: String(user.id), _userModel: user })),
+      option => option.text.toLowerCase()
+    );
   },
 
   validateAndShowErrors() {
-    const regionsToValidate = ['filenameRegion', 'documentFileTitleRegion', 'associatedArbRegion'];
-    const selectedArb = this.associatedArbModel.getSelectedOption() ? this.associatedArbModel.getSelectedOption()._arbModel : null;
-    // const fileUploader = this.getChildView('fileUploadRegion');
-
+    const regionsToValidate = ['filenameRegion', 'documentFileTitleRegion', 'associatedUserRegion'];
+    const selectedUser = this.associatedUserModel.getSelectedOption() ? this.associatedUserModel.getSelectedOption()._userModel : null;
+    
     let isValid = true;
     (regionsToValidate || []).forEach(regionName => {
       const view = this.getChildView(regionName);
@@ -181,11 +187,11 @@ export default ModalBaseView.extend({
       }
     });
 
-    if (!selectedArb) return isValid;
+    if (!selectedUser) return isValid;
 
-    if (this.signatures.findWhere({ common_file_id: selectedArb.getProfile().get('signature_file_id') })) {
-      const arbView = this.getChildView('associatedArbRegion');
-      arbView.showErrorMessage(SIGNATURE_ALREADY_EXISTS_ERROR);
+    if (selectedUser.getProfile().get('signature_file_id') && this.signatures.findWhere({ common_file_id: selectedUser.getProfile().get('signature_file_id') })) {
+      const userView = this.getChildView('associatedUserRegion');
+      userView.showErrorMessage(SIGNATURE_ALREADY_EXISTS_ERROR);
       isValid = false;
     }
 
@@ -228,7 +234,7 @@ export default ModalBaseView.extend({
       this.render();
       this.getUI('save').removeClass('hidden');
       this.getUI('signatureWrapper').removeClass('hidden');
-      this.getUI('signatureArb').removeClass('hidden');
+      this.getUI('signatureUser').removeClass('hidden');
       this.getUI('signatureCropButtons').removeClass('hidden');
     });
     //convert image to base64
@@ -250,7 +256,7 @@ export default ModalBaseView.extend({
   },
 
   setupListeners() {
-    this.listenTo(this.associatedArbModel, 'change:value', function(model) {
+    this.listenTo(this.associatedUserModel, 'change:value', function(model) {
       const displayName = model.getSelectedOption() ? `${model.getSelectedOption().text}_signature` : null;
       this.filenameModel.set({value: displayName});
       const filenameView = this.getChildView('filenameRegion').render();
@@ -293,16 +299,22 @@ export default ModalBaseView.extend({
       apiMapping: 'file_title'
     });
 
-    this.associatedArbModel = new DropdownModel({
+    this.associatedUserModel = new DropdownModel({
       defaultBlank: true,
-      optionData: this._getAllArbOptions(),
-      labelText: 'Associated Arbitrator',
-      errorMessage: 'Choose an Arbitrator',
+      optionData: this._getAllUserOptions(),
+      labelText: 'Associated User',
+      errorMessage: 'Choose a user',
       clearWhenHidden: true,
       required: true,
       value: null,
     });
   },
+
+  /**
+   * @param {String[]} [allowedFileTypes] - Pass in a list of allowed file extensions
+   * @param {FileCollection} files - file collection to add and save signature file to
+   * @param {FileCollection} signatures - file collection of already added signatures. Used to check for duplicates
+   */
 
   initialize(options) {
     this.mergeOptions(options, ['allowedFileTypes', 'files', 'signatures']);
@@ -376,7 +388,7 @@ export default ModalBaseView.extend({
     this.showChildView('filenameRegion', new InputView({ model: this.filenameModel}));
     this.showChildView('documentFileTitleRegion', new InputView({ model: this.documentTitleModel }));
     this.showChildView('fileDescriptionRegion', new TextareaView({ model: this.descriptionModel }));
-    this.showChildView('associatedArbRegion', new DropdownView({ model: this.associatedArbModel }));
+    this.showChildView('associatedUserRegion', new DropdownView({ model: this.associatedUserModel }));
 
     this.setupFileUploaderListeners(fileUploader);
   },

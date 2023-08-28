@@ -49,9 +49,9 @@
   min-width: 300px;
 }
 
-.dispute-list-file { font-size: 18px; }
-.dispute-list-file-number-label { color: #808080; }
-.dispute-list-file-number { margin-right: 20px; font-weight: bold; }
+.dispute-list-file { display: flex; align-items: center; font-size: 18px; }
+.dispute-list-file-number-label { color: #808080; margin-bottom: 2px; }
+.dispute-list-file-number { font-weight: bold; }
 .dispute-list-rental { font-weight: bold; }
 
 
@@ -93,7 +93,7 @@ tr.dispute-list-none-box {
 .dispute-list-info-block { width: 100%; max-width: 500px; margin-right: 15px; white-space: nowrap; }
 .dispute-list-info-block > div:nth-child(2) { overflow: hidden; text-overflow: ellipsis; padding-right: 15px; }
 .dispute-list-evidence-block { min-width: 240px; }
-.dispute-list-review-block {   
+.warning-alert {   
   background-color: #fbf3f2;
   background-image: url("../static/Icon_AlertSml.png");
   background-size: 20px 20px;
@@ -131,8 +131,9 @@ tr.dispute-list-none-box {
   padding-bottom: 10px;
 }
 
-.dispute-list-details-btn,
 .dispute-list-add-evidence-btn,
+.dispute-list-request-reinstatement-btn,
+.dispute-list-submit-service-btn,
 .dispute-list-hearing-details-btn {
   color: #337ab7;
   cursor: pointer;
@@ -140,9 +141,16 @@ tr.dispute-list-none-box {
   text-decoration: none;
 }
 
-.dispute-list-details-btn { background: url('../static/Icon_DisputeDetails.png') no-repeat; }
+.dispute-list-details-btn {
+  padding: 0 0px 0px 30px;
+  margin-left: 10px;
+  background: url('../../core/static/Icon_ViewFile.png') no-repeat;
+}
 
-.dispute-list-add-evidence-btn { background: url('../../core/static/Icon_UploadDA.png') no-repeat; }
+.dispute-list-add-evidence-btn,
+.dispute-list-request-reinstatement-btn,
+.dispute-list-submit-service-btn
+{ background: url('../../core/static/Icon_UploadDA.png') no-repeat; }
 
 .dispute-list-hearing-details-btn { background: url('../static/Icon_Hearing_sml.png') no-repeat; }
 
@@ -157,7 +165,7 @@ tr.dispute-list-none-box {
 
 span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left: 8px; }
 
-.dispute-list-error-text { color: #cc2d2d; }
+.dispute-list-error-text { color: #cc2d2d; line-height: 18px; }
 
 .dispute-list-btn-actions, .dispute-list-btn-actions:hover, .dispute-list-btn-actions:active, .dispute-list-btn-actions:focus {
   padding: 8px 14px 6px 16px;
@@ -288,21 +296,6 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 .page-view .page-item-container .page-item-child-view {
   max-width: 1200px;
 }
-
-.page-item-container > .warning {
-  margin: -20px 15px 20px 0px;
-  padding: 10px 10px 10px 50px;
-  line-height: 22px;
-  background-color: #fff6e5;
-  background-image: url("../../core/static/Icon_Warning.png");
-  background-position: left 5px center;
-  background-repeat: no-repeat;
-  max-width: 1230px;
-  color: #666;
-  font-size: 16px;
-}
-
-.intake-warning { line-height: 22px; }
 
 .step-description {
   font-size: 19px;
@@ -490,6 +483,8 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
   max-width: none;
 }
 
+.evidence-claim__rule-error { margin: 0px 15px; };
+
 .claim-information-collection-view {
   margin-bottom: 20px;
 }
@@ -630,7 +625,7 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
     font-size: 19px;
     line-height: 23px;
     padding-bottom: 0;
-    margin-bottom: 30px;
+    margin-top: 20px;
 }
 
 .evidence-claims > div {
@@ -748,7 +743,6 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 .standalone-evidence-header .section-header { margin: 0; padding-right: 0; }
 .standalone-evidence-main { padding: 10px 10px 20px 15px; font-size: 17px; }
 .standalone-evidence-main ul { padding-left: 25px; }
-.standalone-evidence .info-help-container { margin-left:15px; margin-right:15px; }
 
 .standalone-extra-container { display: flex; justify-content: flex-start; flex-wrap: wrap; margin: 0 15px; }
 .standalone-evidence-date { min-width: 265px; max-width: 265px; margin-right: 10px; }
@@ -793,13 +787,20 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 .payment-page-subtitle { font-size: 17px; line-height: 21px; margin: 0px 0px 20px 0px; }
 .payment-page-subservice-question { margin-top: 20px; }
 .payment-page-subservice-button-header { margin-top: 20px; font-size: 19px; }
-.payment-page-subservice-question-button { height: 50px; padding-left: 45px; background-image: url("../static/Icon_DARedirect.png"); background-position: left 5px center; background-repeat: no-repeat;}
+.payment-page-subservice-question-button { height: 40px; padding-left: 45px; background-image: url("../static/Icon_DARedirect.png"); background-position: left 5px center; background-repeat: no-repeat;}
 .payment-page-subservice-container { font-size: 16px; margin-top: 40px; }
 .payment-page-subservice-description { line-height: 22px; font-size: 19px; margin-bottom: 20px; }
 .payment-page-subservice-respondents { font-size: 19px; line-height: 20px; margin-bottom: 15px; }
 .payment-page-subservice-respondent { font-size: 19px; line-height: 20px; }
 .payment-page-subservice-allowed-methods { margin-top: 10px; }
-.payment-page-subservice-question .intake-warning { margin-top: 20px; padding-top: 18px; font-size: 17px; line-height: 20px; }
+.payment-page-subservice-question .warning { margin-top: 20px; padding-top: 18px; font-size: 17px; line-height: 20px; }
+.payment-page-subservice-question .option-button {
+  font-size: 18px;
+  min-width: 70px;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
+}
 .payment-page-subservice-proof-list { margin-top: 5px; }
 
 .intake-receipt-footer {
@@ -808,7 +809,7 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 }
 
 .intake-logout-btn { font-size: 22px; height: 50px; display: flex; align-items: center;}
-.intake-file-list-btn { font-size: 22px; height: 50px; }
+.intake-file-list-btn { font-size: 22px; height: 40px; margin-top: 4px; }
 
 .da-receipt-main-menu-btn {
   padding: 8px 16px 6px 16px;
@@ -884,6 +885,11 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 
 .income-evidence .evidence-item-container .help-icon { display: none; }
 
+.junk-email-msg {
+  font-size: 17px;
+  margin-top: 10px;
+}
+
 /* Desktop-only css */
 @media (min-width: 769px) {
   #p1-TenancyStartDate .input-group-container,
@@ -924,6 +930,8 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
   }
 
   .intake-claim .notice-method select { max-width: 260px; }
+
+  .modalIntakeContactWarning .modal-dialog { width: auto; }
 }
 
 /* Mobile css */
@@ -951,6 +959,12 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 
   #menu.mobile-render {
     display: block;
+  }
+
+  .mobile-render .menu-steps-title {
+    color: #fff;
+    padding-bottom: 3px;
+    padding-left: 3px;
   }
 
   #menu .menu-container {
@@ -1043,8 +1057,6 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
   }
 
   .no-claims-error { margin-left: 0; }
-
-  .modalIntakeContactWarning .modal-dialog {  }
 }
 
 

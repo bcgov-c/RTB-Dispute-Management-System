@@ -113,15 +113,17 @@ export default PageView.extend({
       city: 'tenancy_city',
       country: 'tenancy_country',
       postalCode: 'tenancy_zip_postal',
-      geozoneId: 'tenancy_geozone_id'
+      geozoneId: 'tenancy_geozone_id',
+      addressIsValidated: 'tenancy_address_validated'
     };
     const rentalAddressModel = new AddressModel({
         json: _.mapObject(rentalAddressApiMappings, function(val) { return dispute.get(val); }),
         apiMapping: rentalAddressApiMappings,
         required: true,
-        useDefaultProvince: true,
-        showValidate: true,
-        useSubLabel: false
+        selectProvinceAndCountry: false,
+        showUpdateControls: true,
+        useSubLabel: false,
+        useAddressValidation: true,
       }),
       is_rental_address_valid = rentalAddressModel.isValid();
 

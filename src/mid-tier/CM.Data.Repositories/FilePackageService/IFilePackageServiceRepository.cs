@@ -12,4 +12,6 @@ public interface IFilePackageServiceRepository : IRepository<Model.FilePackageSe
     Task<bool> CheckFilePackageServiceExistenceAsync(int filePackageServiceId);
 
     Task<List<Data.Model.FilePackageService>> GetServicesWithPackages(Guid disputeGuid, bool isServed);
+
+    Task<Data.Model.FilePackageService> GetWithChild(int filePackageServiceId);
 }

@@ -56,4 +56,10 @@ public class FileInfoResponse : CommonResponse
 
     [JsonProperty("is_deficient")]
     public bool IsDeficient { get; set; }
+
+    [JsonProperty("is_source_file_deleted")]
+    public bool IsSourceFileDeleted { get; set; }
+
+    [JsonProperty("file_meta_summary")]
+    public string FileMetaSummary { get; set; }
 }

@@ -31,12 +31,12 @@ public class FactIntakeProcessingManager : StatisticManagerBase
     {
     }
 
-    public async Task RecordAsync()
+    public async Task RecordAsync(DateTime? startDate, DateTime? endDate)
     {
         var loadingEventId = await LoadingHistoryManager.InsertLoadingHistory(FactTable.FIntakeProcessing);
         try
         {
-            var error = await GetRecords();
+            var error = await GetRecords(startDate, endDate);
 
             if (error == string.Empty)
             {
@@ -75,14 +75,20 @@ public class FactIntakeProcessingManager : StatisticManagerBase
         }
     }
 
-    private async Task<string> GetRecords()
+    private async Task<string> GetRecords(DateTime? startDate, DateTime? endDate)
     {
         LogInformation("Start get records");
         try
         {
-            var(utcStart, utcEnd) = CommonFieldsLoader.GetUtcRange();
+            var utcStart = startDate;
+            var utcEnd = endDate;
 
-            var disputeStatuses = await UnitOfWork.DisputeStatusRepository.GetProcessedStatuses(utcStart, utcEnd);
+            if (utcStart == null || utcEnd == null || endDate <= startDate)
+            {
+                (utcStart, utcEnd) = CommonFieldsLoader.GetUtcRange();
+            }
+
+            var disputeStatuses = await UnitOfWork.DisputeStatusRepository.GetProcessedStatuses(utcStart.Value, utcEnd.Value);
 
             if (disputeStatuses == null || disputeStatuses.Count < 1)
             {
@@ -106,7 +112,7 @@ public class FactIntakeProcessingManager : StatisticManagerBase
                 foreach (var status in statuses)
                 {
                     var prevStatus = await GetPreviousStatus(status);
-                    if (prevStatus.Stage == (byte?)DisputeStage.ApplicationScreening)
+                    if (prevStatus != null && prevStatus.Stage == (byte?)DisputeStage.ApplicationScreening)
                     {
                         var earliestStatus = await GetEarliestSequentialStage2(status);
 
@@ -200,10 +206,12 @@ public class FactIntakeProcessingManager : StatisticManagerBase
                             var intakeWasUpdated = statuses1And6Duration.Exists(x => x.DisputeGuid == item.Key);
                             var timeStatusNeedsUpdateMin = statuses1And6Duration.Where(x => x.DisputeGuid == item.Key).Sum(x => x.Duration);
                             var dispute = disputes.FirstOrDefault(x => x.DisputeGuid == item.Key);
-                            var diputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearingsWithParticipations(dispute.DisputeGuid);
-                            LogInformation($"DiputeHearings count = {diputeHearings.Count}");
-                            var primaryDisputeHearing = diputeHearings != null && diputeHearings.Count > 0
-                                ? diputeHearings.FirstOrDefault(d => d.DisputeHearingRole == (byte)DisputeHearingRole.Active)
+                            var disputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearingsWithParticipations(dispute.DisputeGuid);
+
+                            LogInformation($"DisputeHearings count = {disputeHearings.Count}");
+
+                            var primaryDisputeHearing = disputeHearings != null && disputeHearings.Count > 0
+                                ? disputeHearings.FirstOrDefault(d => d.DisputeHearingRole == (byte)DisputeHearingRole.Active)
                                 : null;
                             var linkedDisputes = primaryDisputeHearing != null
                                 ? await UnitOfWork.DisputeHearingRepository.GetHearingDisputes(primaryDisputeHearing.HearingId)
@@ -227,7 +235,7 @@ public class FactIntakeProcessingManager : StatisticManagerBase
                                 .Where(x => x.GroupParticipantRole == (byte)GroupParticipantRole.Respondent)
                                 .Select(x => x.ParticipantId).ToList();
 
-                            var hearingAllDisputes = diputeHearings.Select(x => x.DisputeGuid).ToList();
+                            var hearingAllDisputes = disputeHearings.Select(x => x.DisputeGuid).ToList();
                             var issues = await CommonFieldsLoader.GetDisputesClaims(UnitOfWork, hearingAllDisputes);
                             var disputeAllStatuses = await UnitOfWork.DisputeStatusRepository.FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid);
                             var processes = CommonFieldsLoader.GetProcessesCount(UnitOfWork, disputeAllStatuses.ToList());
@@ -238,8 +246,10 @@ public class FactIntakeProcessingManager : StatisticManagerBase
                             var associatedFiles = await UnitOfWork.FileRepository.FindAllAsync(x => fileIds.Contains(x.FileId));
                             LogInformation($"AssociatedFiles count = {associatedFiles.Count}");
                             var fileSizesSum = CommonFieldsLoader.GetLinkedEvidenceFilesMb(UnitOfWork, evidenceFiles, associatedFiles);
-
                             var subServices = await UnitOfWork.SubstitutedServiceRepository.FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid);
+
+                            var lastNotice = await UnitOfWork.NoticeRepository.GetLastNotice(dispute.DisputeGuid, new NoticeTypes[] { NoticeTypes.GeneratedDisputeNotice });
+                            var hasArsDeadline = lastNotice != null ? lastNotice.HasServiceDeadline : false;
 
                             LogInformation("All fields are get for status");
 
@@ -302,7 +312,9 @@ public class FactIntakeProcessingManager : StatisticManagerBase
                                 EvidenceFilesMb = (int?)fileSizesSum,
                                 SubServiceRequests = subServices.Count,
                                 ProcessStartStage = earliestStatus.Stage,
-                                ProcessStartStatus = earliestStatus.Status
+                                ProcessStartStatus = earliestStatus.Status,
+                                HasArsDeadline = hasArsDeadline,
+                                DisputeComplexity = (int?)dispute.DisputeComplexity
                             };
 
                             await DwUnitOfWork.FactIntakeProcessingRepository.InsertAsync(factIntakeProcessing);
@@ -317,6 +329,7 @@ public class FactIntakeProcessingManager : StatisticManagerBase
         }
         catch (Exception e)
         {
+            LogError(e.Message, e);
             return e.Message;
         }
     }
@@ -351,6 +364,12 @@ public class FactIntakeProcessingManager : StatisticManagerBase
     {
         var statuses = await UnitOfWork.DisputeStatusRepository.GetDisputeStatuses(status.DisputeGuid);
         var index = statuses.IndexOf(status);
+
+        if (index == 0)
+        {
+            return null;
+        }
+
         var prevStatus = statuses.ElementAt(index - 1);
         return prevStatus;
     }

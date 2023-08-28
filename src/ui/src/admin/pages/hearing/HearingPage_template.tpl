@@ -4,7 +4,7 @@
 <div class="header-page-title-container">
   <div class="header-page-title header-page-title-with-icon">Hearings</div>
   <div class="<%= isLoaded ? '': 'hidden' %> subpage-header-action-container goto-notice-btn-container">
-    <div class="subpage-header-action-icon header-notice-icon">Notice</div>
+    <div class="subpage-header-action-icon header-notice-icon">Dispute Notice</div>
   </div>
 
   <% if (isLoaded && isSchedulerUser) { %>
@@ -12,9 +12,13 @@
       <div class="subpage-header-action-icon hearing-page-add-header-icon">Add New Hearing</div>
     </div>
     <div class="subpage-header-action-container goto-schedule-history-btn-container">
-      <div class="subpage-header-action-icon header-hearing-icon">View Hearing History</div>
+      <div class="subpage-header-action-icon header-hearing-icon">History</div>
     </div>
   <% } %>
+
+  <div class="<%= isLoaded && showNoticeGeneration ? '' : 'hidden' %> subpage-header-action-container generate-hearing-btn-container">
+    <div class="subpage-header-action-icon header-hearing-notice-icon">Generate Hearing Notice</div>
+  </div>
 
   <div class="<%= isLoaded && showHearingTools ? '' : 'hidden' %> subpage-header-action-container">
     <div class="dispute-overview-claims-hearing-tools"></div>

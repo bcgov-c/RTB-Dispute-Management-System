@@ -32,6 +32,5 @@
   <div id="comm-drafts" class=""></div>
   <div id="comm-pickups" class=""></div>
   <div id="comm-emails" class=""></div>
-
   <div id="comm-receipts" class=""></div>
 </div>

@@ -7,6 +7,7 @@ import DisputeDocRequestView from './DisputeDocRequest';
 import CheckboxView from '../../../../core/components/checkbox/Checkbox';
 import CheckboxModel from '../../../../core/components/checkbox/Checkbox_model';
 import './doc-request.css';
+import SessionCollapse from '../../../components/session-settings/SessionCollapseHandler';
 
 const disputeChannel = Radio.channel('dispute');
 const loaderChannel = Radio.channel('loader');
@@ -63,6 +64,7 @@ const DisputeDocRequestCollection = Marionette.CollectionView.extend({
       return new ChildViewClass(childViewOptions);
     }
 
+    const disputeModel = disputeChannel.request('get');
     // Create the child view instance
     const view = ContextContainer.withContextMenu({
       wrappedView: new DisputeDocRequestView(options),
@@ -74,7 +76,8 @@ const DisputeDocRequestCollection = Marionette.CollectionView.extend({
         this.render();
         loaderChannel.trigger('page:load:complete');
       },
-      disputeModel: disputeChannel.request('get')
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Documents', 'outcomeDocRequests', child.id),
     });
 
     const refreshMenuFn = () => {
@@ -113,23 +116,24 @@ const DisputeDocRequests = Marionette.View.extend({
     this.template = this.template.bind(this);
     this.mergeOptions(options, ['disputeModel', 'collection']);
 
-    if (this.disputeModel) this.setupThumbnailModelAndHandler();
+    this.collapseHandler = SessionCollapse.createHandler(this.disputeModel, 'Documents', 'OutcomeDocRequests');
+    this.isCollapsed = this.collapseHandler?.get();
+    this.createSubModels();
+    this.setupListeners();
   },
 
-  setupThumbnailModelAndHandler() {
+  createSubModels() {
     this.showThumbnailsModel = new CheckboxModel({
       html: 'Thumbnails',
       checked: this.disputeModel.get('sessionSettings')?.thumbnailsEnabled
     });
+  },
 
+  setupListeners() {
     this.listenTo(this.showThumbnailsModel, 'change:checked', (checkboxModel, value) => {
       this.disputeModel.checkEditInProgressPromise().then(
         () => {
-          if (value) {
-            this.disputeModel.set({ sessionSettings: { ...this.model.get('sessionSettings'), thumbnailsEnabled: true } });
-          } else {
-            this.disputeModel.set({ sessionSettings: { ...this.model.get('sessionSettings'), thumbnailsEnabled: false } });
-          }
+          this.disputeModel.set({ sessionSettings: { ...this.disputeModel.get('sessionSettings'), thumbnailsEnabled: value } });
           setTimeout(() => loaderChannel.trigger('page:load'), 1);
           setTimeout(() => this.render(), 50);
           setTimeout(() => loaderChannel.trigger('page:load:complete'), 100);
@@ -144,14 +148,22 @@ const DisputeDocRequests = Marionette.View.extend({
     });
   },
 
-  onRender() {
-    this.showChildView('docRequestsRegion', new DisputeDocRequestCollection({
-      collection: this.collection,
-      showThumbnails: !!this.showThumbnailsModel.getData()
-    }));
-
-    if (this.disputeModel) this.showChildView('showThumbnailsRegion', new CheckboxView({ model: this.showThumbnailsModel }));
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
   },
+
+  onRender() {
+    this.showChildView('showThumbnailsRegion', new CheckboxView({ model: this.showThumbnailsModel }));
+    
+    if (!this.isCollapsed) {
+      this.showChildView('docRequestsRegion', new DisputeDocRequestCollection({
+        collection: this.collection,
+        showThumbnails: !!this.showThumbnailsModel.getData()
+      }));
+    }
+  },  
 
   regions: {
     showThumbnailsRegion: '.admin-banner__thumbnails',
@@ -159,13 +171,18 @@ const DisputeDocRequests = Marionette.View.extend({
   },
 
   template() {
+    const enableCollapse = !!this.collapseHandler;
     return (
       <div className={this.showThumbnailsModel.getData() ? 'thumbnails' : ''}>
         <div className="admin-banner">
           <div className="admin-banner__title">Outcome Documents Requests</div>
-          
           <div className="admin-banner__options">
             <div className="admin-banner__thumbnails"></div>
+            {enableCollapse ? 
+              <span className={`dispute-section-title-add collapse-icon ${this.isCollapsed ? 'collapsed' : '' }`}
+                onClick={() => this.clickCollapse()}
+              ></span>
+            : null}
           </div>
         </div>
         <div className="doc-requests"></div>

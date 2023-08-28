@@ -62,4 +62,15 @@ public static class DateTimeExtensions
         var ts = date2.Value - date1.Value;
         return ts.TotalMinutes;
     }
+
+    public static int? DifferenceByDays(this DateTime? date1, DateTime? date2)
+    {
+        if (date1 == null || date2 == null)
+        {
+            return null;
+        }
+
+        var ts = date2.Value - date1.Value;
+        return Math.Abs((int)ts.TotalDays);
+    }
 }

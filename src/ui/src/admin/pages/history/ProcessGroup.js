@@ -5,6 +5,7 @@ import DisputeStatusModel from '../../../core/components/dispute/DisputeStatus_m
 import DisputeStatusView from '../../components/status/DisputeStatus';
 import HistoryListView from './HistoryList';
 import template from './ProcessGroup_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const APP_IN_PROGRESS_STAGE_CODE = 0;
 const APP_SCREENING_STAGE_CODE = 2;
@@ -62,6 +63,14 @@ export default Marionette.View.extend({
     this.hearingPendingDuration = Formatter.toDurationFromSecs(this.calcStageDuration(HEARING_PENDING_STAGE_CODE)) || DEFAULT_BLANK_VALUE;
     this.hearingDuration = Formatter.toDurationFromSecs(this.calcStageDuration(HEARING_STAGE_CODE)) || DEFAULT_BLANK_VALUE;
     this.decisionAndPostSupportDuration = Formatter.toDurationFromSecs(this.calcStageDuration(DECISION_AND_POST_SUPPORT_STAGE_CODE)) || DEFAULT_BLANK_VALUE;
+
+    this.collapseHandler = SessionCollapse.createHandler(this.model.get('disputeModel'), 'History', 'processGroups', this.statusCollection?.at(0)?.id);
+    this.isCollapsed = this.collapseHandler?.get();
+
+    this.listenTo(this.collapseHandler, 'change:isCollapsed', (m, value) => {
+      this.isCollapsed = value;
+      this.render();
+    });
   },
 
   onRender() {
@@ -85,10 +94,13 @@ export default Marionette.View.extend({
         }
       },
       contextRender: () => this.render(),
-      disputeModel: this.model.get('disputeModel')
+      disputeModel: this.model.get('disputeModel'),
+      collapseHandler: this.collapseHandler,
     }));
 
-    this.showChildView('statusListRegion', new HistoryListView({ collection: this.statusCollection }));
+    if (!this.isCollapsed) {
+      this.showChildView('statusListRegion', new HistoryListView({ collection: this.statusCollection }));
+    }
   },
 
   templateContext() {
@@ -102,6 +114,8 @@ export default Marionette.View.extend({
       hearingPendingDuration: this.hearingPendingDuration,
       hearingDuration: this.hearingDuration,
       decisionAndPostSupportDuration: this.decisionAndPostSupportDuration,
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 });

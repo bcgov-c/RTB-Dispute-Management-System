@@ -179,7 +179,7 @@ export default Marionette.View.extend({
         }, err => {
           err = err || {};
           this.loaded = true;
-
+          loaderChannel.trigger('page:load:complete');
           if (err && err.status === 404) {
             modalChannel.request('show:standard', {
               title: 'Hearing Not Found',

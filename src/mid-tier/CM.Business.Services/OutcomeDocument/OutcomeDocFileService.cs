@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.OutcomeDocument;
+using CM.Business.Services.Base;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
@@ -9,7 +10,6 @@ using CM.Messages.PostedDecision.Events;
 using CM.Messages.PostedDecisionDataCollector.Events;
 using CM.UserResolverService;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.OutcomeDocument;
 
@@ -44,10 +44,7 @@ public class OutcomeDocFileService : CmServiceBase, IOutcomeDocFileService
         if (result.CheckSuccess())
         {
             var postedDecisionEvent = await GetPostedDecisionDataCollectionEvent(outcomeDocFileResult);
-            if (postedDecisionEvent != null)
-            {
-                Publish(postedDecisionEvent);
-            }
+            postedDecisionEvent?.Publish(Bus);
 
             return MapperService.Map<OutcomeDocFile, OutcomeDocFileResponse>(outcomeDocFileResult);
         }
@@ -62,7 +59,7 @@ public class OutcomeDocFileService : CmServiceBase, IOutcomeDocFileService
             var postedDecisionEvent = await GetPostedDecisionDataCollectionEvent(outcomeDocFile);
             if (postedDecisionEvent != null)
             {
-                Publish(postedDecisionEvent);
+                postedDecisionEvent.Publish(Bus);
 
                 if (outcomeDocFile.FileId != null)
                 {
@@ -81,7 +78,7 @@ public class OutcomeDocFileService : CmServiceBase, IOutcomeDocFileService
                 OutcomeDocFileId = outcomeDocFile.OutcomeDocFileId
             };
 
-            Publish(postedDecisionDeletionEvent);
+            postedDecisionDeletionEvent.Publish(Bus);
 
             if (outcomeDocFile.FileId != null)
             {
@@ -124,7 +121,7 @@ public class OutcomeDocFileService : CmServiceBase, IOutcomeDocFileService
                 OutcomeDocFileId = outcomeDocFile.OutcomeDocFileId
             };
 
-            Publish(postedDecisionDeletionEvent);
+            postedDecisionDeletionEvent.Publish(Bus);
 
             return result.CheckSuccess();
         }
@@ -180,41 +177,5 @@ public class OutcomeDocFileService : CmServiceBase, IOutcomeDocFileService
         }
 
         return null;
-    }
-
-    private void Publish(PostedDecisionDataCollectionEvent message)
-    {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish posted decision data collection event: {CorrelationGuid} {DisputeGuid}", message.CorrelationGuid, message.DisputeGuid);
-                }
-
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
-    }
-
-    private void Publish(PostedDecisionRemovalEvent message)
-    {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish posted decision data collection event: {CorrelationGuid} {DisputeGuid}", message.CorrelationGuid, message.DisputeGuid);
-                }
-
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

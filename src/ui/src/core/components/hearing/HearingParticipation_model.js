@@ -68,9 +68,11 @@ export default CMModel.extend({
   },
 
   getInitialsDisplay() {
-    // Always display initials with a peroid separating the letters, whether the dots were present first or not
-    const name_abbreviation = $.trim(this.get('name_abbreviation'));
-    return name_abbreviation ? `${name_abbreviation.replace(/\./g, '').split('').join('.')}.` : '-';
+    return `${(this.get('name_abbreviation')||'').trim()}` || this.get('participant_model')?.getInitialsDisplay();
+  },
+
+  getDisplayName() {
+    return this.isOther() ? this.get('other_participant_name') : this.get('participant_model')?.getDisplayName();
   },
 
   setToUnattended() {

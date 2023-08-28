@@ -8,7 +8,6 @@ const menuOverlayHTML = `<div id="${menuOverlayId}" class="hidden-item"></div>`;
 
 const menuChannel = Radio.channel('menu');
 const disputeChannel = Radio.channel('dispute');
-const applicationChannel = Radio.channel('application');
 
 const MenuItemView = Marionette.View.extend({
   template: _.template(`<%= text %>`),
@@ -34,6 +33,10 @@ const MenuStepsView = Marionette.CollectionView.extend({
   tagName: 'div',
   className: 'menu-steps',
 
+  initialize(options) {
+    this.mergeOptions(options, ['routeFormatter']);
+  },
+
   onChildviewMenuClick(menuItemView) {
     const menuItemModel = menuItemView.model;
     if ( menuItemModel.get('active') || !menuItemModel.get('visited') || menuItemModel.get('disabled')) {
@@ -42,7 +45,9 @@ const MenuStepsView = Marionette.CollectionView.extend({
 
     // Always hide the menu once clicked
     menuChannel.trigger('hide:mobile');
-    Backbone.history.navigate('page/'+menuItemView.model.get('step'), {trigger: true});
+    
+    const route = this.routeFormatter ? this.routeFormatter(menuItemView) : menuItemView?.model?.get('route');
+    Backbone.history.navigate(route, {trigger: true});
   }
 
 });
@@ -79,7 +84,9 @@ export default Marionette.View.extend({
     Backbone.history.navigate('logout', { trigger: true });
   },
 
-  initialize() {
+  initialize(options) {
+    this.mergeOptions(options, ['actionOnRender', 'routeFormatter', 'showFileNumber']);
+
     this.listenTo(menuChannel, 'show:mobile', this.showMobileMenu, this);
     this.listenTo(menuChannel, 'hide:mobile', this.hideMobileMenu, this);
     this.listenTo(menuChannel, 'disable:mobile', this.hideMobileMenu, this);
@@ -129,60 +136,16 @@ export default Marionette.View.extend({
     this._hideMenuOverlay();
   },
 
-
   onRender() {
-    this.setMenuStepsVisited();
-    this.showChildView('menuStepsRegion', new MenuStepsView({ collection: this.collection }));
+    if (this.actionOnRender) this.actionOnRender(this.collection);
+    this.showChildView('menuStepsRegion', new MenuStepsView({ collection: this.collection, routeFormatter: this.routeFormatter }));
   },
 
-  setMenuStepsVisited() {
-    const PAYMENT_RECEIPT_STEP_NUMBER = 9,
-      PAYMENT_STEP_NUMBER = 8;
+  templateContext() {
+    return {
+      dispute: disputeChannel.request('get'),
+      showFileNumber: this.showFileNumber,
+    };
+  },
 
-    const dispute = disputeChannel.request('get'),
-      progress = applicationChannel.request('get:progress');
-
-    if (dispute && dispute.isPaymentState()) {
-      this.collection.each(function(menuStep) {
-        if (menuStep.get('step') < PAYMENT_STEP_NUMBER) {
-          menuStep.set({
-            visited: true,
-            disabled: true,
-            unreachable: true,
-            active: false
-          });
-        }
-      });
-    } else if (dispute && dispute.isReviewOnlyState()) {
-      this.collection.each(function(menuStep) {
-        if (menuStep.get('step') !== PAYMENT_RECEIPT_STEP_NUMBER) {
-          menuStep.set({
-            visited: true,
-            disabled: true,
-            unreachable: true,
-            active: false
-          });
-        } else {
-          menuStep.set({
-            visited: true,
-            disabled: false,
-            unreachable: false
-          });
-        }
-      });
-    } else {
-      this.collection.each(function(menuStep) {
-        // Activate the last step completed and everything below it.
-        // Also active the next step after the last completed step
-        if (menuStep.get('step') <= progress + 1) {
-          menuStep.set('visited', true);
-        } else {
-          menuStep.set({
-            visited: false,
-            disabled: false
-          });
-        }
-      });
-    }
-  }
 });

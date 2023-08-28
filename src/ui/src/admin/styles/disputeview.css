@@ -111,6 +111,7 @@
 .amendment-info-container { margin-bottom: 30px; font-size: 18px; }
 .amendment-info-item { margin-bottom: 5px; }
 .amendment-info-item .amendment-icon { width: 26px; height: 24px; float:left; margin-right: 10px; }
+.amendment-info-item .sub-service-icon { width: 26px; height: 24px; float:left; margin-right: 10px; }
 
 .dispute-claim-remedy { padding-bottom: 15px; margin-bottom: 15px; border-bottom: 2px solid #bbb; }
 .dispute-claim-remedy:last-child { border-bottom: none; }
@@ -225,24 +226,24 @@
 
 .edit .component-email-input { margin-right: 0; }
 
-
+.participant-mailing-address,
 .participant-name-section,
 .participant-address,
 .participant-email,
 .edit .intake-address-component,
 .edit .review-participant-email { width: 500px; }
 
-/* Edit Participant address */
-.edit .intake-address-component { width: 350px; }
 
 .edit .dispute-party-container .cityContainer,
-.edit .dispute-party-container .countryTextContainer { width: 210px; }
+.edit .dispute-party-container .countryTextContainer { width: 185px; }
 
 
 .edit .dispute-party-container .postalCodeContainer .intake-input-component { width: 150px; }
 .edit .dispute-party-container .postalCodeContainer input { width: 100px; }
 
 .participant-phone-container { width: 700px; }
+
+.email-verification-instructions .modal-dialog { width: 750px; }
 
 /* Add party/claim modal */
 
@@ -617,6 +618,16 @@
   padding-left: 32px;
   margin-left: 2px;
 }
+.quickaccess-linked-files-save {
+  margin-top: 25px;
+  background-image: url('../static/Icon_Admin_QuickStatusGo.png');
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+  margin-left: 10px;
+  position: relative;
+  bottom: 3px;
+}
 
 .quickstatus-modal-info { margin: 20px 10px 20px 10px; }
 
@@ -624,3 +635,6 @@
 
 .review-applicant-name .rtb-editable-component-value,
 .review-participant-business-name .rtb-editable-component-value { font-weight: bold; }
+
+.review-applicant-name .rtb-editable-component-value span,
+.review-participant-business-name .rtb-editable-component-value span { font-weight: normal; }

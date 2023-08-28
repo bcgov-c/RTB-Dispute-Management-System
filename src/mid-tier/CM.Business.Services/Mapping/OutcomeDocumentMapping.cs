@@ -86,5 +86,32 @@ public class OutcomeDocumentMapping : Profile
 
         CreateMap<Data.Model.OutcomeDocRequest, DisputeOutcomeDocRequestsResponse>()
             .ForMember(x => x.RequestDate, opt => opt.MapFrom(src => src.RequestDate.ToCmDateTimeString()));
+
+        CreateMap<Data.Model.OutcomeDocRequest, ExternalOutcomeDocRequestGetResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.RequestDate, opt => opt.MapFrom(src => src.RequestDate.ToCmDateTimeString()))
+            .ForMember(x => x.RequestCompletionDate, opt => opt.MapFrom(src => src.RequestCompletionDate.ToCmDateTimeString()))
+            .ForMember(x => x.DateDocumentsReceived, opt => opt.MapFrom(src => src.DateDocumentsReceived.ToCmDateTimeString()));
+
+        CreateMap<OutcomeDocReqItem, ExternalOutcomeDocRequestItemResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<OutcomeDocGroup, ExternalOutcomeDocGroupResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.DocStatusDate, opt => opt.MapFrom(src => src.DocStatusDate.ToCmDateTimeString()))
+            .ForMember(x => x.DocCompletedDate, opt => opt.MapFrom(src => src.DocCompletedDate.ToCmDateTimeString()));
+
+        CreateMap<OutcomeDocFile, ExternalOutcomeDocFileResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<OutcomeDocDelivery, ExternalOutcomeDocDeliveryResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.DeliveryDate, opt => opt.MapFrom(src => src.DeliveryDate.ToCmDateTimeString()))
+            .ForMember(x => x.ReadyForDeliveryDate, opt => opt.MapFrom(src => src.ReadyForDeliveryDate.ToCmDateTimeString()));
     }
 }

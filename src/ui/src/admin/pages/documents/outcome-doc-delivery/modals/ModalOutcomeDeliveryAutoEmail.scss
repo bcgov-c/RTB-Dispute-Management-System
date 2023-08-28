@@ -1,0 +1,12 @@
+
+.deliveryAutoEmail_modal {
+
+  
+  &__inputs { display: flex; margin: 20px 0; }
+  &__method { width: 200px; margin-right: 15px; }
+  &__time { flex-grow: 1; max-width: 80%; }
+
+  .modal-dialog { width: 800px; }
+  .modal-button-container { margin-top: 30px; }
+
+}

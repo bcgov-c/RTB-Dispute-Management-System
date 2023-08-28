@@ -86,7 +86,7 @@ public class ClaimDetailService : CmServiceBase, IClaimDetailService
 
     public async Task<DateTime?> GetLastModifiedDateAsync(object id)
     {
-        var lastModifiedDate = await UnitOfWork.ClaimDetailRepository.GetLastModifiedDate((int)id);
+        var lastModifiedDate = await UnitOfWork.DisputeUserRepository.GetLastModifiedDate((int)id);
         return lastModifiedDate;
     }
 }

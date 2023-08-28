@@ -38,4 +38,7 @@ public class ScheduleRequestPostResponse : CommonResponse
 
     [JsonProperty("request_note")]
     public string RequestNote { get; set; }
+
+    [JsonProperty("request_json")]
+    public string RequestJson { get; set; }
 }

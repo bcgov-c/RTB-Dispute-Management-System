@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Contains functionality to check for current maintenance record and display maintenance modal. Used on all DMS sites
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';

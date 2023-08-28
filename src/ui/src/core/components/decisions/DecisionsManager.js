@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Manager that handles loading of data associated with the Posted Decisions site
+ */
+
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 
@@ -34,7 +38,8 @@ const DecisionsManager = Marionette.Object.extend({
     }).fail(err => {
       return err;
     });
-  }
+  },
+
 });
 
 export default new DecisionsManager();

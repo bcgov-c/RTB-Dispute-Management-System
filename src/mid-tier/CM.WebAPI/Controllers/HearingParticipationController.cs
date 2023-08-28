@@ -1,12 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.Hearing;
 using CM.Business.Services.Hearings;
 using CM.Business.Services.Parties;
+using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.Data.Model;
+using CM.Storage;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -21,12 +23,14 @@ public class HearingParticipationController : BaseController
     private readonly IHearingService _hearingService;
     private readonly IMapper _mapper;
     private readonly IParticipantService _participantService;
+    private readonly IUserService _userService;
 
-    public HearingParticipationController(IHearingParticipationService hearingParticipationService, IParticipantService participantService, IHearingService hearingService, IMapper mapper)
+    public HearingParticipationController(IHearingParticipationService hearingParticipationService, IParticipantService participantService, IHearingService hearingService, IUserService userService, IMapper mapper)
     {
         _hearingParticipationService = hearingParticipationService;
         _participantService = participantService;
         _hearingService = hearingService;
+        _userService = userService;
         _mapper = mapper;
     }
 
@@ -51,6 +55,32 @@ public class HearingParticipationController : BaseController
         if (!isHearingExists)
         {
             return BadRequest(string.Format(ApiReturnMessages.HearingDoesNotExist, hearingId));
+        }
+
+        if (request.ParticipationStatusBy.HasValue)
+        {
+            var userExists = await _userService.UserExists(request.ParticipationStatusBy.Value);
+            if (!userExists)
+            {
+                return BadRequest(ApiReturnMessages.InvalidParticipationStatusBy);
+            }
+        }
+
+        if (request.PreParticipationStatusBy.HasValue)
+        {
+            var userExists = await _userService.UserExists(request.PreParticipationStatusBy.Value);
+            if (!userExists)
+            {
+                return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusBy);
+            }
+        }
+
+        if (request.PreParticipationStatusDate.HasValue)
+        {
+            if (request.PreParticipationStatusDate.Value >= System.DateTime.Now)
+            {
+                return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusDate);
+            }
         }
 
         var result = await _hearingParticipationService.CreateAsync(hearingId, request);
@@ -84,6 +114,35 @@ public class HearingParticipationController : BaseController
             if (participantId.Exists && !await _participantService.ParticipantExists(participantId.Value))
             {
                 return BadRequest(string.Format(ApiReturnMessages.ParticipantDoesNotExist, participantId.Value));
+            }
+
+            var participation_status_by = hearingParticipation.GetValue<int?>("/participation_status_by");
+            if (participation_status_by.Exists && participation_status_by.Value.HasValue)
+            {
+                var userExists = await _userService.UserExists(participation_status_by.Value.Value);
+                if (!userExists)
+                {
+                    return BadRequest(ApiReturnMessages.InvalidParticipationStatusBy);
+                }
+            }
+
+            var pre_participation_status_by = hearingParticipation.GetValue<int?>("/pre_participation_status_by");
+            if (pre_participation_status_by.Exists && pre_participation_status_by.Value.HasValue)
+            {
+                var userExists = await _userService.UserExists(pre_participation_status_by.Value.Value);
+                if (!userExists)
+                {
+                    return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusBy);
+                }
+            }
+
+            var pre_participation_status_date = hearingParticipation.GetValue<DateTime?>("/pre_participation_status_date");
+            if (pre_participation_status_date.Exists && pre_participation_status_date.Value.HasValue)
+            {
+                if (pre_participation_status_date.Value.Value >= System.DateTime.Now)
+                {
+                    return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusDate);
+                }
             }
 
             _mapper.Map(hearingParticipationToPatch, originalHearingParticipation);

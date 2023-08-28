@@ -1,5 +1,5 @@
 /**
- * PageLoader is a manger that controls certain repeatable "loader" objects.
+ * @fileoverview - PageLoader is a manger that controls certain repeatable "loader" objects.
  * Currently, only a global page loader is used but in the future, other types of loaders can be configured.
  * @namespace core.components.loaders.PageLoader
  * @memberof core.components

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Modal that allows you to set a deficient reason on one or more Models
+ */
+
 import ModalBaseView from '../modals/ModalBase';
 import Radio from 'backbone.radio';
 import TextareaModel from '../../../core/components/textarea/Textarea_model';
@@ -43,18 +47,27 @@ export default ModalBaseView.extend({
       return this.clickMarkDeficientFn(reason);
     }
 
+    const models = this.collection?.length ? this.collection : [this.model];
     loaderChannel.trigger('page:load');
-    this.model.markAsDeficient(reason);
-    this.model.save( this.model.getApiChangesOnly() ).done(() => {
+    Promise.all(models.map(model => {
+      model.markAsDeficient(reason);
+      return model.save( model.getApiChangesOnly() );
+    })).then(() => {
       this.close();
       this.trigger('save:complete');
-    });
+    })
   },
 
 
   /**
-   * @param {Boolean} [hideReason] - optional param to hide reason textarea
-   * @param {Function} [clickMarkDeficientFn] - optional argument which will be run instead of current.  Will use default scope
+   * @param {Collection} [collection] - Can pass in collection if more than one model should be set to deficient
+   * @param {Model} [model] - Pass in model if only one model should be set to deficient
+   * @param {Boolean} [hideReason] - Param to hide reason textarea
+   * @param {Function} [clickMarkDeficientFn] - Override argument which will be run instead of current.  Will use default scope
+   * @param {String} [title] - Modal title
+   * @param {String} [topHtml] - Top paragraph of modal
+   * @param {String} [bottomHtml] - Bottom paragraph of modal
+   * @param {Function} [getRemovalReasonFn] - Function to return a string which will be saved as the removal reason
    */
   initialize(options) {
     this.mergeOptions(options, ['title', 'topHtml', 'bottomHtml', 'hideReason', 'getRemovalReasonFn', 'clickMarkDeficientFn']);

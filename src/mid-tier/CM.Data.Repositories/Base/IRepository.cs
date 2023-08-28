@@ -18,11 +18,11 @@ public interface IRepository<T>
 
     T GetByGuid(Guid guid);
 
-    Task<T> GetByIdAsync(int id);
+    Task<T> GetByIdAsync(int id, bool ignoreFilter = false);
 
     Task<T> GetByGuidAsync(Guid guid);
 
-    Task<T> GetNoTrackingByIdAsync(Expression<Func<T, bool>> where);
+    Task<T> GetNoTrackingByIdAsync(Expression<Func<T, bool>> where, bool ignoreFilter = false);
 
     Task<T> InsertAsync(T obj);
 

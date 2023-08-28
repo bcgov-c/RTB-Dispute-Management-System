@@ -71,47 +71,45 @@ public class SchedulePeriodService : CmServiceBase, ISchedulePeriodService
 
         var result = new SchedulePeriodGetFilterResponse();
 
-        var periods = await UnitOfWork.SchedulePeriodRepository.GetAllAsync();
+        var predicate = PredicateBuilder.True<Data.Model.SchedulePeriod>();
 
         if (request.BetweenSchedulePeriodId is { Length: > 1 })
         {
-            periods = periods.Where(x => x.SchedulePeriodId >= request.BetweenSchedulePeriodId[0] && x.SchedulePeriodId <= request.BetweenSchedulePeriodId[1]).ToList();
+            predicate = predicate.And(x => x.SchedulePeriodId >= request.BetweenSchedulePeriodId[0] && x.SchedulePeriodId <= request.BetweenSchedulePeriodId[1]);
         }
 
         if (request.AfterPeriodEndingDate.HasValue)
         {
-            periods = periods.Where(x => x.PeriodEnd >= request.AfterPeriodEndingDate.Value).ToList();
+            predicate = predicate.And(x => x.PeriodEnd >= request.AfterPeriodEndingDate.Value);
         }
 
         if (request.BeforePeriodEndingDate.HasValue)
         {
-            periods = periods.Where(x => x.PeriodEnd <= request.BeforePeriodEndingDate.Value).ToList();
+            predicate = predicate.And(x => x.PeriodEnd <= request.BeforePeriodEndingDate.Value);
         }
 
         if (request.InPeriodTimeZone.HasValue)
         {
-            periods = periods.Where(x => x.PeriodTimeZone == request.InPeriodTimeZone.Value).ToList();
+            predicate = predicate.And(x => x.PeriodTimeZone == request.InPeriodTimeZone.Value);
         }
 
         if (request.ContainsPeriodStatuses is { Length: > 0 })
         {
-            periods = periods.Where(x => request.ContainsPeriodStatuses.Contains((int)x.PeriodStatus)).ToList();
+            predicate = predicate.And(x => request.ContainsPeriodStatuses.Contains((int)x.PeriodStatus));
         }
 
-        result.TotalAvailableRecords = periods.Count;
-        periods = await periods.ApplyPagingArrayStyleAsync(count, index);
+        var(totalCount, periods) = await UnitOfWork
+            .SchedulePeriodRepository
+            .GetPeriods(predicate, count, index);
+
+        result.TotalAvailableRecords = totalCount;
+
         var periodsResult = new List<SchedulePeriodGetResponse>();
 
         foreach (var period in periods)
         {
-            var associatedBlocksCount = await UnitOfWork.ScheduleBlockRepository.GetBlocksCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
-            var associatedHearingsCount = await UnitOfWork.HearingRepository.GetHearingsCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
-
-            var temp = MapperService.Map<Data.Model.SchedulePeriod, SchedulePeriodGetResponse>(period);
-            temp.AssociatedScheduleBlocks = associatedBlocksCount;
-            temp.AssociatedHearings = associatedHearingsCount;
-
-            periodsResult.Add(temp);
+            var periodResult = await GetPeriodGetResponse(period);
+            periodsResult.Add(periodResult);
         }
 
         result.Periods = periodsResult;
@@ -124,14 +122,7 @@ public class SchedulePeriodService : CmServiceBase, ISchedulePeriodService
         var period = await UnitOfWork.SchedulePeriodRepository.GetByIdAsync(schedulePeriodId);
         if (period != null)
         {
-            var associatedBlocksCount = await UnitOfWork.ScheduleBlockRepository.GetBlocksCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
-            var associatedHearingsCount = await UnitOfWork.HearingRepository.GetHearingsCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
-
-            var periodResult = MapperService.Map<Data.Model.SchedulePeriod, SchedulePeriodGetResponse>(period);
-            periodResult.AssociatedScheduleBlocks = associatedBlocksCount;
-            periodResult.AssociatedHearings = associatedHearingsCount;
-
-            return periodResult;
+            return await GetPeriodGetResponse(period);
         }
 
         return null;
@@ -169,4 +160,20 @@ public class SchedulePeriodService : CmServiceBase, ISchedulePeriodService
 
         return null;
     }
+
+    #region Private
+
+    private async Task<SchedulePeriodGetResponse> GetPeriodGetResponse(Data.Model.SchedulePeriod period)
+    {
+        var associatedBlocksCount = await UnitOfWork.ScheduleBlockRepository.GetBlocksCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
+        var associatedHearingsCount = await UnitOfWork.HearingRepository.GetHearingsCount(period.SchedulePeriodId, period.PeriodStart, period.PeriodEnd);
+
+        var periodResult = MapperService.Map<Data.Model.SchedulePeriod, SchedulePeriodGetResponse>(period);
+        periodResult.AssociatedScheduleBlocks = associatedBlocksCount;
+        periodResult.AssociatedHearings = associatedHearingsCount;
+
+        return periodResult;
+    }
+
+    #endregion
 }

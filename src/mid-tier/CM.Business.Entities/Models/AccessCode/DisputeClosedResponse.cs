@@ -40,6 +40,9 @@ public class DisputeClosedResponse
     [JsonProperty("evidence_override")]
     public byte? EvidenceOverride { get; set; }
 
+    [JsonProperty("tenancy_address_validated")]
+    public bool? TenancyAddressValidated { get; set; }
+
     [JsonProperty("created_date")]
     public string CreatedDate { get; set; }
 

@@ -96,6 +96,7 @@ export default Backbone.Model.extend({
     this.set('textDescriptionModel', new TextareaModel({
         labelText: this.get('textDescriptionTitle') || 'Describe why this is being requested',
         errorMessage: 'Description is required',
+        min: configChannel.request('get', 'INTAKE_DESCRIPTION_FIELD_MIN_LENGTH'),
         max: configChannel.request('get', 'CLAIM_DESCRIPTION_MAX'),
         countdown: true,
         cssClass: useTextDescription? 'no-max-width' : 'hidden',

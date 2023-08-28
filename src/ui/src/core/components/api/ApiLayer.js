@@ -1,11 +1,13 @@
 /**
  * @namespace core.components.api.ApiLayer
  * @memberof core.components.api
+ * @fileoverview - Manager that contains core api call logic. This includes GET/PATCH requests, error logging, error handling, and unauthorized request handling
  */
 
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
+import ErrorLog_model from '../error-logs/ErrorLog_model';
 import './AjaxQueue';
 
 const disputeChannel = Radio.channel('dispute');
@@ -42,22 +44,18 @@ const ApiLayer = Marionette.Object.extend({
   radioRequests: {
     'set:seq': 'setRequestsToSequential',
     'set:async': 'setRequestsToAsync',
-
     'allow:unauthorized': 'setRequestsToAllowUnauth',
     'restrict:unauthorized': 'setRequestsToRestrictUnauth',
-
     'restrict:collisions': 'setRestrictCollisions',
-
     'track:delete': 'trackModelDelete',
     'check:delete': 'checkModelDeleted',
-
+    'create:errorlog': 'createErrorLogItem',
     'reset': 'setRequestsToAsync',
-
     'call': 'performCall',
     'patch': 'performPatch',
-
     'convert:patch': 'convertToPatchFormat',
-    'convert:patch:display': 'convertToDisplayablePatch'
+    'convert:patch:display': 'convertToDisplayablePatch',
+    'create:errorHandler': 'createGeneralErrorHandler',
   },
 
   _allow_unauthorized_calls: false,
@@ -115,6 +113,7 @@ const ApiLayer = Marionette.Object.extend({
    * Re-initializes Backbone.sync with new code to convert PATCH
    */
   updateBackbonePatchBehaviour() {
+    const self = this;
     // Objects and methods from backbone.js that Backbone.sync requires
     const methodMap = {
       'create': 'POST',
@@ -127,7 +126,6 @@ const ApiLayer = Marionette.Object.extend({
     const urlError = function() {
       throw new Error('A "url" property or function must be specified');
     };
-    const self = this;
     Backbone.sync = _.bind(function(method, model, options) {
       var type = methodMap[method];
 
@@ -340,7 +338,7 @@ const ApiLayer = Marionette.Object.extend({
           const dispute = disputeChannel.request('get');
 
           // Add Auth token request header
-          if (token && !((settings||{}).headers||{}).Token) {
+          if (token && !settings?.headers?.Token) {
             xhr.setRequestHeader('Token', token);
             //xhr.setRequestHeader('Content-Type', 'application/json');
             //xhr.setRequestHeader('Accept:application/json, text/javascript, */*; q=0.01');
@@ -354,7 +352,7 @@ const ApiLayer = Marionette.Object.extend({
               return;
             }
           })
-          if (dispute && dispute.get('dispute_guid') && !isBlackListed) {
+          if (dispute && dispute.get('dispute_guid') && !settings?.headers?.DisputeGuid && !isBlackListed) {
             xhr.setRequestHeader('DisputeGuid', dispute.get('dispute_guid'));
           }
 
@@ -408,7 +406,7 @@ const ApiLayer = Marionette.Object.extend({
     });
   },
 
-  request_fn: default_BackboneAjax,
+  request_fn() { return this.performCall.apply(this, arguments); },
 
   performCall(ajax_request_body, override_token) {
     if (_.has(ajax_request_body, 'headers')) {
@@ -425,7 +423,10 @@ const ApiLayer = Marionette.Object.extend({
      * Set token _simulate500 anything but 0/false to cause any non-Backbone mid-tier call to be interpreted as http500 from that point on
      */
     const dfd = $.Deferred();
-    $.ajax(_.extend({}, default_ajax_settings, ajax_request_body)).done((res, statusString, xhr) => {
+    const callData = Object.assign({}, default_ajax_settings, ajax_request_body);
+    const typesThatChangeData = ['POST', 'PATCH', 'PUT', 'DELETE'];
+    const generatedApiId = typesThatChangeData.includes(callData?.type) ? sessionChannel.request('add:active:api', callData) : null;
+    $.ajax(callData).done((res, statusString, xhr) => {
       const tok = String(localStorage.getItem('_simulate500') || '');
       if (tok && tok !== 'false' && tok !== '0') {
         if (statusString) statusString = 'error';
@@ -434,7 +435,8 @@ const ApiLayer = Marionette.Object.extend({
       } else {
         dfd.resolve(res, statusString, xhr);
       }
-    }).fail(dfd.reject);
+    }).fail(dfd.reject)
+    .always(() => generatedApiId ? sessionChannel.request('remove:active:api', generatedApiId) : null);
     return dfd.promise();
   },
 
@@ -469,7 +471,38 @@ const ApiLayer = Marionette.Object.extend({
 
   requestSynchronous() {
     return Backbone.$.ajaxQueue.apply(Backbone.$, arguments);
-  }
+  },
+
+  // When a top level javascript error is detected, create a new ErrorLog item
+  createGeneralErrorHandler(defaultErrorLogAttrs={}) {
+    const existingOnError = window.onerror;
+    const ERROR_TYPE_GENERAL = configChannel.request('get', 'ERROR_TYPE_GENERAL');
+    window.onerror = (message, source, lineno, colno, error) => {
+      try {
+        // If logged in, fire a UI error in the background asynchronously
+        if (sessionChannel.request('is:authorized')) {
+          this.createErrorLogItem(Object.assign({
+            error_details: `${message}|||${source}|||${lineno}|||${colno}|||${error}`.substring(0, 2450),
+            error_type: ERROR_TYPE_GENERAL
+          }, defaultErrorLogAttrs));
+        }
+        
+        if (_.isFunction(existingOnError)) existingOnError.call(window, message, source, lineno, colno, error);
+      } catch (err) {
+        console.debug(err);
+      }
+    };
+  },
+
+  async createErrorLogItem(attrs={}) {
+    const currentDisputeGuid = disputeChannel.request('get:id');
+    const defaultErrorAttrs = Object.assign({
+      error_title: `${window.location.href||''}`.substring(0, 145),
+    }, currentDisputeGuid ? { dispute_guid: currentDisputeGuid } : null);
+    return new Promise((res, rej) => new ErrorLog_model(Object.assign({}, defaultErrorAttrs, attrs)).save()
+        .done(res).fail(rej));
+  },
+
 });
 
 const apiLayerInstance = new ApiLayer();
@@ -569,6 +602,9 @@ const ErrorResponseFactory = Marionette.Object.extend({
     },
     'INTAKE.PAGE.LOAD.REVIEW': {
       title: 'Validating Intake Application'
+    },
+    'INTAKE.DVIEW.LOAD.DISPUTE': {
+      title: 'Load Intake Dispute View'
     },
 
     'INTAKE.FILEDESCRIPTION.SAVE': {
@@ -768,8 +804,8 @@ const ErrorResponseFactory = Marionette.Object.extend({
       title: 'Common File Save'
     },
 
-    'ADMIN.COMMONFILE.DELETE': {
-      api: 'DELETE /api/commonfiles',
+    'ADMIN.COMMONFILE.REMOVE': {
+      api: 'PATCH /api/commonfiles',
       title: 'Common File Removal'
     },
 
@@ -911,6 +947,11 @@ const ErrorResponseFactory = Marionette.Object.extend({
       title: 'Load Audit Item',
     },
 
+    'ADMIN.AUDIT.SERVICE.LOAD': {
+      api: 'GET /api/audit/service',
+      title: 'Load Service Audit ',
+    },
+
     'ADMIN.PROCESSDETAIL.SAVE': {
       api: 'GET /api/dispute/processdetail',
       title: 'Process Detail Save',
@@ -983,6 +1024,11 @@ const ErrorResponseFactory = Marionette.Object.extend({
       title: 'Load AdHoc Reports'
     },
 
+    'ADMIN.ADHOC_REPORT.LOAD': {
+      api: 'POST /api/adhocdlreport',
+      title: 'Load AdHoc Report'
+    },
+
     'ADMIN.TASKS.UNASSIGNED.LOAD': {
       api: 'GET /api/unassignedtasks',
       title: 'Load Unassigned Tasks'
@@ -1038,7 +1084,7 @@ const ErrorResponseFactory = Marionette.Object.extend({
     },
 
     'ADMIN.LINKFILE.CREATE': {
-      api: 'DELETE /api/linkfile',
+      api: 'POST /api/linkfile',
       title: 'File Link Creation'
     },
 
@@ -1189,6 +1235,11 @@ const ErrorResponseFactory = Marionette.Object.extend({
       title: 'File Description Save'
     },
 
+    'ADMIN.USER.DISPUTE.ACCESS': {
+      api: 'POST/PATCH /api/dispute/disputeUserActive',
+      title: 'Dispute User Active'
+    },
+
     'OS.DISPUTE.LOAD': {
       api: 'GET /api/externalupdate/disputedetails',
       title: 'Load Dispute'
@@ -1307,7 +1358,7 @@ const ErrorResponseFactory = Marionette.Object.extend({
 
     'OUTCOME.DOC.REQUEST.SAVE': {
       api: 'PATCH /api/outcomedocrequests/outcomedocrequest',
-      title: 'Outcome Document Request Item Change'
+      title: 'Outcome Document Request Change'
     },
 
     'OUTCOME.DOC.REQUEST.ITEM.CREATE': {
@@ -1428,6 +1479,21 @@ const ErrorResponseFactory = Marionette.Object.extend({
     'EXTERNAL.CUSTOM.SAVE': {
       api: 'PATCH /api/externalcustomdataobject',
       title: 'Save External Custom Object'
+    },
+
+    'CP.ADDRESS.LOOKUP': {
+      api: 'GET /AddressLookup',
+      title: 'Address Lookup'
+    },
+
+    'EMAIL.VERIFICATION.MESSAGE': {
+      api: 'POST /emailverificationmessage',
+      title: 'Email Verification Message'
+    },
+
+    'EMAIL.CONTACT.VERIFICATION.SAVE': {
+      api: 'POST /contactverification',
+      title: 'Contact Verification'
     }
 
   },
@@ -1462,18 +1528,23 @@ const ErrorResponseFactory = Marionette.Object.extend({
           return;
         }
 
-        let displayFn;
+        let displayFn, sideEffectOnDisplayFn;
         if (status === 400) {
           displayFn = this.showErrorModalAsHttp400;
         } else if (status === 409) {
           displayFn = this.showErrorModalAsHttp409;
         } else if (status === 500) {
           displayFn = this.showErrorModalAsHttp500;
+          sideEffectOnDisplayFn = () => Radio.channel('api').request('create:errorlog', {
+            error_details: `${errorResponseHandler?.apiErrorResponse?.responseText}`.substring(0, 2450),
+            error_type: configChannel.request('get', 'ERROR_TYPE_SERVER_ERROR'),
+          });
         } else {
           displayFn = this.showErrorModalDefault;
         }
 
-        displayFn.bind(this)(errorResponseHandler, closingMsg)
+        if (sideEffectOnDisplayFn && typeof actionFn === 'function') sideEffectOnDisplayFn?.bind(this)(errorResponseHandler);
+        displayFn.bind(this)(errorResponseHandler, closingMsg);
       };
     } catch (err) {
       console.trace(`[Error] Unexpected JavaScript error occurred during API error handler: `, err);

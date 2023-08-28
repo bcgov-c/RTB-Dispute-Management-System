@@ -15,11 +15,7 @@ public interface IConferenceBridgeRepository : IRepository<Model.ConferenceBridg
 
     Task<List<Model.ConferenceBridge>> GetAllByOwnerAsync(int ownerId);
 
-    Task<List<Model.ConferenceBridge>> GetAccordingScheduleForCheck(int? systemUserId, TimeSpan? time);
+    Task<IList<Model.ConferenceBridge>> GetAvailableBridges(DateTime dateTime);
 
-    Task<List<Model.ConferenceBridge>> GetAccordingSchedule(int? systemUserId, TimeSpan? time);
-
-    Task<List<Model.ConferenceBridge>> GetOpenConferenceBridges();
-
-    Task<int[]> GetActiveConferenceBridges();
+    Task<bool> IsBridgeBooked(int conferenceBridgeId, DateTime startTime);
 }

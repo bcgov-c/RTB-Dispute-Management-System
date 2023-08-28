@@ -24,5 +24,7 @@ public class ClaimGroupParticipant : BaseEntity
 
     public int? GroupPrimaryContactId { get; set; }
 
+    public Participant GroupPrimaryContact { get; set; }
+
     public bool? IsDeleted { get; set; }
 }

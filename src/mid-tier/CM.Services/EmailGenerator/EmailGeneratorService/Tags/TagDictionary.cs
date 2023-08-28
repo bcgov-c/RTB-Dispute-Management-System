@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace CM.Services.EmailGenerator.EmailGeneratorService.Tags;
 
@@ -25,7 +27,9 @@ public enum Tag
     PaymentDate,
     PaymentAmount,
     PaymentId,
-    PaymentMethod
+    PaymentMethod,
+    NoticeServiceDeadlineDate,
+    NoticeServiceSecondServiceDeadlineDate
 }
 
 public static class TagDictionary
@@ -52,7 +56,9 @@ public static class TagDictionary
         { Tag.PaymentDate, "{payment_date}" },
         { Tag.PaymentAmount, "{payment_amount}" },
         { Tag.PaymentId, "{payment_id}" },
-        { Tag.PaymentMethod, "{payment_method}" }
+        { Tag.PaymentMethod, "{payment_method}" },
+        { Tag.NoticeServiceDeadlineDate, "{notice_service_deadline_date}" },
+        { Tag.NoticeServiceSecondServiceDeadlineDate, "{notice_service_second_service_deadline_date}" }
     };
 
     public static string GetTag(Tag tag)
@@ -63,5 +69,10 @@ public static class TagDictionary
     public static IEnumerable<string> GetAllTagValues()
     {
         return Tags.Values.ToList();
+    }
+
+    internal static bool TagIsExists(StringBuilder htmlBody, string tag)
+    {
+        return htmlBody.ToString().Contains(tag);
     }
 }

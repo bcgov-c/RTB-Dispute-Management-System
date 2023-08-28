@@ -1,13 +1,17 @@
-
+/**
+ * @fileoverview - Modal for uploading files to multiple decisions as well as uploading working files
+ */
 import React from 'react';
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../../core/components/modals/ModalBase';
 import { ViewJSXMixin } from '../../../../../../core/utilities/JsxViewMixin';
-import BulkUploadDocument from './BulkUploadDocument';
+import BulkUploadFiles from '../../../../../../core/components/files/bulk-upload/BulkUploadFiles';
 import FilesView from '../../../../../../core/components/files/Files';
 import FileCollection from '../../../../../../core/components/files/File_collection';
 import OutcomeDocFilesCollection from '../../../../../../core/components/documents/OutcomeDocFiles_collection';
 import DisputeOutcomeExternalFilesView from '../../../outcome-doc-file/DisputeOutcomeExternalFiles';
+import OutcomeDocFileUploadValidation from '../../OutcomeDocFileUploadValidation';
+import BulkUploadFile_collection from '../../../../../../core/components/files/bulk-upload/BulkUploadFile_collection';
 import { generalErrorFactory } from '../../../../../../core/components/api/ApiLayer';
 import './ModalBulkUploadDocuments.scss';
 
@@ -19,46 +23,51 @@ const NO_SELECTED_FILES = 'No files added to upload. Please select at least one 
 
 const ModalBulkUploadDocuments = ModalBaseView.extend({ 
   id: "bulkUploadDocuments_modal",
-
+  /**
+   * @param {OutcomeDocFileCollection} outcomeFiles
+   */
   initialize(options) {
     this.template = this.template.bind(this);
     this.mergeOptions(options, ['outcomeFiles']);
 
-    this.finalOutcomeDocs = new OutcomeDocFilesCollection(this.outcomeFiles.filter((outcomeFile) => outcomeFile.isActive() && !outcomeFile.hasUploadedFile()));
+    this.finalOutcomeDocs = new OutcomeDocFilesCollection(this.outcomeFiles.filter(f => !f.isPublic() && !f.isExternal() && !f.hasUploadedFile()));
+    this.publicOutcomeDocs = new OutcomeDocFilesCollection(this.outcomeFiles.filter(f => f.isPublic() && !f.hasUploadedFile()));
+
+    this.finalDocBulkFiles = new BulkUploadFile_collection(this.finalOutcomeDocs.map(doc => ({
+      title: doc.get('file_title'),
+      dataModel: doc,
+    })));
+    this.publicDocBulkFiles = new BulkUploadFile_collection(this.publicOutcomeDocs.map(doc => ({
+      title: doc.get('file_title'),
+      dataModel: doc,
+    })));
+
+    if (!configChannel.request('get', 'UAT_TOGGLING')?.SHOW_OUTCOME_PUBLIC_DOCS) this.publicOutcomeDocs.reset([]);
     this.workingFiles = new FileCollection();
 
-    this.setupListeners();
-  },
-
-  setupListeners() {
-    this.listenTo(this.finalOutcomeDocs, 'change:files', () => this.resetFileErrorAndHide());
+    this.listenTo(this.workingFiles, 'update', () => this.resetFileErrorAndHide());
+    [...this.finalDocBulkFiles.models, ...this.publicOutcomeDocs.models]
+      .forEach(m => this.listenTo(m.get('files'), 'update', () => this.resetFileErrorAndHide()));
   },
 
   cancel() {
     const workingDocsfileUploader = this.getChildView('workingFileUploadRegion');
-    if (workingDocsfileUploader) {
-      workingDocsfileUploader.trigger('cancel:all');
-    }
+    if (workingDocsfileUploader) workingDocsfileUploader.trigger('cancel:all');
+
     const finalDocsView = this.getChildView('finalDocsUploadRegion');
     finalDocsView.children?.forEach(child => {
-      const finalDocsFileUploader = child.getChildView('fileUploadRegion');
-      if (finalDocsFileUploader) {
-        finalDocsFileUploader.trigger('cancel:all');
-      }
+      const finalDocsFileUploader = child?.getChildView('fileUploadRegion');
+      if (finalDocsFileUploader) finalDocsFileUploader?.trigger('cancel:all');
     });
-  },
-
-  isFileAlreadyAddedToUpload(fileObj) {
-    const finalDocsView = this.getChildView('finalDocsUploadRegion');
-    const fileObjSize = _.isNumber(fileObj.size) ? fileObj.size : 0;
-    const alreadyUploadededFiles = finalDocsView.children?.filter(child => {
-      const finalDocsFileUploader = child.getChildView('fileUploadRegion');
-        return (finalDocsFileUploader.files.filter(fileModel => fileModel.get('original_file_name') === fileObj.name && fileModel.get('file_size') === fileObjSize)).length
+    const publicDocsView = this.getChildView('publicDocsUploadRegion');
+    publicDocsView?.children?.forEach(child => {
+      const publicDocsFileUploader = child?.getChildView('fileUploadRegion');
+      if (publicDocsFileUploader) publicDocsFileUploader?.trigger('cancel:all');
     });
-    return !!alreadyUploadededFiles.length;
   },
 
   showUploadUI() {
+    
     $('.add-files-container').addClass('hidden');
     $('.outcome-external-file-delete-btn').addClass('hidden');
     this.getUI('continueBtn').addClass('hidden');
@@ -77,28 +86,47 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
   },
 
   save() {
-    this.finalOutcomeDocs.forEach(model => model.trigger('validate:upload'));
-
-    const workingDocsView = this.getChildView('workingFileListRegion');
-    if (workingDocsView) workingDocsView.validateAndShowErrors();
-
-    const visibleErrorEles = this.$('.error-block:visible').filter(function() { return $.trim($(this).html()) !== ""; });
-    if (visibleErrorEles.length) return;
-
     const finalDocsView = this.getChildView('finalDocsUploadRegion');
-    const finalDocsHasUploads = finalDocsView.children?.filter(child => child.files?.length)?.length;
-    const workingDocsHasUploads = this.getChildView('workingFileUploadRegion').files?.length;
-
-    if (!finalDocsHasUploads && !workingDocsHasUploads) {
+    const publicDocsView = this.getChildView('publicDocsUploadRegion');
+    const workingDocsView = this.getChildView('workingFileListRegion');
+    const finalDocsHasUploads = finalDocsView?.hasReadyToUploadFiles();
+    const publicDocsHasUploads = publicDocsView?.hasReadyToUploadFiles();
+    const workingDocsHasUploads = !!this.workingFiles.getReadyToUpload().length;
+    let isValid = finalDocsView.validateAndShowErrors()
+      && (publicDocsView ? publicDocsView.validateAndShowErrors() : true)
+      && workingDocsView.validateAndShowErrors();
+    if (!finalDocsHasUploads && !publicDocsHasUploads && !workingDocsHasUploads) {
       this.getUI('fileError').removeClass('hidden');
-      return;
+      isValid = false;
     }
+    if (!isValid) return;
 
     this.$el.scrollTop(0);
     this.saveInProgress = true;
     this.showUploadUI();
 
-    const finalDocPromise = () => finalDocsHasUploads ? Promise.all(finalDocsView.children?.map(child => child.save())) : Promise.resolve();
+    const uploadDocFiles = async (uploadFilesView) => {
+      try {
+        for (let i=0; i < uploadFilesView.children.length; i++) {
+          const view = uploadFilesView.children?.findByIndex(i);
+          await view.uploadFiles();
+          const firstFile = view.model.get('files')?.at(0);
+          if (firstFile?.isUploaded()) {
+            await view.model.get('dataModel').save({ file_id: firstFile.id });
+          }
+        }
+      } catch (err) {
+        // pass, errors will be shown at the file level
+        console.debug(err);
+      }
+    };
+
+    const finalDocPromise = () => finalDocsHasUploads ? uploadDocFiles(finalDocsView) : Promise.resolve();
+    const publicDocPromise = () => publicDocsHasUploads ?
+      uploadDocFiles(publicDocsView)
+            // When uploading the first file, always set to public=False - it must be set via the Edit Documents save on the Outcome Doc Group edit
+            .then(() => Promise.all(this.publicOutcomeDocs.map(d => d.save({ visible_to_public: false }))))
+      : Promise.resolve();
 
     const fileUploaderView = this.getChildView('workingFileUploadRegion');
     const workingDocsPromise = () => !this.workingFiles.length ? Promise.resolve() : fileUploaderView.uploadAddedFiles().done(() => {
@@ -114,7 +142,7 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
       return allXhr.map(xhr => xhr());
     });
 
-    Promise.all([finalDocPromise(), workingDocsPromise()])
+    Promise.all([finalDocPromise(), workingDocsPromise(), publicDocPromise()])
     .catch(() => {
       this.resetUploadUI();
       return generalErrorFactory.createHandler('ADMIN.FILES.UPLOAD');
@@ -131,8 +159,34 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
     this.getUI('fileError').addClass('hidden');
   },
 
+  getFileProcessingOptions(attrs={isPublic:false}) {
+    const validator = new OutcomeDocFileUploadValidation(Object.assign({ outcomeGroupModel: this.model }, attrs));
+    const context = this;
+    return {
+      errorModalTitle: `Adding ${attrs?.isPublic ? 'Public' : 'Outcome'} Document File`,
+      maxNumberOfFilesErrorMsg: `Only one outcome document can be uploaded.  If you have more than one PDF document for the same outcome document file, they must be combined into a single PDF document.`,
+      maxNumberOfFiles: 1,
+      checkForDisputeDuplicates: false,
+      maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
+      allowedFileTypes: configChannel.request('get', 'VALID_OUTCOME_DOC_FILE_TYPES'),
+      customFileValidationErrorMsg: validator.customFileValidationErrorMsg.bind(validator),
+      customFileValidationFn: (fileObj) => {
+        if (
+          context.finalDocBulkFiles.find(m => m.get('files').getByFileObject(fileObj)) ||
+          context.publicDocBulkFiles.find(m => m.get('files').getByFileObject(fileObj))
+        ) {
+          fileObj._dmsFileValidationError = OutcomeDocFileUploadValidation?.ERROR_CODES?.DUP;
+          return false;
+        } else {
+          return validator.customFileValidationFn.bind(validator)(fileObj);
+        }
+      }
+    };
+  },
+
   regions: {
     finalDocsUploadRegion: '.bulk-upload-document',
+    publicDocsUploadRegion: '.bulk-upload-document-public',
     workingFileUploadRegion: '.working-documents',
     workingFileListRegion: '.working-documents-list',
     externalFilesRegion: '.dispute-outcome-doc-files-external',
@@ -147,16 +201,32 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
   },
 
   onRender() {
-    const allOutcomeFileIds = this.outcomeFiles.filter(doc => doc.id !== this.model.id && !doc.isExternal() && doc.get('file_id')).map(doc => doc.get('file_id'));
-    this.showChildView('finalDocsUploadRegion', new BulkUploadDocument({ collection: this.finalOutcomeDocs, allOutcomeDocIds: allOutcomeFileIds, isFileAlreadyAddedToUpload: this.isFileAlreadyAddedToUpload.bind(this) }));
+    this.showChildView('finalDocsUploadRegion', new BulkUploadFiles({
+      collection: this.finalDocBulkFiles,
+      fileType: configChannel.request('get', 'FILE_TYPE_INTERNAL'),
+      processingOptions: this.getFileProcessingOptions(),
+    }));
+    this.renderWorkingDocuments();
 
+    if (configChannel.request('get', 'UAT_TOGGLING')?.SHOW_OUTCOME_PUBLIC_DOCS && this.publicOutcomeDocs.length) {
+      this.showChildView('publicDocsUploadRegion', new BulkUploadFiles({
+        collection: this.publicDocBulkFiles,
+        fileType: configChannel.request('get', 'FILE_TYPE_ANONYMOUS_EXTERNAL'),
+        processingOptions: this.getFileProcessingOptions({ isPublic: true }),
+        fileCreationFn: (fileData) => Object.assign(fileData, { editable: false, display_mode: true }),
+      }));
+    }
+  },
+
+  renderWorkingDocuments() {
     const fileType = configChannel.request('get', 'FILE_TYPE_INTERNAL');
     const addedBy = participantChannel.request('get:primaryApplicant:id');
     const autofillRename = true;
     const processingOptions = {
       errorModalTitle: 'Adding Working Document',
-      checkForDisputeDuplicates: false, 
-    }
+      checkForDisputeDuplicates: false,
+      maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
+    };
     
     const fileUploader = filesChannel.request('create:uploader', {
       // Use the DisputeEvidenceModel that was passed in
@@ -172,10 +242,6 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
         );
       }
     });
-
-    this.listenTo(fileUploader, 'change:files', () => {
-      this.resetFileErrorAndHide();
-    })
     
     this.showChildView('workingFileUploadRegion', fileUploader);
     this.showChildView('workingFileListRegion', new FilesView({
@@ -208,6 +274,8 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
               <div className="dispute-outcome-doc-files-external"></div>
               <div className="working-documents"></div>
               <div className="working-documents-list"></div>
+
+              {this.renderJsxPublicDocuments()}
             </div>
             <span className="file-error error-block hidden">{NO_SELECTED_FILES}</span>
             <div className="button-row">
@@ -221,6 +289,13 @@ const ModalBulkUploadDocuments = ModalBaseView.extend({
         </div>
       </div>
     );
+  },
+
+  renderJsxPublicDocuments() {
+    return this.publicOutcomeDocs.length ? <>
+      <div className="bulk-upload-documents__header--public">Public Final Documents</div>
+      <div className="bulk-upload-document-public"></div>
+    </> : null;
   },
 
 });

@@ -186,8 +186,7 @@ export default Backbone.Model.extend({
   destroy(options) {
     // Always wait for the server response before continuing with deletes
     options = _.extend({ wait: true }, options || {});
-  
-    if (this.get('modified_date')) {
+    if (this.get('modified_date') && !options.skip_conflict_check) {
       // NOTE: Add extra collision-detection header
       if (!_.has(options, 'headers')) {
         options.headers = {};

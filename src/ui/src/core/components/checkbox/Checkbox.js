@@ -2,6 +2,7 @@
  * @class core.components.checkbox.CheckboxView
  * @memberof core.components.checkbox
  * @augments Marionette.View
+ * @fileoverview - Customizable checkbox View. Wraps a basic <input type=checkbox>
  */
 
 import Marionette from 'backbone.marionette';

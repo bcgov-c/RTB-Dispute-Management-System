@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using CM.Business.Entities.Models.DisputeHearing;
 using CM.Business.Entities.Models.Hearing;
@@ -79,5 +80,35 @@ public static class HearingManager
     public static EntityWithStatus<string> RescheduleHearing(HttpClient client, RescheduleRequest request)
     {
         return client.PostAsync<string>(RouteHelper.RescheduleHearing, request);
+    }
+
+    public static EntityWithStatus<OnHoldHearingsGetResponse> GetOnHoldHearings(HttpClient client, OnHoldHearingsRequest request)
+    {
+        return client.GetAsync<OnHoldHearingsGetResponse>(RouteHelper.GetOnHoldHearings, request);
+    }
+
+    public static EntityWithStatus<List<ReserveAvailableHearingResponse>> ReserveAvailableHearings(HttpClient client, ReserveAvailableHearingsRequest request)
+    {
+        return client.PostAsync<List<ReserveAvailableHearingResponse>>(RouteHelper.ReserveAvailableHearings, request);
+    }
+
+    public static EntityWithStatus<string> HoldHearing(HttpClient client, int hearingId, HoldHearingRequest request)
+    {
+        return client.PostAsync<string>(RouteHelper.HoldHearing + hearingId, request);
+    }
+
+    public static EntityWithStatus<string> BookReservedHearing(HttpClient client, int hearingId)
+    {
+        return client.PostAsync<string>(RouteHelper.BookReservedHearing + hearingId);
+    }
+
+    public static EntityWithStatus<string> CancelReservedHearing(HttpClient client, int hearingId)
+    {
+        return client.PostAsync<string>(RouteHelper.CancelReservedHearing + hearingId);
+    }
+
+    public static EntityWithStatus<DisputeHearingGetResponse> LinkPastHearings(HttpClient client, Guid staticDisputeGuid, Guid movedDisputeGuid)
+    {
+        return client.PostAsync<DisputeHearingGetResponse>(RouteHelper.LinkPastHearings + "?staticDisputeGuid=" + staticDisputeGuid + "&movedDisputeGuid=" + movedDisputeGuid);
     }
 }

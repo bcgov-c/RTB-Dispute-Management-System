@@ -78,6 +78,9 @@ public class HearingRequest
     [StringLength(255)]
     [JsonProperty("hearing_note")]
     public string HearingNote { get; set; }
+
+    [JsonProperty("conference_type")]
+    public byte? ConferenceType { get; set; }
 }
 
 public class HearingPatchRequest : HearingRequest
@@ -90,4 +93,17 @@ public class HearingPatchRequest : HearingRequest
 
     [JsonProperty("hearing_prep_time")]
     public int? HearingPrepTime { get; set; }
+
+    [JsonProperty("notification_file_description_id")]
+    public int? NotificationFileDescriptionId { get; set; }
+
+    [JsonProperty("hearing_reserved_dispute_guid")]
+    public Guid? HearingReservedDisputeGuid { get; set; }
+
+    [StringLength(150)]
+    [JsonProperty("notification_delivery_description")]
+    public string NotificationDeliveryDescription { get; set; }
+
+    [JsonProperty("notification_delivery_date")]
+    public string NotificationDeliveryDate { get; set; }
 }

@@ -116,4 +116,12 @@ public class SystemUserRepository : CmRepository<SystemUser>, ISystemUserReposit
 
         return 0;
     }
+
+    public async Task<List<SystemUser>> GetUsers(IEnumerable<int> usersId)
+    {
+        var users = await Context.SystemUsers
+            .Where(x => usersId.Contains(x.SystemUserId))
+            .ToListAsync();
+        return users;
+    }
 }

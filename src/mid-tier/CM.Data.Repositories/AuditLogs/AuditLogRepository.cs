@@ -50,7 +50,7 @@ public class AuditLogRepository : CmRepository<AuditLog>, IAuditLogRepository
             .Where(predicate)
             .OrderByDescending(a => a.ChangeDate)
             .AsQueryable()
-            .ApplyPaging(count, index)
+            .ApplyPagingArrayStyle(count, index)
             .ToListAsync();
     }
 

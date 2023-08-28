@@ -73,14 +73,15 @@ export default Backbone.Model.extend({
 
   createSubModels() {
     this.set('addressModel', new AddressModel({
-      useDefaultProvince: true,
-      streetSubLabel: `Please ensure address is complete and indicate the unit number if applicable eg. 111 - 1234 Fort Street`,
+      useSubLabel: false,
       name: `address${this.get('r_rental_unit_guid')}`,
       json: {
         street: this.get('r_tenancy_address'),
         city: this.get('r_tenancy_city'),
         postalCode: this.get('r_tenancy_postal_zip'),
-      }
+      },
+      selectProvinceAndCountry: false,
+      showUpdateControls: false,
     }));
 
     this.set('hasUnitTypeModel', new RadioModel({
@@ -238,6 +239,10 @@ export default Backbone.Model.extend({
       (isOther ? this.get('r_tenancy_unit_text') : this.RENT_UNIT_TYPE_DISPLAY[unitType]) : '');
 
     return rentDescriptorString ? `(${rentDescriptorString}) ` : '';
+  },
+
+  getStreetDisplayWithCityAndPostal() {
+    return `${this.getStreetDisplayWithDescriptor()}, ${this.get('r_tenancy_city')}, ${this.get('r_tenancy_postal_zip')}`
   },
 
   getAddressWithoutStreet() {

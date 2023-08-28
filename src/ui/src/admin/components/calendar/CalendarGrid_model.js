@@ -28,6 +28,7 @@ export default Backbone.Model.extend({
 
     borderCol: 6,
     numLowerRows: 6,
+    numLowerCols: 2,
     printableColumns: [2,3,4,5,6,7,8,9,10],
     /**
      * Row data item has the format: {
@@ -189,6 +190,8 @@ export default Backbone.Model.extend({
             class: blockData?.blockModel?.getTypeDisplayClass(),
             startMinutes: blockData?.startMinutes,
             endMinutes: blockData?.endMinutes,
+            startPos: blockData?.startPos,
+            endPos: blockData?.endPos,
           };
         }
       };
@@ -217,6 +220,8 @@ export default Backbone.Model.extend({
             class: blockData?.blockModel?.getTypeDisplayClass(),
             startMinutes: blockData?.startMinutes,
             endMinutes: blockData?.endMinutes,
+            startPos: blockData?.startPos,
+            endPos: blockData?.endPos,
           };
         },
       };
@@ -233,7 +238,7 @@ export default Backbone.Model.extend({
     if (_.isEmpty(apiResponse)) return;
 
     const todayRowEvents = [];
-    const todayDate = Moment(new Date()).format('YYYY-MM-DD');
+    const todayDate = Moment().format('YYYY-MM-DD');
     const userBlocksData = apiResponse?.schedule_blocks?.filter(b=>b.system_user_id === apiResponse.user_id);
     const getBlockData = (positionId) => {
       const blockData = this.get('positionToBlockLookup')[apiResponse.user_id]?.[positionId];
@@ -241,6 +246,8 @@ export default Backbone.Model.extend({
         class: blockData?.blockModel?.getTypeDisplayClass(),
         startMinutes: blockData?.startMinutes,
         endMinutes: blockData?.endMinutes,
+        startPos: blockData?.startPos,
+        endPos: blockData?.endPos,
       };
     }
 
@@ -303,6 +310,8 @@ export default Backbone.Model.extend({
             class: blockData?.blockModel?.getTypeDisplayClass(),
             startMinutes: blockData?.startMinutes,
             endMinutes: blockData?.endMinutes,
+            startPos: blockData?.startPos,
+            endPos: blockData?.endPos,
           };          
         }
       });

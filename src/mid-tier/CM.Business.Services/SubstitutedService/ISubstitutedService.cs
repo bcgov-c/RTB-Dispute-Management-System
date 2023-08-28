@@ -19,4 +19,6 @@ public interface ISubstitutedService : IServiceBase, IDisputeResolver
     Task<List<SubstitutedServicePostResponse>> GetByDisputeGuidAsync(Guid disputeGuid);
 
     Task<SubstitutedServicePatchRequest> GetSubServiceForPatchAsync(int substitutedServiceId);
+
+    Task<List<ExternalSubstitutedServiceResponse>> GetExternalDisputeSubstitutedServices(Guid disputeGuid);
 }

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Displays a red alert style modal that contains information about open review requests. Acknowledge button must be clicked in order to close the modal
+ */
+
 import React from 'react';
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../modals/ModalBase';
@@ -6,6 +10,13 @@ import './ModalReviewNotification.scss';
 
 const Formatter = Radio.channel('formatter').request('get');
 const configChannel = Radio.channel('config');
+
+/**
+ * @param {DisputeFlagModel} reviewFlag - Used to display review flag information
+ * @param {ParticipantModel} participant - Used to display review submitter info
+ * @param {DisputeModel} dispute - Used to obtain file number and dispute submitter type
+ * @param {Number} hearingLinkType - Link type of dispute hearing, e.g single, cross, joiner, etc. Depending on the link type different notification text will be displayed
+ */
 
 const ModalReviewNotification = ModalBaseView.extend({
   id: 'reviewNotification_modal',

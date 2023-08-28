@@ -19,4 +19,7 @@ public class AvailableHearingsRequest
 
     [JsonProperty("included_owner_role_subtype_id")]
     public int[] IncludedOwnerRoleSubtypeId { get; set; }
+
+    [JsonProperty("included_bridge_id")]
+    public int? IncludedBridgeId { get; set; }
 }

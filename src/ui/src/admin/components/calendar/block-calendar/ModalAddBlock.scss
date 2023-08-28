@@ -1,5 +1,8 @@
 
-#modalAddScheduleBlock .modal-dialog { width: 1030px; }
+#modalAddScheduleBlock .modal-dialog {
+  width: 1000px;
+  &--lrg { width: 1200px; }
+}
 
 .modalAddScheduleBlock {
 
@@ -7,13 +10,13 @@
     display: flex;
   }
 
-  &__block-id { float: right; }
-
-  &__owner { width: 300px; margin-right: 15px; }
-  &__type { width: 200px; margin-right: 15px; }
-  &__multi-periods { margin-top: 25px; }
+  &__block-info { float: right; max-width: 300px; }
+  &__owner { width: 300px; margin-right: 15px; flex-shrink: 0; }
+  &__type { width: 200px; margin-right: 15px; flex-shrink: 0; }
+  &__type-time-off { width: 300px; margin-right: 15px; }
   &__description { width: 300px; margin-right: 15px; }
-
+  &__multi-periods { margin-top: 25px; }
+  
   &__start-date { margin-right: 15px; }
   &__start-time { margin-right: 30px; }
 

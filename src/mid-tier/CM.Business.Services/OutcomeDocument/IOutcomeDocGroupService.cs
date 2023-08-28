@@ -22,4 +22,6 @@ public interface IOutcomeDocGroupService : IServiceBase, IDisputeResolver
     Task<OutcomeDocGroup> GetNoTrackingOutcomeDocGroupAsync(int outcomeDocGroupId);
 
     Task<bool> OutcomeDocGroupExists(int outcomeDocGroupId);
+
+    Task<List<ExternalOutcomeDocGroupResponse>> GetExternalOutcomeDocGroups(Guid disputeGuid, ExternalOutcomeDocGroupRequest request);
 }

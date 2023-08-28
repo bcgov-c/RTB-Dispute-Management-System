@@ -22,9 +22,22 @@
   &__urgency { width: 250px; }
   &__owner { width: 250px; }
   &__description {
+    .rtb-editable-component {
+      display: block;
+    }
+
     .rtb-editable-component-label {
-      min-width: fit-content;
-      white-space: nowrap;
+      display: block;
+    }
+
+    .rtb-editable-component-value {
+      display: block;
+      max-height: 350px;
+      overflow-y: auto;
+      height: 100%;
+      width: 100%;
+      padding-right: 10px;
+      padding-bottom: 10px;
     }
   }
   &__receipt { margin-top: 20px; }

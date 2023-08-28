@@ -9,5 +9,8 @@ public class AdHocDlReportMapping : Profile
     {
         CreateMap<AdHocDlReportResponse, Models.AdHocDlReport>();
         CreateMap<Models.AdHocDlReport, AdHocDlReportResponse>();
+
+        CreateMap<AdHocDlReportRequest, Models.AdHocDlReport>();
+        CreateMap<Models.AdHocDlReport, AdHocDlReportRequest>();
     }
 }

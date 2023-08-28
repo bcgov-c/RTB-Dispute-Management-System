@@ -32,6 +32,7 @@ export default Marionette.CollectionView.extend({
       editModalTitle: this.editModalTitle,
       collection: this.collection,
       childIndex: index,
+      collectionLength: _.isFunction(this.filter) ? this.collection.filter(this.filter).length : this.collection.length
     }
   },
 });

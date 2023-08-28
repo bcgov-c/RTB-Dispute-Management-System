@@ -7,6 +7,7 @@ public static class StringBuilderExtensions
     public static StringBuilder And(this StringBuilder sb, string fieldName, string operation, string value)
     {
         sb.Append(" AND");
+        value = value.Replace("'", "''");
 
         switch (operation)
         {
@@ -39,6 +40,7 @@ public static class StringBuilderExtensions
     public static StringBuilder Or(this StringBuilder sb, string fieldName, string operation, string value)
     {
         sb.Append(" OR");
+        value = value.Replace("'", "''");
 
         switch (operation)
         {

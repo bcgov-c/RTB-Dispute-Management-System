@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles the loading, creation, and closing of dispute flags. 
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import DisputeFlagCollection from './DisputeFlag_collection';
@@ -30,9 +33,9 @@ const DisputeFlagManager = Marionette.Object.extend({
     'create:review:hearing': 'createReviewHearingFlag',
     
     'close:adjournments': 'closeAdjournmentFlagsOnDispute',
-    'close:ccr': 'closeCcrFlag',
-    'close:subservice:approved': 'closeSubServiceApprovedFlag',
-    'close:subservice:requested': 'closeSubServiceRequestedFlag',
+    'close:ccr': 'closeCcrFlags',
+    'close:subservice:approved': 'closeSubServiceApprovedFlags',
+    'close:subservice:requested': 'closeSubServiceRequestedFlags',
     'close:prelim': 'closePrelimFlags',
 
     'show:review:notification': 'showReviewNotifications',
@@ -81,7 +84,7 @@ const DisputeFlagManager = Marionette.Object.extend({
    */
   _toCacheData() {
     return {
-      linkedDisputeFlags: new DisputeFlagCollection(this.linkedDisputeFlags.models),
+      linkedDisputeFlags: this.linkedDisputeFlags,
     };
   },
 
@@ -89,9 +92,15 @@ const DisputeFlagManager = Marionette.Object.extend({
 
   initialize() {
     this.cached_data = {};
-    this.linkedDisputeFlags = new DisputeFlagCollection();
+    this.linkedDisputeFlags = this.initNewFlagCollection();
+  },
 
-    this.listenTo(this.linkedDisputeFlags, 'update', () => this.getChannel(this.channelName).trigger('update:flags'));
+  initNewFlagCollection(flags=[]) {
+    const linkedFlags = new DisputeFlagCollection(flags);
+    this.listenTo(linkedFlags, 'update', () => {
+      this.getChannel(this.channelName).trigger('update:flags')
+    });
+    return linkedFlags;
   },
 
   /**
@@ -99,7 +108,7 @@ const DisputeFlagManager = Marionette.Object.extend({
    * Does not flush any cached data.
    */
    clearInternalData() {
-    this.linkedDisputeFlags.reset([]);
+    this.linkedDisputeFlags = this.initNewFlagCollection();
   },
 
   initializeInternalModels() {
@@ -121,7 +130,7 @@ const DisputeFlagManager = Marionette.Object.extend({
         type: 'GET',
         url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_name}/${dispute_guid}`
       }).done(response => {
-        this.linkedDisputeFlags.reset(response, { silent: true });
+        this.linkedDisputeFlags = this.initNewFlagCollection(response);
         res(this.linkedDisputeFlags);
       }).fail(rej);
     });
@@ -154,17 +163,6 @@ const DisputeFlagManager = Marionette.Object.extend({
   createAdjournmentFlag(attrs) {
     const flagConfig = this.getFlagConfig(configChannel.request('get', 'FLAG_ID_ADJOURNED'));
     return this.createFlag(flagConfig, attrs);
-  },
-
-  closeAdjournmentFlagsOnDispute() {
-    const disputeGuid = disputeChannel.request('get:id');
-    const FLAG_ID_ADJOURNED = configChannel.request('get', 'FLAG_ID_ADJOURNED');
-    const openAdjournmentFlags = this.linkedDisputeFlags.filter(flag => flag.get('dispute_guid') === disputeGuid
-      && flag.getFlagId() === FLAG_ID_ADJOURNED
-      && !flag.get('flag_end_date')
-      && flag.isActive()
-    );
-    return this.closeFlags(openAdjournmentFlags);
   },
 
   createCorrectionFlag(attrs) {
@@ -212,36 +210,44 @@ const DisputeFlagManager = Marionette.Object.extend({
     return this.createFlag(flagConfig, attrs);
   },
 
-  closeCcrFlag(outcomeDocRequestId) {
+  closeAdjournmentFlagsOnDispute() {
+    const disputeGuid = disputeChannel.request('get:id');
+    const FLAG_ID_ADJOURNED = configChannel.request('get', 'FLAG_ID_ADJOURNED');
+    const openAdjournmentFlags = this.linkedDisputeFlags.filter(flag => flag.get('dispute_guid') === disputeGuid
+      && flag.getFlagId() === FLAG_ID_ADJOURNED
+      && !flag.get('flag_end_date')
+      && flag.isActive()
+    );
+    return this.closeFlags(openAdjournmentFlags);
+  },
+
+  closeCcrFlags(outcomeDocRequestId) {
     if (!outcomeDocRequestId) {
       console.log(`[Error] No config or outcomeDocRequestId found to close the flag`);
       return Promise.resolve();
     }
 
-    const flag = this.linkedDisputeFlags.findWhere({ related_object_id: outcomeDocRequestId });
-    if (!flag) {
-      console.log(`[Error] No flag that can be closed found`);
-      return Promise.resolve();
-    }
-
-    return this.closeFlags([flag]);
+    const ccrFlags = this.linkedDisputeFlags.filter(flag => flag.get('related_object_id') === outcomeDocRequestId
+      && flag.isActive()
+    );
+    return this.closeFlags(ccrFlags);
   },
 
-  closeSubServiceRequestedFlag(subServId) {
+  closeSubServiceRequestedFlags(subServId) {
     if (!subServId) {
       console.log(`[Error] No config or outcomeDocRequestId found to close the flag`);
       return Promise.resolve();
     }
-
-    const flag = this.linkedDisputeFlags.findWhere({ related_object_id: subServId });
-    if (!flag) {
-      console.log(`[Error] No flag that can be closed found`);
-      return Promise.resolve();
-    }
-    return this.closeFlags([flag]);
+    const subServeConfig = this.getFlagConfig(configChannel.request('get', 'FLAG_ID_SUB_SERVICE_REQUESTED'));
+    const requestedSubServeFlags = this.linkedDisputeFlags.filter(flag => flag.get('related_object_id') === subServId
+      && flag.get('flag_type') === subServeConfig.flag_type
+      && flag.get('flag_subtype') === subServeConfig.flag_subtype
+      && flag.isActive()
+    );
+    return this.closeFlags(requestedSubServeFlags);
   },
 
-  closeSubServiceApprovedFlag() {
+  closeSubServiceApprovedFlags() {
     const subServeConfig = this.getFlagConfig(configChannel.request('get', 'FLAG_ID_SUB_SERVICE_APPROVED'));
     const disputeGuid = disputeChannel.request('get:id');
     const approvedSubServeFlags = this.linkedDisputeFlags.filter(flag => flag.get('dispute_guid') === disputeGuid
@@ -288,7 +294,7 @@ const DisputeFlagManager = Marionette.Object.extend({
       this.listenTo(modalView, 'removed:modal', () => res());
       modalChannel.request('add', modalView);
     });
-    reviewFlags.reduce( (accumulatorPromise, flag) => (
+    return reviewFlags.reduce( (accumulatorPromise, flag) => (
       accumulatorPromise.then(() => showFlagNotificationModal(flag))
     ), Promise.resolve());
   },

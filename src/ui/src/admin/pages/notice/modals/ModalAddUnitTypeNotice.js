@@ -19,6 +19,7 @@ import EditorView from '../../../../core/components/editor/Editor';
 import EditorModel from '../../../../core/components/editor/Editor_model';
 import template from './ModalAddUnitTypeNotice_template.tpl';
 import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
+import { PAGE_BREAK_CLASS } from '../../../components/decision-generator/decision-templates/DecGenPageBreak';
 
 const filesErrorClassSelector = '.add-files-error-block';
 const NO_FILES_ERROR_MSG = `You must add at least one valid file to continue.`;
@@ -37,17 +38,50 @@ const configChannel = Radio.channel('config');
 const loaderChannel = Radio.channel('loader');
 
 const getGenerateProgressLine = (index, total) => index && total ? `Generating: ${index}/${total}` : '';
+const getNumBatches = (total, batchSize) => Math.ceil(total / batchSize);
 
 const NoticeGeneratorHelper = Marionette.Object.extend({
  
   initialize(options) {
     options = options || {};
     const context = options.context || null;
-    this.getGenerateNoticeDfd = this._getGenerateNoticeDfd.bind(context);
+    this.getNoticeGenPromises = this._getNoticeGenPromises.bind(context);
     this.createGenerateProgressModalAndSwitchView = this._createGenerateProgressModalAndSwitchView.bind(context);
+    this.generateNoticeHtml = this._generateNoticeHtml.bind(context);
+    context.__dms_self = this;
   },
 
-  _getGenerateNoticeDfd(unitOrTenant, index, noticeFileDescriptionModel, progressModal) {
+  _getNoticeGenPromises(allUnitsOrTenants, noticeFileDescriptionModel, progressModal) {
+    // Process batches of units/tenants
+
+    const noticeGenPromises = [];
+    const getUnitDisplay = (unitOrTenant) => unitOrTenant?.getUnitNumDisplay?.().replace(/\s/g, '');
+
+    for (let i = 0; i < allUnitsOrTenants.length; i += this.generationCount) {
+      const unitsOrTenants = allUnitsOrTenants.slice(i, i + this.generationCount);
+      const noticeHtml = unitsOrTenants.reduce((html, unitOrTenant, index) => (
+        html += `${this.__dms_self.generateNoticeHtml(unitOrTenant)}\n${index < (unitsOrTenants.length - 1) ? `<div class="${PAGE_BREAK_CLASS}"></div>` : ''}\n`
+      ), '');
+      let noticeTitleCustomText = '';
+      if (this.isCreatedAriE) {
+        noticeTitleCustomText = unitsOrTenants?.[0]?.get('name_abbreviation');
+      } else {
+        // Add UnitX-UnitY display to batches of notices
+        noticeTitleCustomText = `${getUnitDisplay(unitsOrTenants?.[0])}${unitsOrTenants.length > 1 ? `-${getUnitDisplay(unitsOrTenants?.slice(-1)?.[0])}` : ``}`;
+      }
+      const pdfTitle = `${this.disputeNoticeTitleModel.getData()}_${noticeTitleCustomText}`;
+
+      noticeGenPromises.push(this.performNoticeGeneration.bind(this, pdfTitle, noticeHtml, noticeFileDescriptionModel, () => {
+        const nextIndex = i + this.generationCount + 1;
+        if (nextIndex > this.unitOrTenantIterable.length) return;
+        progressModal.updateProgressText( getGenerateProgressLine(getNumBatches(nextIndex, this.generationCount), getNumBatches(this.unitOrTenantIterable.length, this.generationCount)) );
+      }));
+    }
+
+    return noticeGenPromises;
+  },
+
+  _generateNoticeHtml(unitOrTenant) {
     const noticePreviewView = new (this.modalClass)({
       templateData: {
         respondents: this.isCreatedAriE ? [unitOrTenant] : this.unitParticipants[unitOrTenant.get('unit_id')],
@@ -67,21 +101,14 @@ const NoticeGeneratorHelper = Marionette.Object.extend({
       noticePreviewView.hideSpecialInstructions();               
     }
 
-    const noticeTitleCustomText = this.isCreatedAriE ? unitOrTenant.get('name_abbreviation') : unitOrTenant.getUnitNumDisplay().replace(/\s/g, '');
-    const pdfTitle = `${this.disputeNoticeTitleModel.getData()}_${noticeTitleCustomText}`;
-    return this.performNoticeGeneration.bind(this, pdfTitle, noticePreviewView.$el.html(), noticeFileDescriptionModel, () => {
-      const nextIndex = index+2;
-      if (nextIndex > this.unitOrTenantIterable.length ) {
-        return;
-      }
-      progressModal.updateProgressText( getGenerateProgressLine(nextIndex, this.unitOrTenantIterable.length) );
-    });
+    return noticePreviewView.$el.html();
   },
 
   _createGenerateProgressModalAndSwitchView(initialProgressText) {
+    const numToGenerate = getNumBatches(this.unitOrTenantIterable.length, this.generationCount);
     const modalView = modalChannel.request('show:standard', {
       title: 'Generating Notices',
-      bodyHtml: `<p>The notices are being generated for ${this.unitOrTenantIterable.length} ${this.isCreatedAriE ? 'tenant' : 'unit'}${this.unitOrTenantIterable.length===1?'':'s'}.  When this process has completed this window will close automatically.  If you cancel or close this modal all generated notice files will be cleared.</p>
+      bodyHtml: `<p>${numToGenerate} notice${numToGenerate === 1 ? ' is' : 's are'} being generated for ${this.unitOrTenantIterable.length} ${this.isCreatedAriE ? 'tenant' : 'unit'}${this.unitOrTenantIterable.length===1?'':'s'}.  When this process has completed this window will close automatically.  If you cancel or close this modal all generated notice files will be cleared.</p>
         <b><div class="modal-notice-progress-text">${initialProgressText || ''}</div></b>`,
       hideContinueButton: true
     });
@@ -114,6 +141,7 @@ const ModalAddNotice = ModalBaseView.extend({
     disputeNoticeTitleRegion: '.dispute-notice-title',
     specialInstructionsText: '.special-instructions',
     useSpecialInstructions: '.use-special-instructions',
+    singleGenerationRegion: '.notice-single-generation',
     noticePreview: '#notice-preview',
     noticeUploadRegion: '.notice-upload-component',
     noticeFilesRegion: '.notice-upload-files',
@@ -152,7 +180,6 @@ const ModalAddNotice = ModalBaseView.extend({
       notice_special_instructions: this.specialInstructionsModel.getData()
     });
 
-
     const initialFileDescription = this.model.getNoticeFileDescription();
     this.cleanupExistingFileDescriptionAndSaveNewNoticeFileDescription()
       .done(noticeFileDescriptionModel => {
@@ -161,8 +188,8 @@ const ModalAddNotice = ModalBaseView.extend({
         this.model.save()
           .done(() => {
             const noticeHelper = new NoticeGeneratorHelper({ context: this });
-            const progressModal = noticeHelper.createGenerateProgressModalAndSwitchView( getGenerateProgressLine(1, this.unitOrTenantIterable.length) );
-            const generateNoticeDfds = this.unitOrTenantIterable.map((unitModel, index) => noticeHelper.getGenerateNoticeDfd(unitModel, index, noticeFileDescriptionModel, progressModal));
+            const progressModal = noticeHelper.createGenerateProgressModalAndSwitchView( getGenerateProgressLine(1, getNumBatches(this.unitOrTenantIterable.length, this.generationCount)) );
+            const generateNoticeDfds = noticeHelper.getNoticeGenPromises(this.unitOrTenantIterable, noticeFileDescriptionModel, progressModal);
             
             // Add cancel listeners, via the Modal, and trigger them when this modal is removed
             const noticeSaveQueue = UtilityMixin.util_clearQueue(generateNoticeDfds, { stop_on_error: true, add_cancel_listener: true });
@@ -295,7 +322,6 @@ const ModalAddNotice = ModalBaseView.extend({
 
     this.dispute = disputeChannel.request('get');
     this.isCreatedAriE = this.dispute.isCreatedAriE();
-
     const isCreatedAriC = this.dispute.isCreatedAriC();
 
     this.rentIncreaseUnits = participantsChannel.request('get:dispute:units').filter(unit => isCreatedAriC ? unit.hasSavedRentIncreaseData() : unit.get('selected_tenants'));
@@ -312,6 +338,7 @@ const ModalAddNotice = ModalBaseView.extend({
     }
 
     this.createSubModels();
+    this.generationCount = this.singleGenerationModel.getData() ? 1 : this.singleGenerationModel.get('_defaultCount');
     
     this.fileUploader = this.initFileUploader();
     this.setupListeners();
@@ -323,6 +350,7 @@ const ModalAddNotice = ModalBaseView.extend({
       processing_options: {
         maxNumberOfFiles,
         checkForDisputeDuplicates: false,
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
         allowedFileTypes: configChannel.request('get', 'VALID_NOTICE_FILE_TYPES')
       },
       file_creation_fn: function() {
@@ -356,6 +384,13 @@ const ModalAddNotice = ModalBaseView.extend({
       html: 'Include Special Instructions',
       checked: hasHearingInstructions,
       required: true
+    });
+
+    this.singleGenerationModel = new CheckboxModel({
+      html: `Generate Individually`,
+      disabled: this.isCreatedAriE,
+      checked: this.isCreatedAriE,
+      _defaultCount: configChannel.request('get', 'NOTICE_GENERATION_UNIT_COUNT'),
     });
 
     this.specialInstructionsModel = new EditorModel({
@@ -404,6 +439,11 @@ const ModalAddNotice = ModalBaseView.extend({
     this.listenTo(this.specialInstructionsModel, 'change:value', this._onChangeSpecialInstructions, this);
     this.listenTo(this.useSpecialInstructionsModel, 'change:checked', this._onChangeUseSpecialInstructions, this);
     this.listenTo(this.specialInstructionsModel, 'change:required', this._setNoticeRequired, this);
+
+    this.listenTo(this.singleGenerationModel, 'change:checked', (m, checked) => {
+      this.generationCount = checked ? 1 : this.singleGenerationModel.get('_defaultCount');
+      this.render();
+    });
 
     this.setupPackageProvidedUiModelListeners();
   },
@@ -475,15 +515,15 @@ const ModalAddNotice = ModalBaseView.extend({
 
     if (this._isGenerateSelected()) {
       this.showChildView('useSpecialInstructions', new CheckboxView({ model: this.useSpecialInstructionsModel }));
+      this.showChildView('singleGenerationRegion', new CheckboxView({ model: this.singleGenerationModel }));
       this.showChildView('specialInstructionsText', new EditorView({ model: this.specialInstructionsModel })); 
 
       if (this.dispute.getProcess()) {
         this.renderNoticePreview();
+        // If any entered user info in special instructions model, use that on re-render
         // Trigger the special instructions toggle first
         this._onChangeUseSpecialInstructions(null, this.useSpecialInstructionsModel.getData());
-        if (this.activeHearing && this.activeHearing.get('special_instructions')) {
-          this._onChangeSpecialInstructions(null, this.specialInstructionsModel.getData());
-        }
+        this._onChangeSpecialInstructions(null, this.specialInstructionsModel.getData());
       }
     } else if (this._isUploadSelected()) {
       this.showChildView('noticeUploadRegion', this.fileUploader);
@@ -524,7 +564,8 @@ const ModalAddNotice = ModalBaseView.extend({
       existingNoticeFiles: this.existingNoticeFiles,
       rentIncreaseUnits: this.rentIncreaseUnits,
       respondents: this.respondentModels,
-      hideUnitInfo: this.isCreatedAriE
+      hideUnitInfo: this.isCreatedAriE,
+      generationCount: this.generationCount
     };
   }
 });

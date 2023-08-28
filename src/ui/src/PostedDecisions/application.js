@@ -1,8 +1,3 @@
- /**
-  * @namespace intake.application
-  * @memberof intake
-  */
-
 // Import files that need to be loaded immediately
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
@@ -63,6 +58,7 @@ import '../core/components/payments/PaymentManager';
 import '../core/components/decisions/DecisionsManager';
 import { loadAndCheckMaintenance } from '../core/components/maintenance/MaintenanceChecker';
 import '../core/components/custom-data-objs/CustomDataObjManager';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 // Add site name
 var g = window || global;
@@ -87,7 +83,6 @@ const _hotReloadDependencies = [
   '../core/components/status/StatusManager',
   '../core/components/payments/PaymentManager',
   '../core/components/maintenance/MaintenanceChecker',
-  './routers/app_router',
   '../core/components/question/Question_model',
   '../core/components/question/Question_collection', 
   '../core/components/root-layout/RootLayout',
@@ -158,8 +153,10 @@ const AppModel = Backbone.Model.extend({
         dfd.resolve();
       }).fail(function() {
         // An ongoing maintenance record existed, start timout timer
+        setTimeout(function() {
+          window.location.assign(configChannel.request('get', 'EXTERNAL_LOGOUT_URL') || '/');
+        }, 6*1000);
         dfd.resolve();
-        this.load()
       });
     })
 
@@ -180,15 +177,14 @@ const App = Marionette.Application.extend({
   main_content_region: 'mainRegion',
 
   initialize() {
-    console.log('hello posted decisions!');
     this.model = this.options.model;
-    this.model.load();
   },
 
-  initializeCustomAnimations() {
+  initializeEventsAndAnimations() {
     $.initializeCustomAnimations({
       scrollableContainerSelector: '#main-content'
     });
+    $.initializeDatepickerScroll();
   },
 
   onBeforeStart() {
@@ -198,8 +194,9 @@ const App = Marionette.Application.extend({
   },
 
   onStart() {
-    this.initializeCustomAnimations()
+    this.initializeEventsAndAnimations();
     this.initializeViews(PostedDecisions);
+    AnalyticsUtil.initializeAnalyticsTracking();
     this.showMainView();
   },
 
@@ -244,10 +241,6 @@ const _webpackSetupHotModuleReloadHandlers = () => {
 
     // Re-initialize MainView with the newly imported main view
     app.initializeViews(PostedDecisions);
-    if (app.mainViewRouter) {
-      app.mainViewRouter.controller = app.mainView;
-    }
-
   });
 
   // Perform default hot swap behaviour (re-load "import"s) on all of application.js's dependencies
@@ -262,13 +255,6 @@ const loadAndStartApplication = () => {
   } catch (err) {
     console.trace(err);
     alert('[Error] There was an unexpected application error on the page.  Please refresh and try again.');
-    /*
-      const modalView = modalChannel.request('show:standard', {
-        title: ,
-        bodyHtml: '',
-      })
-    }, 25);
-    */
     loaderChannel.trigger('page:load:complete');
   }
 };

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Modal that displays before/after reassignment view that processes reassignment once confirm button is clicked
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import template from './ModalHearingReassignConfirm_template.tpl';
@@ -103,7 +106,9 @@ export default ModalBaseView.extend({
       this.render();
     })
   },
-
+  /**
+   * @param {HearingModel} model 
+   */
   initialize(options) {
     this.mergeOptions(options, ['reassignHearingModel']);
     

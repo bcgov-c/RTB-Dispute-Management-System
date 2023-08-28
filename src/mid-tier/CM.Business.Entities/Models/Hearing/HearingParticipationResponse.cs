@@ -41,4 +41,13 @@ public class HearingParticipationResponse : CommonResponse
 
     [JsonProperty("pre_participation_comment")]
     public string PreParticipationComment { get; set; }
+
+    [JsonProperty("participation_status_by")]
+    public int? ParticipationStatusBy { get; set; }
+
+    [JsonProperty("pre_participation_status_by")]
+    public int? PreParticipationStatusBy { get; set; }
+
+    [JsonProperty("pre_participation_status_date")]
+    public string PreParticipationStatusDate { get; set; }
 }

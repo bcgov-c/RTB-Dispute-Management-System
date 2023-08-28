@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Amendments Collection View. Displays title and list of amendments
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import CheckboxModel from '../../../core/components/checkbox/Checkbox_model';
@@ -43,7 +46,14 @@ export default Marionette.View.extend({
 
   viewDetailsClass: 'amendment-toggle-full',
   viewMinimalClass: 'amendment-toggle-minimal',
-
+  /**
+   * 
+   * @param {AmendmentCollection} collection
+   * @param {String} titleDisplay - title to display above amendment list
+   * @param {Boolean} enableTypeFilter - Displays amendment type filter
+   * @param {Number} initialType - initial value in amendment type dropdown
+   * @param {Boolean} enableUnlinkedIcon - Displays "! Unlinked" for amendments without a notice id
+   */
   initialize(options) {
     this.mergeOptions(options, ['collection', 'titleDisplay', 'enableTypeFilter', 'initialType', 'enableUnlinkedIcon']);
     _.extend(this.options, options);

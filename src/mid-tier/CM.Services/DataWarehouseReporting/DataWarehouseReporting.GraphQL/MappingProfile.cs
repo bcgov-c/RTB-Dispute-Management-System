@@ -13,6 +13,7 @@ public class MappingProfile : Profile
         CreateMap<FactDisputeSummary, FactDisputeSummaryType>(MemberList.Destination);
         CreateMap<FactHearingSummary, FactHearingSummaryType>(MemberList.Destination);
         CreateMap<FactTimeStatistic, FactTimeStatisticType>(MemberList.Destination);
+        CreateMap<FactResolutionService, FactResolutionService>(MemberList.Destination);
         CreateMap<LoadingHistory, LoadingHistoryType>(MemberList.Destination);
     }
 }

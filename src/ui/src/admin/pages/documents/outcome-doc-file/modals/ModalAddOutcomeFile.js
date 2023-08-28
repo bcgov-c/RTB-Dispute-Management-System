@@ -1,3 +1,6 @@
+/** 
+ * @fileoverview - Modal for selecting/adding outcome documents to outcome doc set
+ * */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import InputView from '../../../../../core/components/input/Input';
@@ -65,6 +68,13 @@ export default ModalBaseView.extend({
       else this.model.createOutcomeFileFromConfig(fileConfig, { add: true });
     });
 
+    // Sync public final doc if a doc that can be anonymized is added
+    if (configChannel.request('get', 'UAT_TOGGLING')?.SHOW_OUTCOME_PUBLIC_DOCS && this.model.getOutcomeFiles().find(f => f.canBeAnonymized()) &&
+        !this.model.getOutcomeFilePublicFinal()) {
+      this.model.createOutcomeFilePublicFinal({}, { add: true });
+    }
+    
+    // Add group sub-type
     if (this.showFileSubType) this.model.getOutcomeFiles().forEach(m => m.set('file_sub_type', this.fileSubTypeModel.getData())); 
 
     const promiseToUse = this.fullSave ? this.model.saveAll({ deliveries: true }) : this.model.saveOutcomeFiles();
@@ -153,6 +163,11 @@ _incrementAcronym(sortedExistingAcronymList) {
     return is_valid;
   },
 
+  /**
+   * @param {OutcomeDocGroupModel} model
+   * @param {Boolean} fullSave - saves all outcomedocgroup data 
+   * @returns 
+   */
   initialize(options) {
     if (!(options || {}).model) {
       console.log(`[Error] Need the outcome document group model to add outcome document to`);
@@ -224,6 +239,8 @@ _incrementAcronym(sortedExistingAcronymList) {
       required: true,
       value: this.model.isSubTypeCorrection() && !this.model.isSubTypeReview() ? this.OUTCOME_DOC_FILE_SUB_TYPE_CORR
         : this.model.isSubTypeReview() && !this.model.isSubTypeCorrection() ? this.OUTCOME_DOC_FILE_SUB_TYPE_REVIEW
+        // If no default is set, and a review request exists, and dispute is process=Review Hearing, set Review as default
+        : !this.model.isSubTypeNewDoc() && this.hasReviewRequest && this.dispute.checkProcess(configChannel.request('get', 'PROCESS_REVIEW_HEARING')) ? this.OUTCOME_DOC_FILE_SUB_TYPE_REVIEW
         : this.OUTCOME_DOC_FILE_SUB_TYPE_NEW
     });
 

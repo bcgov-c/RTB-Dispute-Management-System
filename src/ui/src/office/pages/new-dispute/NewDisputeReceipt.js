@@ -94,7 +94,7 @@ export default PageView.extend({
       emailUpdateParticipantId: primaryApplicant ? primaryApplicant.id : null,
       autoSendEmail: false,
       participantSaveModel: currentUser && currentUser.isOfficeUser() ? ExternalParticipantModel : ParticipantModel,
-      messageSubType: configChannel.request('get', 'EMAIL_MESSAGE_SUB_TYPE_OS_NEW_APPLICATION')
+      messageSubType: configChannel.request('get', 'EMAIL_MESSAGE_SUB_TYPE_OS_NEW_APPLICATION'),
     }));
   },
 
@@ -131,6 +131,7 @@ export default PageView.extend({
       addressDisplay: !this.isPrivateMode ? this.addressEditModel.getAddressString() : NOT_VISIBLE_MSG,
       isBusiness: primaryApplicant.isBusiness(),
       primaryApplicant,
+      daRootUrl: configChannel.request('get', 'DISPUTE_ACCESS_URL'),
 
       formTitleDisplay: this.matchingFormFileDescription ? this.matchingFormFileDescription.get('title') : this.formConfig.title,
       formDescriptionDisplay: this.matchingFormFileDescription ? this.matchingFormFileDescription.get('description') : this.OFFICE_FORM_EVIDENCE_DESCRIPTION,

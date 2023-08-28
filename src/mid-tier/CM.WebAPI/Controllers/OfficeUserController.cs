@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CM.Business.Entities.Models.Hearing;
 using CM.Business.Entities.Models.OfficeUser;
 using CM.Business.Entities.Models.RemedyDetail;
 using CM.Business.Services.DisputeServices;
@@ -14,10 +15,10 @@ using CM.Business.Services.Parties;
 using CM.Business.Services.Payment;
 using CM.Business.Services.RemedyDetails;
 using CM.Business.Services.RemedyServices;
+using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -30,7 +31,6 @@ public class OfficeUserController : BaseController
     private readonly IDisputeService _disputeService;
     private readonly IEmailMessageService _emailMessageService;
     private readonly IFileDescriptionService _fileDescriptionService;
-    private readonly IFileService _fileService;
     private readonly IHearingParticipationService _hearingParticipationService;
     private readonly IHearingService _hearingService;
     private readonly IMapper _mapper;
@@ -39,27 +39,27 @@ public class OfficeUserController : BaseController
     private readonly IParticipantService _participantService;
     private readonly IRemedyDetailService _remedyDetailService;
     private readonly IRemedyService _remedyService;
+    private readonly IUserService _userService;
 
     public OfficeUserController(IMapper mapper,
         IOfficeUserService officeUserService,
         IDisputeFeeService disputeFeeService,
         IDisputeService disputeService,
         INoticeService noticeService,
-        IFileService fileService,
         IParticipantService participantService,
         IHearingParticipationService hearingParticipationService,
         IHearingService hearingService,
         IFileDescriptionService fileDescriptionService,
         IEmailMessageService emailMessageService,
         IRemedyDetailService remedyDetailService,
-        IRemedyService remedyService)
+        IRemedyService remedyService,
+        IUserService userService)
     {
         _mapper = mapper;
         _officeUserService = officeUserService;
         _disputeFeeService = disputeFeeService;
         _disputeService = disputeService;
         _noticeService = noticeService;
-        _fileService = fileService;
         _participantService = participantService;
         _hearingParticipationService = hearingParticipationService;
         _hearingService = hearingService;
@@ -67,6 +67,7 @@ public class OfficeUserController : BaseController
         _emailMessageService = emailMessageService;
         _remedyDetailService = remedyDetailService;
         _remedyService = remedyService;
+        _userService = userService;
     }
 
     [HttpGet("api/externalupdate/disputedetails")]
@@ -224,51 +225,6 @@ public class OfficeUserController : BaseController
             return BadRequest(string.Format(ApiReturnMessages.ParticipantWithDisputeDoesNotExist, request.NoticeDeliveredTo, disputeGuid));
         }
 
-        if (request.NoticeFile1Id != null)
-        {
-            var fileExists1 = await _fileService.FileExists(request.NoticeFile1Id.Value);
-            if (!fileExists1)
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, request.NoticeFile1Id.Value));
-            }
-        }
-
-        if (request.NoticeFile2Id != null)
-        {
-            var fileExists2 = await _fileService.FileExists(request.NoticeFile2Id.Value);
-            if (!fileExists2)
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, request.NoticeFile2Id.Value));
-            }
-        }
-
-        if (request.NoticeFile3Id != null)
-        {
-            var fileExists3 = await _fileService.FileExists(request.NoticeFile3Id.Value);
-            if (!fileExists3)
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, request.NoticeFile3Id.Value));
-            }
-        }
-
-        if (request.NoticeFile4Id != null)
-        {
-            var fileExists4 = await _fileService.FileExists(request.NoticeFile4Id.Value);
-            if (!fileExists4)
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, request.NoticeFile4Id.Value));
-            }
-        }
-
-        if (request.NoticeFile5Id != null)
-        {
-            var fileExists5 = await _fileService.FileExists(request.NoticeFile5Id.Value);
-            if (!fileExists5)
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, request.NoticeFile5Id.Value));
-            }
-        }
-
         var fileDescription = await _fileDescriptionService.GetAsync(request.NoticeFileDescriptionId);
         if (fileDescription.DisputeGuid != disputeGuid)
         {
@@ -334,6 +290,73 @@ public class OfficeUserController : BaseController
         return NotFound();
     }
 
+    [HttpPost("api/externalupdate/hearingpreparticipation/{hearingId:int}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedAccessCode, RoleNames.OfficePay })]
+    public async Task<IActionResult> PostHearingParticipation(
+        int hearingId,
+        [FromQuery] int participantId,
+        [FromQuery] Guid disputeGuid,
+        [FromBody] ExternalHearingParticipationRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var hearing = await _hearingService.GetHearingAsync(hearingId);
+        if (hearing == null || hearing.LocalStartDateTime <= DateTime.UtcNow)
+        {
+            return BadRequest(ApiReturnMessages.NotFutureHearing);
+        }
+
+        if (!await _disputeService.DisputeExistsAsync(disputeGuid))
+        {
+            return BadRequest(string.Format(ApiReturnMessages.DisputeDoesNotExist, disputeGuid));
+        }
+
+        var participant = await _participantService.GetAsync(participantId);
+        if (participant == null)
+        {
+            return BadRequest(string.Format(ApiReturnMessages.ParticipantDoesNotExist, participantId));
+        }
+        else if (participant.DisputeGuid != disputeGuid
+                 || participant.ParticipantStatus == (byte)ParticipantStatus.Deleted
+                 || participant.ParticipantStatus == (byte)ParticipantStatus.Removed)
+        {
+            return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute, participantId));
+        }
+
+        if (request.ParticipationStatusBy.HasValue)
+        {
+            var user = await _userService.GetSystemUser(request.ParticipationStatusBy.Value);
+            var isDisputeUser = await _disputeService.IsDisputeUser(disputeGuid, user.SystemUserId);
+            if (user == null || (user.SystemUserRoleId != (int)Roles.StaffUser && !isDisputeUser))
+            {
+                return BadRequest(ApiReturnMessages.InvalidParticipationStatusBy);
+            }
+        }
+
+        if (request.PreParticipationStatusBy.HasValue)
+        {
+            var user = await _userService.GetSystemUser(request.PreParticipationStatusBy.Value);
+            var isDisputeUser = await _disputeService.IsDisputeUser(disputeGuid, user.SystemUserId);
+            if (user == null || (user.SystemUserRoleId != (int)Roles.StaffUser && !isDisputeUser))
+            {
+                return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusBy);
+            }
+        }
+
+        var isHearingParticipantExists = await _hearingParticipationService.HearingParticipantExists(participantId);
+        if (isHearingParticipantExists)
+        {
+            return BadRequest(ApiReturnMessages.HearingParticipantExistsForParticipant);
+        }
+
+        var result = await _hearingParticipationService.CreateAsync(hearingId, participantId, disputeGuid, request);
+        EntityIdSetContext(result.HearingParticipationId);
+        return Ok(result);
+    }
+
     [HttpPatch("api/externalupdate/hearingpreparticipation/{hearingId:int}")]
     [ApplyConcurrencyCheck]
     [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedAccessCode, RoleNames.OfficePay })]
@@ -359,7 +382,29 @@ public class OfficeUserController : BaseController
                  || participant.ParticipantStatus == (byte)ParticipantStatus.Deleted
                  || participant.ParticipantStatus == (byte)ParticipantStatus.Removed)
         {
-            return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute));
+            return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute, participantId));
+        }
+
+        var(participationStatusByExists, participationStatusBy) = request.GetValue<int?>("/participation_status_by");
+        if (participationStatusByExists)
+        {
+            var user = await _userService.GetSystemUser(participationStatusBy.Value);
+            var isDisputeUser = await _disputeService.IsDisputeUser(disputeGuid, user.SystemUserId);
+            if (user == null || (user.SystemUserRoleId != (int)Roles.StaffUser && !isDisputeUser))
+            {
+                return BadRequest(ApiReturnMessages.InvalidParticipationStatusBy);
+            }
+        }
+
+        var(preParticipationStatusByExists, preParticipationStatusBy) = request.GetValue<int?>("/pre_participation_status_by");
+        if (preParticipationStatusByExists)
+        {
+            var user = await _userService.GetSystemUser(preParticipationStatusBy.Value);
+            var isDisputeUser = await _disputeService.IsDisputeUser(disputeGuid, user.SystemUserId);
+            if (user == null || (user.SystemUserRoleId != (int)Roles.StaffUser && !isDisputeUser))
+            {
+                return BadRequest(ApiReturnMessages.InvalidPreParticipationStatusBy);
+            }
         }
 
         var originalHearingParticipation = await _hearingParticipationService.GetHearingParticipation(hearingId, participantId, disputeGuid);
@@ -426,7 +471,7 @@ public class OfficeUserController : BaseController
             var participant = await _participantService.GetByIdAsync(request.ParticipantId);
             if (remedy.Claim.ClaimGroup.DisputeGuid != participant.DisputeGuid)
             {
-                return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute));
+                return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute, request.ParticipantId));
             }
         }
 

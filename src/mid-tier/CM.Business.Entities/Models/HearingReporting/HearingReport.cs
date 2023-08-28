@@ -56,6 +56,12 @@ public class HearingReport
     [JsonProperty("hearing_reserved_by_id")]
     public int? HearingReservedById { get; set; }
 
+    [JsonProperty("hearing_reserved_dispute_guid")]
+    public Guid? HearingReservedDisputeGuid { get; set; }
+
+    [JsonProperty("hearing_reserved_file_number")]
+    public int? HearingReservedFileNumber { get; set; }
+
     [JsonIgnore]
     public int? HearingOwner { get; set; }
 

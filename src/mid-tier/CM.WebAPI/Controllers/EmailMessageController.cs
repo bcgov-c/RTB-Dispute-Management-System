@@ -2,11 +2,11 @@
 using System.Net;
 using System.Threading.Tasks;
 using CM.Business.Entities.Models.EmailMessage;
+using CM.Business.Services.DisputeServices;
 using CM.Business.Services.EmailMessages;
 using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -18,11 +18,16 @@ public class EmailMessageController : BaseController
 {
     private readonly IEmailMessageService _emailMessageService;
     private readonly IParticipantService _participantService;
+    private readonly IDisputeService _disputeService;
 
-    public EmailMessageController(IEmailMessageService emailMessageService, IParticipantService participantService)
+    public EmailMessageController(
+        IEmailMessageService emailMessageService,
+        IParticipantService participantService,
+        IDisputeService disputeService)
     {
         _emailMessageService = emailMessageService;
         _participantService = participantService;
+        _disputeService = disputeService;
     }
 
     [HttpPost("{disputeGuid:Guid}")]
@@ -206,6 +211,178 @@ public class EmailMessageController : BaseController
     public async Task<IActionResult> GetByDisputeGuid(Guid disputeGuid, int count, int index)
     {
         var emailMessages = await _emailMessageService.GetByDisputeGuidAsync(disputeGuid, count, index);
+        return Ok(emailMessages);
+    }
+
+    [HttpPost("/api/emailverificationmessage/{participantId:int}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.ExtendedAccessCode, RoleNames.OfficePay })]
+    public async Task<IActionResult> PostVerificationMessage(int participantId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var headerGuid = HttpContext.Request.Headers["disputeGuid"].ToString();
+        var disputeGuid = Guid.Empty;
+        var isValid = Guid.TryParse(headerGuid, out disputeGuid);
+
+        if (string.IsNullOrEmpty(headerGuid) || !isValid)
+        {
+            return BadRequest(ApiReturnMessages.DisputeGuidRequired);
+        }
+
+        var disputeExists = await _disputeService.DisputeExistsAsync(disputeGuid);
+        if (!disputeExists)
+        {
+            return BadRequest(ApiReturnMessages.DisputeDoesNotExist);
+        }
+
+        var participant = await _participantService.GetByIdAsync(participantId);
+        if (participant == null || participant.ParticipantStatus == (byte)ParticipantStatus.Removed ||
+                                    participant.ParticipantStatus == (byte)ParticipantStatus.Deleted)
+        {
+            return BadRequest(ApiReturnMessages.InvalidParticipant);
+        }
+
+        if (disputeGuid != participant.DisputeGuid)
+        {
+            return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute, participantId));
+        }
+
+        if (string.IsNullOrEmpty(participant.Email))
+        {
+            return BadRequest(ApiReturnMessages.ParticipantEmailDoesNotExist);
+        }
+
+        if (participant.EmailVerified == true)
+        {
+            return BadRequest(ApiReturnMessages.ParticipantEmailAlreadyVerified);
+        }
+
+        var result = await _emailMessageService.CreateAsync(participant);
+        if (!result)
+        {
+            return BadRequest(ApiReturnMessages.EmailSentFailed);
+        }
+        else
+        {
+            return Ok(ApiReturnMessages.EmailSent);
+        }
+    }
+
+    [HttpPost("/api/contactverification/{participantId:int}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.ExtendedAccessCode, RoleNames.OfficePay })]
+    public async Task<IActionResult> PostEmailVerification(int participantId, EmailVerificationRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var headerGuid = HttpContext.Request.Headers["disputeGuid"].ToString();
+        var disputeGuid = Guid.Empty;
+        var isValid = Guid.TryParse(headerGuid, out disputeGuid);
+
+        if (string.IsNullOrEmpty(headerGuid) || !isValid)
+        {
+            return BadRequest(ApiReturnMessages.DisputeGuidRequired);
+        }
+
+        var disputeExists = await _disputeService.DisputeExistsAsync(disputeGuid);
+        if (!disputeExists)
+        {
+            return BadRequest(ApiReturnMessages.DisputeDoesNotExist);
+        }
+
+        var participant = await _participantService.GetByIdAsync(participantId);
+        if (participant == null || participant.ParticipantStatus == (byte)ParticipantStatus.Removed ||
+                                    participant.ParticipantStatus == (byte)ParticipantStatus.Deleted)
+        {
+            return BadRequest(ApiReturnMessages.InvalidParticipant);
+        }
+
+        if (disputeGuid != participant.DisputeGuid)
+        {
+            return BadRequest(string.Format(ApiReturnMessages.InvalidParticipantOnDispute, participantId));
+        }
+
+        if (request.VerificationType == VerificationType.Email)
+        {
+            if (string.IsNullOrEmpty(participant.Email))
+            {
+                return BadRequest(ApiReturnMessages.ParticipantEmailDoesNotExist);
+            }
+
+            if (participant.EmailVerified == true)
+            {
+                return BadRequest(ApiReturnMessages.ParticipantEmailAlreadyVerified);
+            }
+
+            if (participant.EmailVerifyCode != request.VerificationCode)
+            {
+                participant.EmailVerifyCode = StringHelper.GetRandomCode();
+                await _participantService.PatchAsync(participant);
+                return BadRequest(ApiReturnMessages.InvalidVerificationCode);
+            }
+        }
+
+        if (request.VerificationType == VerificationType.PrimaryPhone)
+        {
+            if (string.IsNullOrEmpty(participant.PrimaryPhone))
+            {
+                return BadRequest(ApiReturnMessages.ParticipantPrimaryPhoneDoesNotExist);
+            }
+
+            if (participant.PrimaryPhoneVerified == true)
+            {
+                return BadRequest(ApiReturnMessages.ParticipantPrimaryPhoneAlreadyVerified);
+            }
+
+            if (participant.PrimaryPhoneVerifyCode != request.VerificationCode)
+            {
+                participant.PrimaryPhoneVerifyCode = StringHelper.GetRandomCode();
+                await _participantService.PatchAsync(participant);
+                return BadRequest(ApiReturnMessages.InvalidVerificationCode);
+            }
+        }
+
+        if (request.VerificationType == VerificationType.SecondaryPhone)
+        {
+            if (string.IsNullOrEmpty(participant.SecondaryPhone))
+            {
+                return BadRequest(ApiReturnMessages.ParticipantSecondaryPhoneDoesNotExist);
+            }
+
+            if (participant.SecondaryPhoneVerified == true)
+            {
+                return BadRequest(ApiReturnMessages.ParticipantSecondaryPhoneAlreadyVerified);
+            }
+
+            if (participant.SecondaryPhoneVerifyCode != request.VerificationCode)
+            {
+                participant.SecondaryPhoneVerifyCode = StringHelper.GetRandomCode();
+                await _participantService.PatchAsync(participant);
+                return BadRequest(ApiReturnMessages.InvalidVerificationCode);
+            }
+        }
+
+        var result = await _emailMessageService.VerifyCode(participant, request);
+        if (!result)
+        {
+            return BadRequest(ApiReturnMessages.EmailSentFailed);
+        }
+        else
+        {
+            return Ok(ApiReturnMessages.EmailSent);
+        }
+    }
+
+    [HttpGet("/api/externaldisputeemailmessages/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalDisputeEmailMessages(Guid disputeGuid, ExternalEmailMessagesRequest request, int count, int index)
+    {
+        var emailMessages = await _emailMessageService.GetExternalDisputeEmailMessages(disputeGuid, request, count, index);
         return Ok(emailMessages);
     }
 }

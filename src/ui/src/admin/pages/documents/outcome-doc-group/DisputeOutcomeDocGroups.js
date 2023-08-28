@@ -7,6 +7,7 @@ import ModalAddOutcomeFile from '../outcome-doc-file/modals/ModalAddOutcomeFile'
 import PrimaryOutcomeDocGroupsView from './PrimaryOutcomeDocGroups';
 import OutcomeDocGroupCollection from '../../../../core/components/documents/OutcomeDocGroup_collection';
 import template from './DisputeOutcomeDocGroups_template.tpl';
+import SessionCollapse from '../../../components/session-settings/SessionCollapseHandler';
 
 let UAT_TOGGLING = {};
 
@@ -28,8 +29,7 @@ const OutcomeDocGroupsView = Marionette.CollectionView.extend({
 
   _getMenuStates(child) {
     const dispute = disputeChannel.request('get');
-    const hasExistingPublicDoc = child.getOutcomeFiles().find(outcomeFile => outcomeFile.isPublic()) ? true : false;
-    const hasFinalDocsWithNoUploads = child.getOutcomeFiles().find(outcomeFile => outcomeFile.isActive() && !outcomeFile.hasUploadedFile()) ? true : false;
+    const hasFinalDocsWithNoUploads = child.getOutcomeFiles().find(outcomeFile => !outcomeFile.hasUploadedFile()) ? true : false;
     const canBeDeleted = child.canBeDeleted();
 
     return {
@@ -50,7 +50,6 @@ const OutcomeDocGroupsView = Marionette.CollectionView.extend({
         { name: 'Save', event: 'save:documents' },
         { name: 'Cancel', event: 'cancel' },
         { name: 'Add Document', event: 'add:doc:file' },
-        ...(UAT_TOGGLING.SHOW_OUTCOME_PUBLIC_DOCS && !hasExistingPublicDoc ? [{ name: 'Add Public Document', event: 'add:public:doc' }] : []),
         ...(hasFinalDocsWithNoUploads ? [{ name: 'Bulk Upload Documents', event: 'bulk:upload:documents' }] : []),
       ],
       edit_delivery: [
@@ -91,12 +90,9 @@ const OutcomeDocGroupsView = Marionette.CollectionView.extend({
       return new ChildViewClass(childViewOptions);
     }
 
-    const lookups = configChannel.request('get', 'outcome_doc_groups') || {};
-    const doc_group_type = child.get('doc_group_type');
-    const config = lookups[doc_group_type] || {};
     const indexDisplay = Formatter.toLeftPad((child.collection.length+1) - childViewOptions.childIndex, '0', 2);
     const activeDisplay = child.isActive() ? 'In Progress / Not Completed' : 'Completed / Ready to Deliver';
-
+    const disputeModel = disputeChannel.request('get')
     // Create the child view instance
     const view = ContextContainer.withContextMenu({
       wrappedView: new DisputeOutcomeDocGroupView(options),
@@ -109,7 +105,8 @@ const OutcomeDocGroupsView = Marionette.CollectionView.extend({
         if (view.model && options.deliveryEdit) view.model.trigger('render:deliveryEdit', subView?.getSelectedDocumentEditData());
         loaderChannel.trigger('page:load:complete');
       },
-      disputeModel: disputeChannel.request('get')
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Documents', 'outcomeDocGroups', child.id),
     });
 
     const refreshMenuFn = () => {
@@ -139,7 +136,8 @@ export default Marionette.View.extend({
   template,
 
   ui: {
-    add: '.dispute-section-title-add',
+    add: '.outcome-documents-add-icon',
+    collapse: '.dispute-section-title-add.collapse-icon',
   },
 
   regions: {
@@ -148,7 +146,8 @@ export default Marionette.View.extend({
   },
 
   events: {
-    'click @ui.add': 'clickAdd'
+    'click @ui.add': 'clickAdd',
+    'click @ui.collapse': 'clickCollapse',
   },
 
   /**
@@ -159,10 +158,11 @@ export default Marionette.View.extend({
   initialize(options) {
     this.mergeOptions(options, ['primaryOutcomeDocGroupModels', 'primaryFileModelLookup']);
     _.extend(this.options, {}, options);
+    this.collapseHandler = SessionCollapse.createHandler(disputeChannel.request('get'), 'Documents', 'OutcomeDocGroups');
+    this.isCollapsed = this.collapseHandler?.get();
   },
 
   clickAdd() {
-
     const addDocSetFn = () => {
       const modalAddOutcomeDocGroup = new ModalAddOutcomeFile({
         fullSave: true,
@@ -192,14 +192,27 @@ export default Marionette.View.extend({
     }
   },
 
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
+  },
+
   onRender() {
+    if (this.isCollapsed) return;
     if (this.primaryOutcomeDocGroupModels && this.primaryOutcomeDocGroupModels.length) {
       this.showChildView('primaryDocGroupsRegion', new PrimaryOutcomeDocGroupsView({
         collection: new OutcomeDocGroupCollection(this.primaryOutcomeDocGroupModels || []),
         fileModelLookup: this.primaryFileModelLookup || {},
       }));
     }
-
     this.showChildView('outcomeDocsRegion', new OutcomeDocGroupsView(this.options));
-  }
+  },
+
+  templateContext() {
+    return {
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
+    }
+  },
 });

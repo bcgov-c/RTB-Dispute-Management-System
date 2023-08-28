@@ -80,7 +80,6 @@ const FileAttachmentCheckboxView = Marionette.View.extend({
 });
 
 const FileAttachmentCollectionView = Marionette.CollectionView.extend({
-  viewComparator: model => (model.get('file_name') || '').toLowerCase(),
   childView: FileAttachmentCheckboxView,
 });
 

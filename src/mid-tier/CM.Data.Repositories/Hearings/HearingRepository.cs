@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CM.Business.Entities.Models.ExternalUpdate;
 using CM.Business.Entities.Models.Hearing;
 using CM.Business.Entities.Models.HearingReporting;
 using CM.Common.Utilities;
@@ -21,6 +22,7 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
     public async Task<List<Hearing>> GetHearingsByYear(int year, List<byte> priorities)
     {
         var hearings = await Context.Hearings
+            .Include(x => x.DisputeHearings)
             .Where(h => h.LocalStartDateTime.Value.Year <= year && h.LocalEndDateTime.Value.Year >= year &&
                         priorities.Contains((byte)h.HearingPriority))
             .ToListAsync();
@@ -31,6 +33,7 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
     public async Task<List<Hearing>> GetHearingsByMonth(int month, int year, List<byte> priorities)
     {
         var hearings = await Context.Hearings
+            .Include(x => x.DisputeHearings)
             .Where(h => h.LocalStartDateTime.Value.Year <= year && h.LocalEndDateTime.Value.Year >= year &&
                         h.LocalStartDateTime.Value.Month <= month && h.LocalEndDateTime.Value.Month >= month &&
                         priorities.Contains((byte)h.HearingPriority))
@@ -42,6 +45,7 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
     public async Task<List<Hearing>> GetHearingsByDay(DateTime date)
     {
         var hearings = await Context.Hearings
+            .Include(x => x.DisputeHearings)
             .Include(h => h.SystemUser)
             .Where(h => h.LocalStartDateTime.Value.Date.DayOfYear == date.DayOfYear &&
                         h.LocalStartDateTime.Value.Year == date.Year)
@@ -51,21 +55,13 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
         return hearings;
     }
 
-    public async Task<List<Hearing>> GetHearingByOwner(int hearingOwnerId, DateTime startDate, DateTime? endDate)
+    public async Task<List<Hearing>> GetHearingByOwner(int hearingOwnerId, DateTime startDate, DateTime endDate)
     {
-        if (endDate.HasValue)
-        {
-            var hearingsWithEnd = await Context.Hearings
-                .Where(h => h.HearingOwner == hearingOwnerId && h.LocalStartDateTime.Value >= startDate &&
-                            h.LocalStartDateTime.Value <= endDate.Value).OrderBy(h => h.LocalStartDateTime.Value)
-                .Include(h => h.ConferenceBridge)
-                .ToListAsync();
-
-            return hearingsWithEnd;
-        }
-
         var hearings = await Context.Hearings
-            .Where(h => h.HearingOwner == hearingOwnerId && h.LocalStartDateTime.Value >= startDate)
+            .Include(x => x.DisputeHearings)
+            .Where(h => h.HearingOwner == hearingOwnerId &&
+                        ((h.LocalStartDateTime.Value >= startDate && h.LocalStartDateTime.Value <= endDate) ||
+                        (h.LocalEndDateTime.Value >= startDate && h.LocalEndDateTime.Value <= endDate)))
             .OrderBy(h => h.LocalStartDateTime.Value)
             .Include(h => h.ConferenceBridge)
             .ToListAsync();
@@ -119,6 +115,11 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
             result = await result.Where(x => x.HearingOwner == request.IncludedOwnerId.Value).ToListAsync();
         }
 
+        if (request.IncludedBridgeId.HasValue)
+        {
+            result = await result.Where(x => x.ConferenceBridgeId == request.IncludedBridgeId.Value).ToListAsync();
+        }
+
         if (request.IncludedOwnerRoleSubtypeId != null && request.IncludedOwnerRoleSubtypeId.Any())
         {
             var internalUsers = await Context
@@ -152,7 +153,7 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
     public async Task<Hearing> GetHearingWithParticipationList(int hearingId)
     {
         var hearing = await Context.Hearings
-            .Include(x => x.HearingParticipations)
+            .Include(x => x.HearingParticipations.OrderBy(hp => hp.HearingParticipationId))
             .SingleOrDefaultAsync(x => x.HearingId == hearingId);
 
         return hearing;
@@ -185,25 +186,49 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
         return availableStaff;
     }
 
-    public async Task<List<AvailableConferenceBridgesResponse>> GetAvailableHearingsByPeriod(AvailableConferenceBridgesRequest request, IEnumerable<int> activeBridges)
+    public async Task<List<AvailableConferenceBridgesResponse>> GetAvailableHearingsByPeriod(AvailableConferenceBridgesRequest request)
     {
-        var busyConferenceBridges = await Context.Hearings
-            .Where(x => (x.LocalEndDateTime > request.LocalStartDatetime
-                         && x.LocalStartDateTime < request.LocalEndDatetime)
-                        && activeBridges.Contains(x.ConferenceBridgeId.Value))
+        var activeBridges = await Context.ConferenceBridges
+            .Where(x => x.BridgeStatus == (int)BridgeStatus.Active)
+            .Select(c => c.ConferenceBridgeId)
+            .ToListAsync();
+
+        var bookedBridges = await Context
+            .Hearings
+            .Where(x => x.LocalStartDateTime.HasValue &&
+                        x.LocalStartDateTime.Value.Date == request.LocalStartDatetime.Date &&
+                        x.ConferenceBridgeId.HasValue)
             .Select(x => x.ConferenceBridgeId.Value)
             .ToListAsync();
 
-        var availableBridges = activeBridges.Except(busyConferenceBridges);
+        var availableBridges = activeBridges.Except(bookedBridges);
 
-        var conferenceBridges = await Context.ConferenceBridges.Where(x => availableBridges.Contains(x.ConferenceBridgeId))
-            .Select(x => new AvailableConferenceBridgesResponse { BridgeId = x.ConferenceBridgeId, BridgeType = x.BridgeType, PreferredStartTime = x.PreferredStartTime, PreferredOwner = x.PreferredOwner }).ToListAsync();
+        var conferenceBridges = await Context.ConferenceBridges
+            .Where(x => availableBridges
+            .Contains(x.ConferenceBridgeId))
+            .Select(x => new AvailableConferenceBridgesResponse
+            {
+                BridgeId = x.ConferenceBridgeId,
+                BridgeType = x.BridgeType,
+                PreferredStartTime = x.PreferredStartTime,
+                PreferredOwner = x.PreferredOwner
+            })
+            .OrderBy(guid => Guid.NewGuid())
+            .ToListAsync();
 
         foreach (var cb in conferenceBridges)
         {
             cb.SameDayHearings = await Context.Hearings
-                .Where(x => x.LocalStartDateTime.Value.Date == request.LocalStartDatetime.Date && x.ConferenceBridgeId == cb.BridgeId)
-                .Select(x => new SameDayHearing { HearingId = x.HearingId, LocalStartDateTime = x.LocalStartDateTime.Value, LocalEndDateTime = x.LocalEndDateTime.Value, HearingStartDateTime = x.HearingStartDateTime.ToCmDateTimeString(), HearingEndDateTime = x.HearingEndDateTime.ToCmDateTimeString() })
+                .Where(x => x.LocalStartDateTime.Value.Date == request.LocalStartDatetime.Date &&
+                            x.ConferenceBridgeId == cb.BridgeId)
+                .Select(x => new SameDayHearing
+                {
+                    HearingId = x.HearingId,
+                    LocalStartDateTime = x.LocalStartDateTime.Value,
+                    LocalEndDateTime = x.LocalEndDateTime.Value,
+                    HearingStartDateTime = x.HearingStartDateTime.ToCmDateTimeString(),
+                    HearingEndDateTime = x.HearingEndDateTime.ToCmDateTimeString()
+                })
                 .ToListAsync();
         }
 
@@ -250,10 +275,13 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
         return dates?.FirstOrDefault();
     }
 
-    public async Task<bool> IsHearingExist(int userId, DateTime startDateTime, DateTime endDataTime)
+    public async Task<bool> IsHearingExist(int userId, DateTime startDateTime, DateTime endDateTime)
     {
-        var isAny = await Context.Hearings.AnyAsync(x => x.HearingOwner == userId
-                                                         && x.LocalEndDateTime >= startDateTime && x.LocalStartDateTime <= endDataTime);
+        var isAny = await Context
+            .Hearings
+            .AnyAsync(x => x.HearingOwner == userId
+                        && ((x.HearingStartDateTime >= startDateTime && x.HearingStartDateTime < endDateTime)
+                        || (x.HearingEndDateTime > startDateTime && x.HearingStartDateTime <= startDateTime)));
         return isAny;
     }
 
@@ -261,14 +289,6 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
     {
         var count = await Context.Hearings.CountAsync(x => x.HearingStartDateTime >= periodStart && x.HearingStartDateTime <= periodEnd);
         return count;
-    }
-
-    public async Task<bool> IsAssignedHearings(int userId, DateTime blockStart)
-    {
-        var isAnyAssigned = await Context
-            .Hearings
-            .AnyAsync(x => x.HearingOwner == userId && x.HearingStartDateTime.HasValue && x.HearingStartDateTime.Value.Date == blockStart.Date);
-        return isAnyAssigned;
     }
 
     public async Task<int> GetAssociatedHearingsCount(DateTime blockStart, DateTime blockEnd, int systemUserId)
@@ -289,33 +309,14 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
         return count;
     }
 
-    public async Task<List<int>> GetHearingsByHearingStartDate(DateTime startDate, DateTime endDate, List<int> disputeHearings)
+    public async Task<List<Hearing>> GetHearingsByHearingStartDate(DateTime startDate, DateTime endDate, List<int> disputeHearings)
     {
         var emptyHearings = await Context.Hearings
             .Where(x => x.HearingStartDateTime >= startDate && x.HearingStartDateTime <= endDate)
-            .Select(x => x.HearingId)
-            .Where(h => disputeHearings.All(dh => dh != h))
+            .Where(h => disputeHearings.All(dh => dh != h.HearingId))
             .ToListAsync();
 
         return emptyHearings;
-    }
-
-    public async Task<decimal> GetAvgNext10HearingDays(int dayInterval, byte hearingPriority, List<int> disputeHearings)
-    {
-        var totalDays = await Context
-            .Hearings
-            .Where(x => x.HearingStartDateTime >= DateTime.UtcNow.AddDays(dayInterval)
-                        && x.HearingPriority == hearingPriority && x.IsDeleted != true && !disputeHearings.Contains(x.HearingId))
-            .OrderBy(x => x.HearingStartDateTime)
-            .Take(10)
-            .Select(x => (x.HearingStartDateTime.Value - DateTime.UtcNow).TotalDays)
-            .ToListAsync();
-
-        var average = totalDays.Count > 0 ? totalDays.Average() : 0;
-
-        var res = decimal.Round((decimal)average, 2);
-
-        return res;
     }
 
     public async Task<List<Hearing>> GetReserveAvailableHearings(ReserveAvailableHearingsRequest request)
@@ -392,9 +393,107 @@ public class HearingRepository : CmRepository<Hearing>, IHearingRepository
         return result;
     }
 
-    public async Task<bool> IsBookedHearingByConferenceBridgeAndDate(int conferenceBridgeId, DateTime startTime, DateTime endTime)
+    public async Task<int> GetAssociatedBookedHearingsCount(DateTime blockStart, DateTime blockEnd, int systemUserId)
     {
-        var isExist = await Context.Hearings.AnyAsync(x => x.ConferenceBridgeId == conferenceBridgeId && startTime < x.LocalEndDateTime && endTime > x.LocalStartDateTime);
-        return isExist;
+        var count = await Context
+            .Hearings
+            .Include(x => x.DisputeHearings)
+            .CountAsync(x => x.DisputeHearings != null && x.DisputeHearings.Count > 0
+                             && x.HearingOwner == systemUserId
+                             && ((x.HearingStartDateTime.HasValue
+                                  && x.HearingStartDateTime.Value > blockStart
+                                  && x.HearingStartDateTime.Value < blockEnd)
+                                 || (x.HearingEndDateTime.HasValue
+                                     && x.HearingEndDateTime.Value > blockStart
+                                     && x.HearingEndDateTime.Value < blockEnd)
+                                 || (x.HearingStartDateTime.HasValue && x.HearingEndDateTime.HasValue
+                                    && x.HearingStartDateTime <= blockStart
+                                    && x.HearingEndDateTime >= blockEnd)));
+
+        return count;
+    }
+
+    public async Task<int?> GetHearingWaitTime(ExternalHearingWaitTimeRequest request)
+    {
+        var now = DateTime.UtcNow;
+
+        var days = await Context.Hearings
+            .Where(x => x.DisputeHearings.Count == 0
+                && x.HearingPriority == request.HearingPriority
+                && x.HearingStartDateTime.HasValue
+                && x.HearingStartDateTime >= now.AddDays(request.NoticeInterval))
+            .OrderBy(x => x.HearingStartDateTime)
+            .Take(request.AvgSetSize)
+            .Select(x => (x.HearingStartDateTime.Value - now).Days)
+            .ToListAsync();
+
+        if (days != null && days.Count > 0)
+        {
+            return days.Sum() / request.AvgSetSize;
+        }
+
+        return null;
+    }
+
+    public async Task<List<Hearing>> GetOnHoldHearings(OnHoldHearingsRequest request)
+    {
+        var predicate = PredicateBuilder.True<Hearing>();
+
+        predicate = predicate.And(x => x.DisputeHearings.Count == 0 && x.HearingReservedUntil >= DateTime.UtcNow);
+
+        if (request.MinHearingStartTime.HasValue)
+        {
+            predicate = predicate.And(x => x.LocalStartDateTime >= request.MinHearingStartTime);
+        }
+
+        if (request.MaxHearingEndTime.HasValue)
+        {
+            predicate = predicate.And(x => x.LocalEndDateTime <= request.MaxHearingEndTime);
+        }
+
+        if (request.FilterDisputeGuid.HasValue)
+        {
+            predicate = predicate.And(x => x.HearingReservedDisputeGuid == request.FilterDisputeGuid);
+        }
+
+        var hearings = await Context.Hearings
+            .Where(predicate)
+            .OrderBy(x => x.HearingStartDateTime)
+            .ToListAsync();
+
+        return hearings;
+    }
+
+    public async Task<int?> GetWaitTimeDays(byte urgency, int interval, int limit)
+    {
+        var topDate = await Context
+            .Hearings
+            .Include(x => x.DisputeHearings)
+            .Where(x => x.LocalStartDateTime > DateTime.Now.AddDays(interval)
+                        && !x.DisputeHearings.Where(dh => dh.IsDeleted != true).Select(dh => dh.HearingId).Contains(x.HearingId)
+                        && x.HearingPriority == urgency)
+            .Select(x => x.LocalStartDateTime)
+            .OrderBy(x => x.Value)
+            .Take(limit + 1)
+            .MaxAsync();
+
+        if (!topDate.HasValue)
+        {
+            return null;
+        }
+
+        var diff = topDate.DifferenceByDays(DateTime.Now);
+
+        return (int)diff;
+    }
+
+    public async Task<Hearing> GetHearingWithConferenceBridge(int hearingId)
+    {
+        var hearing = await Context
+            .Hearings
+            .Include(x => x.ConferenceBridge)
+            .FirstOrDefaultAsync(x => x.HearingId == hearingId);
+
+        return hearing;
     }
 }

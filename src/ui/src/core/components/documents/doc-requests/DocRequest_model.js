@@ -25,6 +25,7 @@ export default CMModel.extend({
 	  file_description_id: null,
 	  request_description: null,
 	  request_status: null,
+    request_sub_status: null,
 	  other_status_description: null,
     request_processing_time: null,
     request_source: null,
@@ -51,6 +52,7 @@ export default CMModel.extend({
     'outcome_doc_group_id',
     'file_description_id',
     'request_status',
+    'request_sub_status',
     'other_status_description',
     'request_processing_time',
     'request_source',
@@ -135,6 +137,10 @@ export default CMModel.extend({
       : `Other${this.get('request_type') ? ` (Type ${this.get('request_type')})` : ''}`
   },
 
+  isPastProcess() {
+    return this.get('request_sub_status') && this.get('request_sub_status') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_SUB_STATUS_PAST_PROCESS');
+  },
+
   isCorrection() {
     return this.get('request_type') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_TYPE_CORRECTION');
   },
@@ -159,6 +165,18 @@ export default CMModel.extend({
 
   isStatusCompleted() {
     return this.get('request_status') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_STATUS_COMPLETE');
+  },
+
+  isStatusWithdrawn() {
+    return this.get('request_status') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_STATUS_WITHDRAWN');
+  },
+
+  isStatusAbandoned() {
+    return this.get('request_status') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_STATUS_ABANDONED');
+  },
+
+  isStatusCancelledOrDeficient() {
+    return this.get('request_status') === configChannel.request('get', 'OUTCOME_DOC_REQUEST_STATUS_CANCELLED_OR_DEFICIENT');
   },
 
   isStatusOther() {

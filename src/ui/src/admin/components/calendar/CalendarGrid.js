@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Grid View that displays hearings by day. Used in the Daily, Personal, and My Schedule calendar views. Contains optional controlls for changing between day, month and year.
+ */
 import BaseCalendarGridView from './BaseCalendarGrid';
 import CalendarGridEventView from './CalendarGridEvent';
 import template from './CalendarGrid_template.tpl'

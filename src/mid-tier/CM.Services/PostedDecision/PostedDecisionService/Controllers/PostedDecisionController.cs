@@ -53,14 +53,14 @@ public class PostedDecisionController : Controller
     }
 
     [HttpGet("full-text/search")]
-    public async Task<IActionResult> FindByText(string query, int count = Pagination.DefaultPageSize, int index = 1)
+    public async Task<IActionResult> FindByText(string query, [FromQuery]PostedDecisionFullTextSearchRequest request, int count = Pagination.DefaultPageSize, int index = 0)
     {
         if (count == 0)
         {
             count = Pagination.DefaultPageSize;
         }
 
-        var searchResponse = await FullTextSearch(query, count, index);
+        var searchResponse = await FullTextSearch(query, request, count, index);
         if (searchResponse == null)
         {
             return Ok();
@@ -85,9 +85,9 @@ public class PostedDecisionController : Controller
 
         PostedDecisionSearchResponse searchResponse;
 
-        if (request.FileNumber != null)
+        if (!string.IsNullOrEmpty(request.AnonDecisionId))
         {
-            searchResponse = await FindByFileNumber((int)request.FileNumber, count, index);
+            searchResponse = await FindByAnonDecisionId(request.AnonDecisionId, count, index);
         }
         else
         {
@@ -259,17 +259,20 @@ public class PostedDecisionController : Controller
         return sb.ToString();
     }
 
-    private async Task<PostedDecisionSearchResponse> FindByFileNumber(int fileNumber, int count, int index)
+    private async Task<PostedDecisionSearchResponse> FindByAnonDecisionId(string anonDecisionId, int count, int index)
     {
         var searchResponse = new PostedDecisionSearchResponse();
 
         var postedDecisions = await _context.PostedDecisions
             .Include(p => p.PostedDecisionOutcomes)
-            .Where(p => p.FileNumber == fileNumber && p.IsDeleted != true)
+            .Where(p => p.AnonDecisionId == anonDecisionId && p.IsDeleted != true)
             .ToListAsync();
 
         var totalDatabaseRecords = await _context.PostedDecisions.CountAsync(x => x.IsDeleted != true);
-        var earliestRecordDate = await _context.PostedDecisions.Where(x => x.IsDeleted != true).MinAsync(x => x.DecisionDate);
+        var earliestRecordDate = await _context.PostedDecisions
+            .Where(x => x.IsDeleted != true)
+            .Select(x => (DateTime?)x.DecisionDate)
+            .MinAsync();
         searchResponse.EarliestRecordDate = earliestRecordDate.ToCmDateTimeString();
         searchResponse.TotalDatabaseRecords = totalDatabaseRecords;
 
@@ -291,8 +294,15 @@ public class PostedDecisionController : Controller
             searchResponse.TotalAvailableRecords = resultDecisions.Count;
 
             var totalDatabaseRecords = await _context.PostedDecisions.CountAsync(x => x.IsDeleted != true);
-            var earliestRecordDate = await _context.PostedDecisions.Where(x => x.IsDeleted != true).MinAsync(x => x.DecisionDate);
-            searchResponse.EarliestRecordDate = earliestRecordDate.ToCmDateTimeString();
+            if (totalDatabaseRecords > 0)
+            {
+                var earliestRecordDate = await _context.PostedDecisions
+                    .Where(x => x.IsDeleted != true)
+                    .Select(x => (DateTime?)x.DecisionDate)
+                    .MinAsync();
+                searchResponse.EarliestRecordDate = earliestRecordDate.ToCmDateTimeString();
+            }
+
             searchResponse.TotalDatabaseRecords = totalDatabaseRecords;
 
             resultDecisions = resultDecisions.AsQueryable().ApplyPaging(count, index).ToList();
@@ -321,65 +331,103 @@ public class PostedDecisionController : Controller
         }
     }
 
-    private async Task<PostedDecisionSearchResponse> FullTextSearch(string query, int count, int index)
+    private async Task<PostedDecisionSearchResponse> FullTextSearch(string query, PostedDecisionFullTextSearchRequest request, int count, int index)
     {
         var response = await _elasticClient.SearchAsync<PostedDecisionIndex>(
-            s => s.Query(q => q.QueryString(d => d.Query(query)))
-                .From((index - 1) * count)
-                .Size(count));
+            s =>
+                s.Query(q =>
+                q.QueryString(d => d.Query(query))));
 
         if (!response.IsValid)
         {
             return null;
         }
 
-        var postedDecisionId = await response.Documents
+        var postedDecisionIdList = await response.Documents
             .Select(x => x.PostedDecisionId)
             .Distinct()
             .ToListAsync();
 
-        if (postedDecisionId.Any())
+        var searchResponse = new PostedDecisionSearchResponse();
+
+        if (!postedDecisionIdList.Any())
         {
-            var resultDecisions = await _context.PostedDecisions
-                .Where(x => postedDecisionId.Contains(x.PostedDecisionId))
-                .Distinct()
-                .ToListAsync();
-
-            var searchResponse = new PostedDecisionSearchResponse
-            {
-                TotalAvailableRecords = response.Total
-            };
-
-            var totalDatabaseRecords = await _context.PostedDecisions
-                .CountAsync(x => x.IsDeleted != true);
-
-            var earliestRecordDate = await _context.PostedDecisions
-                .Where(x => x.IsDeleted != true)
-                .MinAsync(x => x.DecisionDate);
-
-            searchResponse.EarliestRecordDate = earliestRecordDate.ToCmDateTimeString();
-            searchResponse.TotalDatabaseRecords = totalDatabaseRecords;
-
-            foreach (var resultDecision in resultDecisions)
-            {
-                var resultDecisionOutcomes = await _context.PostedDecisionOutcomes
-                    .Where(p => p.PostedDecisionId == resultDecision.PostedDecisionId)
-                    .ToListAsync();
-
-                resultDecision.PostedDecisionOutcomes = new List<PostedDecisionOutcome>();
-
-                foreach (var resultDecisionOutcome in resultDecisionOutcomes)
-                {
-                    resultDecision.PostedDecisionOutcomes.Add(resultDecisionOutcome);
-                }
-            }
-
-            searchResponse.PostedDecisionResponses.AddRange(
-                _mapper.Map<List<Models.PostedDecision>, List<PostedDecisionResponse>>(resultDecisions));
-
             return searchResponse;
         }
 
-        return null;
+        var predicate = PredicateBuilder.True<Models.PostedDecision>();
+        predicate.And(x => postedDecisionIdList.Contains(x.PostedDecisionId) && x.IsDeleted == false);
+
+        if (request.ApplicationSubmittedDateGreaterThan != null)
+        {
+            predicate = predicate.And(x => request.ApplicationSubmittedDateGreaterThan <= x.ApplicationSubmittedDate);
+        }
+
+        if (request.ApplicationSubmittedDateLessThan != null)
+        {
+            predicate = predicate.And(x => request.ApplicationSubmittedDateLessThan <= x.ApplicationSubmittedDate);
+        }
+
+        if (request.DecisionDateGreaterThan != null)
+        {
+            predicate = predicate.And(x => request.DecisionDateGreaterThan <= x.DecisionDate);
+        }
+
+        if (request.DecisionDateLessThan != null)
+        {
+            predicate = predicate.And(x => request.DecisionDateLessThan <= x.DecisionDate);
+        }
+
+        if (request.PreviousHearingDateGreaterThan != null)
+        {
+            predicate = predicate.And(x => request.PreviousHearingDateGreaterThan <= x.PreviousHearingDate);
+        }
+
+        if (request.PreviousHearingDateLessThan != null)
+        {
+            predicate = predicate.And(x => request.PreviousHearingDateLessThan <= x.PreviousHearingDate);
+        }
+
+        var resultDecisionsCount = await _context.PostedDecisions
+            .Where(predicate)
+            .Distinct()
+            .CountAsync();
+
+        var resultDecisionsPaged = await _context.PostedDecisions
+            .Where(predicate)
+            .Distinct()
+            .ApplyPaging(count, index)
+            .ToListAsync();
+
+        var totalDatabaseRecords = await _context.PostedDecisions
+            .CountAsync(x => x.IsDeleted != true);
+
+        var earliestRecordDate = await _context.PostedDecisions
+            .Where(x => x.IsDeleted != true)
+            .Select(x => (DateTime?)x.DecisionDate)
+            .MinAsync();
+
+        searchResponse.TotalAvailableRecords = resultDecisionsCount;
+        searchResponse.EarliestRecordDate = earliestRecordDate.ToCmDateTimeString();
+        searchResponse.TotalDatabaseRecords = totalDatabaseRecords;
+
+        foreach (var resultDecision in resultDecisionsPaged)
+        {
+            var resultDecisionOutcomes = await _context.PostedDecisionOutcomes
+                .Where(p => p.PostedDecisionId == resultDecision.PostedDecisionId)
+                .ToListAsync();
+
+            resultDecision.PostedDecisionOutcomes = new List<PostedDecisionOutcome>();
+
+            foreach (var resultDecisionOutcome in resultDecisionOutcomes)
+            {
+                resultDecision.PostedDecisionOutcomes.Add(resultDecisionOutcome);
+            }
+        }
+
+        searchResponse.PostedDecisionResponses.AddRange(
+            _mapper.Map<List<Models.PostedDecision>, List<PostedDecisionResponse>>(resultDecisionsPaged));
+
+        return searchResponse;
     }
 }

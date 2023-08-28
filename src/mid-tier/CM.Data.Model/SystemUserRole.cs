@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace CM.Data.Model;
@@ -18,4 +19,6 @@ public class SystemUserRole
     [Required]
     [DefaultValue(900)]
     public int SessionDuration { get; set; }
+
+    public virtual ICollection<SystemUser> SystemUsers { get; set; }
 }

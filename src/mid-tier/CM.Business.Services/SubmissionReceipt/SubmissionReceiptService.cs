@@ -62,6 +62,26 @@ public class SubmissionReceiptService : CmServiceBase, ISubmissionReceiptService
         return submissionReceipt;
     }
 
+    public async Task<ExternalSubmissionReceiptResponse> GetExternalSubmissionReceipts(Guid disputeGuid, ExternalSubmissionReceiptRequest request, int count, int index)
+    {
+        if (count == 0)
+        {
+            count = int.MaxValue;
+        }
+
+        var result = new ExternalSubmissionReceiptResponse();
+
+        var(receipts, totalCount) = await UnitOfWork.SubmissionReceiptRepository.GetExternalSubmissionReceipts(disputeGuid, request);
+        if (receipts != null)
+        {
+            result.ExternalSubmissionReceipts = MapperService.Map<List<Data.Model.SubmissionReceipt>, List<ExternalSubmissionReceipt>>(receipts).ApplyPaging(count, index);
+        }
+
+        result.TotalAvailableRecords = totalCount;
+
+        return result;
+    }
+
     public async Task<DateTime?> GetLastModifiedDateAsync(object id)
     {
         var lastModifiedDate = await UnitOfWork.SubmissionReceiptRepository.GetLastModifiedDate((int)id);

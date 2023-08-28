@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - A bi-weekly calendar View for the working schedule
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import DragSelect from 'dragselect';
@@ -53,6 +56,7 @@ export default BaseCalendarGridView.extend({
       blockOwner: arbModel,
       periodModel: this.model.get('periodModel'),
       model: this.model,
+      loadedUserBlocks: this.model.get('scheduleBlocksCollection').filter(b => b.get('system_user_id') === arbModel?.id),
     }));
   },
 
@@ -94,6 +98,7 @@ export default BaseCalendarGridView.extend({
   },
 
   clickHeaderDate(ev) {
+    if (this.model.get('disableHeaderRouting')) return;
     const ele = $(ev.currentTarget);
     const date = ele.data('date');
     if (date) Backbone.history.navigate(routeParse('scheduled_hearings_daily_param_item', null, date), { trigger: true });
@@ -188,8 +193,6 @@ export default BaseCalendarGridView.extend({
       },
     });
 
-    this.dragSelects.forEach(ds => ds.stop());
-    this.dragSelects = [];
     this.renderDragSelectJs();
   },
 
@@ -265,40 +268,58 @@ export default BaseCalendarGridView.extend({
     });
   },
 
+  isElementInView(el) {
+    el = typeof jQuery === "function" && el instanceof $ ? el[0] : el;
+    const coords = el.getBoundingClientRect();
+    return (
+      coords.top >= 0 &&
+      coords.bottom <= (window.innerHeight || $(window).height())
+    );
+  },
+
   renderDragSelectJs() {
     if (this.model.get('disableSelection') || this.model.get('disabled')) {
-      this.dragSelects.forEach(ds => ds.stop());
+      this.dragSelects.forEach(ds => {
+        try { ds.stop(); } catch (err) {}
+      });
       return;
     }
-    
-    // If dragSelects have already been initialized, then just refresh the existing dragselects
-    if (this.dragSelects.length) {
-      this.dragSelects.forEach(ds => {
-        ds.setSelectables(ds._selectables);
-        ds.start();
-      });
-    } else {
-      const parentEleIterator = this.$('.calendar-grid-time-flex:not(.--disabled)');
-      const self = this;
-      parentEleIterator.each(function() {
-        const ds = new DragSelect({
-          selectables: $(this).find('.block-calendar__block').get(),
-          area: this,
-          multiSelectMode: false,
-          draggability: false,
-          immediateDrag: false,
-        });
-  
-        ds._parentEle = $(this);
-        ds._selectables = $(this).find('.block-calendar__block').get();
-        self.dragSelects.push(ds);
-      });
 
+    if (!this.dragSelects?.length) {
+      this.createDragSelects();
+    } else {
+      // Refresh drag selects, filter based on which ones are in view for the user
       this.dragSelects.forEach(ds => {
-        this.attachDragSelectHandlerSelectionStart(ds);
-        this.attachDragSelectHandlerSelectionComplete(ds);
+        if (this.isElementInView(ds._parentEle)) {
+          ds.setSelectables(ds._selectables);
+          ds.start();
+        } else {
+          try { ds.stop(); } catch (err) {}
+        }
       });
     }
+  },
+
+  createDragSelects() {
+    this.dragSelects = [];
+    const parentEleIterator = this.$('.calendar-grid-time-flex:not(.--disabled)');
+    const self = this;
+    parentEleIterator.each(function() {
+      const ds = new DragSelect({
+        selectables: $(this).find('.block-calendar__block').get(),
+        area: this,
+        multiSelectMode: false,
+        draggability: false,
+        immediateDrag: false,
+      });
+      ds._parentEle = $(this);
+      ds._selectables = $(this).find('.block-calendar__block').get();
+      self.dragSelects.push(ds);
+    });
+    this.dragSelects.forEach(ds => {
+      this.attachDragSelectHandlerSelectionStart(ds);
+      this.attachDragSelectHandlerSelectionComplete(ds);
+    });
   },
 
   attachDragSelectHandlerSelectionStart(ds) {
@@ -313,7 +334,6 @@ export default BaseCalendarGridView.extend({
   attachDragSelectHandlerSelectionComplete(ds) {
     const scheduleBlocksCollection = this.model.get('scheduleBlocksCollection');
     const arbPositionLookup = this.model.get('arbPositionLookup') || {};
-    const timezoneStr = configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING');
     const self = this;
     ds.subscribe("callback", function(callbackObj={}) {
       const dailySelectionOnly = self.model.get('dailySelectionOnly');
@@ -322,8 +342,8 @@ export default BaseCalendarGridView.extend({
       let firstSelect = selected.length ? selected[0] : null;
       let lastSelect = selected.length ? selected[selected.length-1] : null;
       if (!firstSelect || !lastSelect) return ds.clearSelection();
-      const firstStartMoment = Moment(firstSelect.dataset.startDatetime);
-      const lastStartMoment = Moment(lastSelect.dataset.startDatetime);
+      const firstStartMoment = Moment.tz(firstSelect.dataset.startDatetime, self.RTB_OFFICE_TIMEZONE_STRING);
+      const lastStartMoment = Moment.tz(lastSelect.dataset.startDatetime, self.RTB_OFFICE_TIMEZONE_STRING);
       if (!firstStartMoment.isValid() || !lastStartMoment.isValid()) return ds.clearSelection();
       if (firstStartMoment.isAfter(lastStartMoment, 'minutes')) {
         selected.reverse();
@@ -334,21 +354,18 @@ export default BaseCalendarGridView.extend({
       const arbPositionId = firstSelect.dataset.arbPositionId;
       const blockOwner = arbPositionLookup[arbPositionId];
       const blocksForSameOwner = scheduleBlocksCollection.filter(block => block.get('system_user_id') === blockOwner.id);
-      const nowMoment = Moment();
       const validBlocks = [];
       
       let unselectAllNext = false;
       const selectablesToRemove = selected.filter(selectedItem => {
         if (unselectAllNext) return true;
 
-        const itemStart = Moment(selectedItem.dataset.startDatetime);
-        // Check for past blocks
-        if (itemStart.isBefore(nowMoment)) return true;
-
+        const itemStart = Moment.tz(selectedItem.dataset.startDatetime, self.RTB_OFFICE_TIMEZONE_STRING);
+        
         // Check for conflicts with existing blocks for same user
-        if (blocksForSameOwner.find(block => (
-          Moment(block.get('block_start')).isSameOrBefore(itemStart, 'minutes')
-          && Moment(block.get('block_end')).isAfter(itemStart, 'minutes')
+        if (selected.length > 1 && blocksForSameOwner.find(block => (
+          Moment.tz(block.get('block_start'), self.RTB_OFFICE_TIMEZONE_STRING).isSameOrBefore(itemStart, 'minutes')
+          && Moment.tz(block.get('block_end'), self.RTB_OFFICE_TIMEZONE_STRING).isAfter(itemStart, 'minutes')
         ))) {
           unselectAllNext = true;
           return true;
@@ -359,14 +376,14 @@ export default BaseCalendarGridView.extend({
 
       // Then, filter again to apply daily restrictions.  Two-stage filter results in more intuitive UX when user
       // selects multiple types of invalid blocks within one selection
-      const selectionStartDay = validBlocks.length ? Moment.tz(validBlocks[0].dataset.startDatetime, timezoneStr).day() : null;
+      const selectionStartDay = validBlocks.length ? Moment.tz(validBlocks[0].dataset.startDatetime, self.RTB_OFFICE_TIMEZONE_STRING).day() : null;
       const validBlocksFinal = [];
       unselectAllNext = false;
       const dailySelectablesToRemove = validBlocks.filter(selectedItem => {
         if (unselectAllNext) return true;
         const itemStart = Moment(selectedItem.dataset.startDatetime);
         // Check for a daily block selecting the next day(s)
-        if (dailySelectionOnly && Moment.tz(itemStart, timezoneStr).day() !== selectionStartDay) {
+        if (dailySelectionOnly && Moment.tz(itemStart, self.RTB_OFFICE_TIMEZONE_STRING).day() !== selectionStartDay) {
           unselectAllNext = true;
           return true;
         }

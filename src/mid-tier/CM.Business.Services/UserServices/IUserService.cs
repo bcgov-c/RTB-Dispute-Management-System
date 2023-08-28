@@ -40,4 +40,6 @@ public interface IUserService : IServiceBase
     Task<SystemUser> CreateUpdateSmUser(string username, string email, string displayName, Guid userGuid, int roleId);
 
     Task<bool> UserIsActiveAdmin(int systemUserId);
+
+    Task<List<RecentLoginsResponse>> GetRecentLogins(int userId);
 }

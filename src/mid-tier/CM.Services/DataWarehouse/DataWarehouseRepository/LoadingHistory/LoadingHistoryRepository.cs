@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CM.Common.Utilities;
 using CM.Services.DataWarehouse.DataWarehouseDataModel;
 using CM.Services.DataWarehouse.DataWarehouseRepository.Base;
 using Microsoft.EntityFrameworkCore;
@@ -14,13 +15,16 @@ public class LoadingHistoryRepository : DwRepository<CM.Services.DataWarehouse.D
     {
     }
 
-    public async Task<DateTime?> GetLastLoadStartDateTime()
+    public async Task<DateTime?> GetLastLoadStartDateTime(int factTableId)
     {
-        var isAny = await Context.LoadingHistories.AnyAsync();
+        var isAny = await Context.LoadingHistories.AnyAsync(x => x.FactTableId == factTableId);
 
         if (isAny)
         {
-            var history = await Context.LoadingHistories.OrderByDescending(x => x.LoadingEventId).FirstOrDefaultAsync();
+            var history = await Context
+                .LoadingHistories
+                .OrderByDescending(x => x.LoadingEventId)
+                .FirstOrDefaultAsync(x => x.FactTableId == factTableId);
             return history.LoadStartDateTime;
         }
 

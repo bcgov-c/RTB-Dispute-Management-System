@@ -29,10 +29,13 @@
 <div class="<%= isLoaded ? '': 'hidden' %>">
   <div class="dispute-flags"></div>
   <div class="documents-section">
-    <div id="documents-dispute-files">
+    <div id="documents-dispute-files" class="<%= isCollapsed ? 'collapsed' : '' %>">
 
       <div class="page-section-title-container">
         <span class="page-section-title">Dispute Files</span>
+        <% if (enableCollapse) { %>
+          <span class="dispute-section-title-add collapse-icon <%= isCollapsed ? 'collapsed' : '' %>"></span>
+        <% } %>
       </div>
       
       <div class="general-filter-container dispute-files-filters-container hidden-print clearfix">
@@ -57,6 +60,9 @@
   <div class="deficient-dispute-documents-list-container">
     <div class="page-section-title-container">
       <span class="page-section-title">Removed / Deficient Files</span>
+      <% if (enableCollapse2) { %>
+        <span class="dispute-section-title-add collapse-icon <%= isCollapsed2 ? 'collapsed' : '' %>"></span>
+      <% } %>
     </div>
     <div class="deficient-dispute-documents-list"></div>
   </div>

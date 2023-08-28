@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays, and contains functionality for hearings on the CalendarGrid
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import CalendarGridEventMenuView from './CalendarGridEventMenu';
@@ -21,11 +24,17 @@ export default Marionette.View.extend({
 
   ui: {
     eventText: '.calendar-grid-event-text.clickable',
+    onHoldText: '.calendar-on-hold-filenumber.clickable',
     openTodayFiles: '.today-calendar-event-link'
   },
 
   events: {
-    'click @ui.eventText': 'clickEventText'
+    'click @ui.eventText': 'clickEventText',
+    'click @ui.onHoldText': 'clickOnHoldText'
+  },
+
+  clickOnHoldText() {
+    Backbone.history.navigate(routeParse('overview_item', this.model.get('hearing_reserved_dispute_guid')), { trigger: true });
   },
 
   clickEventText() {
@@ -36,6 +45,12 @@ export default Marionette.View.extend({
     Backbone.history.navigate(routeParse('overview_item', this.primaryDisputeHearing.get('dispute_guid')), { trigger: true });
   },
 
+  /**
+   * @param {BlockCalendarGridModel} calendarModel
+   * @param {Number} gridCellWidth - Width of hearing item on the calendar view in PX
+   * @param {Boolean} isToday
+   * @param {Function} calendarItemMenuFn - Function that returns an array of objects containing menu options. E.G: [{ menuLabel: "", event: "" }]
+   */
   initialize(options) {
     this.mergeOptions(options, ['calendarModel', 'gridCellWidth', 'isToday', 'calendarItemMenuFn']);
     this.calendarItemMenuFn = _.isFunction(this.calendarItemMenuFn) ? this.calendarItemMenuFn : () => {};
@@ -144,7 +159,6 @@ export default Marionette.View.extend({
     clearInterval(this.interval);
   },
 
-
   setupViewListeners() {
     const menuView = this.getChildView('menuRegion');
     const linkMenuRegion = this.getChildView('linkMenuRegion');
@@ -177,6 +191,7 @@ export default Marionette.View.extend({
     return {
       text: this.text,
       hasDisputeGuid: !!(this.primaryDisputeHearing && this.primaryDisputeHearing.get('dispute_guid')),
+      onHoldFileNumber: this.model.get('hearing_reserved_file_number') || null,
       cssClass: (this.text ? `calendar-grid-event-bg${priority}--dark` : `calendar-grid-event-bg${priority}--light`)
         + (this.model.isFaceToFace() ? ' calendar-grid-event--f2f' : '')
         + (this.linkMenuOptions && this.linkMenuOptions.length ? ' calendar-grid-event--linked' : ''),

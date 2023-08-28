@@ -9,6 +9,8 @@ public class AuditLog
 
     public Guid? DisputeGuid { get; set; }
 
+    public Dispute Dispute { get; set; }
+
     public int? AssociatedRecordId { get; set; }
 
     [StringLength(10)]

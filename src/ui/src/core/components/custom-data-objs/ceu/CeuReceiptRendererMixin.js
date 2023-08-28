@@ -83,12 +83,12 @@ export default {
         <table style={{ width: '100%' }}>
         <tr><td>
           {this.model.get('reference_id') ? <p className="listitem">File Number:&nbsp;<b>{this.model.get('reference_id')}</b></p> : null}
-          
-          {options.renderAsStaffDoc ? <p className="listitem">Submitted:&nbsp;<b>{Formatter.toDateAndTimeDisplay(this.currentSubmissionData?.g_submitted_date) || '-'}</b></p> : null}
-          
+          <p className="listitem">Submitted:&nbsp;<b>{Formatter.toFullDateAndTimeDisplay(this.currentSubmissionData?.g_submitted_date) || '-'}</b></p>
           <p className="listitem">Complainant Type:&nbsp;<b>{isRespondentLandlord  ? 'Tenant (or tenant advocate)' : 'Landlord'}</b></p>
+          {this.currentSubmissionData.g_contact_email ? <p className="listitem">Confirmation Email:&nbsp;<b>{this.currentSubmissionData.g_contact_email}</b></p> : null}
           <p className="listitem">Respondent Type:&nbsp;<b>{isRespondentLandlord  ? 'Landlord' : 'Tenant (or tenant advocate)'}</b></p>
           <p className="listitem">Act:&nbsp;<b>{IntakeCeuDataParser.isMHPTA() ? 'MHPTA' : 'RTA'}</b></p>
+          {options?.showIntakeMode ? null : <p className="listitem">Codes:&nbsp;{this.contraventions.map(c => c.get('c_code')).join(', ')}</p>}
           <p className="listitem">Indicated immediate risk:&nbsp;<b>{this.currentSubmissionData?.g_complaint_is_emergency ? 'Yes' : 'No'}</b></p>
         </td></tr>
         </table>
@@ -102,9 +102,6 @@ export default {
           <table style={{ width: '100%' }}>
           <tr><td>
             <p className="staff-title"><b>Synopsis</b></p>
-          </td></tr>
-          <tr><td>
-            <p className="listitem">Codes: {this.contraventions.map(c => c.get('c_code')).join(', ')}</p>
           </td></tr>
           <tr><td>
             <p className="listitem">Urgency regarding health safety housing:</p>
@@ -444,14 +441,23 @@ export default {
       {this.model.get('reference_id') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
         <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>File Number: </span><b>{this.model.get('reference_id')}</b>
       </p> : null}
+      {options?.showIntakeNav ? null : <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
+        <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Submitted: </span>{Formatter.toFullDateAndTimeDisplay(this.currentSubmissionData?.g_submitted_date) || '-'}
+      </p>}
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
         <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Complainant Type: </span>{isRespondentLandlord  ? 'Tenant (or tenant advocate)' : 'Landlord'}
       </p>
+      {this.currentSubmissionData.g_contact_email ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
+        <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Confirmation Email: </span>{this.currentSubmissionData.g_contact_email}
+      </p> : null}
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
         <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Respondent Type: </span>{isRespondentLandlord  ? 'Landlord' : 'Tenant (or tenant advocate)'}</p>
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
         <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Act: </span>{IntakeCeuDataParser.isMHPTA() ? 'MHPTA' : 'RTA'}
       </p>
+      {options?.showIntakeMode ? null : <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
+        <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Codes: </span>{this.contraventions.map(c => c.get('c_code')).join(', ')}
+      </p>}
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
         <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Indicated immediate risk: </span>{this.currentSubmissionData?.g_complaint_is_emergency ? 'Yes' : 'No'}
       </p>
@@ -492,7 +498,7 @@ export default {
     <div style={{ marginTop: '40px' }}>
       <h4 className="er-title" style={{borderBottom: '1px solid #e3e3e3', margin: '0 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}>
         <span className="er-darktext" style={{ color: '#292929' }}><b>Complainants</b>&nbsp;(who filled the complaint)</span>
-        {options.showIntakeNav ? <a href="#page/2" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
+        {options?.showIntakeMode && options?.showIntakeNav ? <a href="#page/2" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
       </h4>
 
       {this.submitters.map(applicant => this.renderJsxParticipant(applicant, `Your Contact Information`))}
@@ -528,7 +534,7 @@ export default {
     <div style={{ marginTop: '40px' }}>
       <h4 className="er-title" style={{borderBottom: '1px solid #e3e3e3', margin: '0 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}>
         <span className="er-darktext" style={{ color: '#292929' }}><b>Respondents</b>&nbsp;(who are causing the issues)</span>
-        {options.showIntakeNav ? <a href="#page/4" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
+        {options?.showIntakeMode && options?.showIntakeNav ? <a href="#page/4" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
       </h4>
       {this.respondents.map(r => this.renderJsxParticipant(r, participantMainTypeDisplay))}
     </div>;
@@ -602,7 +608,7 @@ export default {
         {this.units.map((unit, index) => {
           return <div className="review-unit" >
             <p className="listitem"><b>Specified Rental Unit {Formatter.toLeftPad(index+1)}</b></p>
-            <p className="listitem">Address:&nbsp;<b>{unit.getStreetDisplayWithDescriptor()}</b></p>
+            <p className="listitem">Address:&nbsp;<b>{unit.getStreetDisplayWithCityAndPostal()}</b></p>
             {!isMHPTA ? <p className="listitem">Shared Address:&nbsp;{unit.get('r_tenancy_unit_type') ? 'Yes' : 'No'}</p> : null}
             <p className="listitem">Associated Complainants:&nbsp;<b>{this.getUnitTenantsDisplay(unit.getParticipantIds())}</b></p>
             <p className="listitem">Tenancy Ended:&nbsp;<b>{unit.get('r_tenancy_ended') ? `Yes - ${Formatter.toDateDisplay(unit.get('r_tenancy_end_date'))}` : 'No'}</b></p>
@@ -625,7 +631,7 @@ export default {
     <div style={{ marginTop: '40px' }}>
       <h4 className="er-title" style={{borderBottom: '1px solid #e3e3e3', margin: '0 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}>
         <span className="er-darktext" style={{ color: '#292929' }}><b>Rental Units/Sites</b>&nbsp;(associated with this complaint)</span>
-        {options.showIntakeNav ? <a href="#page/5" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
+        {options?.showIntakeMode && options?.showIntakeNav ? <a href="#page/5" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
       </h4>
 
       <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>
@@ -641,7 +647,7 @@ export default {
             </p>
             <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
               <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Address:</span>
-              <span>{unit.getStreetDisplayWithDescriptor()}</span>
+              <span>{unit.getStreetDisplayWithCityAndPostal()}</span>
             </p>
             {!isMHPTA ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 0px 0px'}}>
               <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Shared Address:</span>
@@ -686,7 +692,7 @@ export default {
     <div style={{ marginTop: '40px' }}>
       <h4 className="er-title" style={{borderBottom: '1px solid #e3e3e3', margin: '0 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}>
         <span className="er-darktext" style={{ color: '#292929' }}><b>Contraventions</b></span>
-        {options.showIntakeNav ? <a href="#page/6" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
+        {options?.showIntakeMode && options?.showIntakeNav ? <a href="#page/6" style={{ marginLeft: '15px'}} className="general-link">edit</a> : null}
       </h4>
 
       {this.contraventions.map((contravention, index) => {

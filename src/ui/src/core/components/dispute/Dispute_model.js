@@ -33,6 +33,7 @@ export default CMModel.extend({
     initial_payment_date: null,
     initial_payment_method: null,
     tenancy_address: null,
+    tenancy_address_validated: null,
     tenancy_city: null,
     tenancy_country: null,
     tenancy_zip_postal: null,
@@ -61,6 +62,7 @@ export default CMModel.extend({
     creation_method: null,
     submitted_date: null,
     submitted_by: null,
+    created_by: null,
     modified_date: null,
     modified_by: null,
 
@@ -90,6 +92,8 @@ export default CMModel.extend({
         filter_noteCreatedBy: null,
         filter_emailType: null
       },
+
+      collapseSettings: null,
     },
 
     editInProgress: null,
@@ -123,6 +127,7 @@ export default CMModel.extend({
     'initial_payment_date',
     'initial_payment_method',
     'tenancy_address',
+    'tenancy_address_validated',
     'tenancy_city',
     'tenancy_country',
     'tenancy_zip_postal',
@@ -215,6 +220,10 @@ export default CMModel.extend({
 
   hasSecurityDeposit() {
     return this.get('security_deposit_amount');
+  },
+
+  getDepositAmount() {
+    return ((Number(this.get('security_deposit_amount')) || 0) + (Number(this.get('pet_damage_deposit_amount')) || 0)) || 0;
   },
 
   hasPetDeposit() {
@@ -312,12 +321,11 @@ export default CMModel.extend({
     return !!this.get('submitted_date');
   },
 
-  getFullAddressString(options={}) {
+  getCityCountryPostalString() {
     return [
-      ...options.withoutAddress ? [] : $.trim(this.get('tenancy_address')),
-      $.trim(this.get('tenancy_city')),
-      $.trim(this.get('tenancy_country')),
-      $.trim(this.get('tenancy_zip_postal'))
+      (this.get('tenancy_city')||'').trim(),
+      (this.get('tenancy_country')||'').trim(),
+      (this.get('tenancy_zip_postal')||'').trim(),
     ].join(', ');
   },
 
@@ -331,6 +339,27 @@ export default CMModel.extend({
   getAddressStringWithUnit() {
     const unitTypeToDisplay = this.getDisputeUnitTypeDisplay();
     return `${unitTypeToDisplay ? `(${unitTypeToDisplay}) ` : ''}${this.getAddressString()}`;
+  },
+
+  getFullAddressString() {
+    const unitTypeToDisplay = this.getDisputeUnitTypeDisplay();
+    const addressDisplay = `${unitTypeToDisplay ? `(${unitTypeToDisplay}) ` : ''}${(this.get('tenancy_address')||'').trim()}`;
+    return [
+      addressDisplay,
+      (this.get('tenancy_city')||'').trim(),
+      "BC",
+    ].join(', ');
+  },
+
+  getCompleteAddress() {
+    const unitTypeToDisplay = this.getDisputeUnitTypeDisplay();
+    return `${unitTypeToDisplay ? `(${unitTypeToDisplay}) ` : ''}${[
+      (this.get('tenancy_address')||'').trim(),
+      (this.get('tenancy_city')||'').trim(),
+      "British Columbia",
+      (this.get('tenancy_country')||'').trim(),
+      (this.get('tenancy_zip_postal')||'').trim(),
+    ].join(', ')}`;
   },
 
   getDisputeUnitTypeDisplay() {
@@ -363,7 +392,8 @@ export default CMModel.extend({
     if (_.isNumber(statuses)) {
       statuses = [statuses];
     }
-    return _.contains(stages, this.getStage()) && _.contains(statuses, this.getStatus());
+    return (stages?.length ? stages.includes(this.getStage()) : true) &&
+      (statuses?.length ? statuses.includes(this.getStatus()) : true);
   },
 
   startEditInProgress(editModel) {
@@ -418,23 +448,36 @@ export default CMModel.extend({
     });
   },
 
-  saveStatus(attrs) {
-    const dfd = $.Deferred(),
-      self = this;
-
-    const existing_status = _.pick(this._getStatusObj(), this.API_STATUS_ATTRS);
-    const statusModel = new DisputeStatusModel(_.extend(
-      { dispute_guid: this.id },
-      existing_status,
-      attrs
+  saveStatus(attrs={}) {
+    const dfd = $.Deferred();
+    const existingSSPO = this._getStatusObj() || {};
+    const statusModel = new DisputeStatusModel(Object.assign({
+      dispute_guid: this.id,
+      // Status changes must always involve at least stage, status, owner, or process - always pass dispute status from UI change
+      dispute_status: existingSSPO?.dispute_status,
+    },
+      // Due to a mid-tier bug, some status attributes have to be re-sent or they will be cleared out
+      existingSSPO?.evidence_override ? { evidence_override: existingSSPO.evidence_override } : null,
+      existingSSPO?.status_note ? { status_note: existingSSPO.status_note } : null,
+      // Always overwrite with the passed-in user data
+      attrs,
     ));
-    statusModel.save().done(function(status_response) {
-      self.set('status', status_response);
-      _.extend(self.get('_originalData'), { status: status_response });
-      dfd.resolve(status_response);
-    }).fail(dfd.reject);
+    
+    const noChanges = !Object.keys(attrs)?.length || Object.keys(attrs).every(key => (
+      // SSPO values are all false-y 0/""/null all have the same meaning
+      (String(existingSSPO?.[key]) === String(attrs?.[key])) || (!existingSSPO?.[key] && !attrs?.[key])
+    ));
 
-    return dfd.promise();
+    if (noChanges) {
+      return $.Deferred().resolve(existingSSPO).promise();
+    } else {
+      statusModel.save().done((response={}) => {
+        this.set('status', response);
+        _.extend(this.get('_originalData'), { status: response });
+        dfd.resolve(response);
+      }).fail(dfd.reject);
+      return dfd.promise();
+    }
   },
 
   triggerPageRefresh() {

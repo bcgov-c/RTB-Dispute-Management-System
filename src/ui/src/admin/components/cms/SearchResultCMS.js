@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Displays search results for CMS advanced search
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';

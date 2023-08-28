@@ -69,4 +69,13 @@ public class FileResponse : CommonResponse
 
     [JsonProperty("storage")]
     public StorageType Storage { get; set; }
+
+    [JsonProperty("is_source_file_deleted")]
+    public bool IsSourceFileDeleted { get; set; }
+
+    [JsonProperty("file_meta_summary")]
+    public string FileMetaSummary { get; set; }
+
+    [JsonIgnore]
+    public bool? IsDeleted { get; set; }
 }

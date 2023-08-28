@@ -63,4 +63,7 @@ public class OutcomeDocRequestResponse : CommonResponse
 
     [JsonProperty("request_source")]
     public byte? RequestSource { get; set; }
+
+    [JsonProperty("request_sub_status")]
+    public byte? RequestSubStatus { get; set; }
 }

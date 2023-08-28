@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal that has functionality for rescheduling a booked hearing to another empty hearing
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import HearingCollection from '../../../../../core/components/hearing/Hearing_collection';
@@ -105,7 +108,8 @@ export default ModalBaseView.extend({
     return is_valid;
   },
 
-  initialize() {
+  initialize(options) {
+    this.mergeOptions(options, ['title', 'deleteHearing', 'deleteAfterReschedule']);
     this.hearingResultsCollection = null;
     this.forceHideLoadMore = false;
     this.isAdjourned = false;
@@ -303,6 +307,7 @@ export default ModalBaseView.extend({
     this.showChildView('searchResultsRegion', new RescheduleHearingListView({
       parentModalView: this,
       hearingModel: this.model,
+      deleteAfterReschedule: this.deleteAfterReschedule,
       collection: this.hearingResultsCollection,
     }));
   },
@@ -310,7 +315,8 @@ export default ModalBaseView.extend({
   templateContext() {
     return {
       showLoadMore: this.hearingResultsCollection && this.hearingResultsCollection.length &&
-        this.count && this.hearingResultsCollection.length === this.count && !this.forceHideLoadMore
+        this.count && this.hearingResultsCollection.length === this.count && !this.forceHideLoadMore,
+      title: this.title || 'Reschedule Hearing'
     };
   }
 

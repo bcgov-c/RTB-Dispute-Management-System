@@ -11,7 +11,6 @@ using CM.Data.Model;
 using CM.FileSystem.Service;
 using CM.FileSystem.Service.FileHelper;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using static System.Net.Mime.MediaTypeNames;
@@ -86,7 +85,7 @@ public class CommonFileController : BaseController
         FileUtils.CheckIfNotExistsCreate(Path.GetDirectoryName(absolutePath));
         System.IO.File.Move(file.TemporaryLocation, absolutePath);
 
-        ThumbnailHelper.Create(absolutePath, await _systemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
+        await ThumbnailHelper.CreateAsync(absolutePath, file.ContentType, await _systemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
 
         return Ok(newFile);
     }
@@ -198,5 +197,14 @@ public class CommonFileController : BaseController
         }
 
         return NotFound();
+    }
+
+    [HttpGet]
+    [Route("/api/externalcommonfiles")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.User, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalCommonFiles(int count, int index)
+    {
+        var externalCommonFiles = await _commonFileService.GetExternalCommonFiles(count, index);
+        return Ok(externalCommonFiles);
     }
 }

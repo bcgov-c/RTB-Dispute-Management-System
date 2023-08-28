@@ -19,7 +19,7 @@
           <div style="padding-top: 10px; padding-left: 14px;	padding-bottom: 10px; background-color: #003366; border-bottom: 1px solid #fcba19;" align="left">
             <p style="font-size:18px; font-weight:normal; color:#FFF; padding: 0px 0px 0px 0px; 	margin: 0px; font-style: normal;">
               <img style="position:relative; top:2px; width:95px; height:65px; -ms-interpolation-mode: bicubic;" src="<%= COMMON_IMAGE_ROOT + 'BCLogoBlue.jpg'%>" alt="BC Logo" width="95" height="65" />
-              <span>Residential Tenancies</span>
+              <span style="font-size: 18px">Residential Tenancies</span>
             </p>
           </div>
 

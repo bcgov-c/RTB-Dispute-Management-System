@@ -98,8 +98,8 @@ export default PageView.extend({
     const dispute = disputeChannel.request('get');
     const respondents = participantsChannel.request('get:respondents');
     this.intakeRespondents = new IntakeParticipantCollection(respondents.map(function(respondent) {
-      return { participantModel: respondent, noPackageProvision: true };
-    }), { participantCollection: respondents, isRespondent: true });
+      return { participantModel: respondent, noPackageProvision: true, useMailAddressValidation: true, useAddressValidation: true };
+    }), { participantCollection: respondents, isRespondent: true, noPackageProvision: true, useMailAddressValidation: true, useAddressValidation: true });
 
     const respondentCountModel = this.getPageItem('respondentCount').getModel();
     // Select the larger of the API-loaded respondents, or the current value of the user-answered question
@@ -345,7 +345,6 @@ export default PageView.extend({
     // Track respondents that are removed
     this.listenTo(respondentCollection, 'remove', function(removed_intake_respondent) {
       self.intake_respondents_to_remove.push(removed_intake_respondent);
-      self.intake_respondents_to_remove.push(removed_intake_respondent);
     });
 
     // Setup deletes / removal listeners
@@ -484,11 +483,15 @@ export default PageView.extend({
       }
     });
 
-    _.each(this.intake_respondents_to_remove, function(intake_respondent_to_remove) {
+    const removedIds = {};
+    this.intake_respondents_to_remove.forEach(intake_respondent_to_remove => { 
       const respondent = intake_respondent_to_remove.get('participantModel');
       if (respondent.isNew()) {
-        console.log(`[Warning] Trying to remove an respondent that has not been saved, skip removal`, respondent);
+        console.log(`[Warning] Trying to remove a respondent that has not been saved, skip removal`, respondent);
+      } else if (removedIds[respondent?.id]) {
+        console.log(`[Warning] Trying to remove the same respondent twice, skip removal`, respondent);
       } else {
+        removedIds[respondent?.id] = true;
         all_xhr.push(_.bind(participantsChannel.request, participantsChannel, 'delete:participant', respondent));
       }
     });

@@ -272,20 +272,6 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
   max-width: 1200px;
 }
 
-.page-item-container > .warning {
-  margin: -20px 15px 20px 0px;
-  padding: 10px 10px 10px 50px;
-  line-height: 22px;
-  background-color: #fff6e5;
-  background-image: url("../../core/static/Icon_Warning.png");
-  background-position: left 5px center;
-  background-repeat: no-repeat;
-  max-width: 1230px;
-  color: #666;
-  font-size: 16px;
-}
-
-
 .step-description {
   font-size: 19px;
   color: #343434;
@@ -908,6 +894,8 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
   }
 
   .intake-claim .notice-method select { max-width: 260px; }
+
+  .modalIntakeContactWarning .modal-dialog { width: auto; }
 }
 
 /* Mobile css */
@@ -935,6 +923,12 @@ span.glyphicon.glyphicon-calendar.calendar-icon { margin-right: 3px; margin-left
 
   #menu.mobile-render {
     display: block;
+  }
+
+  .mobile-render .menu-steps-title {
+    color: #fff;
+    padding-bottom: 3px;
+    padding-left: 3px;
   }
 
   #menu .menu-container {

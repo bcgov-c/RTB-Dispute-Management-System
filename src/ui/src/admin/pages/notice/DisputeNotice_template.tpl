@@ -48,6 +48,26 @@
 
     <div class="notice-other-delivery-description <%= showNoticeOtherDelivery ? '' : 'hidden' %>"></div>
 
+    <% if (service_deadline_date || second_service_deadline_date) { %>
+      <% var deadlineInFuture = Moment(service_deadline_date).isAfter(Moment()) %>
+      <% var secondDeadlineInFuture = Moment(second_service_deadline_date).isAfter(Moment()) %>
+      <div class="notice-ars-deadlines <%= has_service_deadline ? 'notice-ars-deadlines--enabled' : 'notice-ars-deadlines--disabled' %>">
+        <div class="notice-ars-deadline"><b>ARS Deadlines <%= has_service_deadline ? '' : 'Removed' %></b></div>
+        <div class="">
+          <label>Declaration Deadline:</label><span class="<%=
+            has_service_deadline && hasUnservedServices && !deadlineInFuture ? 'error-red'
+            : has_service_deadline && (!hasUnservedServices || deadlineInFuture) ? 'success-green'
+            : '' %>">
+            <%= Formatter.toDateAndTimeDisplay(service_deadline_date) %></span>
+          &nbsp;-&nbsp;
+          <label>Reinstatement Deadline:</label><span class="<%=
+            has_service_deadline && hasUnservedServices && !secondDeadlineInFuture ? 'error-red'
+            : has_service_deadline  && (!hasUnservedServices || secondDeadlineInFuture) ? 'success-green'
+            : '' %>">
+            <%= Formatter.toDateAndTimeDisplay(second_service_deadline_date) %></span>
+        </div>
+      </div>
+      <% } %>
   </div>
 </div>
 

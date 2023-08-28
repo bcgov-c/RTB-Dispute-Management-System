@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View for bypassing payments via the fee waiver process. Contains functionality for verifying fee waiver eligibility, and proof files upload.
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';

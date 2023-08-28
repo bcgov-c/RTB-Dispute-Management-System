@@ -13,8 +13,11 @@ import { DecisionSearch } from './decisions-search/DecisionSearch';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 
 const DEFAULT_DECISION_DISPLAY_AMOUNT = 10;
-const RADIO_CODE_PROPERTIES = 0;
-const RADIO_CODE_FREE_TEXT = 1;
+export const RADIO_FILTER_CODES = {
+  PROPERTIES: 1,
+  FREE_TEXT: 2,
+  DECISION_ID: 3,
+};
 
 const PostedDecisions = Marionette.View.extend({
   initialize(options) {
@@ -23,7 +26,6 @@ const PostedDecisions = Marionette.View.extend({
     this.createSubModels();
     this.createSubViews();
     this.setupListeners();
-    this.decisionData = '';
     this.count = DEFAULT_DECISION_DISPLAY_AMOUNT;
     this.animationChannel = Radio.channel('animations');
     this.Formatter = Radio.channel('formatter').request('get');
@@ -47,7 +49,7 @@ const PostedDecisions = Marionette.View.extend({
   createSubModels() {
     this.disputeTypeFiltersModel = new RadioModel({
       optionData: this.getDisputeFilters(),
-      value: RADIO_CODE_PROPERTIES,
+      value: RADIO_FILTER_CODES.PROPERTIES,
     });
   },
 
@@ -58,7 +60,7 @@ const PostedDecisions = Marionette.View.extend({
     this.listenTo(this.model, 'form:disabled', (decisionData) => {
       this.searchButtonDisabled = true;
       this.searchResultsHidden = false;
-      this.disputeTypeFiltersModel.set({ valuesToDisable: [RADIO_CODE_PROPERTIES ,RADIO_CODE_FREE_TEXT] });
+      this.disputeTypeFiltersModel.set({ valuesToDisable: [RADIO_FILTER_CODES.PROPERTIES, RADIO_FILTER_CODES.FREE_TEXT, RADIO_FILTER_CODES.DECISION_ID] });
       this.loadFilteredDecisions(decisionData);
     });
   },
@@ -83,22 +85,26 @@ const PostedDecisions = Marionette.View.extend({
   },
 
   loadFilteredDecisions(decisionData) {
-    this.decisionData = decisionData;
+    const formatDeadlineToEndOfDay = (date) => Moment(date).add(1, 'day').toISOString();
     const requestData = {
-      ...(decisionData?.disputeType?.getData() ? {DisputeType: decisionData.disputeType.getData()} : null),
-      ...(decisionData?.tenancyEnded?.getData() ? {TenancyEnded: decisionData.tenancyEnded.getData()} : null),
-      ...(decisionData?.disputeProcess?.getData() ? {DisputeProcess: decisionData.disputeProcess.getData()} : null),
-      ...(decisionData?.disputeSubType?.getData() ? {DisputeSubType: decisionData.disputeSubType.getData()} : null),
-      ...(decisionData?.businessNames?.getData() ? {BusinessNames: decisionData.businessNames.getData()} : null),
-      ...(decisionData?.hearingAttendance?.getData() ? {HearingAttendance: decisionData.hearingAttendance.getData()} : null),
-      ...(decisionData?.decisionDateGreaterThan?.getData() ? {DecisionDateGreaterThan: decisionData.decisionDateGreaterThan.getData()} : null),
-      ...(decisionData?.decisionDateLessThan?.getData() ? {DecisionDateLessThan: this.getDecisionBeforeDate()} : null),
+      ...(decisionData?.disputeType ? { DisputeType: decisionData.disputeType } : null),
+      ...(decisionData?.tenancyEnded ? { TenancyEnded: decisionData.tenancyEnded } : null),
+      ...(decisionData?.disputeProcess ? { DisputeProcess: decisionData.disputeProcess } : null),
+      ...(decisionData?.disputeSubType ? { DisputeSubType: decisionData.disputeSubType } : null),
+      ...(decisionData?.businessNames ? { BusinessNames: decisionData.businessNames } : null),
+      ...(decisionData?.hearingAttendance ? { HearingAttendance: decisionData.hearingAttendance } : null),
+      ...(decisionData?.decisionDateGreaterThan ? { DecisionDateGreaterThan: decisionData.decisionDateGreaterThan } : null),
+      ...(decisionData?.decisionDateLessThan ? {DecisionDateLessThan: formatDeadlineToEndOfDay(decisionData?.decisionDateLessThan) } : null),
       ...(decisionData?.includedClaimCodes ? {IncludedClaimCodes: decisionData.includedClaimCodes} : null),
-      ...(decisionData?.query ? {Query: decisionData.query.getData()} : null),
+      ...(decisionData?.query ? { Query: decisionData.query } : null),
+      // Always search for .pdf, this is part of the db decision id
+      ...(decisionData?.decisionId ? { AnonDecisionId: `${decisionData.decisionId}.pdf` } : null),
       count: this.count,
-    }
-
-    const loadRequestType = this.disputeTypeFiltersModel.getData() === RADIO_CODE_PROPERTIES ? 'load:filtered:decisions' : 'load:fulltext:decisions';
+    };
+    
+    const disputeTypeFiltersModel = this.disputeTypeFiltersModel.getData();
+    const loadRequestType = disputeTypeFiltersModel === RADIO_FILTER_CODES.FREE_TEXT ? 'load:fulltext:decisions'
+      : 'load:filtered:decisions';
     this.loaderChannel.trigger('page:load');
     this.decisionsChannel.request(loadRequestType, requestData).then((response) => {
       this.searchResults = response;
@@ -107,17 +113,16 @@ const PostedDecisions = Marionette.View.extend({
       const searchResultsEle = this.getUI('searchResults');
       this.animationChannel.request('queue', $(searchResultsEle) , 'scrollPageTo', {is_page_item: true});
     }).catch(err => {
-      this.loaderChannel.trigger('page:load:complete');
       if (err.status === 200) {
-        this.searchResults = { posted_decisions: [], total_available_records: 0 };
+        this.searchResults = { posted_decisions: [], total_available_records: 0, total_database_records: null, earliest_record_date: null };
         this.render();
         const searchResultsEle = this.getUI('searchResults');
+        this.loaderChannel.trigger('page:load:complete');
         this.animationChannel.request('queue', $(searchResultsEle) , 'scrollPageTo', {is_page_item: true});
         return;
       }
-      this.model.trigger('search:reset');
-      const handler = generalErrorFactory.createHandler('POSTED.DECISIONS.LOAD');
-      handler(err);
+      generalErrorFactory.createHandler('POSTED.DECISIONS.LOAD', () => this.reset())(err);
+      this.loaderChannel.trigger('page:load:complete');
     })
   },
 
@@ -129,14 +134,10 @@ const PostedDecisions = Marionette.View.extend({
 
   getDisputeFilters() {
     return  [
-      { value: RADIO_CODE_PROPERTIES, text: 'Find decisions by dispute properties (recommended)'},
-      { value: RADIO_CODE_FREE_TEXT, text: 'Free text'}
+      { value: RADIO_FILTER_CODES.PROPERTIES, text: 'Find decisions by dispute properties (recommended)'},
+      { value: RADIO_FILTER_CODES.FREE_TEXT, text: 'Free text'},
+      { value: RADIO_FILTER_CODES.DECISION_ID, text: 'Decision ID'}
     ]
-  },
-
-  getDecisionBeforeDate() {
-    const endOfDay = Moment(this.decisionData.decisionDateLessThan.getData()).add(1, 'd').toISOString();
-    return endOfDay;
   },
 
   /* Marionette Methods */
@@ -208,7 +209,10 @@ const PostedDecisions = Marionette.View.extend({
       return (
         <>
           <span className="posted-decisions__results__searched">
-            {`Searched ${this.searchResults.total_database_records} decisions starting ${this.Formatter.toDateDisplay(this.searchResults.earliest_record_date)}`}
+            {this.searchResults.total_database_records !== null && this.searchResults.earliest_record_date !== null ?
+              `Searched ${this.searchResults.total_database_records} decisions starting ${this.Formatter.toDateDisplay(this.searchResults.earliest_record_date)}`
+              : ''
+            }
           </span>
           <div className="posted-decisions__results__title">
             <span className="posted-decisions__results__title__text">
@@ -244,7 +248,7 @@ const PostedDecisions = Marionette.View.extend({
             </>
           : 
           <div className="posted-decisions__results__decision">
-            <span>No Search Results</span>
+            <span>No Results Found - click 'Search Again' to try a new search</span>
           </div>
           }
         </>

@@ -25,7 +25,7 @@ import 'jquery-ui/themes/base/datepicker.css';
 import '../core/styles/index.css';
 import '../core/styles/index.scss';
 import './styles/dac.scss';
-import './styles/LoginLogout.scss';
+import './styles/loginlogout.scss';
 import './pages/update-contact/UpdateContact.scss';
 import './pages/upload/Upload.scss';
 import './pages/notice-service/NoticeService.scss';
@@ -77,13 +77,13 @@ import LoginPageView from './pages/login/LoginPage';
 import AccessPageView from './pages/access/AccessPage';
 import UpdateContactPageView from './pages/update-contact/UpdateContactPage';
 import UpdateContactReceipt from './pages/update-contact/UpdateContactReceipt';
-import UpdateNoticeServicePageView from './pages/notice-service/UpdateNoticeServicePage';
-import UpdateNoticeServiceReceiptPageView from './pages/notice-service/UpdateNoticeServiceReceipt';
+import NoticeServiceMenuPage from './pages/notice-service/NoticeServiceMenuPage';
+import SubmitNoticeServicePage from './pages/notice-service/SubmitNoticeServicePage';
+import SubmitNoticeServiceReceipt from './pages/notice-service/SubmitNoticeServiceReceipt';
 import EvidenceSummaryPageView from './pages/upload/EvidenceSummaryPage';
 import EvidenceUploadPageView from './pages/upload/DAUploadPage';
 import { UploadReceiptPage } from './pages/upload/upload-receipt/UploadReceiptPage';
 import LogoutPageView from './pages/logout/LogoutPage';
-import ModifyNoticeServicePageView from './pages/notice-service/DAModifyNoticeServicePage';
 import DAPaymentPage from './pages/payment/DAPaymentPage';
 import DAPaymentReceiptPage from './pages/payment/DAPaymentReceiptPage';
 import ExternalDisputeStatus_model from './components/external-api/ExternalDisputeStatus_model';
@@ -101,6 +101,9 @@ import UtilityMixin from '../core/utilities/UtilityMixin';
 import ModalExternalLogin from './pages/login/ModalExternalLogin';
 import TrialLogic_BIGEvidence from '../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
 import ModalEvidenceReminder from '../core/components/trials/BIGEvidence/ModalEvidenceReminder';
+import AmendmentPage from './pages/amendment/AmendmentPage';
+import { AmendmentReceiptPage } from './pages/amendment/AmendmentReceiptPage';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 const DA_MAIN_SITE_CLASSNAME = 'dac';
 const DA_HEADER_TITLE_TEXT = 'Residential Tenancies - Dispute Access';
@@ -176,6 +179,7 @@ const AppModel = Backbone.Model.extend({
     skipInitialLogin: false,
     reviewDataCache: null,
     reviewNotificationDisplayed: false,
+    emailVerificationDisplayed: false,
     
     // For external routing
     extSiteId: null,
@@ -253,6 +257,19 @@ const AppModel = Backbone.Model.extend({
   },
 
   load() {
+    // Setup login and logout listeners
+    this.listenTo(sessionChannel, 'login:complete', (options={}) => {
+      sessionChannel.request('clear:timers');
+      sessionChannel.request('create:timers', options);
+    });
+    this.listenTo(sessionChannel, 'logout:complete', () => {
+      this.set('skipInitialLogin', false);
+      sessionStorage.removeItem('_dmsPaymentToken');
+      localStorage.removeItem('_dmsDaAuthToken');
+      applicationChannel.request('clear');
+      sessionChannel.request('clear:timers');
+    });
+
     const logoutFn = () => {
       const EXTERNAL_LOGOUT_URL = configChannel.request('get', 'EXTERNAL_LOGOUT_URL');
       if (EXTERNAL_LOGOUT_URL) {
@@ -261,12 +278,13 @@ const AppModel = Backbone.Model.extend({
         Backbone.history.navigate('logout', { trigger: true }); 
       }
     };
+
     const dfd = $.Deferred();
     $.whenAll(
-      this.loadConfigs().then(_.bind(this.mixin_checkVersion, this), () => sessionChannel.trigger('redirect:config:error')),
+      this.loadConfigs()
+        .then(this.mixin_checkVersion.bind(this), () => sessionChannel.trigger('redirect:config:error')),
       this.minimumLoadTimePromise()
-    )
-      .done(function() {
+    ).done(function() {
         const disputeAccessSystemId = configChannel.request('get', 'MAINTENANCE_SYSTEM_ID_DISPUTEACCESS');
         loadAndCheckMaintenance(disputeAccessSystemId, logoutFn).done(function() {
           dfd.resolve();
@@ -558,10 +576,11 @@ const App = Marionette.Application.extend({
     });
   },
 
-  initializeCustomAnimations() {
+  initializeEventsAndAnimations() {
     $.initializeCustomAnimations({
       scrollableContainerSelector: '.page-view'
     });
+    $.initializeDatepickerScroll();
   },
 
   initializeSiteDependentData() {
@@ -573,11 +592,19 @@ const App = Marionette.Application.extend({
   },
 
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
-    this.initializeCustomAnimations();
+    this.initializeEventsAndAnimations();
     this.initializeViews();
     this.initializeRoutersAndRouteListeners();
     this.model.mixin_checkClientTimeSyncAndLogout();
+    AnalyticsUtil.initializeAnalyticsTracking();
+  },
+
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_DISPUTEACCESS')
+    });
   },
 
   initializeViews() {
@@ -592,24 +619,8 @@ const App = Marionette.Application.extend({
     modalChannel.request('render:root');
   },
 
-  onLoginComplete(options) {
-    options = options || {};
-    sessionChannel.request('clear:timers');
-    sessionChannel.request('create:timers', options);
-  },
-
   initializeRoutersAndRouteListeners() {
     new AppRouter({ controller: this });
-
-    this.listenTo(sessionChannel, 'login:complete', this.onLoginComplete, this);
-
-    this.listenTo(sessionChannel, 'logout:complete', function() {
-      this.model.set('skipInitialLogin', false);
-      sessionStorage.removeItem('_dmsPaymentToken');
-      localStorage.removeItem('_dmsDaAuthToken');
-      applicationChannel.request('clear');
-      sessionChannel.request('clear:timers');
-    });
 
     Backbone.history.start();
   },
@@ -649,8 +660,8 @@ const App = Marionette.Application.extend({
   },
 
   showAccessView() {
-    const routingFromLogin = this.model.get('routingfromLogin');
-    this.model.set('routingfromLogin', false);
+    const routingFromLogin = this.model.get('routingFromLogin');
+    this.model.set('routingFromLogin', false);
     this.clearReceiptData();
 
     if (!routingFromLogin) {
@@ -688,18 +699,68 @@ const App = Marionette.Application.extend({
     this.renderMainContent(new UpdateContactReceipt({ model: this.model }));
   },
 
-  showUpdateNoticeServiceView() {
+  showNoticeServiceMenuView() {
     this.model.clearPendingUploads();
-    this.renderMainContent(new UpdateNoticeServicePageView({ model: this.model }));
+    this.renderMainContent(new NoticeServiceMenuPage({ model: this.model }));
   },
 
-  showModifyNoticeServiceView() {
+  showSubmitNoticeServiceView() {
     this.model.clearPendingUploads();
-    this.renderMainContent(new ModifyNoticeServicePageView({ model: this.model }));
+    this.renderMainContent(new SubmitNoticeServicePage({ model: this.model }));
   },
 
-  showNoticeServiceReceiptView() {
-    this.renderMainContent(new UpdateNoticeServiceReceiptPageView({ model: this.model }));
+  showSubmitNoticeServiceReceiptView() {
+    this.renderMainContent(new SubmitNoticeServiceReceipt({ model: this.model }));
+  },
+
+  
+  showReinstateServiceListView() {
+    this.model.clearPendingUploads();
+    const notice = noticeChannel.request('get:active');
+    
+    // TODO: Add extra validation check here that notice is available for ARS mode??
+
+    this.renderMainContent(new NoticeServiceMenuPage({
+      model: this.model,
+      pageTitle: `Request Reinstatement`,
+      pageInstructionsHtml: `
+        <div class="da-update-contact-service-info-header">
+          Upload a proof of service RTB-55 for each respondent that you have served.
+        </div>
+        <div class="da-update-contact-service-info-desc">
+          <p>To have your hearing reinstated, you must provide proof that you served at least one respondent.</p>
+          <p>
+            For privacy reasons, only the initials and access code are displayed for each respondent. The full names and access codes are listed in your Notice of Dispute document.
+            If you did no serve any respondents prior to your deadline this dispute will be automatically withdrawn on ${Formatter.toFullDateAndTimeDisplay(notice?.get('second_service_deadline_date'))} and you may be able to file a new application as long as you are still eligible to do so.
+            For more information on this reinstatement process or the ability to file a new application, visit our&nbsp;<a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies">web site</a>.
+          <p>
+        </div>`,
+      disableProgressBar: true,
+      serviceRoute: 'reinstate/service',
+    }));
+  },
+
+  showReinstateServiceView() {
+    this.model.clearPendingUploads();
+    const notice = noticeChannel.request('get:active');
+    this.renderMainContent(new SubmitNoticeServicePage({
+      model: this.model,
+      pageTitle: `Request Reinstatement`,
+      formTypeText: 'RTB-55',
+      noticeServiceDeadline: notice?.get('has_service_deadline') ? notice?.get('service_deadline_date') : null,
+      serviceListRoute: 'reinstate/service/list',
+      serviceReceiptRoute: 'reinstate/service/receipt',
+      maxDeliveryDate: notice?.get('has_service_deadline') ? notice?.get('service_deadline_date') : null
+    }));
+  },
+
+  showReinstateServiceReceiptView() {
+    this.renderMainContent(new SubmitNoticeServiceReceipt({
+      model: this.model,
+      submissionTitle: `Hearing successfully re-instated`,
+      submissionMessage: `Your request for reinstatement has been automatically approved. You can now continue with your service and submissions in preparation for your hearing.  Your original notice package and hearing information has not changed.`,
+      serviceListRoute: `reinstate/service/list`
+    }));
   },
 
   showEvidenceSummaryView() {
@@ -851,15 +912,19 @@ const App = Marionette.Application.extend({
     this.listenTo(modalExternalLoginView, 'continue', () => {
       loaderChannel.trigger('page:load');
       isLogin = true;
-      this.model.set('staffLogin', true);
+
+      if (this.model.get('extSiteId') === configChannel.request('get', 'MAINTENANCE_SYSTEM_ID_OFFICE')) {
+        this.model.set('staffLogin', true);
+      }
       modalExternalLoginView.close();
       this.listenToOnce(applicationChannel, 'dispute:loaded:disputeaccess', () => {
         const extActionId = this.model.get('extActionId');
         let urlFragment = 'access';
         if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_CONTACT')) urlFragment = 'update/contact';
         else if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_EVIDENCE')) urlFragment = 'evidence';
-        else if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_NOTICE')) urlFragment = 'update/notice/service';
+        else if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_NOTICE')) urlFragment = 'notice/service/list';
         else if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_SUBSERV')) urlFragment = 'substituted-service';
+        else if (extActionId === configChannel.request('get', 'EXTERNAL_DA_ACTION_REINSTATEMENT')) urlFragment = 'reinstate/service/list';
 
         Backbone.history.navigate(urlFragment, { trigger: true });
       });
@@ -872,6 +937,15 @@ const App = Marionette.Application.extend({
     modalChannel.request('add', modalExternalLoginView);
   },
 
+  showAmendmentView() {
+    this.model.clearPendingUploads();
+    this.renderMainContent(new AmendmentPage({ model: this.model }));
+  },
+
+  showAmendmentReceiptView() {
+    this.model.clearPendingUploads();
+    this.renderMainContent(new AmendmentReceiptPage({ model: this.model }));
+  },
 
   showCorrectionView() {
     this.model.clearPendingUploads();
@@ -938,7 +1012,7 @@ const App = Marionette.Application.extend({
   showLoginView() {
     applicationChannel.request('clear');
     this.clearReceiptData();
-    this.model.set({ reviewNotificationDisplayed: false });
+    this.model.set({ reviewNotificationDisplayed: false, emailVerificationDisplayed: false });
     this.renderFloatingContent(new LoginPageView({ model: this.model }));
   },
 
@@ -967,23 +1041,18 @@ const _webpackSetupHotModuleReloadHandlers = () => {
   // If any view changes, re-render the current page to make sure we capture any updates
   module.hot.accept([
     '../core/components/root-layout/FloatingRootLayout',
-  
     './pages/login/LoginPage',
     './pages/access/AccessPage',
     './pages/update-contact/UpdateContactPage',
     './pages/update-contact/UpdateContactReceipt',
-    './pages/notice-service/UpdateNoticeServicePage',
-    './pages/notice-service/UpdateNoticeServiceReceipt',
     './pages/upload/EvidenceSummaryPage',
     './pages/upload/DAUploadPage',
     './pages/upload/upload-receipt/UploadReceiptPage',
     './pages/logout/LogoutPage',
-    './pages/notice-service/DAModifyNoticeServicePage',
-    
     './pages/payment/DAPaymentPage',
     './pages/payment/DAPaymentReceiptPage',
     './pages/correction-clarification/CorrectionClarificationPage',
-    './components/CcrRequestItem/CcrRequestItem',
+    './components/ccrRequestItem/CcrRequestItem',
   ], () => {
     console.log(`[DMS_HMR] Re-loading evidence main view..`);
     Backbone.history.loadUrl(Backbone.history.fragment);

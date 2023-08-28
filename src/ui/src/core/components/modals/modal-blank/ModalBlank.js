@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Basic modal used throughout system. Displays passed in HTML as the modal body. Contains options for customizing modal functionality/appearance  
+ */
 import ModalBaseView from '../../../../core/components/modals/ModalBase';
 import template from './ModalBlank_template.tpl';
 

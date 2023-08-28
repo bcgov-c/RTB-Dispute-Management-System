@@ -7,7 +7,7 @@ import ModalAddUnitTypeNoticeView from './modals/ModalAddUnitTypeNotice';
 import ModalAddNoticeView from './modals/ModalAddNotice';
 import ModalAddAmendmentNoticeView from './modals/ModalAddAmendmentNotice';
 import ModalAddOtherNoticeView from './modals/ModalAddOtherNotice';
-import NoticeServiceView from '../../components/service/NoticeService';
+import DisputeServiceView from '../../components/service/DisputeService';
 import HearingToolsServiceView from '../../components/service/HearingToolsService';
 import ModalMarkAsDeficientView from '../../../core/components/claim/ModalMarkAsDeficient';
 import DisputeAmdendmentsView from '../../components/amendments/DisputeAmendments';
@@ -16,6 +16,7 @@ import AmendmentCollection from '../../components/amendments/Amendment_collectio
 import template from './DisputeNotice_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import ModalAddNoticeBase from './modals/ModalAddNoticeBase';
+import ApplicantRequiredService from '../../../core/components/service/ApplicantRequiredService';
 
 const DROPDOWN_CODE_NO = '1';
 const DROPDOWN_CODE_YES = '2';
@@ -30,6 +31,7 @@ const noticeChannel = Radio.channel('notice');
 const sessionChannel = Radio.channel('session');
 const hearingChannel = Radio.channel('hearings');
 const modalChannel = Radio.channel('modals');
+const claimsChannel = Radio.channel('claims');
 const Formatter = Radio.channel('formatter').request('get');
 
 const DisputeNoticeView = Marionette.View.extend({
@@ -119,6 +121,31 @@ const DisputeNoticeView = Marionette.View.extend({
   },
 
   onMenuRegenerateNotice() {
+    const showArsConfirmationModalSetDeadlines = () => new Promise(res => {
+      let withDeadlines = false;
+      const onComplete = () => res(withDeadlines);
+      if (ApplicantRequiredService.canGenerateNoticeARS(this.dispute, claimsChannel.request('get'), hearingChannel.request('get:latest'), this.model, noticeChannel.request('get:all'))) {
+        const modalView = modalChannel.request('show:standard', {
+          title: `Apply ARS Deadlines?`,
+          bodyHtml: `<div>
+            <p>This file has Applicant Required Service (ARS) deadlines.</p>
+            <p>Select "Continue with Deadlines" to regenerate with ARS deadlines.</p>
+            <p>Only select "Remove Deadlines" if you confirmed this notice should be regenerated without ARS deadlines.</p>
+          </div>`,
+          primaryButtonText: `Continue With Deadlines`,
+          cancelButtonText: `Remove Deadlines`,
+          onContinueFn(_modalView) {
+            // Enable ARS deadlines only if the user opts-in
+            withDeadlines = true;
+            _modalView.close();
+          }
+        });
+        this.listenTo(modalView, 'removed:modal', onComplete);
+      } else {
+        onComplete();
+      }
+    });
+
     this.withDisputeEditCheck(() => {
       const isOtherNotice = this.model.isOtherNotice();
       if ((this.model.isDisputeNotice() || isOtherNotice) && !this._checkAndShowHearingWarningModal()) {
@@ -128,10 +155,14 @@ const DisputeNoticeView = Marionette.View.extend({
         isOtherNotice ? ModalAddOtherNoticeView : 
         this.dispute.isUnitType() || this.dispute.isCreatedRentIncrease() ? ModalAddUnitTypeNoticeView : ModalAddNoticeView;
       
-      modalChannel.request('add', new modalClassToUse({
-        model: this.model,
-        isRegenerationMode: true
-      }), { duration: 0, duration2: 400 });
+      
+      showArsConfirmationModalSetDeadlines().then(isArsEnabled => {
+        modalChannel.request('add', new modalClassToUse({
+          isArsEnabled,
+          model: this.model,
+          isRegenerationMode: true
+        }), { duration: 0, duration2: 400 });
+      });
     });
   },
 
@@ -268,8 +299,7 @@ const DisputeNoticeView = Marionette.View.extend({
     this.noticeCreationTypeDisplay = NOTICE_CREATION_TYPES_DISPLAY[this.model.get('notice_type')]
 
     this.linkedAmendmentModels = this.amendmentCollection.filter( (amendment) => amendment.get('notice_id') === this.model.get('notice_id'), this);
-
-    this.noticeFileModels = this.model.getNoticeFileModels();
+    this.noticeFileModels = _.sortBy(this.model.getNoticeFileModels(), m => m.get('created_date'));
     
     this.createPackageProvidedUiModels();
   },
@@ -309,14 +339,15 @@ const DisputeNoticeView = Marionette.View.extend({
           matchingUnit
         };
       },
-      childView: NoticeServiceView,
+      childView: DisputeServiceView,
       collection: this.model.getServices()
     }));
 
     this.showChildView('noticeServiceHearingTools', new HearingToolsServiceView({
       model: this.model,
       unitCollection: this.unitCollection,
-      childView: NoticeServiceView,
+      childView: DisputeServiceView,
+      saveAllAcknowledgedServedButtonText: 'Mark All Editable Acknowledged Served',
       resetServicesFn() { noticeChannel.request('update:notice:service', this.model); }
     }));
   },
@@ -351,7 +382,8 @@ const DisputeNoticeView = Marionette.View.extend({
       noticeMethodDisplay: isOtherNoticeDelivery ? `Other Method - ${this.noticeOtherDeliveryDescriptionModel.getData()}` : NOTICE_METHOD_DISPLAY[this.model.get('notice_delivery_method')],
       hearingDate: hearingModel ? hearingModel.get('local_start_datetime') : null,
       noticeCreationTypeDisplay: this.noticeCreationTypeDisplay,
-      showNoticeOtherDelivery: isOtherNoticeDelivery
+      showNoticeOtherDelivery: isOtherNoticeDelivery,
+      hasUnservedServices: !!this.model.getUnservedServices().length,
     };
   }
 

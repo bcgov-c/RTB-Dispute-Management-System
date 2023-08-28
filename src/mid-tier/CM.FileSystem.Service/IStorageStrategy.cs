@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CM.Business.Services.SystemSettingsService;
 
@@ -10,4 +11,6 @@ public interface IStorageStrategy
     Task<string> TempFileRootAsync { get; }
 
     ISystemSettingsService SystemSettingsService { get; }
+
+    List<string> WhitelistedExtensions { get; }
 }

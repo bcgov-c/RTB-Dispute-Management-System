@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Modal that allows for a booked hearing to be reassigned to another available arb
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import HearingCollection from '../../../../../core/components/hearing/Hearing_collection';
@@ -36,7 +39,9 @@ export default ModalBaseView.extend({
     filterRegion: '.modalReassign-filters',
     resultsRegion: '.modalReassign-results'
   },
-
+  /**
+   * @param {HearingModel} model
+   */
   initialize() {
     this.availableHearings = null;
     this.allAvailableHearings = null;

@@ -67,5 +67,12 @@ public class DisputeMapping : Profile
             .ForMember(x => x.IsActive, opt => opt.MapFrom(src => src.SystemUser.IsActive))
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.SystemUser.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.SystemUser.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<DisputeUser, DisputeUserGetResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<DisputeUser, DisputeUserPatchRequest>();
+        CreateMap<DisputeUserPatchRequest, DisputeUser>();
     }
 }

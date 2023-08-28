@@ -19,6 +19,11 @@ public static class DisputeHearingManager
         return client.GetAsync<List<DisputeHearingGetResponse>>(RouteHelper.GetDisputeHearings + disputeGuid);
     }
 
+    public static EntityWithStatus<List<ExternalDisputeHearingGetResponse>> GetExternalDisputeHearings(HttpClient client, Guid disputeGuid)
+    {
+        return client.GetAsync<List<ExternalDisputeHearingGetResponse>>(RouteHelper.GetExternalDisputeHearings + disputeGuid);
+    }
+
     public static HttpResponseMessage DeleteDisputeHearing(HttpClient client, int disputeHearingId)
     {
         var response = client.DeleteAsync(RouteHelper.DeleteDisputeHearing + disputeHearingId).Result;

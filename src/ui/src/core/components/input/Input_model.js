@@ -11,7 +11,7 @@ import Radio from 'backbone.radio';
 const filename__restricted_chars = [',', '~', '#', '%', '{', '}', ';', '^', '`', '+', '<', '>', ':', '"', '“', '”', '‘', '’', '/', '\\', '|', '?', '*'];
 // NOTE: This does not include special chars that are part of filename restricted chars
 const special_chars = ['(', ')', '!', '@', '$', '&', '=', '[', ']', '_'];
-const address__allowed_chars = ['&', '+', '/', ',', '(', ')', '#'];
+const address_special_chars = ['&', '+', '/', ',', '(', ')', '#'];
 const charArrayToRegexString = (charArray) => charArray.map(c => `\\${c}`).join('');
 
 const typeRegex = {
@@ -26,16 +26,15 @@ const typeRegex = {
   positive_integer: /^[1-9]\d*$/,
   access_code: /^[A-Za-z\d]{7}$/,
   dial_code: /^\d{7}#$/,
-  // Allow unicode accents like é and ü in names, but not special characters like !]@#$%[ etc
-  // NOTE: Maybe this is not needed, just use the person name restricted entry chars.
-  // person_name: /^[A-Za-zÀ-ÖØ-öø-ÿ\-\.\-\s]+$/,
-
   whitespace__restricted_chars: '\\s',
   person_name__restricted_chars: `${charArrayToRegexString([...filename__restricted_chars, ...special_chars])}\\d`,
   filename__restricted_chars: charArrayToRegexString(filename__restricted_chars),
-  address__restricted_chars: charArrayToRegexString([...filename__restricted_chars, ...special_chars].filter(function(c) { return this.indexOf(c) < 0; }, address__allowed_chars)),
+  address__restricted_chars: charArrayToRegexString([...filename__restricted_chars, ...special_chars].filter(function(c) { return this.indexOf(c) < 0; }, address_special_chars)),
   // Strip HTML characters by default
-  html__restricted_chars: '\\<\\>'
+  html__restricted_chars: '\\<\\>',
+  person_name__allowed_chars: /[^\w\-.\s\.]/ig,
+  address__allowed_chars: /[^\w\-.\s\.\&\+\/\,\(\)\#]/ig,
+  filename__allowed_chars: /[^\w\-.\s]/ig
 };
 
 const subLabels = {
@@ -74,6 +73,7 @@ export default Backbone.Model.extend({
     isMobile: false,
     placeholder: null,
     subLabel: null,
+    allowedCharacters: null,
     restrictedCharacters: null,
     replacementCharacters: null,
     maxLength: null,
@@ -97,12 +97,11 @@ export default Backbone.Model.extend({
     yearRange: null,
     minTime: null,
     maxTime: null,
+    minNum: null,
+    maxNum: null,
     restrictHtml: true,
-
     restrictedStrings: null,
-
     clearWhenHidden: false,
-
     apiMapping: null
   },
 
@@ -212,8 +211,13 @@ export default Backbone.Model.extend({
 
     const allRestrictedChars = [].concat(this.get('restrictedCharacters') || [], this.get('restrictHtml') ? typeRegex.html__restricted_chars : []);
     if (allRestrictedChars.length) {
-      replaced_value = replaced_value.replace(new RegExp('['+allRestrictedChars+']', 'g'), '');
+      replaced_value = replaced_value.replace(new RegExp(`[${allRestrictedChars}]`, 'g'), '');
     }
+
+    if (this.get('allowedCharacters')) {
+      replaced_value = replaced_value.replace(new RegExp(this.get('allowedCharacters')), '');
+    }
+
     return replaced_value;
   },
 
@@ -300,10 +304,17 @@ export default Backbone.Model.extend({
     } else if(attrs.value !== '' && attrs.inputType === 'legacy_dispute_number' && !typeRegex.legacy_dispute_number.test(attrs.value)) {
       this.set('stepComplete', false);
       return 'Invalid file number';
-    } else if(attrs.value !== '' && attrs.inputType === 'positive_integer' && !typeRegex.positive_integer.test(attrs.value)) {
-      if (Number(attrs.value) !== 0 || !attrs.allowZeroAmount) {
+    } else if (attrs.value !== '' && attrs.inputType === 'positive_integer') {
+      if (!typeRegex.positive_integer.test(attrs.value) || (Number(attrs.value) === 0 && !attrs.allowZeroAmount)) {
         this.set('stepComplete', false);
         return 'Please enter a number greater than 0';
+      }
+      if (Number.isInteger(attrs?.minNum) && Number(attrs.minNum) > Number(attrs.value)) {
+        this.set('stepComplete', false);
+        return `Please enter a number greater than ${attrs.minNum}`;
+      } else if (Number.isInteger(attrs?.maxNum) && Number(attrs.maxNum) < Number(attrs.value)) {
+        this.set('stepComplete', false);
+        return `Please enter a number less than ${attrs.maxNum}`;
       }
     } else if(attrs.value !== '' && attrs.inputType === 'access_code' && !typeRegex.access_code.test(attrs.value)) {
       this.set('stepComplete', false);
@@ -324,7 +335,7 @@ export default Backbone.Model.extend({
 
     const restricted_strings = this.get('restrictedStrings');
     if (attrs.value) {
-      // check for prohibited values
+      // Check for prohibited values
       if (restricted_strings && restricted_strings.values && restricted_strings.errorMessage) {
         if ($.trim(attrs.value).indexOf(restricted_strings.values) >= 0) {
           this.set('stepComplete', false);
@@ -353,7 +364,6 @@ export default Backbone.Model.extend({
       if (!parsed_value.isValid()) {
         parsed_value = Moment(val, getLongDateFormat());
       }
-
       parsed_value = options.format === 'date' ? parsed_value.format(_dateFormatData) : parsed_value.toISOString();
     } else if (this.isCurrency() && val) {
       parsed_value = parseFloat(val);

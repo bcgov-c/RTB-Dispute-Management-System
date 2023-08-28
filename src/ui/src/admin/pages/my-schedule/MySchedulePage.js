@@ -98,7 +98,7 @@ const MySchedulePage = PageView.extend({
     });
 
     this.inactiveModel = new CheckboxModel({
-      html: 'Include inactive staff (**)',
+      html: 'Inactive staff (**)',
       checked: false
     });
 
@@ -138,9 +138,12 @@ const MySchedulePage = PageView.extend({
   },
 
   updateCalendar() {
-    const scheduleTableView = this.getChildView('scheduleTableRegion');
+    const scheduleType = this.scheduleTypeDropdownModel.getData();
+    const isMyScheduleView = scheduleType === SCHEDULE_REQUEST_PAGE_CODE;
+    const tableRegionName = isMyScheduleView ? 'myScheduleRequestRegion' : 'scheduleTableRegion'
+    const scheduleTableView =  this.getChildView(tableRegionName);
     scheduleTableView.updateSelectedUser(this.arbitratorDropdownModel.getData({ parse: true }))
-    scheduleTableView.loadHearings();
+    isMyScheduleView ? scheduleTableView.loadMoreRequests() : scheduleTableView.loadHearings();
   },
 
   setupListeners() {
@@ -235,7 +238,7 @@ const MySchedulePage = PageView.extend({
       this.renderMySchedule();
     } else {
       this.renderMyScheduleRequest();
-      Backbone.history.navigate(routeParse('scheduled_requests_item', null), { trigger: false });
+      Backbone.history.navigate(routeParse('scheduled_requests_param_item', null), { trigger: false });
     }
   },
 
@@ -256,14 +259,23 @@ const MySchedulePage = PageView.extend({
       model: this.model
     }));
 
-    this.showChildView('calendarArbitratorRegion', new DropdownView({ model: this.arbitratorDropdownModel }));
-    this.showChildView('showInactiveRegion', new CheckboxView({ model: this.inactiveModel }));
+    if (this.currentUserModel.isInformationOfficerLead() || this.currentUserModel.isArbitratorLead() || this.currentUserModel.isScheduleManager()) {
+      this.showChildView('calendarArbitratorRegion', new DropdownView({ model: this.arbitratorDropdownModel }));
+      this.showChildView('showInactiveRegion', new CheckboxView({ model: this.inactiveModel }));
+    }
   },
 
   renderMyScheduleRequest() {
+    const currentPickedUser = this.arbitratorDropdownModel.getData({ parse: true });
+
+    if (this.currentUserModel.isInformationOfficerLead() || this.currentUserModel.isArbitratorLead() || this.currentUserModel.isScheduleManager()) {
+      this.showChildView('calendarArbitratorRegion', new DropdownView({ model: this.arbitratorDropdownModel }));
+      this.showChildView('showInactiveRegion', new CheckboxView({ model: this.inactiveModel }));
+    }
+
     this.showChildView('requestStartingDateRegion', new InputView({ model: this.requestStartingDateModel }));
     this.showChildView('filterDropdownRegion', new DropdownView({ model: this.scheduleStatusFilterDropdownModel }));
-    this.showChildView('myScheduleRequestRegion', new MyScheduleRequestPage({ tableView: MyScheduleTable, filterToCurrentUser: true, getCurrentFilters: () => this.getScheduleRequestFilters() }));
+    this.showChildView('myScheduleRequestRegion', new MyScheduleRequestPage({ tableView: MyScheduleTable, currentPickedUser, getCurrentFilters: () => this.getScheduleRequestFilters() }));
   },
 
   template() {
@@ -324,11 +336,17 @@ const MySchedulePage = PageView.extend({
       return (
         <>
           <div className="my-schedule-filters hidden-print">
-            <span className="my-schedule-filters-filter"><span className="my-schedule-filters-filter-text">Starting After</span><div className="request-starting-date"></div></span>
-            <span className="my-schedule-filters-filter"><span className="my-schedule-filters-filter-text">Filters</span><div className="filter-region"></div></span>
-            <div className="my-schedule-add hidden-print" onClick={() => this.openRequestModal()}>
-              <img src={AddHearingIcon} alt=""/>
-              <span>&nbsp;New Request</span>
+            <div className="my-schedule-filters__left-filters">
+              <div className="my-schedule-calendar-arbitrator"></div>
+              <div className="my-schedule-inactive-filter"></div>
+            </div>
+            <div className="my-schedule-filters__right-filters">
+              <span className="my-schedule-filters-filter"><span className="my-schedule-filters-filter-text">Starting After</span><div className="request-starting-date"></div></span>
+              <span className="my-schedule-filters-filter"><span className="my-schedule-filters-filter-text">Filters</span><div className="filter-region"></div></span>
+              <div className="my-schedule-add hidden-print" onClick={() => this.openRequestModal()}>
+                <img src={AddHearingIcon} alt=""/>
+                <span>&nbsp;New</span>
+              </div>
             </div>
           </div>
           <div className="visible-print">

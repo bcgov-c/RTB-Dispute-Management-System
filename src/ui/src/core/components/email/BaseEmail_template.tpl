@@ -6,6 +6,9 @@
 		<meta name="format-detection" content="telephone=no">
 	<title></title>
 <style type="text/css">
+	body {
+		font-family: Arial;
+	}
 	table td {
 		border-collapse: collapse; font-size:<%=FONT_SIZE_PX%>px;
 	}
@@ -13,16 +16,16 @@
 		font-size:<%=FONT_SIZE_PX%>px;
 	}
 	td.email-content {
-		padding: 20px 24px 12px 24px; background-color: #FFF; color: #374550; font-size:<%=FONT_SIZE_PX%>px; 
+		padding: 20px 24px 12px 24px; background-color: #FFF; color: #222; font-size:<%=FONT_SIZE_PX%>px; 
 	}
 	.email-content h1 {
 		font-size:21px; margin:20px 0px 4px 0px; 
 	}
 	.email-content h2 {
-		color:#414141; font-size:18px; margin:20px 0px 4px 0px; 
+		color:#0f0f0f; font-size:18px; margin:20px 0px 4px 0px; 
 	}
 	.email-content p {
-		color:#414141; 	font-size:<%=FONT_SIZE_PX%>px; line-height:20px;
+		color:#0f0f0f; 	font-size:<%=FONT_SIZE_PX%>px; line-height:20px;
 	}
 	.email-content  a {
 		color: #1268b5;
@@ -38,6 +41,7 @@
 		margin-top:25px;
 		margin-bottom:25px;
 	}
+	h4 { color: #222; }
 
 	.receipt-container__content__buttons, .receipt-container__thank-you { display: none; }
 	
@@ -105,16 +109,16 @@
     <table border="0" cellpadding="0" cellspacing="0" class="container" style="margin-top:0px; width:100%; max-width:960px; background-color: #FFF;"> <tr>
       <td style="padding-top: 10px; padding-left: 14px;	padding-bottom: 10px; background-color: #003366; border-bottom: 1px solid #fcba19;" align="left">
         <p style="font-size:18px; font-weight:normal; color:#FFF; padding: 0px 0px 0px 0px; 	margin: 0px; font-style: normal;">
-          <img style="position:relative; top:2px; width:95px; height:65px; -ms-interpolation-mode: bicubic;" src="<%= COMMON_IMAGE_ROOT + 'BCLogoBlue.jpg' %>" alt="BC Logo" width="95" height="65" /> <span>Residential Tenancies</span> </p>
+          <img style="position:relative; top:2px; width:95px; height:65px; -ms-interpolation-mode: bicubic;" src="<%= COMMON_IMAGE_ROOT + 'BCLogoBlue.jpg' %>" alt="BC Logo" width="95" height="65" /> <span style="font-size: 18px">Residential Tenancies</span> </p>
       </td> </tr>
-      <tr><td style="height: 25px; padding: 2px 4px 2px 14px; background-color: #38598a;	color: #e2e9f3;	font-size: 15px; font-style: normal;">
+      <tr><td style="height: 25px; padding: 4px 4px 4px 14px; background-color: #38598a;	color: #e2e9f3;	font-size: 15px; font-style: normal;">
         <p><%= 'Transaction Receipt - Do not reply' %></p>
       </td> </tr>
       <tr> <td class="email-content" align="left" style="padding:10px 20px 10px 20px;">			
         <%= emailBody %>
       </td></tr>
       <tr> <td class="container-padding footer" style="padding:10px" align="left"> <hr style="display:block; height:1px; border:0px; border-top:1px solid #dedede; margin:0px 0px 10px 0px; padding:0px;" />
-        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: separate; border-spacing: 0px; font-size: 15px; margin:0px; max-width:980px; width:100%;"> <tbody>
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: separate; border-spacing: 0px; font-size: 16px; margin:0px; max-width:980px; width:100%;"> <tbody>
           <tr> <td colspan="2" style="margin-bottom:5px; color: #989898;font-weight: normal; font-size: 14px !important; margin: 0px; padding: 2px 0px 3px 0px;"> <strong>British Columbia Residential Tenancy Branch</strong></td> </tr>
           <tr>
             <td width="30" valign="top"><img style="-ms-interpolation-mode: bicubic;" src= "<%= COMMON_IMAGE_ROOT + 'Icon_ContactEmailsmlGry.png' %>" width="20" height="20" /></td>

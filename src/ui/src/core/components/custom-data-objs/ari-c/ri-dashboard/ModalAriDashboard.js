@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Modal that displays information about a ARI dispute, and includes ability to download a .csv file containing the improvements data.
+ */
+
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../modals/ModalBase';
@@ -211,7 +215,7 @@ export default ModalBaseView.extend({
 
   _createAndDownloadCsvFile(filenameStart, csvFileLines) {
     const csvFilename = `${filenameStart}${this.model.get('file_number')}_${Moment().format('MM_DD_YYYY')}.csv`;
-    filesChannel.request('download:csv', csvFilename, csvFileLines);
+    filesChannel.request('download:csv', csvFileLines, csvFilename);
   },
 
   initialize() {

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all task related functionality. Covers loading, getters, creation, and task configs.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../utilities/UtilityMixin';
@@ -44,6 +47,7 @@ const TaskCreator = Marionette.Object.extend({
     const TASK_ACTIVITY_TYPE_DA_CORRECTION = configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_CORRECTION');
     const TASK_ACTIVITY_TYPE_DA_CLARIFICATION = configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_CLARIFICATION');
     const TASK_ACTIVITY_TYPE_DA_REV_REQUEST = configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_REV_REQUEST');
+    const TASK_ACTIVITY_TYPE_DA_AMENDMENT = configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_AMENDMENT');
     const TASK_ACTIVITY_TYPE_DA_SUB_SERVICE = configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_SUB_SERVICE');
     const TASK_ACTIVITY_TYPE_OS_AMENDMENT = configChannel.request('get', 'TASK_ACTIVITY_TYPE_OS_AMENDMENT');
     const TASK_ACTIVITY_TYPE_OS_SUB_SERVICE = configChannel.request('get', 'TASK_ACTIVITY_TYPE_OS_SUB_SERVICE');
@@ -83,6 +87,8 @@ const TaskCreator = Marionette.Object.extend({
     } else if (taskData.task_activity_type === TASK_ACTIVITY_TYPE_DA_SUB_SERVICE) {
       return this.saveAsUnassigned(taskModel);
     } else if (taskData.task_activity_type === TASK_ACTIVITY_TYPE_OS_AMENDMENT) {
+      return this.saveAsUnassigned(taskModel);
+    } else if (taskData.task_activity_type === TASK_ACTIVITY_TYPE_DA_AMENDMENT) {
       return this.saveAsUnassigned(taskModel);
     } else if (taskData.task_activity_type === TASK_ACTIVITY_TYPE_OS_SUB_SERVICE) {
       return this.saveAsUnassigned(taskModel);
@@ -285,7 +291,7 @@ const TaskManager = Marionette.Object.extend({
     const default_count = 999990;
     searchParams = _.extend({
       index: default_index,
-      count: default_count
+      count: default_count,
     }, searchParams);
     const dfd = $.Deferred();
 

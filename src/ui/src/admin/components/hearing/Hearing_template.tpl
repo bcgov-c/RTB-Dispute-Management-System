@@ -32,7 +32,10 @@
         <div class="hearing-end-time"></div>
 
         <div class="hearing-notice-generated-info">
-          <label class="review-label">Notice generated for this hearing:</label>&nbsp;<span><%= noticeGeneratedDisplay %></span>
+          <label class="review-label">Dispute Notice generated for this hearing:</label>&nbsp;<span><%= noticeGeneratedDisplay %></span>
+        </div>
+        <div class="hearing-notice-generated-info">
+          <label class="review-label">Hearing Notice:</label>&nbsp;<div class="hearing-notice-generated-files"><%= hearingNoticeDisplay %></div>
         </div>
 
         <div class="hearing-recording">
@@ -50,7 +53,7 @@
             <label class="review-label"><%= conferenceBridgeData.dial_in_description2 %>:</label>&nbsp;<span><%= Formatter.toPhoneDisplay(conferenceBridgeData.dial_in_number2) %></span>
           </div>
           <div class="hearing-participant-code">
-            <label class="review-label">Participant Access Code:</label>&nbsp;<span><%= conferenceBridgeData.participant_code %></span>
+            <label class="review-label">Teleconference Access Code:</label>&nbsp;<span><%= conferenceBridgeData.participant_code %></span>
           </div>
         </div>
         <div class="<%= isConference ? 'hidden' : '' %>">

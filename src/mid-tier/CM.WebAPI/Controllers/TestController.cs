@@ -39,7 +39,7 @@ public class TestController : BaseController
     {
         var result = await schedulingService.RubJob(jobName);
 
-        return Ok(result);
+        return result ? Ok("Job triggered successfully") : NotFound("Job not found");
     }
 
     [HttpPost("encrypt")]

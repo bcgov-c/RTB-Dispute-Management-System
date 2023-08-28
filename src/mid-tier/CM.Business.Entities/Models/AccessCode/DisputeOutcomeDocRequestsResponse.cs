@@ -25,4 +25,7 @@ public class DisputeOutcomeDocRequestsResponse
 
     [JsonProperty("request_status")]
     public int? RequestStatus { get; set; }
+
+    [JsonProperty("request_sub_status")]
+    public int? RequestSubStatus { get; set; }
 }

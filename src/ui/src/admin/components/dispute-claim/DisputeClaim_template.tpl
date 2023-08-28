@@ -35,13 +35,13 @@
           </div>
         <% } %>
       <% } %>
-      <div class="dispute-claim-details <%= !useAmount && !useNoticeDueDate && !useNoticeMethod ? 'hidden-item' : '' %>">
-        <div class="review-claim-amount <%= useAmount ? '' : 'hidden-item' %>"></div>
-        <div class="review-claim-delivery-date <%= useNoticeDueDate ? '' : 'hidden-item' %>"></div>
-        <div class="review-claim-delivery-method <%= useNoticeMethod ? '' : 'hidden-item' %>"></div>
+      <div class="dispute-claim-details <%= !useAmount && !useNoticeDueDate && !useNoticeMethod ? 'hidden' : '' %>">
+        <div class="review-claim-amount <%= useAmount ? '' : 'hidden' %>"></div>
+        <div class="review-claim-delivery-date <%= useNoticeDueDate ? '' : 'hidden' %>"></div>
+        <div class="review-claim-delivery-method <%= useNoticeMethod ? '' : 'hidden' %>"></div>
       </div>
       
-      <div class="<%= useTextDescription ? '' : 'hidden-item' %> review-claim-description-container">
+      <div class="<%= useTextDescription ? '' : 'hidden' %> review-claim-description-container">
         <div class="review-claim-description"></div>
       </div>
     </div>

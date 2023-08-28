@@ -5,7 +5,7 @@ import DocRequestSelectView from '../../../../core/components/documents/doc-requ
 import InputView from '../../../../core/components/input/Input';
 import QuestionView from '../../../../core/components/question/Question';
 import PageItem from '../../../../core/components/page/PageItem';
-import { CcrRequestItem } from '../../../components/CcrRequestItem/CcrRequestItem';
+import { CcrRequestItem } from '../../../components/ccrRequestItem/CcrRequestItem';
 import UploadViewMixin from '../../../../core/components/upload/UploadViewMixin';
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
 import { ParentViewMixin } from '../../../../core/utilities/ParentViewMixin';
@@ -209,12 +209,13 @@ const ReviewPageStepOne = Marionette.View.extend({
     this.showChildView('outcomeDocsRegion', new DocRequestSelectView({
       docGroupCollection: documentsChannel.request('get:all'),
       getValidDocFilesFromGroupFn: docGroup => {
-        const hasExistingReviewRequest =  outcomeDocRequestCollection.find(request => (
+        const requestsForGroup = outcomeDocRequestCollection.filter(req => req.get('outcome_doc_group_id') === docGroup.id);
+        const hasCurrentUserReview = requestsForGroup.find(request => (
+          !request.isPastProcess() &&
           request.isReview() &&
-          request.get('submitter_id') === loggedInParticipant &&
-          request.get('outcome_doc_group_id') === docGroup.id
+          request.get('submitter_id') === loggedInParticipant
         ));
-        return hasExistingReviewRequest ? [] : docGroup.getDocFilesThatCanRequestReview();
+        return hasCurrentUserReview ? [] : docGroup.getDocFilesThatCanRequestReview();
       },
       model: this.docRequestModel,
     }));
@@ -344,9 +345,11 @@ const ReviewPageStepOne = Marionette.View.extend({
               </li>
             </ul>
             <p>
-            For more information contact the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>.
-            Please review <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Policy Guideline 24: Review Consideration of a Decision or Order</a>&nbsp;or visit the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Residential Tenancy Branch website</a>&nbsp;for more information.
+              <b>All evidence must be provided at the time that the application for review is being completed as there is no opportunity to add more evidence after the application for review is submitted.</b>&nbsp;
+              For more information contact the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>.
+              Please review <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Policy Guideline 24: Review Consideration of a Decision or Order</a>&nbsp;or visit the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Residential Tenancy Branch website</a>&nbsp;for more information.
             </p>
+            <p>If you requested and obtained a copy of the hearing recording from the Residential Tenancy Branch, do not submit it as part of your application for review consideration</p>
           </div>
         </div>
 

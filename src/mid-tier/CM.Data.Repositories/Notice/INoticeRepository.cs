@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CM.Common.Utilities;
 using CM.Data.Repositories.Base;
 
 namespace CM.Data.Repositories.Notice;
@@ -28,4 +29,6 @@ public interface INoticeRepository : IRepository<Model.Notice>
     Task<List<Model.Notice>> GetRespondentNotices(Guid disputeGuid);
 
     Task<List<Model.Notice>> GetApplicantNotices(Guid disputeGuid);
+
+    Task<Model.Notice> GetLastNotice(Guid disputeGuid, NoticeTypes[] types);
 }

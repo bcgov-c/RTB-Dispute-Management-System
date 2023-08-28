@@ -46,7 +46,7 @@ export default Backbone.Collection.extend({
   initialize(models, options) {
     options = options || {};
     this.participantCollection = options.participantCollection;
-    this.isRespondent = options.isRespondent;
+    this.collectionOptions = options;
 
     if (!this.participantCollection) {
       console.log(`[Error] Need a participantCollection in the IntakeParticipantCollection`, this);
@@ -137,7 +137,7 @@ export default Backbone.Collection.extend({
   // This just removes the intake participant from the collection, without any API deletes
   // On page Next is when deletes happen, or changes can be undone if an API participant was removed
   _addIntakeParticipant(intakeParticipantOptions) {
-    const intakeParticipant = new IntakeParticipantModel(_.extend(intakeParticipantOptions, {
+    const intakeParticipant = new IntakeParticipantModel(_.extend({...intakeParticipantOptions, ...this.collectionOptions}, {
       participantModel: new ParticipantModel()
     }), { collection: this });
     this.add(intakeParticipant);

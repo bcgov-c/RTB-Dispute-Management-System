@@ -60,7 +60,19 @@ export default CMModel.extend({
   },
 
   isSubServiceRequested() {
-    return this.getFlagId() === configChannel.request('get', 'FLAG_ID_SUB_SERVICE_REQUESTED')
+    return this.getFlagId() === configChannel.request('get', 'FLAG_ID_SUB_SERVICE_REQUESTED');
+  },
+
+  isCorrection() {
+    return this.getFlagId() === configChannel.request('get', 'FLAG_ID_CORRECTION');
+  },
+
+  isClarification() {
+    return this.getFlagId() === configChannel.request('get', 'FLAG_ID_CLARIFICATION');
+  },
+
+  isReviewRequest() {
+    return this.getFlagId() === configChannel.request('get', 'FLAG_ID_REVIEW');
   },
 
   isSubServiceApproved() {

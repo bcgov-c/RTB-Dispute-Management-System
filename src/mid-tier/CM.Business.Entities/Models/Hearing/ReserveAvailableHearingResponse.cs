@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace CM.Business.Entities.Models.Hearing;
 
@@ -27,4 +28,10 @@ public class ReserveAvailableHearingResponse
 
     [JsonProperty("hearing_reserved_until")]
     public string HearingReservedUntil { get; set; }
+
+    [JsonProperty("hearing_reserved_by_id")]
+    public int? HearingReservedById { get; set; }
+
+    [JsonProperty("hearing_reserved_dispute_guid")]
+    public Guid? HearingReservedDisputeGuid { get; set; }
 }

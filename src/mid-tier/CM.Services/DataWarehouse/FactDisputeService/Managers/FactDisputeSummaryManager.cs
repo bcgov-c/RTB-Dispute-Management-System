@@ -16,10 +16,9 @@ namespace CM.Services.DataWarehouse.FactDisputeService.Managers;
 public class FactDisputeSummaryManager : StatisticManagerBase
 {
     private static bool _anyFailed;
-    private static int[] outcomeDocFileTypes = { 1, 2, 3, 4, 5, 6, 7, 8, 25, 30, 31, 32, 33, 40, 41, 42, 45, 46, 47, 50, 55, 60 };
-    private static int[] outcomeDocFileTypesOrdersPossession = { 10, 11 };
-    private static int[] outcomeDocFileTypesOrderMonetary = { 15, 16 };
-    private static int[] outcomeDocFileTypesDecisionsInterim = { 30, 31, 32, 33, 60 };
+    private static int[] outcomeDocFileTypesOrdersPossession = { 15, 16, 17 };
+    private static int[] outcomeDocFileTypesOrderMonetary = { 10, 11 };
+    private static int[] outcomeDocFileTypesDecisionsInterim = { 30, 31, 32, 33, 34, 35, 36, 37, 60 };
 
     public FactDisputeSummaryManager(IUnitOfWork unitOfWork, IUnitOfWorkDataWarehouse dwUnitOfWork, ILogger logger)
         : base(unitOfWork, dwUnitOfWork, logger)
@@ -28,13 +27,9 @@ public class FactDisputeSummaryManager : StatisticManagerBase
 
     public async Task RecordClosedDisputes(List<ExistedFileNumbersResponse> fileNumbersResponse, int dateDelay)
     {
-        var lastLoadedDateTime = await DwUnitOfWork.LoadingHistoryRepository.GetLastLoadStartDateTime();
-
         var existedDisputeGuids = fileNumbersResponse.Select(x => x.DisputeGuid).ToList();
-        var disputes = await UnitOfWork.DisputeRepository.GetDisputesWithLastModify(existedDisputeGuids, lastLoadedDateTime, dateDelay);
-        var dwDisputesGuid = await DwUnitOfWork.FactDisputeSummaryRepository.GetDelayedDisputes(dateDelay);
-        var dwDisputes = await UnitOfWork.DisputeRepository.GetDisputesByDisputeGuid(dwDisputesGuid);
-        disputes = disputes.Union(dwDisputes).ToList();
+
+        var finalDisputes = await CommonFieldsLoader.GetDisputes(UnitOfWork, DwUnitOfWork, dateDelay);
 
         var insertedCount = 0;
 
@@ -42,7 +37,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
 
         try
         {
-            foreach (var dispute in disputes)
+            foreach (var dispute in finalDisputes)
             {
                 LogInformation($"FileNumber = {dispute.FileNumber}");
 
@@ -92,6 +87,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         }
         catch (Exception ex)
         {
+            LogError(ex.Message, ex);
             await LoadingHistoryManager.UpdateLoadingHistory(loadingEventId, LoadingHistoryStatus.Failed, ex.Message, insertedCount);
             return;
         }
@@ -203,6 +199,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         var disputeNotices = await UnitOfWork.NoticeRepository.FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid);
         LogInformation($"DisputeNotices count = {disputeNotices.Count}");
         var noticeServices = await UnitOfWork.NoticeServiceRepository.FindAllAsync(x => x.IsServed == true && disputeNotices.Select(n => n.NoticeId).Contains(x.NoticeId));
+        var noticeNotServed = await UnitOfWork.NoticeServiceRepository.FindAllAsync(x => x.IsServed == false && disputeNotices.Select(n => n.NoticeId).Contains(x.NoticeId));
         var amendmentsCount = await CommonFieldsLoader.GetAmendmentsCount(UnitOfWork, dispute.DisputeGuid);
         var subServices = await UnitOfWork.SubstitutedServiceRepository.FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid);
 
@@ -257,7 +254,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         var odFiles = outcomeDocFiles.Count > 0 ? outcomeDocFiles.Where(x => x.FileId != null && x.File != null).Select(x => x.File).ToList() : new List<Data.Model.File>();
         LogInformation("This point achieved!!!!!!!!!!");
         LogInformation($"OdFiles count = {odFiles.Count}");
-        var odFileSizesSum = odFiles.Count > 0 ? Utils.ConvertBytesToMegabytes(odFiles.Sum(x => x.FileSize)) : 0;
+        var odFileSizesSum = odFiles.Count > 0 ? FileUtils.ConvertBytesToMegabytes(odFiles.Sum(x => x.FileSize)) : 0;
         var outcomeDocDeliveries = await UnitOfWork.OutcomeDocDeliveryRepository.FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid && x.IsDelivered == true);
         var totalOpenTimeMin = Utils.GetStatusesTotalOpenTime(disputeStatuses.ToList());
         var totalCitizenStatusTime = citizenStatusList.Sum(x => x.DurationSeconds.GetValueOrDefault());
@@ -279,13 +276,13 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         LogInformation($"RespondentFilePackages count = {respondentFilePackages.Count}");
         var applicantFilePackagesId = applicantFilePackages.Select(x => x.FilePackageId);
         var applicantFiles = associatedFiles.Where(x => applicantFilePackagesId.Contains(x.FilePackageId.GetValueOrDefault())).ToList();
-        var applicantFileSizesSum = Utils.ConvertBytesToMegabytes(applicantFiles.Sum(x => x.FileSize));
+        var applicantFileSizesSum = FileUtils.ConvertBytesToMegabytes(applicantFiles.Sum(x => x.FileSize));
         var respondentFilePackagesId = respondentFilePackages.Select(x => x.FilePackageId);
         var respondentFiles = associatedFiles.Where(x => respondentFilePackagesId.Contains(x.FilePackageId.GetValueOrDefault())).ToList();
         LogInformation($"RespondentFiles count = {respondentFiles.Count}");
-        var respondentFileSizesSum = Utils.ConvertBytesToMegabytes(respondentFiles.Sum(x => x.FileSize));
+        var respondentFileSizesSum = FileUtils.ConvertBytesToMegabytes(respondentFiles.Sum(x => x.FileSize));
 
-        var outcomeDocFilesSelected = disputeOutcomeDocFiles.Where(x => outcomeDocFileTypes.Contains(x.FileType) && x.FileId.HasValue).ToList();
+        var outcomeDocFilesSelected = disputeOutcomeDocFiles.Where(x => x.FileId.HasValue).ToList();
         var documentSets = outcomeDocFilesSelected.Select(x => x.OutcomeDocGroupId).Distinct();
 
         var odFilesOrdersMonetary = disputeOutcomeDocFiles.Where(x => outcomeDocFileTypesOrderMonetary.Contains(x.FileType)
@@ -324,8 +321,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
 
         var completedTasks = tasks.Where(x => x.TaskStatus == (byte)TasksStatus.Complete).ToList();
         LogInformation($"CompletedTasks count = {completedTasks.Count}");
-        var avgTaskOpenTimeMin = completedTasks.Any() ? (completedTasks.Sum(x => x.UnassignedDurationSeconds)
-                                                         + completedTasks.Sum(x => x.UnassignedDurationSeconds)) / (60 * tasks.Count()) : 0;
+        var avgTaskOpenTimeMin = completedTasks.Any() ? completedTasks.Sum(x => (x.AssignedDurationSeconds + x.UnassignedDurationSeconds) / 60) / completedTasks.Count() : 0;
 
         var amendRemovedParticipants = allParticipants.Where(x => x.ParticipantStatus == (byte)ParticipantStatus.Removed);
         var amendRemovedIssues = allClaims.Where(x => x.ClaimStatus == (byte)ClaimStatus.Removed);
@@ -369,6 +365,22 @@ public class FactDisputeSummaryManager : StatisticManagerBase
             .FirstOrDefault()?.DocCompletedDate;
         var firstDecisionDateTimeId = await GetTimeIdAsync(firstDecisionDateTime);
 
+        var isMissingResolutionTime = disputeHearings
+            .Any(x => !x.Hearing.HearingPrepTime.HasValue || !x.Hearing.HearingDuration.HasValue)
+            || outcomeDocGroups.Any(x => !x.DocWritingTime.HasValue);
+
+        var caseManagedTimeMin = disputeStatuses
+            .Where(x => x.Status == (byte)DisputeStatuses.CaseManaged)
+            .Sum(x => x.DurationSeconds);
+
+        var claimCodes = new byte[] { 123, 124, 125, 126, 102, 122, 104, 101, 103, 105, 131, 130, 106, 227, 226, 132, 137, 138, 139, 140 };
+        var countPossessions = claims.Count(x => x.ClaimCode.HasValue && claimCodes.Contains(x.ClaimCode.Value));
+        var requestedPossession = countPossessions > 0;
+
+        var activeRemediesCount = remediesForRequested.Count(x => x.RemedyStatus == (byte?)RemedyStatus.NotSet);
+        var activeNoticeServices = await UnitOfWork.NoticeServiceRepository
+            .FindAllAsync(x => x.IsServed == null && disputeNotices.Select(n => n.NoticeId).Contains(x.NoticeId));
+
         LogInformation("All fields are get");
 
         FactDisputeSummary factDisputeSummary;
@@ -410,6 +422,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         factDisputeSummary.HearingParticipations = hearingParticipations?.Count ?? 0;
         factDisputeSummary.Notices = notices?.Count ?? 0;
         factDisputeSummary.NoticeServices = noticeServices?.Count ?? 0;
+        factDisputeSummary.NoticeNotServed = noticeNotServed?.Count ?? 0;
         factDisputeSummary.Amendments = amendmentsCount;
         factDisputeSummary.SubServiceRequests = subServices?.Count ?? 0;
         factDisputeSummary.EvidenceFiles = linkedFiles.Count;
@@ -420,7 +433,7 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         factDisputeSummary.DecisionsAndOrdersMb = odFileSizesSum;
         factDisputeSummary.DocumentsDelivered = outcomeDocDeliveries.Count;
         factDisputeSummary.TotalOpenTimeMin = totalOpenTimeMin;
-        factDisputeSummary.TotalCitizenStatusTimeMin = totalCitizenStatusTime / Utils.SecondsInMinute;
+        factDisputeSummary.TotalCitizenStatusTimeMin = totalCitizenStatusTime / Constants.SecondsInMinute;
         factDisputeSummary.TotalIoTimeMin = totalIoTimeMin;
         factDisputeSummary.TotalArbTimeMin = totalArbTimeMin;
         factDisputeSummary.SubmittedDateTime = dispute.SubmittedDate;
@@ -499,6 +512,11 @@ public class FactDisputeSummaryManager : StatisticManagerBase
         factDisputeSummary.DisputeComplexity = (int?)disputeComplexity;
         factDisputeSummary.FirstDecisionDateTime = firstDecisionDateTime;
         factDisputeSummary.FirstDecisionDateTimeId = firstDecisionDateTimeId;
+        factDisputeSummary.IsMissingResolutionTime = isMissingResolutionTime;
+        factDisputeSummary.CaseManagedTimeMin = caseManagedTimeMin.HasValue ? caseManagedTimeMin / Constants.SecondsInMinute : 0;
+        factDisputeSummary.RequestedPossession = requestedPossession;
+        factDisputeSummary.IsMissingIssueOutcomes = activeRemediesCount > 0;
+        factDisputeSummary.IsMissingNoticeService = activeNoticeServices.Count > 0;
 
         LogInformation("All fields are assigned");
 

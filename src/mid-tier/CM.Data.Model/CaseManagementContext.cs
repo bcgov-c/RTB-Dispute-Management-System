@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CM.Common.Utilities;
+using CM.Data.Model.AdHocFile;
 using CM.Data.Model.Context;
 using CM.Data.Model.HearingReport;
 using CM.Data.Model.Search;
@@ -175,6 +176,28 @@ public sealed partial class CaseManagementContext : DbContext
 
     public DbSet<CustomConfigObject> CustomConfigObjects { get; set; }
 
+    public DbSet<AdHocFileCleanup> AdHocFileCleanup { get; set; }
+
+    public DbSet<AdHocFileCleanupTracking> AdHocFileCleanupTracking { get; set; }
+
+    public DbSet<ServiceAuditLog> ServiceAuditLogs { get; set; }
+
+    public DbSet<ExternalErrorLog> ExternalErrorLogs { get; set; }
+
+    public DbSet<Poll> Polls { get; set; }
+
+    public DbSet<PollResponse> PollResponses { get; set; }
+
+    public DbSet<ParticipantIdentity> ParticipantIdentities { get; set; }
+
+    public DbSet<OnlineMeeting> OnlineMeetings { get; set; }
+
+    public DbSet<DisputeLink> DisputeLinks { get; set; }
+
+    public DbSet<DisputeVerification> DisputeVerifications { get; set; }
+
+    public DbSet<VerificationAttempt> VerificationAttempts { get; set; }
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         AddTimestamps();
@@ -212,14 +235,7 @@ public sealed partial class CaseManagementContext : DbContext
         //// https://github.com/npgsql/efcore.pg/issues/1064
         modelBuilder.UseSerialColumns();
         modelBuilder.AddViewsAndCustomSets();
-        modelBuilder.ApplyDisputeRelations();
-        modelBuilder.ApplyTrialRelations();
-        modelBuilder.ApplyParticipantRelations();
-        modelBuilder.ApplySystemUserRelations();
-        modelBuilder.ApplyFileRelations();
-        modelBuilder.ApplyCommonFileRelations();
-        modelBuilder.ApplySchedulePeriodRelations();
-        modelBuilder.ApplyHearingRelations();
+        modelBuilder.ApplyRelations();
         modelBuilder.ApplyIndexes();
         modelBuilder.ApplyUniqueIndexes();
         modelBuilder.ApplyIsDeletedFilter();

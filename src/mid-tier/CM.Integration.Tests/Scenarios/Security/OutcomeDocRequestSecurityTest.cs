@@ -43,4 +43,26 @@ public partial class SecurityTests
         var outcomeDocRequestGetAllResponse = OutcomeDocRequestManager.GetDisputeOutcomeDocRequests(Client, Data.Dispute.DisputeGuid);
         outcomeDocRequestGetAllResponse.ResponseMessage.StatusCode.Should().Be(httpStatusCode);
     }
+
+    [Theory]
+    [InlineData(Users.Admin, Users.Admin, HttpStatusCode.OK)]
+    [InlineData(Users.User, Users.User, HttpStatusCode.OK)]
+    [InlineData(Users.User2, Users.User2, HttpStatusCode.Unauthorized)]
+    [InlineData(Users.RemoteOffice, Users.RemoteOffice, HttpStatusCode.OK)]
+    [InlineData(null, null, HttpStatusCode.Unauthorized)]
+    public void CheckExternalGetOutcomeDocRequestSecurity(string userName, string password, HttpStatusCode httpStatusCode)
+    {
+        if (userName == null)
+        {
+            var auth = Client.Authenticate(Data.Participant.AccessCode);
+            Assert.True(auth.ResponseObject is string);
+        }
+        else
+        {
+            Client.Authenticate(userName, password);
+        }
+
+        var externalOutcomeDocRequestGetAllResponse = OutcomeDocRequestManager.GetExternalDisputeOutcomeDocRequests(Client, Data.Dispute.DisputeGuid);
+        externalOutcomeDocRequestGetAllResponse.ResponseMessage.StatusCode.Should().Be(httpStatusCode);
+    }
 }

@@ -62,4 +62,6 @@ public class ConferenceBridge : BaseEntity
     public ICollection<DisputeHearing> DisputeHearings { get; set; }
 
     public ICollection<HearingAuditLog> HearingAuditLogs { get; set; }
+
+    public ICollection<Hearing> Hearings { get; set; }
 }

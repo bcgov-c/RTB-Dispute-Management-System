@@ -11,6 +11,8 @@ import DropdownModel from '../../../core/components/dropdown/Dropdown_model';
 import DropdownView from '../../../core/components/dropdown/Dropdown';
 import DoubleSelectorView from '../../../core/components/double-selector/DoubleSelector';
 import DoubleSelectorModel from '../../../core/components/double-selector/DoubleSelector_model';
+import AddressView from '../../../core/components/address/Address';
+import AddressModel from '../../../core/components/address/Address_model';
 import EmailView from '../../../core/components/email/Email';
 import template from './NewDisputePage_template.tpl';
 
@@ -24,14 +26,11 @@ const DROPDOWN_CODE_NO = '2';
 const DROPDOWN_CODE_HOME = '1';
 const DROPDOWN_CODE_MH_PARK = '2';
 const TENANCY_COUNTRY = 'Canada';
-const GEOZONE_WARNING = 'This address does not appear to be a valid British Columbia address. Check that the address is correct before you continue.';
+const GEOZONE_WARNING = 'We were not able to confirm your address with the Canada Post system. Please update the address then press the&nbsp;<b>Retry</b>&nbsp;link above. If no corrections need to be made, you may continue without changes.';
 const TENANT_DR_WARNING = `A Tenant application by Direct Request is not allowed for rentals that fall under the Manufactured Home Park Tenancy Act (MHPTA).  
 Based on the above selections this unit falls under the MHPTA and this application cannot be submitted by Direct Request.`;
 const ISSUES_ARIE_TEXT = 'All pages and signed?';
-const RENTAL_ARIE_TEXT = 'Main Rental Site Address';
 const ISSUES_TEXT = 'Issues selected and signed?'
-const RENTAL_TEXT = 'Rental Unit Street Address'
-
 
 const geozoneChannel = Radio.channel('geozone');
 const participantsChannel = Radio.channel('participants');
@@ -53,9 +52,7 @@ export default PageView.extend({
     rentalTypeRegion: '.office-new-dispute-rental-type',
     ownsHomeRegion: '.office-new-dispute-owns-home',
     crossAppRegion: '.office-new-dispute-cross-app',
-    streetRegion: '.office-new-dispute-street',
-    cityRegion: '.office-new-dispute-city',
-    postalCodeRegion: '.office-new-dispute-postal-code',
+    addressRegion: '.office-new-page-address',
 
     addressQuestionRegion: '.office-new-dispute-shared-address',
     rentalUnitRegion: '.office-new-dispute-rental-unit',
@@ -213,12 +210,10 @@ export default PageView.extend({
 
       if(pageData.isRentIncrease) { 
         this.issuesSelectedModel.set('labelText', ISSUES_ARIE_TEXT);
-        this.streetModel.set('labelText', RENTAL_ARIE_TEXT);
         this.rentIncreaseUnitsModel.set('required', true);
         this.rentIncreaseInformationModel.set('required', true);
       } else {
         this.issuesSelectedModel.set('labelText', ISSUES_TEXT);
-        this.streetModel.set('labelText', RENTAL_TEXT);
         this.rentIncreaseUnitsModel.set('required', false);
         this.rentIncreaseInformationModel.set('required', false);
       }
@@ -399,11 +394,7 @@ export default PageView.extend({
   },
 
   _validateGeozone() {
-    if (!_.all([this.streetModel, this.cityModel, this.postalCodeModel], (model) => model.isValid() )) {
-      return;
-    }
-
-    const addressString = `${this.streetModel.getData()} ${this.cityModel.getData()}, ${this.postalCodeModel.getData()}`;
+    const addressString = this.rentalAddressModel.getAddressString({no_province: true, no_country: true });
 
     loaderChannel.trigger('page:load');
     this.listenToOnce(geozoneChannel, 'lookup:address:complete', function(geozone_val) {
@@ -439,6 +430,23 @@ export default PageView.extend({
 
   _doesNotHaveRespondentAddress() {
     return String(this.hasRespondentAddressModel.getData()) === String(DROPDOWN_CODE_NO);
+  },
+
+  _showARSWarningText() {
+    const isLandlord = this.step1PageData.isLandlord;
+    const isTenant = this.step1PageData.isTenant;
+    const isCurrentTenancy = this.step1PageData.isCurrentTenancy;
+    const isPastTenancy = this.step1PageData.isPastTenancy;
+    const isNotEmergency = this.step1PageData.isNotEmergency;
+    const isDirectRequest = this.step1PageData.isDirectRequest;
+    const isRentIncrease = this.step1PageData.isRentIncrease;
+
+    const isTenantPT = isTenant && isPastTenancy && !isDirectRequest;
+    const isTenantCT = isTenant && isCurrentTenancy && isNotEmergency;
+    const isLandlordPT = isLandlord && isPastTenancy;
+    const isLandlordCt = isLandlord && isCurrentTenancy && isNotEmergency && !isRentIncrease;
+
+    return isTenantPT || isTenantCT || isLandlordPT || isLandlordCt;
   },
 
   _getPackageMethodPickupOptions(configCodesToUse) {
@@ -577,38 +585,6 @@ export default PageView.extend({
       apiMapping: 'cross_app_file_number'
     });
 
-    this.streetModel = new InputModel({
-      labelText: 'Rental Unit Street Address',
-      errorMessage: 'Rental Address is required',
-      required: true,
-      minLength: this.ADDRESS_FIELD_MIN,
-      maxLength: this.ADDRESS_FIELD_MAX,
-      value: null,
-      apiMapping: 'tenancy_address',
-      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
-    });
-
-    this.cityModel = new InputModel({
-      labelText: 'City',
-      errorMessage: 'City is required',
-      required: true,
-      minLength: this.CITY_FIELD_MIN,
-      maxLength: this.APPLICANT_FIELD_MAX,
-      value: null,
-      apiMapping: 'tenancy_city',
-    });
-
-    this.postalCodeModel = new InputModel({
-      labelText: 'Postal Code',
-      errorMessage: 'Required',
-      required: true,
-      inputType: 'postal_code',
-      subLabel: ' ',
-      maxLength: this.POSTAL_CODE_FIELD_MAX,
-      value: null,
-      apiMapping: 'tenancy_zip_postal',
-    });
-
     this.addressQuestionModel = new DropdownModel({
       labelText: 'Shared Address?',
       optionData: [{ value: DROPDOWN_CODE_YES, text: 'Yes' }, { value: DROPDOWN_CODE_NO, text: 'No' }],
@@ -652,6 +628,24 @@ export default PageView.extend({
       currentValue: null
     });
 
+    const rentalAddressApiMappings = {
+      street: 'tenancy_address',
+      city: 'tenancy_city',
+      country: 'tenancy_country',
+      postalCode: 'tenancy_zip_postal',
+      geozoneId: 'tenancy_geozone_id',
+      addressIsValidated: 'tenancy_address_validated'
+    };
+    this.rentalAddressModel = new AddressModel({
+      json: _.mapObject(rentalAddressApiMappings, (val) => { return this.model.get(val); }),
+      apiMapping: rentalAddressApiMappings,
+      required: true,
+      selectProvinceAndCountry: false,
+      showUpdateControls: false,
+      useSubLabel: false,
+      useAddressValidation: true,
+    });
+
     // Primary Applicant Info
     const PARTICIPANT_TYPE_DISPLAY = configChannel.request('get', 'PARTICIPANT_TYPE_DISPLAY');
     const PARTICIPANT_TYPE_PERSON = configChannel.request('get', 'PARTICIPANT_TYPE_PERSON');
@@ -680,6 +674,7 @@ export default PageView.extend({
     });
 
     this.firstNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: isBusiness ? 'Business contact first name' : 'First name',
       errorMessage: 'First name is required',
@@ -690,6 +685,7 @@ export default PageView.extend({
     });
 
     this.lastNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: isBusiness ? 'Business contact last name' : 'Last name',
       errorMessage: 'Last name is required',
@@ -804,11 +800,6 @@ export default PageView.extend({
 
     this.SEND_METHOD_EMAIL = String(configChannel.request('get', 'SEND_METHOD_EMAIL'));
 
-    this.CITY_FIELD_MIN = configChannel.request('get', 'CITY_FIELD_MIN');
-    this.ADDRESS_FIELD_MIN = configChannel.request('get', 'ADDRESS_FIELD_MIN');
-    this.ADDRESS_FIELD_MAX = configChannel.request('get', 'ADDRESS_FIELD_MAX');
-    this.POSTAL_CODE_FIELD_MAX = configChannel.request('get', 'POSTAL_CODE_FIELD_MAX');
-    
     this.geozoneWarning = null;
     this.tenantDrWarning = null;
     this.noEmail = false;
@@ -817,7 +808,7 @@ export default PageView.extend({
     this.createSubModels();
     this.setupListeners();
 
-    const siteInfoGroup = ['rentalTypeRegion', 'ownsHomeRegion', 'streetRegion', 'cityRegion', 'postalCodeRegion', 'addressQuestionRegion', 'rentalUnitRegion'];
+    const siteInfoGroup = ['rentalTypeRegion', 'ownsHomeRegion', 'addressRegion', 'addressQuestionRegion', 'rentalUnitRegion'];
     const applicantInfoGroup = ['participantTypeRegion', 'crossAppRegion', 'businessNameRegion', 'firstNameRegion', 'lastNameRegion', 'emailRegion', 'phoneRegion', 'packageMethodRegion'];
 
     this.step1Group = _.union([], siteInfoGroup, applicantInfoGroup);
@@ -940,12 +931,11 @@ export default PageView.extend({
     this.showChildView('rentalTypeRegion', new DropdownView({ model: this.rentalTypeModel }));
     this.showChildView('ownsHomeRegion', new DropdownView({ model: this.ownsHomeModel }));
     this.showChildView('crossAppRegion', new InputView({ model: this.crossAppModel }));
-    this.showChildView('streetRegion', new InputView({ model: this.streetModel }));
-    this.showChildView('cityRegion', new InputView({ model: this.cityModel }));
-    this.showChildView('postalCodeRegion', new InputView({ model: this.postalCodeModel }));
 
     this.showChildView('addressQuestionRegion', new DropdownView({ model: this.addressQuestionModel }));
     this.showChildView('rentalUnitRegion', new DoubleSelectorView({ model: this.rentalUnitModel }));
+
+    const addressRegion = this.showChildView('addressRegion', new AddressView({ model: this.rentalAddressModel }));
 
     // Primary Applicant information
     this.showChildView('participantTypeRegion', new RadioView({ model: this.participantTypeModel }));
@@ -970,17 +960,15 @@ export default PageView.extend({
       this.listenTo(unitRegion.currentView, 'itemComplete', this.clickRentIncreaseSubmit.bind(this));
     }
 
-    // Setup address view listeners for geozone
-    _.each(['streetRegion', 'cityRegion', 'postalCodeRegion'], function(regionName) {
-      const view = this.getChildView(regionName);
-      if (!view) {
-        return;
-      }
-      
-      this.stopListening(view, 'blur');
-      this.listenTo(view, 'blur', this._validateGeozone, this);
-    }, this);
-    
+    if (addressRegion) {
+      this.listenTo(addressRegion.currentView, 'itemComplete', (model) => {
+        if (!addressRegion.currentView?.model?.get('addressIsValidated')) {
+          this.showGeozoneWarning();
+        } else {
+          this.hideGeozoneWarning();
+        }
+      });
+    }
   },
 
   templateContext() {
@@ -1006,6 +994,7 @@ export default PageView.extend({
       isDirectRequest,
       isRentIncrease,
       isBusiness: this._isBusinessSelected(),
+      showARSWarningText: this._showARSWarningText(),
       doesNotHaveRespondentAddress: this._doesNotHaveRespondentAddress(),
       hasAdditionalForms: this._hasAdditionalForms(),
       issuesSelectedLabel,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CM.Business.Entities.Models.EmailMessage;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.Base;
@@ -65,9 +66,12 @@ public class EmailMessageRepository : CmRepository<Model.EmailMessage>, IEmailMe
         var emailMessage = await Context.EmailMessages
             .SingleOrDefaultAsync(e => e.EmailMessageId == emailId);
 
-        emailMessage.EmailAttachments = await Context.EmailAttachments
-            .Where(e => e.EmailMessageId == emailId && e.IsDeleted == false)
-            .ToListAsync();
+        if (emailMessage != null)
+        {
+            emailMessage.EmailAttachments = await Context.EmailAttachments
+                .Where(e => e.EmailMessageId == emailId && e.IsDeleted == false)
+                .ToListAsync();
+        }
 
         return emailMessage;
     }
@@ -79,12 +83,62 @@ public class EmailMessageRepository : CmRepository<Model.EmailMessage>, IEmailMe
             .Select(d => d.ModifiedDate)
             .ToListAsync();
 
-        return dates?.FirstOrDefault();
+        return dates.FirstOrDefault();
     }
 
     public async Task<bool> EmailMessageExists(int emailMessageId, Guid disputeGuid)
     {
         var exists = await Context.EmailMessages.AnyAsync(x => x.EmailMessageId == emailMessageId && x.DisputeGuid == disputeGuid);
         return exists;
+    }
+
+    public async Task<List<Model.EmailMessage>> GetUnsentEmails(int maxBatchSize = 1000)
+    {
+        var emailMessages = await Context.EmailMessages
+            .Where(e => e.SendStatus == (byte)EmailStatus.UnSent &&
+                        e.IsActive &&
+                        e.MessageType < (byte)EmailMessageType.Pickup &&
+                        e.SendStatus != (byte)EmailStatus.Pending &&
+                        e.PreferredSendDate <= DateTime.UtcNow.AddMinutes(10))
+            .Include(x => x.EmailAttachments)
+            .ApplyPaging(maxBatchSize, 0)
+            .ToListAsync();
+
+        return emailMessages;
+    }
+
+    public async Task<List<Model.EmailMessage>> GetErrorEmails(int emailErrorResentHoursAgo = 1, int maxBatchSize = 1000)
+    {
+        var emailMessages = await Context.EmailMessages
+            .Where(e => e.SendStatus == (byte)EmailStatus.Error &&
+                        e.IsActive &&
+                        e.MessageType < (byte)EmailMessageType.Pickup &&
+                        e.SendStatus != (byte)EmailStatus.Pending &&
+                        e.SentDate == null &&
+                        e.CreatedDate >= DateTime.UtcNow.AddHours(-emailErrorResentHoursAgo))
+            .Include(x => x.EmailAttachments)
+            .ApplyPaging(maxBatchSize, 0)
+            .ToListAsync();
+
+        return emailMessages;
+    }
+
+    public async Task<(List<Model.EmailMessage> emailMessages, int totalCount)> GetExternalEmailMessages(Guid disputeGuid, ExternalEmailMessagesRequest request)
+    {
+        var emailMessages = await Context.EmailMessages
+            .Where(e => e.DisputeGuid == disputeGuid &&
+                            e.ParticipantId.HasValue &&
+                            request.Participants.Contains(e.ParticipantId.Value) &&
+                            e.SendStatus == (byte?)EmailStatus.Sent)
+            .ToListAsync();
+
+        foreach (var item in emailMessages)
+        {
+            item.EmailAttachments = await Context.EmailAttachments
+                .Where(e => e.EmailMessageId == item.EmailMessageId && e.IsDeleted == false)
+                .ToListAsync();
+        }
+
+        return (emailMessages, emailMessages.Count);
     }
 }

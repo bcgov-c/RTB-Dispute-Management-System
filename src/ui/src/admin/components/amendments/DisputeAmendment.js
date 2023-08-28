@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays amendment information. 
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import template from './DisputeAmendment_template.tpl';
@@ -10,7 +13,10 @@ const Formatter = Radio.channel('formatter').request('get');
   export default Marionette.View.extend({
   template,
   className: 'amendment-list-item',
-
+  /**
+   * 
+   * @param {Boolean} enableUnlinkedIcon - Displays "! Unlinked" for amendments without a notice id
+   */
   initialize(options) {
     this.mergeOptions(options, ['enableUnlinkedIcon']);
   },

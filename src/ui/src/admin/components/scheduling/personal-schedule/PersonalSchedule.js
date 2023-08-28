@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays all hearings for a selected month and user
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
@@ -179,21 +182,6 @@ const PersonalSchedule = Marionette.View.extend({
       loaderChannel.trigger('page:load:complete');
       this.loaded = true;
     });
-    /*
-    hearingChannel.request('get:by:owner', this.currentPickedUser, searchParams).done((hearings) => {
-      hearings = hearings || {};
-      this.calendarGridModel.set({ currentPickedMonth: currentMonth, currentPickedYear: currentYear });
-      this.calendarGridModel.parseOwnerFromApi(hearings || [], startDateOfMonth);
-      this.todayCalendarGridModel.parseMyTodayHearingFromApi(hearings || []);
-      this.loaded = true;
-      this.render();
-    }).fail(
-      generalErrorFactory.createHandler('ADMIN.OWNER.HEARINGS.LOAD', () => this.render())
-    ).always(() => {
-      loaderChannel.trigger('page:load:complete');
-      this.loaded = true;
-    });
-    */
   },
 
   clickNext() {

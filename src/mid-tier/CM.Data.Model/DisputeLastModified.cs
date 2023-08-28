@@ -9,7 +9,7 @@ public class DisputeLastModified
     [Key]
     public int DisputeLastModifiedId { get; set; }
 
-    [ForeignKey("DisputeGuid")]
+    [ForeignKey("Dispute")]
     public Guid DisputeGuid { get; set; }
 
     public DateTime LastModifiedDate { get; set; }

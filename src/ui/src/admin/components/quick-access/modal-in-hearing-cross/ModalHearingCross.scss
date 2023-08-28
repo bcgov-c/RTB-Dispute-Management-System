@@ -1,0 +1,59 @@
+.modal-hearing-cross {
+  width: 1000px;
+
+  &__wrapper {
+    display: flex;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+
+    &--right {
+      @extend .modal-hearing-cross__item;
+
+      // .modal-hearing-cross__item__info { padding-left: 10px; }
+    }
+
+    &__header {
+      display: flex;
+      padding: 0 10px;
+    }
+
+    &__border {
+      border-right: 1px #e5e5e5 solid;
+    }
+
+    &__title {
+      font-size: 20px;
+    }
+
+    &__info-wrapper {
+      margin-top: 20px;
+    }
+
+    &__info {
+      padding: 10px 0;
+      border-top: 1px #e5e5e5 solid;
+      padding-left: 10px;
+    }
+  }
+
+  &__img {
+    width: 40px;
+    height: 38px;
+    margin-right: 8px;
+
+  }
+
+  &__confirmation-text {
+    margin-top: 40px;
+    margin-left: 10px;
+
+    &--error {
+      @extend .modal-hearing-cross__confirmation-text;
+      color: #d80000;
+    }
+  }
+}

@@ -7,7 +7,6 @@ using CM.Business.Services.Parties;
 using CM.Business.Services.SubmissionReceipt;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -134,5 +133,18 @@ public class SubmissionReceiptController : BaseController
     {
         var submissionReceiptList = await _submissionReceiptService.GetList(disputeGuid);
         return Ok(submissionReceiptList);
+    }
+
+    [HttpGet("api/externalsubmissionreceipts/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalSubmissionReceipts(Guid disputeGuid, ExternalSubmissionReceiptRequest request, int count, int index)
+    {
+        if (request.Participants == null || request.Participants.Length < 1)
+        {
+            return BadRequest(ApiReturnMessages.EmptyParticipantList);
+        }
+
+        var externalSubmissionReceiptList = await _submissionReceiptService.GetExternalSubmissionReceipts(disputeGuid, request, count, index);
+        return Ok(externalSubmissionReceiptList);
     }
 }

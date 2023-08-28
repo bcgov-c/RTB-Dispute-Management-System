@@ -10,7 +10,7 @@
     <div class="da-upload-add-evidence-line-container">
       <div class="da-upload-evidence-file-upload-container">
         <div class="add-evidence-title">
-          <span class="da-upload-evidence-title">Other</span>
+          <span class="da-upload-evidence-title <%= isUploadingOtherEvidence ? '': 'hidden' %>">Other</span>
           <span class="add-evidence-files-count <%= isUpload ? 'hidden': '' %> <%= uploadedOtherEvidenceCount ? '' : 'hidden' %>">
             <%= '('+uploadedOtherEvidenceCount + ' ' + (uploadedOtherEvidenceCount === 1 ? 'file' : 'files')+' uploaded)' %>
           </span>

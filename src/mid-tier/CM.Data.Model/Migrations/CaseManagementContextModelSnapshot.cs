@@ -39,6 +39,80 @@ namespace CM.Data.Model.Migrations
                     b.ToTable("AccessCodeExcludeWords");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.AdHocFile.AdHocFileCleanup", b =>
+                {
+                    b.Property<long>("AdHocFileCleanupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("AdHocFileCleanupId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CronJob")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("QueryForCleanup")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<byte?>("Type")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("AdHocFileCleanupId");
+
+                    b.ToTable("AdHocFileCleanup");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.AdHocFile.AdHocFileCleanupTracking", b =>
+                {
+                    b.Property<long>("AdHocFileCleanupTrackingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<long>("AdHocFileCleanupTrackingId"));
+
+                    b.Property<long>("AdHocFileCleanupId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("StartTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("AdHocFileCleanupTrackingId");
+
+                    b.ToTable("AdHocFileCleanupTracking");
+                });
+
             modelBuilder.Entity("CM.Data.Model.Amendment", b =>
                 {
                     b.Property<int>("AmendmentId")
@@ -90,7 +164,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -105,7 +179,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("NoticeId")
                         .HasColumnType("integer");
@@ -156,7 +230,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -175,6 +249,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("AuditLogId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("DisputeGuid"), new[] { "ApiResponse", "ApiCallType" });
 
                     b.HasIndex("SubmitterParticipantId");
 
@@ -195,7 +273,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -206,7 +284,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("TextContent")
                         .HasColumnType("text");
@@ -258,7 +336,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -267,10 +345,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("PreferredSendDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("RecipientEmailAddress")
                         .HasMaxLength(100)
@@ -282,6 +360,8 @@ namespace CM.Data.Model.Migrations
                     b.HasKey("BulkEmailRecipientId");
 
                     b.HasIndex("AssociatedDisputeGuid");
+
+                    b.HasIndex("RecipientParticipantId");
 
                     b.ToTable("BulkEmailRecipients");
                 });
@@ -320,7 +400,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsAmended")
                         .HasColumnType("boolean");
@@ -332,11 +412,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("ClaimId");
 
                     b.HasIndex("ClaimGroupId");
+
+                    b.HasIndex("ClaimStatus");
 
                     b.ToTable("Claims");
                 });
@@ -356,7 +438,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -383,10 +465,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("NoticeDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("NoticeMethod")
                         .HasColumnType("smallint");
@@ -419,7 +501,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -431,7 +513,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("ClaimGroupId");
 
@@ -455,7 +537,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -473,7 +555,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("ParticipantId")
                         .HasColumnType("integer");
@@ -483,6 +565,10 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("ClaimGroupId");
 
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("GroupParticipantRole");
+
+                    b.HasIndex("GroupPrimaryContactId");
 
                     b.HasIndex("ParticipantId");
 
@@ -507,7 +593,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("Created_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("File_Number")
                         .IsRequired()
@@ -532,7 +618,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(2000)");
 
                     b.Property<DateTime?>("Comment_Submitted_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Comment_Submitter")
                         .HasMaxLength(50)
@@ -568,7 +654,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("Created_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("File_GUID")
                         .HasColumnType("uuid");
@@ -603,6 +689,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.HasKey("ETL_File_ID");
+
+                    b.HasIndex("File_Number");
+
+                    b.HasIndex("File_Type");
 
                     b.ToTable("CMSFiles");
                 });
@@ -706,6 +796,12 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("ETL_ParticipantRow_ID");
 
+                    b.HasIndex("CMS_Sequence_Number");
+
+                    b.HasIndex("Participant_Type");
+
+                    b.HasIndex("Request_ID");
+
                     b.ToTable("CMSParticipants");
                 });
 
@@ -724,7 +820,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FileDescription")
                         .HasMaxLength(1000)
@@ -748,6 +844,9 @@ namespace CM.Data.Model.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint");
 
+                    b.Property<byte?>("FileStatus")
+                        .HasColumnType("smallint");
+
                     b.Property<string>("FileTitle")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -762,9 +861,11 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("CommonFileId");
+
+                    b.HasIndex("FileType");
 
                     b.ToTable("CommonFiles");
                 });
@@ -789,7 +890,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DialInDescription1")
                         .IsRequired()
@@ -828,20 +929,20 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ParticipantCode")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("PreferredEndTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("PreferredOwner")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("PreferredStartTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("RecordCode")
                         .HasMaxLength(20)
@@ -863,7 +964,11 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("ParticipantCode")
                         .IsUnique();
 
+                    b.HasIndex("PreferredEndTime");
+
                     b.HasIndex("PreferredOwner");
+
+                    b.HasIndex("PreferredStartTime");
 
                     b.ToTable("ConferenceBridges");
                 });
@@ -883,7 +988,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -898,7 +1003,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ObjectDescription")
                         .HasMaxLength(255)
@@ -953,7 +1058,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
@@ -979,7 +1084,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ObjectJson")
                         .HasColumnType("json");
@@ -1009,19 +1114,19 @@ namespace CM.Data.Model.Migrations
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("ETL_DataRow_ID"));
 
                     b.Property<DateTime?>("Abandoned_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Additional_Rent_Increase")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Adjourned_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Applicant_Type")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Approved_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Arbitrator_Comments")
                         .HasMaxLength(255)
@@ -1031,20 +1136,20 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Cancelled_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Closed_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Conference_Bridge_Number")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("Created")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Created_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Cross_App_File_Number")
                         .HasMaxLength(60)
@@ -1073,19 +1178,19 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(61)");
 
                     b.Property<DateTime?>("DR_Pending_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Date_NTE_Served")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Date_Terminated")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Decision_Details")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Decision_Issue_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Decision_Staff_Code")
                         .HasMaxLength(20)
@@ -1166,7 +1271,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Hearing_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("Hearing_Duration")
                         .HasColumnType("integer");
@@ -1197,7 +1302,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("Last_Modified_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Method_of_Resolution")
                         .HasColumnType("smallint");
@@ -1222,10 +1327,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("Needs_Update_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("New_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
@@ -1248,7 +1353,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Order_of_Possession_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Outcome_Commercial_Landlord")
                         .HasColumnType("smallint");
@@ -1266,7 +1371,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("Ready_To_Pay_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Reference_Number")
                         .HasMaxLength(30)
@@ -1276,10 +1381,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("Reopened_1_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Reopened_2_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Request_ID")
                         .IsRequired()
@@ -1287,10 +1392,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("Rescheduled_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("Scheduled_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("Searchable_Record")
                         .HasColumnType("smallint");
@@ -1318,7 +1423,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("Submitted_Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Submitter")
                         .HasMaxLength(50)
@@ -1328,6 +1433,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.HasKey("ETL_DataRow_ID");
+
+                    b.HasIndex("File_Number");
+
+                    b.HasIndex("Request_ID");
 
                     b.ToTable("CMSData");
                 });
@@ -1344,7 +1453,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("CreationMethod")
                         .HasColumnType("smallint");
@@ -1385,7 +1494,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("InitialPaymentDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("InitialPaymentMethod")
                         .HasColumnType("smallint");
@@ -1400,10 +1509,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("OriginalNoticeDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("OriginalNoticeDelivered")
                         .HasColumnType("boolean");
@@ -1437,19 +1546,19 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("SubmittedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("TenancyAddress")
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
-                    b.Property<byte?>("TenancyAddressValidated")
+                    b.Property<bool?>("TenancyAddressValidated")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((byte)0);
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("TenancyAgreementDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("TenancyAgreementSignedBy")
                         .HasColumnType("smallint");
@@ -1463,7 +1572,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime?>("TenancyEndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("TenancyEnded")
                         .HasColumnType("smallint");
@@ -1472,7 +1581,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("TenancyStartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("TenancyUnitText")
                         .HasMaxLength(50)
@@ -1498,13 +1607,23 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("FileNumber");
 
+                    b.HasIndex("InitialPaymentBy");
+
+                    b.HasIndex("InitialPaymentDate");
+
                     b.HasIndex("ModifiedDate");
 
+                    b.HasIndex("OriginalNoticeId");
+
                     b.HasIndex("OwnerSystemUserId");
+
+                    b.HasIndex("SubmittedBy");
 
                     b.HasIndex("SubmittedDate");
 
                     b.HasIndex("TenancyAddress");
+
+                    b.HasIndex("TenancyCity");
 
                     b.HasIndex("TenancyZipPostal");
 
@@ -1529,16 +1648,16 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DatePaid")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DueDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FeeDescription")
                         .HasMaxLength(255)
@@ -1567,7 +1686,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PaymentOverrideCode")
                         .HasMaxLength(10)
@@ -1578,7 +1697,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("DisputeFeeId");
 
+                    b.HasIndex("DatePaid");
+
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("IsPaid");
+
+                    b.HasIndex("PayorId");
 
                     b.ToTable("DisputeFees");
                 });
@@ -1595,13 +1720,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("FlagEndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("FlagOwnerId")
                         .HasColumnType("integer");
@@ -1610,7 +1735,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("FlagStartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("FlagStatus")
                         .ValueGeneratedOnAdd()
@@ -1641,7 +1766,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("RelatedObjectId")
                         .HasColumnType("integer");
@@ -1649,6 +1774,10 @@ namespace CM.Data.Model.Migrations
                     b.HasKey("DisputeFlagId");
 
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("FlagOwnerId");
+
+                    b.HasIndex("FlagParticipantId");
 
                     b.ToTable("DisputeFlags");
                 });
@@ -1665,7 +1794,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -1692,7 +1821,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("NoticeConferenceBridgeId")
                         .HasColumnType("integer");
@@ -1703,6 +1832,8 @@ namespace CM.Data.Model.Migrations
                     b.HasKey("DisputeHearingId");
 
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("DisputeHearingRole");
 
                     b.HasIndex("DisputeHearingStatus");
 
@@ -1728,7 +1859,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("LastModifiedSource")
                         .HasColumnType("jsonb");
@@ -1738,7 +1869,58 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("DisputeGuid")
                         .IsUnique();
 
+                    b.HasIndex("LastModifiedDate");
+
                     b.ToTable("DisputesLastModified");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.DisputeLink", b =>
+                {
+                    b.Property<int>("DisputeLinkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("DisputeLinkId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DisputeLinkRole")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DisputeLinkStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DisputeLinkType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("OnlineMeetingId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("DisputeLinkId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("OnlineMeetingId");
+
+                    b.ToTable("DisputeLinks");
                 });
 
             modelBuilder.Entity("CM.Data.Model.DisputeProcessDetail", b =>
@@ -1756,7 +1938,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -1770,7 +1952,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("PreparationDuration")
                         .HasColumnType("integer");
@@ -1869,11 +2051,15 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StatusStartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("DisputeStatusId");
 
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("DisputeStatusId");
+
+                    b.HasIndex("IsActive");
 
                     b.HasIndex("Owner");
 
@@ -1902,7 +2088,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -1914,7 +2100,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ParticipantId")
                         .HasColumnType("integer");
@@ -1931,6 +2117,80 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("SystemUserId");
 
                     b.ToTable("DisputeUsers");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.DisputeVerification", b =>
+                {
+                    b.Property<int>("VerificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("VerificationId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DisputeFeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("HearingId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool?>("IsRefundIncluded")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("RefundInitiatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("RefundInitiatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("RefundNote")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("RefundStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("VerificationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("VerificationStatusDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte?>("VerificationSubStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("VerificationType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("VerificationId");
+
+                    b.HasIndex("DisputeFeeId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("HearingId");
+
+                    b.HasIndex("RefundInitiatedBy");
+
+                    b.ToTable("DisputeVerifications");
                 });
 
             modelBuilder.Entity("CM.Data.Model.EmailAttachment", b =>
@@ -1951,7 +2211,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("EmailMessageId")
                         .HasColumnType("integer");
@@ -1966,13 +2226,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("SendDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("EmailAttachmentId");
 
@@ -2007,7 +2267,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -2044,16 +2304,16 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ParticipantId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("PreferredSendDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("RecipientGroup")
                         .HasColumnType("smallint");
@@ -2065,7 +2325,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ResponseDueDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("Retries")
                         .ValueGeneratedOnAdd()
@@ -2085,7 +2345,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("SentDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Subject")
                         .IsRequired()
@@ -2097,9 +2357,15 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("EmailMessageId");
 
+                    b.HasIndex("CreatedDate");
+
                     b.HasIndex("DisputeGuid");
 
                     b.HasIndex("ParticipantId");
+
+                    b.HasIndex("PreferredSendDate");
+
+                    b.HasIndex("SendStatus", "MessageType", "IsActive");
 
                     b.ToTable("EmailMessages");
                 });
@@ -2119,7 +2385,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DefaultRecipientGroup")
                         .HasColumnType("smallint");
@@ -2131,7 +2397,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ReplyEmailAddress")
                         .HasMaxLength(100)
@@ -2203,14 +2469,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime>("Expiry")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime?>("Expiry")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsActive")
                         .HasColumnType("boolean");
@@ -2224,7 +2490,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ObjectJson")
                         .HasColumnType("json");
@@ -2266,6 +2532,88 @@ namespace CM.Data.Model.Migrations
                     b.ToTable("ExternalCustomDataObjects");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.ExternalErrorLog", b =>
+                {
+                    b.Property<int>("ExternalErrorLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("ExternalErrorLogId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ErrorComment")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ErrorDetails")
+                        .IsRequired()
+                        .HasMaxLength(2500)
+                        .HasColumnType("character varying(2500)");
+
+                    b.Property<byte?>("ErrorImpact")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("ErrorOwner")
+                        .HasColumnType("integer");
+
+                    b.Property<byte?>("ErrorSeverity")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("ErrorSite")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ErrorStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ErrorSubType")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("ErrorTitle")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<byte>("ErrorType")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ErrorUrgency")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("FeatureTitle")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ReportedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("ExternalErrorLogId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("ErrorOwner");
+
+                    b.ToTable("ExternalErrorLogs");
+                });
+
             modelBuilder.Entity("CM.Data.Model.ExternalFile", b =>
                 {
                     b.Property<int>("ExternalFileId")
@@ -2278,7 +2626,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("ExternalCustomDataObjectId")
                         .HasColumnType("integer");
@@ -2328,7 +2676,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OriginalFileName")
                         .IsRequired()
@@ -2357,7 +2705,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -2368,10 +2716,14 @@ namespace CM.Data.Model.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<DateTime?>("FileDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("FileGuid")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("FileMetaSummary")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("FileMimeType")
                         .IsRequired()
@@ -2427,11 +2779,16 @@ namespace CM.Data.Model.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsSourceFileDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OriginalFileName")
                         .IsRequired()
@@ -2476,7 +2833,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DecisionReference")
                         .HasColumnType("smallint");
@@ -2522,7 +2879,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("RemedyId")
                         .HasColumnType("integer");
@@ -2563,16 +2920,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("CreatedParticipantParticipantId")
-                        .HasColumnType("integer");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
-
-                    b.Property<int?>("DisputeId")
-                        .HasColumnType("integer");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -2581,10 +2932,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("PackageDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PackageDescription")
                         .HasMaxLength(10000)
@@ -2599,11 +2950,9 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("FilePackageId");
 
-                    b.HasIndex("CreatedParticipantParticipantId");
+                    b.HasIndex("CreatedBy");
 
                     b.HasIndex("DisputeGuid");
-
-                    b.HasIndex("DisputeId");
 
                     b.ToTable("FilePackages");
                 });
@@ -2617,16 +2966,24 @@ namespace CM.Data.Model.Migrations
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("FilePackageServiceId"));
 
                     b.Property<DateTime?>("ArchiveReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ArchiveServedBy")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ArchiveServiceComment")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime?>("ArchiveServiceDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("ArchiveServiceDateUsed")
                         .HasColumnType("smallint");
+
+                    b.Property<string>("ArchiveServiceDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<byte?>("ArchiveServiceMethod")
                         .HasColumnType("smallint");
@@ -2638,7 +2995,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("FilePackageId")
                         .HasColumnType("integer");
@@ -2653,7 +3010,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OtherParticipantName")
                         .HasMaxLength(255)
@@ -2666,6 +3023,9 @@ namespace CM.Data.Model.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int?>("OtherProofFileDescriptionId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("ParticipantId")
                         .HasColumnType("integer");
 
@@ -2673,7 +3033,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ServedBy")
                         .HasColumnType("integer");
@@ -2683,10 +3043,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("ServiceDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("ServiceDateUsed")
                         .HasColumnType("smallint");
+
+                    b.Property<string>("ServiceDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<byte?>("ServiceMethod")
                         .HasColumnType("smallint");
@@ -2696,7 +3060,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("FilePackageServiceId");
 
+                    b.HasIndex("ArchiveServedBy");
+
+                    b.HasIndex("ArchivedBy");
+
                     b.HasIndex("FilePackageId");
+
+                    b.HasIndex("OtherProofFileDescriptionId");
 
                     b.HasIndex("ParticipantId");
 
@@ -2718,11 +3088,14 @@ namespace CM.Data.Model.Migrations
                     b.Property<int?>("ConferenceBridgeId")
                         .HasColumnType("integer");
 
+                    b.Property<byte?>("ConferenceType")
+                        .HasColumnType("smallint");
+
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("HearingComplexity")
                         .HasColumnType("smallint");
@@ -2735,7 +3108,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("HearingEndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("HearingLocation")
                         .HasMaxLength(255)
@@ -2760,11 +3133,14 @@ namespace CM.Data.Model.Migrations
                     b.Property<int?>("HearingReservedById")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("HearingReservedDisputeGuid")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("HearingReservedUntil")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("HearingStartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("HearingSubType")
                         .HasColumnType("smallint");
@@ -2776,16 +3152,26 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LocalEndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("LocalStartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("NotificationDeliveryDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("NotificationDeliveryDescription")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int?>("NotificationFileDescriptionId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("OtherStaffParticipants")
                         .HasMaxLength(255)
@@ -2826,6 +3212,12 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("HearingOwner");
 
+                    b.HasIndex("HearingReservedById");
+
+                    b.HasIndex("HearingReservedDisputeGuid");
+
+                    b.HasIndex("NotificationFileDescriptionId");
+
                     b.HasIndex("StaffParticipant1");
 
                     b.HasIndex("StaffParticipant2");
@@ -2835,6 +3227,8 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("StaffParticipant4");
 
                     b.HasIndex("StaffParticipant5");
+
+                    b.HasIndex("LocalStartDateTime", "LocalEndDateTime");
 
                     b.ToTable("Hearings");
                 });
@@ -2854,7 +3248,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -2866,7 +3260,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("HearingEndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("HearingId")
                         .HasColumnType("integer");
@@ -2878,7 +3272,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("HearingStartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("HearingSubType")
                         .HasColumnType("smallint");
@@ -2887,10 +3281,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("LocalEndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("LocalStartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("SharedHearingLinkType")
                         .HasColumnType("smallint");
@@ -2920,10 +3314,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ImportEndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("ImportFileId")
                         .HasColumnType("integer");
@@ -2939,7 +3333,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ImportStartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("ImportStatus")
                         .HasColumnType("smallint");
@@ -2948,7 +3342,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("HearingImportId");
 
@@ -2969,7 +3363,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -2984,7 +3378,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NameAbbreviation")
                         .HasMaxLength(10)
@@ -3011,12 +3405,21 @@ namespace CM.Data.Model.Migrations
                     b.Property<byte?>("ParticipationStatus")
                         .HasColumnType("smallint");
 
+                    b.Property<int?>("ParticipationStatusBy")
+                        .HasColumnType("integer");
+
                     b.Property<string>("PreParticipationComment")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
                     b.Property<byte?>("PreParticipationStatus")
                         .HasColumnType("smallint");
+
+                    b.Property<int?>("PreParticipationStatusBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PreParticipationStatusDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("HearingParticipationId");
 
@@ -3025,6 +3428,10 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("HearingId");
 
                     b.HasIndex("ParticipantId");
+
+                    b.HasIndex("ParticipationStatusBy");
+
+                    b.HasIndex("PreParticipationStatusBy");
 
                     b.ToTable("HearingParticipations");
                 });
@@ -3102,7 +3509,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("QuestionAnswer")
                         .HasMaxLength(6)
@@ -3133,7 +3540,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("InternalUserId")
                         .HasColumnType("integer");
@@ -3142,7 +3549,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ProfileDecision")
                         .HasMaxLength(255)
@@ -3194,7 +3601,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("EngagementType")
                         .ValueGeneratedOnAdd()
@@ -3213,10 +3620,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("RoleGroupId")
                         .HasColumnType("smallint");
+
+                    b.Property<string>("RoleNote")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<byte?>("RoleSubtypeId")
                         .HasColumnType("smallint");
@@ -3231,6 +3642,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("InternalUserRoleId");
+
+                    b.HasIndex("EngagementType");
+
+                    b.HasIndex("ManagedById");
+
+                    b.HasIndex("RoleGroupId");
+
+                    b.HasIndex("RoleSubtypeId");
 
                     b.HasIndex("UserId", "RoleGroupId", "RoleSubtypeId")
                         .IsUnique();
@@ -3253,7 +3672,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -3271,7 +3690,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("LinkedFileId");
 
@@ -3308,7 +3727,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(15)");
 
                     b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("SystemId")
                         .HasColumnType("smallint");
@@ -3330,7 +3749,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("CreatorGroupRoleId")
                         .HasColumnType("smallint");
@@ -3345,7 +3764,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NoteContent")
                         .IsRequired()
@@ -3392,10 +3811,15 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("HasServiceDeadline")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<int?>("HearingId")
                         .HasColumnType("integer");
@@ -3413,13 +3837,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("NoticeAssociatedTo")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("NoticeDeliveredDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("NoticeDeliveredTo")
                         .HasColumnType("integer");
@@ -3430,21 +3854,6 @@ namespace CM.Data.Model.Migrations
 
                     b.Property<byte?>("NoticeDeliveryMethod")
                         .HasColumnType("smallint");
-
-                    b.Property<int?>("NoticeFile1Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeFile2Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeFile3Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeFile4Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeFile5Id")
-                        .HasColumnType("integer");
 
                     b.Property<int?>("NoticeFileDescriptionId")
                         .HasColumnType("integer");
@@ -3472,6 +3881,15 @@ namespace CM.Data.Model.Migrations
                     b.Property<int?>("ParentNoticeId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime?>("SecondServiceDeadlineDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ServiceDeadlineDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ServiceDeadlineDays")
+                        .HasColumnType("integer");
+
                     b.HasKey("NoticeId");
 
                     b.HasIndex("ConferenceBridgeId");
@@ -3480,19 +3898,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("HearingId");
 
+                    b.HasIndex("NoticeAssociatedTo");
+
                     b.HasIndex("NoticeDeliveredTo");
 
-                    b.HasIndex("NoticeFile1Id");
-
-                    b.HasIndex("NoticeFile2Id");
-
-                    b.HasIndex("NoticeFile3Id");
-
-                    b.HasIndex("NoticeFile4Id");
-
-                    b.HasIndex("NoticeFile5Id");
-
                     b.HasIndex("NoticeFileDescriptionId");
+
+                    b.HasIndex("NoticeType");
 
                     b.HasIndex("ParentNoticeId");
 
@@ -3508,16 +3920,24 @@ namespace CM.Data.Model.Migrations
                     NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("NoticeServiceId"));
 
                     b.Property<DateTime?>("ArchiveReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ArchiveServedBy")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ArchiveServiceComment")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime?>("ArchiveServiceDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("ArchiveServiceDateUsed")
                         .HasColumnType("smallint");
+
+                    b.Property<string>("ArchiveServiceDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<byte?>("ArchiveServiceMethod")
                         .HasColumnType("smallint");
@@ -3529,7 +3949,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -3541,24 +3961,9 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("NoticeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeServiceFile1Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeServiceFile2Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeServiceFile3Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeServiceFile4Id")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("NoticeServiceFile5Id")
                         .HasColumnType("integer");
 
                     b.Property<byte?>("OtherParticipantRole")
@@ -3568,6 +3973,9 @@ namespace CM.Data.Model.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int?>("OtherProofFileDescriptionId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("ParticipantId")
                         .HasColumnType("integer");
 
@@ -3575,7 +3983,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ServedBy")
                         .HasColumnType("integer");
@@ -3585,10 +3993,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("ServiceDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("ServiceDateUsed")
                         .HasColumnType("smallint");
+
+                    b.Property<string>("ServiceDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<byte?>("ServiceMethod")
                         .HasColumnType("smallint");
@@ -3598,23 +4010,106 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("NoticeServiceId");
 
+                    b.HasIndex("ArchiveServedBy");
+
+                    b.HasIndex("ArchivedBy");
+
+                    b.HasIndex("IsServed");
+
                     b.HasIndex("NoticeId");
 
-                    b.HasIndex("NoticeServiceFile1Id");
-
-                    b.HasIndex("NoticeServiceFile2Id");
-
-                    b.HasIndex("NoticeServiceFile3Id");
-
-                    b.HasIndex("NoticeServiceFile4Id");
-
-                    b.HasIndex("NoticeServiceFile5Id");
+                    b.HasIndex("OtherProofFileDescriptionId");
 
                     b.HasIndex("ParticipantId");
 
                     b.HasIndex("ProofFileDescriptionId");
 
+                    b.HasIndex("ServedBy");
+
                     b.ToTable("NoticeServices");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.OnlineMeeting", b =>
+                {
+                    b.Property<int>("OnlineMeetingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("OnlineMeetingId"));
+
+                    b.Property<string>("ConferenceId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ConferencePassword")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte?>("ConferenceStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("ConferenceType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConferenceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DialInDescription1")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("DialInDescription2")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("DialInDescription3")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("DialInNumber1")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("DialInNumber2")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("DialInNumber3")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("GeneralInstructions")
+                        .HasMaxLength(2500)
+                        .HasColumnType("character varying(2500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("SpecialInstructions")
+                        .HasMaxLength(2500)
+                        .HasColumnType("character varying(2500)");
+
+                    b.HasKey("OnlineMeetingId");
+
+                    b.ToTable("OnlineMeetings");
                 });
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocContent", b =>
@@ -3638,7 +4133,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -3649,7 +4144,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("OutcomeDocFileId")
                         .HasColumnType("integer");
@@ -3682,14 +4177,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DeliveryComment")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("DeliveryDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DeliveryMethod")
                         .HasColumnType("smallint");
@@ -3712,7 +4207,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("OutcomeDocFileId")
                         .HasColumnType("integer");
@@ -3726,18 +4221,28 @@ namespace CM.Data.Model.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime?>("ReadyForDeliveryDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("OutcomeDocDeliveryId");
 
+                    b.HasIndex("AssociatedEmailId");
+
+                    b.HasIndex("DeliveryDate");
+
+                    b.HasIndex("DeliveryMethod");
+
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("IsDelivered");
 
                     b.HasIndex("OutcomeDocFileId");
 
                     b.HasIndex("ParticipantId");
+
+                    b.HasIndex("ReadyForDelivery");
 
                     b.ToTable("OutcomeDocDeliveries");
                 });
@@ -3754,7 +4259,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -3807,7 +4312,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("NoteWorthy")
                         .ValueGeneratedOnAdd()
@@ -3828,6 +4333,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("FileId");
 
+                    b.HasIndex("FileType");
+
                     b.HasIndex("OutcomeDocGroupId");
 
                     b.ToTable("OutcomeDocFiles");
@@ -3845,13 +4352,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("DocCompletedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DocComplexity")
                         .HasColumnType("smallint");
@@ -3875,7 +4382,7 @@ namespace CM.Data.Model.Migrations
                         .HasDefaultValue((byte)1);
 
                     b.Property<DateTime?>("DocStatusDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("DocVersion")
                         .HasColumnType("smallint");
@@ -3892,7 +4399,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("OutcomeDocGroupId");
 
@@ -3913,7 +4420,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("FileDescriptionId")
                         .HasColumnType("integer");
@@ -3946,12 +4453,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("OutcomeDocRequestId")
                         .HasColumnType("integer");
 
                     b.HasKey("OutcomeDocReqItemId");
+
+                    b.HasIndex("FileDescriptionId");
 
                     b.HasIndex("OutcomeDocRequestId");
 
@@ -3977,10 +4486,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DateDocumentsReceived")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -3995,7 +4504,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OtherStatusDescription")
                         .HasMaxLength(100)
@@ -4005,10 +4514,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("RequestCompletionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("RequestDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("RequestDescription")
                         .HasMaxLength(1000)
@@ -4021,6 +4530,9 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<byte?>("RequestStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("RequestSubStatus")
                         .HasColumnType("smallint");
 
                     b.Property<int?>("RequestSubType")
@@ -4040,6 +4552,10 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("DisputeGuid");
 
+                    b.HasIndex("FileDescriptionId");
+
+                    b.HasIndex("OutcomeDocGroupId");
+
                     b.HasIndex("SubmitterId");
 
                     b.ToTable("OutcomeDocRequests");
@@ -4057,7 +4573,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("AcceptedTouDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("AccessCode")
                         .HasMaxLength(10)
@@ -4067,7 +4583,7 @@ namespace CM.Data.Model.Migrations
                         .HasMaxLength(125)
                         .HasColumnType("character varying(125)");
 
-                    b.Property<bool>("AddressIsValidated")
+                    b.Property<bool?>("AddressIsValidated")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
@@ -4099,7 +4615,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DecisionDeliveryMethod")
                         .HasColumnType("integer");
@@ -4116,6 +4632,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("EmailVerifyCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("Fax")
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)");
@@ -4128,6 +4648,9 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsParty")
                         .HasColumnType("boolean");
 
                     b.Property<bool?>("IsSubService")
@@ -4145,6 +4668,11 @@ namespace CM.Data.Model.Migrations
                     b.Property<string>("MailAddress")
                         .HasMaxLength(125)
                         .HasColumnType("character varying(125)");
+
+                    b.Property<bool?>("MailAddressIsValidated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("MailCity")
                         .HasMaxLength(50)
@@ -4166,7 +4694,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NameAbbreviation")
                         .HasMaxLength(20)
@@ -4211,6 +4739,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("PrimaryPhoneVerifyCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("ProvinceState")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -4240,6 +4772,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("SecondaryPhoneVerifyCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<int?>("SystemUserId")
                         .HasColumnType("integer");
 
@@ -4256,9 +4792,71 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("DisputeGuid");
 
+                    b.HasIndex("ParticipantStatus");
+
                     b.HasIndex("SystemUserId");
 
                     b.ToTable("Participants");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.ParticipantIdentity", b =>
+                {
+                    b.Property<int>("ParticipantIdentityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("ParticipantIdentityId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("IdentityDisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("IdentityNote")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<int>("IdentityParticipantId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte?>("IdentityStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("IdentitySystemUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ParticipantIdentityId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("IdentityDisputeGuid");
+
+                    b.HasIndex("IdentityParticipantId");
+
+                    b.HasIndex("IdentitySystemUserId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("ParticipantIdentities");
                 });
 
             modelBuilder.Entity("CM.Data.Model.PaymentTransaction", b =>
@@ -4276,7 +4874,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("DisplayMsg")
                         .HasMaxLength(100)
@@ -4308,7 +4906,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OfficePaymentIdir")
                         .HasMaxLength(50)
@@ -4335,7 +4933,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("ReconcileDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("ReconcileStatus")
                         .ValueGeneratedOnAdd()
@@ -4358,14 +4956,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("TrnDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("TrnId")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("TrnReqDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("TrnResponse")
                         .HasColumnType("integer");
@@ -4381,6 +4979,160 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("TransactionBy");
 
                     b.ToTable("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.Poll", b =>
+                {
+                    b.Property<int>("PollId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("PollId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("MaxResponses")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MinResponses")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("PollAudience")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PollConfiguration")
+                        .HasColumnType("json");
+
+                    b.Property<string>("PollDescription")
+                        .HasMaxLength(2500)
+                        .HasColumnType("character varying(2500)");
+
+                    b.Property<byte?>("PollDisputeSubType")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("PollDisputeType")
+                        .HasColumnType("smallint");
+
+                    b.Property<DateTime?>("PollEndDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte?>("PollParticipantType")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("PollSite")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PollStartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("PollStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PollTitle")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<byte>("PollType")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("PollId");
+
+                    b.HasIndex("PollSite");
+
+                    b.HasIndex("PollStatus");
+
+                    b.HasIndex("PollTitle")
+                        .IsUnique();
+
+                    b.HasIndex("PollType");
+
+                    b.ToTable("Polls");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.PollResponse", b =>
+                {
+                    b.Property<int>("PollResponseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("PollResponseId"));
+
+                    b.Property<int?>("AssociatedFileId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ParticipantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PollId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ResponseDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("ResponseJson")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<byte?>("ResponseSite")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("ResponseStatus")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte?>("ResponseSubType")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("ResponseText")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<byte?>("ResponseType")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("PollResponseId");
+
+                    b.HasIndex("AssociatedFileId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("PollId");
+
+                    b.ToTable("PollResponses");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Remedy", b =>
@@ -4399,7 +5151,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("numeric(10,2)");
 
                     b.Property<DateTime?>("AwardedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("AwardedDaysAfterService")
                         .HasColumnType("integer");
@@ -4411,7 +5163,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsAmended")
                         .HasColumnType("boolean");
@@ -4426,13 +5178,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("PrevAwardBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("PrevAwardDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PrevAwardDetails")
                         .HasColumnType("text");
@@ -4441,7 +5193,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime?>("PrevAwardedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("PrevAwardedDaysAfterService")
                         .HasColumnType("integer");
@@ -4485,6 +5237,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("ClaimId");
 
+                    b.HasIndex("PrevAwardBy");
+
                     b.ToTable("Remedies");
                 });
 
@@ -4500,13 +5254,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("numeric(10,2)");
 
                     b.Property<DateTime?>("AssociatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -4525,7 +5279,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("PositionStatus")
                         .HasColumnType("smallint");
@@ -4555,14 +5309,14 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("BlockEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("BlockNote")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("BlockStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("BlockStatus")
                         .HasColumnType("integer");
@@ -4577,7 +5331,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -4586,7 +5340,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("SchedulePeriodId")
                         .HasColumnType("integer");
@@ -4595,6 +5349,12 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("ScheduleBlockId");
+
+                    b.HasIndex("BlockEnd");
+
+                    b.HasIndex("BlockStart");
+
+                    b.HasIndex("BlockType");
 
                     b.HasIndex("SchedulePeriodId");
 
@@ -4615,7 +5375,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -4623,22 +5383,22 @@ namespace CM.Data.Model.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("LocalPeriodEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("LocalPeriodStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("PeriodEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("PeriodStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("PeriodStatus")
                         .ValueGeneratedOnAdd()
@@ -4665,7 +5425,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -4676,14 +5436,17 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("RequestDescription")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
                     b.Property<DateTime?>("RequestEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("RequestJson")
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("RequestNote")
                         .HasMaxLength(500)
@@ -4693,7 +5456,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("RequestStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("RequestStatus")
                         .HasColumnType("integer");
@@ -4710,14 +5473,13 @@ namespace CM.Data.Model.Migrations
                     b.Property<int>("RequestorSystemUserId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SystemUserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("ScheduleRequestId");
 
-                    b.HasIndex("RequestorSystemUserId");
+                    b.HasIndex("RequestOwnerId");
 
-                    b.HasIndex("SystemUserId");
+                    b.HasIndex("RequestSubmitter");
+
+                    b.HasIndex("RequestorSystemUserId");
 
                     b.ToTable("ScheduleRequests");
                 });
@@ -4800,6 +5562,101 @@ namespace CM.Data.Model.Migrations
                     b.ToView("CrossAppDestinationParticipants");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.ServiceAuditLog", b =>
+                {
+                    b.Property<int>("ServiceAuditLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("ServiceAuditLogId"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("FilePackageServiceId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsServed")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("NoticeServiceId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte?>("OtherParticipantRole")
+                        .HasColumnType("smallint");
+
+                    b.Property<int?>("OtherProofFileDescriptionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ParticipantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ProofFileDescriptionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ReceivedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ServiceBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ServiceChangeType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ServiceComment")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("ServiceDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte?>("ServiceDateUsed")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("ServiceDescription")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<byte?>("ServiceMethod")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("ServiceType")
+                        .HasColumnType("integer");
+
+                    b.Property<byte?>("ValidationStatus")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("ServiceAuditLogId");
+
+                    b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("FilePackageServiceId");
+
+                    b.HasIndex("NoticeServiceId");
+
+                    b.HasIndex("OtherProofFileDescriptionId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("ProofFileDescriptionId");
+
+                    b.HasIndex("ServiceBy");
+
+                    b.ToTable("ServiceAuditLogs");
+                });
+
             modelBuilder.Entity("CM.Data.Model.ServiceOffice", b =>
                 {
                     b.Property<int>("ServiceOfficeId")
@@ -4812,7 +5669,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -4823,7 +5680,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OfficeAbbreviation")
                         .HasMaxLength(10)
@@ -4866,38 +5723,38 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("EmailGeneratorVersion")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("EmailGeneratorVersionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("EmailNotificationVersion")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("EmailNotificationVersionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("MidTierVersion")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("MidTierVersionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PdfVersion")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("PdfVersionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("ReleaseDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("ReleaseDetails")
                         .HasMaxLength(2500)
@@ -4915,7 +5772,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("UiVersionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("SiteVersionId");
 
@@ -4934,7 +5791,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -4946,7 +5803,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("ParticipantId")
                         .HasColumnType("integer");
@@ -4955,7 +5812,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ReceiptDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("ReceiptEmailed")
                         .HasColumnType("boolean");
@@ -4977,6 +5834,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("DisputeGuid");
 
+                    b.HasIndex("ParticipantId");
+
                     b.ToTable("SubmissionReceipts");
                 });
 
@@ -4992,13 +5851,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("FailedMethod1Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FailedMethod1Description")
                         .HasMaxLength(255)
@@ -5019,7 +5878,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("FailedMethod2Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FailedMethod2Description")
                         .HasMaxLength(255)
@@ -5040,7 +5899,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("FailedMethod3Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("FailedMethod3Description")
                         .HasMaxLength(255)
@@ -5070,7 +5929,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OtherFailedMethodDetails")
                         .HasMaxLength(255)
@@ -5118,7 +5977,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("RequestingTimeExtensionDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("RespondentAvoidingDetails")
                         .HasMaxLength(255)
@@ -5137,10 +5996,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("SubServiceEffectiveDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("SubServiceExpiryDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("SubServiceInstructions")
                         .HasMaxLength(2000)
@@ -5156,6 +6015,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("SubstitutedServiceId");
 
+                    b.HasIndex("DisputeGuid");
+
                     b.HasIndex("FailedMethod1FileDescId");
 
                     b.HasIndex("FailedMethod2FileDescId");
@@ -5165,6 +6026,8 @@ namespace CM.Data.Model.Migrations
                     b.HasIndex("OutcomeDocumentFileId");
 
                     b.HasIndex("RequestMethodFileDescId");
+
+                    b.HasIndex("RequestSource");
 
                     b.HasIndex("ServiceByParticipantId");
 
@@ -5193,6 +6056,8 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("SystemSettingsId");
+
+                    b.HasIndex("Key");
 
                     b.ToTable("SystemSettings");
                 });
@@ -5223,7 +6088,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("DashboardAccess")
                         .ValueGeneratedOnAdd()
@@ -5241,7 +6106,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Password")
                         .HasMaxLength(250)
@@ -5311,6 +6176,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("SystemUserRoleId");
 
+                    b.HasIndex("RoleName");
+
                     b.ToTable("SystemUserRoles");
                 });
 
@@ -5331,10 +6198,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("DateTaskCompleted")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -5343,28 +6210,28 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastAssignedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("LastOwnerAssignedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("LastOwnerId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("LastUnassignedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("TaskActivityType")
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("TaskDueDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("TaskLinkId")
                         .HasColumnType("integer");
@@ -5401,11 +6268,19 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("TaskId");
 
+                    b.HasIndex("DateTaskCompleted");
+
                     b.HasIndex("DisputeGuid");
 
                     b.HasIndex("LastOwnerId");
 
+                    b.HasIndex("TaskActivityType");
+
                     b.HasIndex("TaskOwnerId");
+
+                    b.HasIndex("TaskStatus");
+
+                    b.HasIndex("TaskSubType");
 
                     b.ToTable("Tasks");
                 });
@@ -5423,7 +6298,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5450,7 +6325,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool>("OptinRequired")
                         .HasColumnType("boolean");
@@ -5460,10 +6335,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(750)");
 
                     b.Property<DateTime?>("TrialEndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("TrialStartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte?>("TrialStatus")
                         .HasColumnType("smallint");
@@ -5484,6 +6359,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("TrialGuid");
 
+                    b.HasIndex("AssociatedTrialGuid");
+
                     b.HasIndex("TrialGuid")
                         .IsUnique();
 
@@ -5500,7 +6377,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -5527,7 +6404,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5536,10 +6413,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("TrialGuid")
                         .HasColumnType("uuid");
@@ -5547,6 +6424,10 @@ namespace CM.Data.Model.Migrations
                     b.HasKey("TrialDisputeGuid");
 
                     b.HasIndex("DisputeGuid");
+
+                    b.HasIndex("DisputeOptedInByParticipantId");
+
+                    b.HasIndex("DisputeOptedInByStaffId");
 
                     b.HasIndex("TrialGuid");
 
@@ -5563,10 +6444,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("InterventionDescription")
                         .HasColumnType("text");
@@ -5593,13 +6474,13 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("OtherAssociatedId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("TrialDisputeGuid")
                         .HasColumnType("uuid");
@@ -5612,7 +6493,11 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("TrialInterventionGuid");
 
+                    b.HasIndex("TrialDisputeGuid");
+
                     b.HasIndex("TrialGuid");
+
+                    b.HasIndex("TrialParticipantGuid");
 
                     b.ToTable("TrialInterventions");
                 });
@@ -5627,10 +6512,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5639,7 +6524,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<byte>("OutcomeBy")
                         .HasColumnType("smallint");
@@ -5689,7 +6574,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("TrialDisputeGuid")
                         .HasColumnType("uuid");
@@ -5705,7 +6590,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("TrialOutcomeGuid");
 
+                    b.HasIndex("TrialDisputeGuid");
+
                     b.HasIndex("TrialGuid");
+
+                    b.HasIndex("TrialInterventionGuid");
+
+                    b.HasIndex("TrialParticipantGuid");
 
                     b.ToTable("TrialOutcomes");
                 });
@@ -5720,7 +6611,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid?>("DisputeGuid")
                         .HasColumnType("uuid");
@@ -5729,7 +6620,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5738,7 +6629,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("OtherParticipantDescription")
                         .HasMaxLength(255)
@@ -5767,7 +6658,7 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("smallint");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("SystemUserId")
                         .HasColumnType("integer");
@@ -5777,7 +6668,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasKey("TrialParticipantGuid");
 
+                    b.HasIndex("DisputeGuid");
+
                     b.HasIndex("DisputeId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.HasIndex("SystemUserId");
 
                     b.HasIndex("TrialGuid");
 
@@ -5798,10 +6695,10 @@ namespace CM.Data.Model.Migrations
                         .HasColumnType("character varying(250)");
 
                     b.Property<DateTime>("ExpiresOn")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("IssuedOn")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("ParticipantId")
                         .HasColumnType("integer");
@@ -5818,14 +6715,105 @@ namespace CM.Data.Model.Migrations
 
                     b.HasIndex("SystemUserId");
 
+                    b.HasIndex("ExpiresOn", "AuthToken");
+
                     b.ToTable("UserTokens");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.VerificationAttempt", b =>
+                {
+                    b.Property<int>("VerificationAttemptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("VerificationAttemptId"));
+
+                    b.Property<DateTime?>("AttemptEndDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("AttemptMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AttemptStartDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("DisputeVerificationId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte>("ParticipantRole")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("VerificationAddress")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateTime?>("VerificationDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("VerificationEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("VerificationName")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("VerificationNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int?>("VerificationOutcome")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("VerificationPaymentDetail")
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("text");
+
+                    b.Property<string>("VerificationPhone")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
+                    b.Property<int?>("VerificationReason")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("VerificationRefundRequested")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("VerificationAttemptId");
+
+                    b.HasIndex("DisputeVerificationId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("VerificationAttempts");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Amendment", b =>
                 {
                     b.HasOne("CM.Data.Model.FileDescription", "AmendFileDescription")
                         .WithMany("Amendments")
-                        .HasForeignKey("AmendFileDescriptionId");
+                        .HasForeignKey("AmendFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("Amendments")
@@ -5841,7 +6829,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.Notice", "Notice")
                         .WithMany("Amendments")
-                        .HasForeignKey("NoticeId");
+                        .HasForeignKey("NoticeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AmendFileDescription");
 
@@ -5854,6 +6843,12 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.AuditLog", b =>
                 {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("AuditLogs")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Participant", "SubmitterParticipant")
                         .WithMany("AuditLogs")
                         .HasForeignKey("SubmitterParticipantId")
@@ -5863,6 +6858,8 @@ namespace CM.Data.Model.Migrations
                         .WithMany("AuditLogs")
                         .HasForeignKey("SubmitterUserId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Dispute");
 
                     b.Navigation("SubmitterParticipant");
 
@@ -5888,7 +6885,14 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.Participant", "RecipientParticipant")
+                        .WithMany("BulkEmailRecipients")
+                        .HasForeignKey("RecipientParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Dispute");
+
+                    b.Navigation("RecipientParticipant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Claim", b =>
@@ -5896,7 +6900,7 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.ClaimGroup", "ClaimGroup")
                         .WithMany("Claims")
                         .HasForeignKey("ClaimGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ClaimGroup");
@@ -5906,7 +6910,8 @@ namespace CM.Data.Model.Migrations
                 {
                     b.HasOne("CM.Data.Model.Claim", "Claim")
                         .WithMany("ClaimDetails")
-                        .HasForeignKey("ClaimId");
+                        .HasForeignKey("ClaimId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("ClaimDetails")
@@ -5936,7 +6941,7 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.ClaimGroup", "ClaimGroup")
                         .WithMany("ClaimGroupParticipants")
                         .HasForeignKey("ClaimGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
@@ -5945,6 +6950,11 @@ namespace CM.Data.Model.Migrations
                         .HasPrincipalKey("DisputeGuid")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Participant", "GroupPrimaryContact")
+                        .WithMany("PrimaryContactClaimGroupParticipants")
+                        .HasForeignKey("GroupPrimaryContactId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("ClaimGroupParticipants")
@@ -5955,6 +6965,8 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("ClaimGroup");
 
                     b.Navigation("Dispute");
+
+                    b.Navigation("GroupPrimaryContact");
 
                     b.Navigation("Participant");
                 });
@@ -5983,11 +6995,32 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.Dispute", b =>
                 {
+                    b.HasOne("CM.Data.Model.Participant", "InitialPaymentParticipant")
+                        .WithMany("Disputes")
+                        .HasForeignKey("InitialPaymentBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Notice", "OriginalNotice")
+                        .WithMany("Disputes")
+                        .HasForeignKey("OriginalNoticeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
                         .WithMany("Disputes")
                         .HasForeignKey("OwnerSystemUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Participant", "SubmittedParticipant")
+                        .WithMany("SubPartDisputes")
+                        .HasForeignKey("SubmittedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("InitialPaymentParticipant");
+
+                    b.Navigation("OriginalNotice");
+
+                    b.Navigation("SubmittedParticipant");
 
                     b.Navigation("SystemUser");
                 });
@@ -6001,7 +7034,13 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.Participant", "Payor")
+                        .WithMany("DisputeFees")
+                        .HasForeignKey("PayorId");
+
                     b.Navigation("Dispute");
+
+                    b.Navigation("Payor");
                 });
 
             modelBuilder.Entity("CM.Data.Model.DisputeFlag", b =>
@@ -6013,7 +7052,21 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.SystemUser", "FlagOwner")
+                        .WithMany("DisputeFlags")
+                        .HasForeignKey("FlagOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Participant", "FlagParticipant")
+                        .WithMany("DisputeFlags")
+                        .HasForeignKey("FlagParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Dispute");
+
+                    b.Navigation("FlagOwner");
+
+                    b.Navigation("FlagParticipant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.DisputeHearing", b =>
@@ -6051,6 +7104,26 @@ namespace CM.Data.Model.Migrations
                         .IsRequired();
 
                     b.Navigation("Dispute");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.DisputeLink", b =>
+                {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("DisputeLinks")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.OnlineMeeting", "OnlineMeeting")
+                        .WithMany("DisputeLinks")
+                        .HasForeignKey("OnlineMeetingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("OnlineMeeting");
                 });
 
             modelBuilder.Entity("CM.Data.Model.DisputeProcessDetail", b =>
@@ -6110,12 +7183,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("DisputeUsers")
-                        .HasForeignKey("ParticipantId");
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
                         .WithMany("DisputeUsers")
                         .HasForeignKey("SystemUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dispute");
@@ -6125,21 +7199,56 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("SystemUser");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.DisputeVerification", b =>
+                {
+                    b.HasOne("CM.Data.Model.DisputeFee", "DisputeFee")
+                        .WithMany("DisputeVerifications")
+                        .HasForeignKey("DisputeFeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("DisputeVerifications")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Hearing", "Hearing")
+                        .WithMany("DisputeVerifications")
+                        .HasForeignKey("HearingId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "RefundInitiated")
+                        .WithMany("DisputeVerifications")
+                        .HasForeignKey("RefundInitiatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("DisputeFee");
+
+                    b.Navigation("Hearing");
+
+                    b.Navigation("RefundInitiated");
+                });
+
             modelBuilder.Entity("CM.Data.Model.EmailAttachment", b =>
                 {
                     b.HasOne("CM.Data.Model.CommonFile", "CommonFile")
                         .WithMany("EmailAttachments")
-                        .HasForeignKey("CommonFileId");
+                        .HasForeignKey("CommonFileId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.EmailMessage", "EmailMessage")
                         .WithMany("EmailAttachments")
                         .HasForeignKey("EmailMessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.File", "File")
                         .WithMany("EmailAttachments")
-                        .HasForeignKey("FileId");
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CommonFile");
 
@@ -6159,7 +7268,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("EmailMessages")
-                        .HasForeignKey("ParticipantId");
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Dispute");
 
@@ -6176,12 +7286,30 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("OwnerSystemUser");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.ExternalErrorLog", b =>
+                {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("ExternalErrorLogs")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "ErrorOwnerUser")
+                        .WithMany("ExternalErrorLogs")
+                        .HasForeignKey("ErrorOwner")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("ErrorOwnerUser");
+                });
+
             modelBuilder.Entity("CM.Data.Model.ExternalFile", b =>
                 {
                     b.HasOne("CM.Data.Model.ExternalCustomDataObject", "ExternalCustomDataObject")
                         .WithMany("ExternalFiles")
                         .HasForeignKey("ExternalCustomDataObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ExternalCustomDataObject");
@@ -6198,7 +7326,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.FilePackage", "FilePackage")
                         .WithMany("Files")
-                        .HasForeignKey("FilePackageId");
+                        .HasForeignKey("FilePackageId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Dispute");
 
@@ -6209,7 +7338,8 @@ namespace CM.Data.Model.Migrations
                 {
                     b.HasOne("CM.Data.Model.Claim", "Claim")
                         .WithMany("FileDescriptions")
-                        .HasForeignKey("ClaimId");
+                        .HasForeignKey("ClaimId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("FileDescriptions")
@@ -6224,7 +7354,8 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.Remedy", "Remedy")
                         .WithMany("FileDescriptions")
-                        .HasForeignKey("RemedyId");
+                        .HasForeignKey("RemedyId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Claim");
 
@@ -6239,11 +7370,15 @@ namespace CM.Data.Model.Migrations
                 {
                     b.HasOne("CM.Data.Model.Participant", "CreatedParticipant")
                         .WithMany("FilePackages")
-                        .HasForeignKey("CreatedParticipantParticipantId");
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
                         .WithMany("FilePackages")
-                        .HasForeignKey("DisputeId");
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("CreatedParticipant");
 
@@ -6252,11 +7387,26 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.FilePackageService", b =>
                 {
+                    b.HasOne("CM.Data.Model.Participant", "ArchiveServed")
+                        .WithMany("ArchiveServedFilePackageServices")
+                        .HasForeignKey("ArchiveServedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "Archived")
+                        .WithMany("FilePackageServices")
+                        .HasForeignKey("ArchivedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.FilePackage", "FilePackage")
                         .WithMany("FilePackageServices")
                         .HasForeignKey("FilePackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("CM.Data.Model.FileDescription", "OtherProofFileDescription")
+                        .WithMany("OtherFilePackageServices")
+                        .HasForeignKey("OtherProofFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("FilePackageServices")
@@ -6264,15 +7414,22 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.FileDescription", "ProofFileDescription")
-                        .WithMany()
-                        .HasForeignKey("ProofFileDescriptionId");
+                        .WithMany("FilePackageServices")
+                        .HasForeignKey("ProofFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "ServedParticipant")
                         .WithMany("ServedFilePackageServices")
                         .HasForeignKey("ServedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("ArchiveServed");
+
+                    b.Navigation("Archived");
+
                     b.Navigation("FilePackage");
+
+                    b.Navigation("OtherProofFileDescription");
 
                     b.Navigation("Participant");
 
@@ -6284,12 +7441,29 @@ namespace CM.Data.Model.Migrations
             modelBuilder.Entity("CM.Data.Model.Hearing", b =>
                 {
                     b.HasOne("CM.Data.Model.ConferenceBridge", "ConferenceBridge")
-                        .WithMany()
-                        .HasForeignKey("ConferenceBridgeId");
+                        .WithMany("Hearings")
+                        .HasForeignKey("ConferenceBridgeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
                         .WithMany("Hearings")
                         .HasForeignKey("HearingOwner")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.UserToken", "HearingReservedBy")
+                        .WithMany("Hearings")
+                        .HasForeignKey("HearingReservedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Dispute", "HearingReservedDispute")
+                        .WithMany("Hearings")
+                        .HasForeignKey("HearingReservedDisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.FileDescription", "NotificationFileDescription")
+                        .WithMany("Hearings")
+                        .HasForeignKey("NotificationFileDescriptionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser1")
@@ -6318,6 +7492,12 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ConferenceBridge");
+
+                    b.Navigation("HearingReservedBy");
+
+                    b.Navigation("HearingReservedDispute");
+
+                    b.Navigation("NotificationFileDescription");
 
                     b.Navigation("SystemUser");
 
@@ -6388,18 +7568,33 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.Hearing", "Hearing")
                         .WithMany("HearingParticipations")
                         .HasForeignKey("HearingId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("HearingParticipations")
-                        .HasForeignKey("ParticipantId");
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "ParticipationStatusUser")
+                        .WithMany("HearingParticipations")
+                        .HasForeignKey("ParticipationStatusBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "PreParticipationStatusUser")
+                        .WithMany("PreHearingParticipations")
+                        .HasForeignKey("PreParticipationStatusBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Dispute");
 
                     b.Navigation("Hearing");
 
                     b.Navigation("Participant");
+
+                    b.Navigation("ParticipationStatusUser");
+
+                    b.Navigation("PreParticipationStatusUser");
                 });
 
             modelBuilder.Entity("CM.Data.Model.IntakeQuestion", b =>
@@ -6441,11 +7636,18 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.InternalUserRole", b =>
                 {
+                    b.HasOne("CM.Data.Model.SystemUser", "ManagedBy")
+                        .WithMany("ManagedByInternalUserRoles")
+                        .HasForeignKey("ManagedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
                         .WithMany("InternalUserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ManagedBy");
 
                     b.Navigation("SystemUser");
                 });
@@ -6462,13 +7664,13 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.FileDescription", "FileDescription")
                         .WithMany("LinkedFiles")
                         .HasForeignKey("FileDescriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.File", "File")
                         .WithMany("LinkedFiles")
                         .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dispute");
@@ -6494,7 +7696,8 @@ namespace CM.Data.Model.Migrations
                 {
                     b.HasOne("CM.Data.Model.ConferenceBridge", "ConferenceBridge")
                         .WithMany("Notices")
-                        .HasForeignKey("ConferenceBridgeId");
+                        .HasForeignKey("ConferenceBridgeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
                         .WithMany("Notices")
@@ -6504,60 +7707,28 @@ namespace CM.Data.Model.Migrations
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Hearing", "Hearing")
-                        .WithMany()
-                        .HasForeignKey("HearingId");
+                        .WithMany("Notices")
+                        .HasForeignKey("HearingId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("Notices")
                         .HasForeignKey("NoticeDeliveredTo")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("CM.Data.Model.File", "File1")
-                        .WithMany("Notices1")
-                        .HasForeignKey("NoticeFile1Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File2")
-                        .WithMany("Notices2")
-                        .HasForeignKey("NoticeFile2Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File3")
-                        .WithMany("Notices3")
-                        .HasForeignKey("NoticeFile3Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File4")
-                        .WithMany("Notices4")
-                        .HasForeignKey("NoticeFile4Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File5")
-                        .WithMany("Notices5")
-                        .HasForeignKey("NoticeFile5Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("CM.Data.Model.FileDescription", "NoticeFileDescription")
                         .WithMany("Notices")
-                        .HasForeignKey("NoticeFileDescriptionId");
+                        .HasForeignKey("NoticeFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Notice", "ParentNotice")
-                        .WithMany()
-                        .HasForeignKey("ParentNoticeId");
+                        .WithMany("ChildNotices")
+                        .HasForeignKey("ParentNoticeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ConferenceBridge");
 
                     b.Navigation("Dispute");
-
-                    b.Navigation("File1");
-
-                    b.Navigation("File2");
-
-                    b.Navigation("File3");
-
-                    b.Navigation("File4");
-
-                    b.Navigation("File5");
 
                     b.Navigation("Hearing");
 
@@ -6570,35 +7741,25 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.NoticeService", b =>
                 {
+                    b.HasOne("CM.Data.Model.Participant", "ArchiveServedParticipant")
+                        .WithMany("ArchiveServedNoticeServices")
+                        .HasForeignKey("ArchiveServedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "Archived")
+                        .WithMany("NoticeServices")
+                        .HasForeignKey("ArchivedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Notice", "Notice")
                         .WithMany("NoticeServices")
                         .HasForeignKey("NoticeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CM.Data.Model.File", "File1")
-                        .WithMany("NoticeServices1")
-                        .HasForeignKey("NoticeServiceFile1Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File2")
-                        .WithMany("NoticeServices2")
-                        .HasForeignKey("NoticeServiceFile2Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File3")
-                        .WithMany("NoticeServices3")
-                        .HasForeignKey("NoticeServiceFile3Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File4")
-                        .WithMany("NoticeServices4")
-                        .HasForeignKey("NoticeServiceFile4Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("CM.Data.Model.File", "File5")
-                        .WithMany("NoticeServices5")
-                        .HasForeignKey("NoticeServiceFile5Id")
+                    b.HasOne("CM.Data.Model.FileDescription", "OtherProofFileDescription")
+                        .WithMany("OtherNoticeServices")
+                        .HasForeignKey("OtherProofFileDescriptionId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
@@ -6609,23 +7770,27 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.FileDescription", "ProofFileDescription")
                         .WithMany("NoticeServices")
-                        .HasForeignKey("ProofFileDescriptionId");
+                        .HasForeignKey("ProofFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("File1");
+                    b.HasOne("CM.Data.Model.Participant", "Served")
+                        .WithMany("ServedNoticeServices")
+                        .HasForeignKey("ServedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("File2");
+                    b.Navigation("ArchiveServedParticipant");
 
-                    b.Navigation("File3");
-
-                    b.Navigation("File4");
-
-                    b.Navigation("File5");
+                    b.Navigation("Archived");
 
                     b.Navigation("Notice");
+
+                    b.Navigation("OtherProofFileDescription");
 
                     b.Navigation("Participant");
 
                     b.Navigation("ProofFileDescription");
+
+                    b.Navigation("Served");
                 });
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocContent", b =>
@@ -6633,7 +7798,7 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.OutcomeDocFile", "OutcomeDocFile")
                         .WithMany("OutcomeDocContents")
                         .HasForeignKey("OutcomeDocFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("OutcomeDocFile");
@@ -6641,6 +7806,11 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocDelivery", b =>
                 {
+                    b.HasOne("CM.Data.Model.EmailMessage", "AssociatedEmail")
+                        .WithMany("OutcomeDocDeliveries")
+                        .HasForeignKey("AssociatedEmailId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
                         .WithMany("OutcomeDocDocDeliveries")
                         .HasForeignKey("DisputeGuid")
@@ -6651,12 +7821,15 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.OutcomeDocFile", "OutcomeDocFile")
                         .WithMany("OutcomeDocDeliveries")
                         .HasForeignKey("OutcomeDocFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
                         .WithMany("OutcomeDocDeliveries")
-                        .HasForeignKey("ParticipantId");
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AssociatedEmail");
 
                     b.Navigation("Dispute");
 
@@ -6676,12 +7849,13 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.File", "File")
                         .WithMany("OutcomeDocFiles")
-                        .HasForeignKey("FileId");
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.OutcomeDocGroup", "OutcomeDocGroup")
                         .WithMany("OutcomeDocFiles")
                         .HasForeignKey("OutcomeDocGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dispute");
@@ -6705,11 +7879,18 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocReqItem", b =>
                 {
+                    b.HasOne("CM.Data.Model.FileDescription", "FileDescription")
+                        .WithMany("OutcomeDocReqItems")
+                        .HasForeignKey("FileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.OutcomeDocRequest", "OutcomeDocRequest")
                         .WithMany("OutcomeDocReqItems")
                         .HasForeignKey("OutcomeDocRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("FileDescription");
 
                     b.Navigation("OutcomeDocRequest");
                 });
@@ -6723,6 +7904,16 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.FileDescription", "FileDescription")
+                        .WithMany("OutcomeDocRequests")
+                        .HasForeignKey("FileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.OutcomeDocGroup", "OutcomeDocGroup")
+                        .WithMany("OutcomeDocRequests")
+                        .HasForeignKey("OutcomeDocGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Participant", "Submitter")
                         .WithMany("OutcomeDocRequests")
                         .HasForeignKey("SubmitterId")
@@ -6730,6 +7921,10 @@ namespace CM.Data.Model.Migrations
                         .IsRequired();
 
                     b.Navigation("Dispute");
+
+                    b.Navigation("FileDescription");
+
+                    b.Navigation("OutcomeDocGroup");
 
                     b.Navigation("Submitter");
                 });
@@ -6745,11 +7940,56 @@ namespace CM.Data.Model.Migrations
 
                     b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
                         .WithMany("Participants")
-                        .HasForeignKey("SystemUserId");
+                        .HasForeignKey("SystemUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Dispute");
 
                     b.Navigation("SystemUser");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.ParticipantIdentity", b =>
+                {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("IdentityParticipants")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Dispute", "IdentityDispute")
+                        .WithMany("ParticipantIdentities")
+                        .HasForeignKey("IdentityDisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Participant", "IdentityParticipant")
+                        .WithMany("ParticipantIdentities")
+                        .HasForeignKey("IdentityParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.SystemUser", "IdentitySystemUser")
+                        .WithMany("ParticipantIdentities")
+                        .HasForeignKey("IdentitySystemUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("IdentityParticipants")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("IdentityDispute");
+
+                    b.Navigation("IdentityParticipant");
+
+                    b.Navigation("IdentitySystemUser");
+
+                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.PaymentTransaction", b =>
@@ -6757,7 +7997,7 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.DisputeFee", "DisputeFee")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("DisputeFeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Participant", "Participant")
@@ -6770,15 +8010,56 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("Participant");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.PollResponse", b =>
+                {
+                    b.HasOne("CM.Data.Model.File", "AssociatedFile")
+                        .WithMany("PollResponses")
+                        .HasForeignKey("AssociatedFileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("PollResponses")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("PollResponses")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Poll", "Poll")
+                        .WithMany("PollResponses")
+                        .HasForeignKey("PollId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssociatedFile");
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("Poll");
+                });
+
             modelBuilder.Entity("CM.Data.Model.Remedy", b =>
                 {
                     b.HasOne("CM.Data.Model.Claim", "Claim")
                         .WithMany("Remedies")
                         .HasForeignKey("ClaimId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.SystemUser", "PrevAward")
+                        .WithMany("Remedies")
+                        .HasForeignKey("PrevAwardBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Claim");
+
+                    b.Navigation("PrevAward");
                 });
 
             modelBuilder.Entity("CM.Data.Model.RemedyDetail", b =>
@@ -6792,7 +8073,7 @@ namespace CM.Data.Model.Migrations
                     b.HasOne("CM.Data.Model.Remedy", "Remedy")
                         .WithMany("RemedyDetails")
                         .HasForeignKey("RemedyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Participant");
@@ -6821,17 +8102,80 @@ namespace CM.Data.Model.Migrations
 
             modelBuilder.Entity("CM.Data.Model.ScheduleRequest", b =>
                 {
+                    b.HasOne("CM.Data.Model.SystemUser", "RequestOwner")
+                        .WithMany("OwnerScheduleRequests")
+                        .HasForeignKey("RequestOwnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "RequestSubmitterUser")
+                        .WithMany("SubmitterScheduleRequests")
+                        .HasForeignKey("RequestSubmitter")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.SystemUser", "RequestorSystemUser")
                         .WithMany("ScheduleRequests")
                         .HasForeignKey("RequestorSystemUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CM.Data.Model.SystemUser", null)
-                        .WithMany("OwnerScheduleRequests")
-                        .HasForeignKey("SystemUserId");
+                    b.Navigation("RequestOwner");
+
+                    b.Navigation("RequestSubmitterUser");
 
                     b.Navigation("RequestorSystemUser");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.ServiceAuditLog", b =>
+                {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("ServiceAuditLogs")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.FilePackageService", "FilePackageService")
+                        .WithMany("ServiceAuditLogs")
+                        .HasForeignKey("FilePackageServiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.NoticeService", "NoticeService")
+                        .WithMany("ServiceAuditLogs")
+                        .HasForeignKey("NoticeServiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.FileDescription", "OtherProofFileDescription")
+                        .WithMany("OtherServiceAuditLogs")
+                        .HasForeignKey("OtherProofFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("ServiceAuditLogs")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.FileDescription", "ProofFileDescription")
+                        .WithMany("ServiceAuditLogs")
+                        .HasForeignKey("ProofFileDescriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.Participant", "Served")
+                        .WithMany("ServedServiceAuditLogs")
+                        .HasForeignKey("ServiceBy");
+
+                    b.Navigation("Dispute");
+
+                    b.Navigation("FilePackageService");
+
+                    b.Navigation("NoticeService");
+
+                    b.Navigation("OtherProofFileDescription");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("ProofFileDescription");
+
+                    b.Navigation("Served");
                 });
 
             modelBuilder.Entity("CM.Data.Model.SubmissionReceipt", b =>
@@ -6843,46 +8187,68 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("SubmissionReceipts")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Dispute");
+
+                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.SubstitutedService", b =>
                 {
+                    b.HasOne("CM.Data.Model.Dispute", "Dispute")
+                        .WithMany("SubstitutedServices")
+                        .HasForeignKey("DisputeGuid")
+                        .HasPrincipalKey("DisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("CM.Data.Model.FileDescription", "FailedMethod1FileDesc")
-                        .WithMany()
-                        .HasForeignKey("FailedMethod1FileDescId");
+                        .WithMany("SubstitutedServices1")
+                        .HasForeignKey("FailedMethod1FileDescId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.FileDescription", "FailedMethod2FileDesc")
-                        .WithMany()
-                        .HasForeignKey("FailedMethod2FileDescId");
+                        .WithMany("SubstitutedServices2")
+                        .HasForeignKey("FailedMethod2FileDescId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.FileDescription", "FailedMethod3FileDesc")
-                        .WithMany()
-                        .HasForeignKey("FailedMethod3FileDescId");
+                        .WithMany("SubstitutedServices3")
+                        .HasForeignKey("FailedMethod3FileDescId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.OutcomeDocFile", "OutcomeDocumentFile")
-                        .WithMany()
+                        .WithMany("SubstitutedServices")
                         .HasForeignKey("OutcomeDocumentFileId");
 
                     b.HasOne("CM.Data.Model.FileDescription", "RequestMethodFileDesc")
-                        .WithMany()
-                        .HasForeignKey("RequestMethodFileDescId");
+                        .WithMany("SubstitutedServices")
+                        .HasForeignKey("RequestMethodFileDescId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Participant", "ServiceByParticipant")
-                        .WithMany()
+                        .WithMany("BySubstitutedServices")
                         .HasForeignKey("ServiceByParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.Participant", "ServiceToParticipant")
-                        .WithMany()
+                        .WithMany("ToSubstitutedServices")
                         .HasForeignKey("ServiceToParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CM.Data.Model.SystemUser", "SubServiceApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("SubServiceApprovedById");
+                        .WithMany("SubstitutedServices")
+                        .HasForeignKey("SubServiceApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Dispute");
 
                     b.Navigation("FailedMethod1FileDesc");
 
@@ -6908,9 +8274,9 @@ namespace CM.Data.Model.Migrations
                         .HasForeignKey("ServiceOfficeId");
 
                     b.HasOne("CM.Data.Model.SystemUserRole", "SystemUserRole")
-                        .WithMany()
+                        .WithMany("SystemUsers")
                         .HasForeignKey("SystemUserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ServiceOffice");
@@ -6944,6 +8310,16 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("SystemUser");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.Trial", b =>
+                {
+                    b.HasOne("CM.Data.Model.Trial", "AssociatedTrial")
+                        .WithMany("RelatedTrials")
+                        .HasForeignKey("AssociatedTrialGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AssociatedTrial");
+                });
+
             modelBuilder.Entity("CM.Data.Model.TrialDispute", b =>
                 {
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
@@ -6953,52 +8329,115 @@ namespace CM.Data.Model.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.Participant", "DisputeOptedInByParticipant")
+                        .WithMany("TrialDisputes")
+                        .HasForeignKey("DisputeOptedInByParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "DisputeOptedInByStaff")
+                        .WithMany("TrialDisputes")
+                        .HasForeignKey("DisputeOptedInByStaffId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Trial", "Trial")
                         .WithMany("TrialDisputes")
                         .HasForeignKey("TrialGuid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dispute");
+
+                    b.Navigation("DisputeOptedInByParticipant");
+
+                    b.Navigation("DisputeOptedInByStaff");
 
                     b.Navigation("Trial");
                 });
 
             modelBuilder.Entity("CM.Data.Model.TrialIntervention", b =>
                 {
+                    b.HasOne("CM.Data.Model.TrialDispute", "TrialDispute")
+                        .WithMany("TrialInterventions")
+                        .HasForeignKey("TrialDisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Trial", "Trial")
                         .WithMany("TrialInterventions")
                         .HasForeignKey("TrialGuid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.TrialParticipant", "TrialParticipant")
+                        .WithMany("TrialInterventions")
+                        .HasForeignKey("TrialParticipantGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Trial");
+
+                    b.Navigation("TrialDispute");
+
+                    b.Navigation("TrialParticipant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.TrialOutcome", b =>
                 {
+                    b.HasOne("CM.Data.Model.TrialDispute", "TrialDispute")
+                        .WithMany("TrialOutcomes")
+                        .HasForeignKey("TrialDisputeGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("CM.Data.Model.Trial", "Trial")
                         .WithMany("TrialOutcomes")
                         .HasForeignKey("TrialGuid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("CM.Data.Model.TrialIntervention", "TrialIntervention")
+                        .WithMany("TrialOutcomes")
+                        .HasForeignKey("TrialInterventionGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.TrialParticipant", "TrialParticipant")
+                        .WithMany("TrialOutcomes")
+                        .HasForeignKey("TrialParticipantGuid")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Trial");
+
+                    b.Navigation("TrialDispute");
+
+                    b.Navigation("TrialIntervention");
+
+                    b.Navigation("TrialParticipant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.TrialParticipant", b =>
                 {
                     b.HasOne("CM.Data.Model.Dispute", "Dispute")
-                        .WithMany()
+                        .WithMany("TrialParticipants")
                         .HasForeignKey("DisputeId");
+
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("TrialParticipants")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("CM.Data.Model.SystemUser", "SystemUser")
+                        .WithMany("TrialParticipants")
+                        .HasForeignKey("SystemUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CM.Data.Model.Trial", "Trial")
                         .WithMany("TrialParticipants")
                         .HasForeignKey("TrialGuid")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Dispute");
+
+                    b.Navigation("Participant");
+
+                    b.Navigation("SystemUser");
 
                     b.Navigation("Trial");
                 });
@@ -7010,6 +8449,25 @@ namespace CM.Data.Model.Migrations
                         .HasForeignKey("SystemUserId");
 
                     b.Navigation("SystemUser");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.VerificationAttempt", b =>
+                {
+                    b.HasOne("CM.Data.Model.DisputeVerification", "DisputeVerification")
+                        .WithMany("VerificationAttempts")
+                        .HasForeignKey("DisputeVerificationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CM.Data.Model.Participant", "Participant")
+                        .WithMany("VerificationAttempts")
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DisputeVerification");
+
+                    b.Navigation("Participant");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Claim", b =>
@@ -7045,12 +8503,16 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("HearingAuditLogs");
 
+                    b.Navigation("Hearings");
+
                     b.Navigation("Notices");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Dispute", b =>
                 {
                     b.Navigation("Amendments");
+
+                    b.Navigation("AuditLogs");
 
                     b.Navigation("BulkEmailRecipients");
 
@@ -7068,13 +8530,19 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("DisputeLastModified");
 
+                    b.Navigation("DisputeLinks");
+
                     b.Navigation("DisputeProcessDetails");
 
                     b.Navigation("DisputeStatuses");
 
                     b.Navigation("DisputeUsers");
 
+                    b.Navigation("DisputeVerifications");
+
                     b.Navigation("EmailMessages");
+
+                    b.Navigation("ExternalErrorLogs");
 
                     b.Navigation("FileDescriptions");
 
@@ -7085,6 +8553,10 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("HearingAuditLogs");
 
                     b.Navigation("HearingParticipations");
+
+                    b.Navigation("Hearings");
+
+                    b.Navigation("IdentityParticipants");
 
                     b.Navigation("IntakeQuestions");
 
@@ -7102,17 +8574,29 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("OutcomeDocRequests");
 
+                    b.Navigation("ParticipantIdentities");
+
                     b.Navigation("Participants");
 
+                    b.Navigation("PollResponses");
+
+                    b.Navigation("ServiceAuditLogs");
+
                     b.Navigation("SubmissionReceipts");
+
+                    b.Navigation("SubstitutedServices");
 
                     b.Navigation("Tasks");
 
                     b.Navigation("TrialDisputes");
+
+                    b.Navigation("TrialParticipants");
                 });
 
             modelBuilder.Entity("CM.Data.Model.DisputeFee", b =>
                 {
+                    b.Navigation("DisputeVerifications");
+
                     b.Navigation("PaymentTransactions");
                 });
 
@@ -7121,9 +8605,16 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("DisputeProcessDetails");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.DisputeVerification", b =>
+                {
+                    b.Navigation("VerificationAttempts");
+                });
+
             modelBuilder.Entity("CM.Data.Model.EmailMessage", b =>
                 {
                     b.Navigation("EmailAttachments");
+
+                    b.Navigation("OutcomeDocDeliveries");
                 });
 
             modelBuilder.Entity("CM.Data.Model.ExternalCustomDataObject", b =>
@@ -7137,38 +8628,44 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("LinkedFiles");
 
-                    b.Navigation("NoticeServices1");
-
-                    b.Navigation("NoticeServices2");
-
-                    b.Navigation("NoticeServices3");
-
-                    b.Navigation("NoticeServices4");
-
-                    b.Navigation("NoticeServices5");
-
-                    b.Navigation("Notices1");
-
-                    b.Navigation("Notices2");
-
-                    b.Navigation("Notices3");
-
-                    b.Navigation("Notices4");
-
-                    b.Navigation("Notices5");
-
                     b.Navigation("OutcomeDocFiles");
+
+                    b.Navigation("PollResponses");
                 });
 
             modelBuilder.Entity("CM.Data.Model.FileDescription", b =>
                 {
                     b.Navigation("Amendments");
 
+                    b.Navigation("FilePackageServices");
+
+                    b.Navigation("Hearings");
+
                     b.Navigation("LinkedFiles");
 
                     b.Navigation("NoticeServices");
 
                     b.Navigation("Notices");
+
+                    b.Navigation("OtherFilePackageServices");
+
+                    b.Navigation("OtherNoticeServices");
+
+                    b.Navigation("OtherServiceAuditLogs");
+
+                    b.Navigation("OutcomeDocReqItems");
+
+                    b.Navigation("OutcomeDocRequests");
+
+                    b.Navigation("ServiceAuditLogs");
+
+                    b.Navigation("SubstitutedServices");
+
+                    b.Navigation("SubstitutedServices1");
+
+                    b.Navigation("SubstitutedServices2");
+
+                    b.Navigation("SubstitutedServices3");
                 });
 
             modelBuilder.Entity("CM.Data.Model.FilePackage", b =>
@@ -7178,20 +8675,43 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("Files");
                 });
 
+            modelBuilder.Entity("CM.Data.Model.FilePackageService", b =>
+                {
+                    b.Navigation("ServiceAuditLogs");
+                });
+
             modelBuilder.Entity("CM.Data.Model.Hearing", b =>
                 {
                     b.Navigation("DisputeHearings");
 
+                    b.Navigation("DisputeVerifications");
+
                     b.Navigation("HearingAuditLogs");
 
                     b.Navigation("HearingParticipations");
+
+                    b.Navigation("Notices");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Notice", b =>
                 {
                     b.Navigation("Amendments");
 
+                    b.Navigation("ChildNotices");
+
+                    b.Navigation("Disputes");
+
                     b.Navigation("NoticeServices");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.NoticeService", b =>
+                {
+                    b.Navigation("ServiceAuditLogs");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.OnlineMeeting", b =>
+                {
+                    b.Navigation("DisputeLinks");
                 });
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocFile", b =>
@@ -7199,11 +8719,15 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("OutcomeDocContents");
 
                     b.Navigation("OutcomeDocDeliveries");
+
+                    b.Navigation("SubstitutedServices");
                 });
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocGroup", b =>
                 {
                     b.Navigation("OutcomeDocFiles");
+
+                    b.Navigation("OutcomeDocRequests");
                 });
 
             modelBuilder.Entity("CM.Data.Model.OutcomeDocRequest", b =>
@@ -7215,17 +8739,31 @@ namespace CM.Data.Model.Migrations
                 {
                     b.Navigation("Amendments");
 
+                    b.Navigation("ArchiveServedFilePackageServices");
+
+                    b.Navigation("ArchiveServedNoticeServices");
+
                     b.Navigation("AuditLogs");
+
+                    b.Navigation("BulkEmailRecipients");
+
+                    b.Navigation("BySubstitutedServices");
 
                     b.Navigation("ClaimDetails");
 
                     b.Navigation("ClaimGroupParticipants");
+
+                    b.Navigation("DisputeFees");
+
+                    b.Navigation("DisputeFlags");
 
                     b.Navigation("DisputeProcessDetail1");
 
                     b.Navigation("DisputeProcessDetail2");
 
                     b.Navigation("DisputeUsers");
+
+                    b.Navigation("Disputes");
 
                     b.Navigation("EmailMessages");
 
@@ -7237,6 +8775,8 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("HearingParticipations");
 
+                    b.Navigation("IdentityParticipants");
+
                     b.Navigation("NoticeServices");
 
                     b.Navigation("Notices");
@@ -7245,11 +8785,40 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("OutcomeDocRequests");
 
+                    b.Navigation("ParticipantIdentities");
+
                     b.Navigation("PaymentTransactions");
+
+                    b.Navigation("PollResponses");
+
+                    b.Navigation("PrimaryContactClaimGroupParticipants");
 
                     b.Navigation("RemedyDetails");
 
                     b.Navigation("ServedFilePackageServices");
+
+                    b.Navigation("ServedNoticeServices");
+
+                    b.Navigation("ServedServiceAuditLogs");
+
+                    b.Navigation("ServiceAuditLogs");
+
+                    b.Navigation("SubPartDisputes");
+
+                    b.Navigation("SubmissionReceipts");
+
+                    b.Navigation("ToSubstitutedServices");
+
+                    b.Navigation("TrialDisputes");
+
+                    b.Navigation("TrialParticipants");
+
+                    b.Navigation("VerificationAttempts");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.Poll", b =>
+                {
+                    b.Navigation("PollResponses");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Remedy", b =>
@@ -7277,13 +8846,23 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("ConferenceBridges");
 
+                    b.Navigation("DisputeFlags");
+
                     b.Navigation("DisputeUsers");
+
+                    b.Navigation("DisputeVerifications");
 
                     b.Navigation("Disputes");
 
                     b.Navigation("ExternalCustomDataObjects");
 
+                    b.Navigation("ExternalErrorLogs");
+
+                    b.Navigation("FilePackageServices");
+
                     b.Navigation("HearingAuditLogs");
+
+                    b.Navigation("HearingParticipations");
 
                     b.Navigation("Hearings");
 
@@ -7303,19 +8882,44 @@ namespace CM.Data.Model.Migrations
 
                     b.Navigation("LastOwnerTasks");
 
+                    b.Navigation("ManagedByInternalUserRoles");
+
+                    b.Navigation("NoticeServices");
+
                     b.Navigation("OwnerScheduleRequests");
 
+                    b.Navigation("ParticipantIdentities");
+
                     b.Navigation("Participants");
+
+                    b.Navigation("PreHearingParticipations");
+
+                    b.Navigation("Remedies");
 
                     b.Navigation("ScheduleBlocks");
 
                     b.Navigation("ScheduleRequests");
 
+                    b.Navigation("SubmitterScheduleRequests");
+
+                    b.Navigation("SubstitutedServices");
+
                     b.Navigation("Tasks");
+
+                    b.Navigation("TrialDisputes");
+
+                    b.Navigation("TrialParticipants");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.SystemUserRole", b =>
+                {
+                    b.Navigation("SystemUsers");
                 });
 
             modelBuilder.Entity("CM.Data.Model.Trial", b =>
                 {
+                    b.Navigation("RelatedTrials");
+
                     b.Navigation("TrialDisputes");
 
                     b.Navigation("TrialInterventions");
@@ -7323,6 +8927,30 @@ namespace CM.Data.Model.Migrations
                     b.Navigation("TrialOutcomes");
 
                     b.Navigation("TrialParticipants");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.TrialDispute", b =>
+                {
+                    b.Navigation("TrialInterventions");
+
+                    b.Navigation("TrialOutcomes");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.TrialIntervention", b =>
+                {
+                    b.Navigation("TrialOutcomes");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.TrialParticipant", b =>
+                {
+                    b.Navigation("TrialInterventions");
+
+                    b.Navigation("TrialOutcomes");
+                });
+
+            modelBuilder.Entity("CM.Data.Model.UserToken", b =>
+                {
+                    b.Navigation("Hearings");
                 });
 #pragma warning restore 612, 618
         }

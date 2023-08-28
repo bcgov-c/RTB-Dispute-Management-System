@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all creation, loading, and retrieval of data related to the Work Schedule feature. This includes: schedule blocks, schedule requests, and schedule periods.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ScheduleRequest_collection from './schedule-requests/ScheduleRequest_collection';
@@ -206,7 +209,10 @@ const SchedulingManager = Marionette.Object.extend({
 
     // If we are in edit mode, the first block to change should be the saved block
     if (blocksToCreate.length && editBlock) {
-      blocksToCreate[0].set(blocksToCreate[0].idAttribute, editBlock?.id);
+      blocksToCreate[0].set({
+        [blocksToCreate[0].idAttribute]: editBlock?.id,
+        _originalData: editBlock?.get('_originalData'),
+      });
     }
 
     return new Promise((res, rej) => Promise.allSettled(blocksToCreate.map(b => b.save(b.getApiChangesOnly())))

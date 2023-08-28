@@ -2,15 +2,17 @@
 
 public static class ApiReturnMessages
 {
-    // Auth
+    #region Auth
     public const string Authorized = "Authorized";
     public const string WrongToken = "Wrong token specified";
+    #endregion
 
-    // External auth
+    #region External Auth
     public const string InvalidSessionClaims = "Invalid session claims";
     public const string InvalidRefreshToken = "Invalid refresh token";
     public const string RefreshTokenExpired = "Refresh token is expired";
     public const string InvalidSessionTokenForRotation = "Invalid session token for rotation";
+    #endregion
 
     // General messages
     public const string Succeeded = "Succeeded";
@@ -18,7 +20,7 @@ public static class ApiReturnMessages
     public const string Deleted = "Deleted";
     public const string Ok = "Ok";
 
-    // Users
+    #region Users
     public const string InactiveUser = "user with ID={0} does not match an active role 1 user in the dispute";
     public const string UserDoesNotExist = "user with ID={0} does not exist";
     public const string InvalidUser = "Invalid system user ID provided";
@@ -27,6 +29,7 @@ public static class ApiReturnMessages
     public const string InternalUserProfileExists = "A profile already exists for this user, Update the current profile";
     public const string InvalidManagedById = "ManagedById must be a valid active role 1 user id";
     public const string InvalidExternalCustomDataObjectOwner = "The owner_id value provided is not valid";
+    public const string InvalidExpiryDate = "The external user session expiry date time must be in the future";
 
     public const string DuplicateEmailForRole = "Email address already exists for this role, a new user with the same email cannot be created";
     public const string DuplicateUsernameForRole = "User name already exists for this role, a new user with the same user name cannot be created";
@@ -37,8 +40,12 @@ public static class ApiReturnMessages
 
     public const string InvalidActiveAdminUser = "the system_user_id is not a valid active Role 1 user ID";
 
-    // Dispute
+    public const string InvalidErrorOwner = "Invalid error owner id";
+    #endregion
+
+    #region Dispute
     public const string DisputeDoesNotExist = "Dispute with ID={0} does not exist";
+    public const string InvalidDisputeGuid = "Invalid dispute guid";
     public const string DisputeStatusDoesNotExist = "Dispute status with ID={0} does not exist";
     public const string DisputeGuidRequired = "Dispute Guid is Required";
     public const string DisputeFileNumberRequired = "File Number is Required for Dispute {0}";
@@ -47,6 +54,7 @@ public static class ApiReturnMessages
     public const string CurrentStatusCannotBeModified = "The current status cannot be modified by access code users";
     public const string InvalidCreationMethod = "The creation_method filter is invalid";
     public const string InvalidFilenumberCount = "A valid 8-9 digit file number is required";
+    #endregion
 
     // Dispute Flag
     public const string InvalidFlagOwnerId = "Invalid flag owner value";
@@ -68,7 +76,7 @@ public static class ApiReturnMessages
     public const string RemedyChildReference = "Remedy with ID={0} has child references. Remove them first";
     public const string RemedyDoesNotExist = "Remedy with ID={0} does not exist";
 
-    // Participants
+    #region Participants
     public const string ParticipantReference = "This participant is related to Claim Group with ID={0}";
     public const string ParticipantWithDisputeDoesNotExist = "Participant with ID={0} and DisputeGuid={1} does not exist";
     public const string ParticipantDoesNotExist = "Participant with ID={0} does not exist";
@@ -78,9 +86,14 @@ public static class ApiReturnMessages
     public const string InvalidParticipant = "Participant ID is invalid";
     public const string ParticipantRemoved = "Participant removed";
     public const string ParticipantRemovedOrDeleted = "Participant ID={0} has been removed from this dispute";
-    public const string InvalidParticipantOnDispute = "A valid active participant ID on this dispute is required";
+    public const string InvalidParticipantOnDispute = "A valid active participant ID={0} on this dispute is required";
+    public const string EmptyParticipantList = "At least one participant id must be provided and all must be associated to the provided dispute guid";
 
     public const string SendAccessCodeRecoveryEmail = "Access Code recovery request initiated";
+
+    public const string IdentityParticipantDoesNotExist = "IdentityParticipant with ID={0} does not exist";
+    public const string SameDisputeAssociation = "The participant Id's for this identity record cannot be associated to the same dispute guid";
+    #endregion
 
     // Payment
     public const string DisputeFeeChildReference = "Dispute fee with ID={0} has child references. Remove them first";
@@ -89,14 +102,26 @@ public static class ApiReturnMessages
     public const string PaymentIsNotOnline = "Payment transaction with ID = {0} is not an online payment";
     public const string InvalidPaymentTransaction = "Payment transaction with ID = {0} is not a valid active transaction";
     public const string TransactionSiteSourceIsRequired = "transaction site source is required when payment method = 1";
+    public const string InvalidOrUnassociatedDisputeFee = "The provided dispute fee ID is not valid or not associated to the provided dispute guid";
 
-    // Email
+    #region Email
     public const string EmailAlreadySent = "This email message is already sent. Could not be deleted";
     public const string EmailMessageDoesNotExist = "Email message with ID={0} does not exist";
     public const string ParticipantIdIsSetted = "ParticipantId is already setted.";
     public const string InvalidPickupMessage = "This is not a valid email message id for pickup.";
+    public const string EmailSent = "Email sent";
+    public const string EmailSentFailed = "The verification email could not be created, please try again later";
+    public const string ParticipantPrimaryPhoneDoesNotExist = "The participant does not have a primary phone number on file";
+    public const string ParticipantSecondaryPhoneDoesNotExist = "The participant does not have a secondary phone number on file";
+    public const string InvalidRelatedMessage = "Related message ID must be a valid ID of an email message associated to this dispute";
+    public const string SendMethodIsRequired = "Send method is required";
+    public const string ParticipantEmailAlreadyVerified = "This participant email has already been verified";
+    public const string ParticipantPrimaryPhoneAlreadyVerified = "This participants primary phone number has already been verified";
+    public const string ParticipantSecondaryPhoneAlreadyVerified = "This participants secondary phone number has already been verified";
+    public const string InvalidVerificationCode = "The provided verification code does not match";
+    #endregion
 
-    // Hearings
+    #region Hearings
     public const string HearingDoesNotExist = "The hearing with ID={0} does not exist";
     public const string InvalidHearingForSwitch = "Hearing ID {0} is not a valid hearing in the future";
     public const string HearingsDatesNotMatch = "Hearing start and end times must match";
@@ -117,8 +142,13 @@ public static class ApiReturnMessages
     public const string AssociatedDisputeHearing = "This hearing is associated to DisputeHearingId = {0}.";
     public const string PreParticipationStatusRequired = "PreParticipationStatus is Required";
     public const string NotFutureHearing = "The hearing id provided is not a valid future hearing id";
+    public const string InvalidParticipationStatusBy = "The participation status by ID must be a valid system user ID, and for external users it must be associated to the dispute file";
+    public const string InvalidPreParticipationStatusBy = "The pre participation status by ID must be a valid system user ID, and for external users it must be associated to the dispute file";
+    public const string InvalidPreParticipationStatusDate = "The pre participation status date must be a valid date in the past";
+    public const string InvalidReservedUntilDateTime = "The hearing reserved until value must be a valid UTC date time in the future";
+    #endregion
 
-    // File
+    #region File
     public const string FileExtensionDifferent = "File extension not the same as in originally saved";
     public const string AddedByNotParticipant = "AddedBy with ID={0} not match the participant ID of a participant in the dispute";
     public const string FileDoesNotExist = "The file with ID={0} does not exist";
@@ -133,6 +163,10 @@ public static class ApiReturnMessages
     public const string FileUploadError = "File upload aborted";
     public const string FileUploadChunkSuccess = "File chunk upload succeeded";
     public const string FileNameIsMissing = "File name is not specified";
+    public const string DeletedSource = "The source file that you requested has been deleted from the system and is no longer available";
+    public const string ProofFileDescriptionInvalid = "Proof File Description with ID={0} and DisputeGuid={1} does not exist";
+    public const string OtherProofFileDescriptionInvalid = "Other Proof File Description with ID={0} and DisputeGuid={1} does not exist";
+    #endregion
 
     // CommonFile
     public const string ProfilePictureFileExists = "No common file located that matches the profile_picture_id provided";
@@ -145,6 +179,8 @@ public static class ApiReturnMessages
     public const string InvalidParentNotice = "The parent notice ID is invalid";
     public const string ParentNoticeRequired = "The parent notice ID is required";
     public const string InvalidParentNoticeHierarchy = "The parent notice ID cannot be set to the same value as the current notice_id";
+    public const string DeliveryDeadlineIssue = "You cannot enable a service deadline without setting a positive service deadline days value or a future service deadline date";
+    public const string SecondServiceDeadlineDateIssue = "Second service deadline date must be a date in the future";
 
     // Note
     public const string LinkedObjectNotExistsOrInactive = "The {0} with ID={1} not exists or inactive";
@@ -176,6 +212,7 @@ public static class ApiReturnMessages
     public const string OutcomeDocGroupDoesNotExist = "The outcomeDocGroup with ID={0} does not exist";
     public const string OutcomeDocFileDoesNotExist = "The outcomeDocFile with ID={0} does not exist";
     public const string DuplicateOutcomeDocDeliveryRecordByParticipantAndFileId = "A delivery for Participant ID={0} and Outcome Doc File ID={1} already exists.";
+    public const string IncorrectDeliveryParticipantIds = "At least one delivery participant id must be provided and all delivery participant ids must be participants associated to the provided dispute guid.";
 
     // Access Code
     public const string IncorrectAccessCode = "Provided Access Code is incorrect";
@@ -205,6 +242,8 @@ public static class ApiReturnMessages
     public const string DisputeGuidOrExternalFileIdRequired = "DisputeGuid Or ExternalFileId is Required.";
     public const string FutureHearingExist = "Dispute GUID provided is already associated to an future dispute";
     public const string OverlappedHearingExist = "Dispute GUID provided is already booked during this time period";
+    public const string EmptyDisputeHearings = "Empty Dispute Hearings";
+    public const string HearingNotAssociatedToDispute = "The provided hearing Id is not associated to the provided dispute guid";
 
     // Scheduled Hearing
     public const string DurationIsNotValid = "A hearing start and end date and time must be provided and the duration cannot exceed 8 hours";
@@ -218,6 +257,10 @@ public static class ApiReturnMessages
 
     // Hearing Reporting
     public const string AtLeastOneHearingPriority = "At least on hearing priority value must be provided";
+    public const string NotAssociatedStaticDisputeGuidInPast = "Static dispute guid must be associated to a hearing with a start time in the past";
+    public const string NotAssociatedMovedDisputeGuidInPast = "Moved dispute guid must be associated to a hearing with a start time in the future";
+    public const string StaticAlreadyLinkedToAnotherDispute = "The static dispute guid is already linked to another dispute guid";
+    public const string MovedAlreadyLinkedToAnotherDispute = "The moved dispute guid is already linked to another dispute guid";
 
     // Hearing Import
     public const string HearingImportExist = "The record with provided FileId is already exists";
@@ -260,17 +303,14 @@ public static class ApiReturnMessages
     // Custom Object
     public const string CustomObjectIsNotActive = "Older inactive records cannot be patched";
 
-    // Schedule Period
+    #region Schedule Period
     public const string InvalidTimeZone = "The period_time_zone id is not an accepted value";
     public const string IncorrectSchedulePeriodIdRange = "The first between_schedule_period_ids value must be a lower number than the second value";
     public const string InvalidSchedulePeriod = "The schedule_period_id that was provided is not valid";
-    public const string PastSchedulePeriod = "The target schedule_period is in the past and cannot have blocks added";
     public const string InactiveSchedulePeriod = "The associated schedule period is not in a status that allows edits";
-    public const string PastBlockStart = "You cannot add a block that starts in the past";
     public const string BlockStartAfterEnd = "The block_start must be before the block_end";
     public const string ScheduleStartOutOfPeriod = "the block_start value is not within the associated schedule period";
     public const string InvalidStartLocalTimePeriod = "the local converted time of the block_start must be between 6AM and 9PM";
-    public const string PastBlockEnd = "You cannot add a block that ends in the past";
     public const string ScheduleEndOutOfPeriod = "the block_end value is not within the associated schedule period";
     public const string InvalidEndLocalTimePeriod = "the local converted time of the block_end must be between 6AM and 9PM";
     public const string ShortScheduleBlockDuration = "Added blocks must be 1 hour minimum in duration";
@@ -278,12 +318,10 @@ public static class ApiReturnMessages
     public const string InvalidBlockType = "The block_type is required and must be an accepted integer value";
     public const string ExceedWorkingDayBlock = "Working time blocks cannot exceed the current working day";
 
-    public const string PastBlockPatch = "The target schedule_block_id is in the past and cannot be modified";
-    public const string PastBlockStartPatch = "You cannot modify the start of a block that is in the past";
     public const string AssignedHearings = "the target schedule block times cannot be modified because hearings are assigned";
 
-    public const string PastBlockDelete = "The target schedule_block_id is in the past and cannot be deleted";
     public const string BlockStartingBeforeAfterInvalid = "The blocks_starting_after must be an earlier datetime than blocks_starting_before";
+    #endregion
 
     // Email Templates
     public const string AssignedTemplateIdNonUnique = "assigned_template_id must be unique and not already exist for another record in dbo.EmailTemplates";
@@ -296,7 +334,7 @@ public static class ApiReturnMessages
     public const string RestrictDeletePastScheduleRequest = "The target schedule_request_id is in the past and cannot be deleted";
     public const string InvalidRequestType = "A valid request_type value must be provided to create a request";
 
-    // OutcomeDocRequest
+    #region OutcomeDocRequest
     public const string InvalidSubmitter = "Invalid submitter ID";
     public const string InvalidFileDescription = "Invalid File Description Id";
     public const string NotPastDate = "Date documents received is required and must be a past date";
@@ -306,15 +344,12 @@ public static class ApiReturnMessages
     public const string InvalidDocRequestType = "Invalid request type";
     public const string InvalidRequestSubType = "Invalid request sub type";
     public const string InvalidAffectedDocuments = "Invalid affected documents";
+    #endregion
 
     // Remedy
     public const string PrevAwardByInvalidRole = "prev_award_by does not match a valid Role 1 user";
 
-    // EmailMessage
-    public const string InvalidRelatedMessage = "Related message ID must be a valid ID of an email message associated to this dispute";
-    public const string SendMethodIsRequired = "Send method is required";
-
-    // Trials
+    #region Trials
     public const string AssociatedTrialInvalid = "The associated trial guid is not valid";
     public const string TrialInvalid = "Invalid trial guid";
     public const string InvalidOptedInParticipant = "Opted in participant id is not a valid id on the dispute file";
@@ -331,6 +366,7 @@ public static class ApiReturnMessages
     public const string AssociatedRecordExistsForTrialDispute = "This trial dispute record cannot be deleted as it has active associated records";
     public const string InvalidOutcomeStatus = "A valid outcome status value is required";
     public const string InvalidOutcomeBy = "A valid outcome by value is required";
+    #endregion
 
     // Custom Config Object
     public const string OnlyJsonAccepted = "Object json b and object text cannot be set on object storage type 1 config objects";
@@ -343,4 +379,46 @@ public static class ApiReturnMessages
 
     // Custom Config Object
     public const string ExternalCustomDataObjectDoesNotExist = "CustomDataObject with ID={0} does not exist";
+
+    // AdHocReport Service
+    public const string ExcelTemplateIdRequired = "ExcelTemplateId is Required when ExcelTemplateExist is true";
+    public const string InvalidExcelTemplateId = "The associated excel template ID is not valid";
+    public const string ValidationForSetIsActive = "You can only set an email adhoc report to active if it has an active report attachment";
+    public const string AdHocReportAttachmentsExists = "You cannot delete an adhoc report that has associated attachments. Delete the attachments first.";
+    public const string LastAttachmentDelete = "You cannot delete the last attachment associated to an active adhoc email report, set the email inactive first.";
+
+    // Service Audit Log
+    public const string NoticeServiceIdCannotProvide = "A Notice Service Id can only be provided on Service Type 1 searches";
+    public const string InvalidNoticeServiceId = "Invalid notice service Id";
+    public const string FilePackageServiceIdCannotProvide = "A File Package Service Id can only be provided on Service Type 2 searches";
+    public const string InvalidFilePackageServiceId = "Invalid file package service Id";
+
+    // Error Log
+    public const string ReportedDateMustBeInPast = "Reported date must be a date in the past";
+
+    // Poll
+    public const string PollTitleExists = "The poll title you have provided has already been used by another poll. Please provide a unique poll title";
+    public const string PollTitleLengthIssue = "A poll title is required with a minimum of 5 characters.";
+    public const string PollChildReference = "Poll contains Poll Responses. Firstly delete Poll Responses.";
+    public const string InvalidPoll = "Invalid Poll ID.";
+    public const string FileNotAssociatedToDispute = "The File ID must be associated to the provided dispute guid.";
+
+    // HearingParticipant
+    public const string HearingParticipantExistsForParticipant = "A hearing participation record already exists for the provided participant id";
+
+    // DisputeLink
+    public const string DisputeLinkExist = "This dispute guid already has an active status dispute link";
+    public const string OnlineMeetingNotExists = "Invalid online meeting id";
+    public const string PrimaryDisputeLinkExists = "There can only be one active primary dispute link per online meeting id";
+    public const string PrimaryDisputeLinkMustExists = "To add a secondary role dispute link an active primary role dispute link must exist";
+    public const string SameDisputeLinkRole = "The provided dispute link role is the same as the current value in the system";
+    public const string WrongDisputeLinkStatus = "You can only change the link status away from active (1)";
+    public const string InvalidDisputeLink = "Invalid dispute link id";
+
+    // Dispute Verification
+    public const string DisputeVerificationDoesNotExist = "A valid dispute verification id is required";
+    public const string InvalidRefundIncluded = "You can only indicate a refund is included on verifications that have an associated dispute fee id";
+    public const string InvalidRefundInitiatedBy = "Invalid refund initiated by Id";
+    public const string AssignedAttemptsExists = "Dispute verifications cannot be deleted if they have associated verification attempts, you must delete the verification attempts first";
+    public const string InvalidParticipantForVerification = "A valid participant id is required that is associated to the same dispute as the dispute verification record";
 }

@@ -21,10 +21,12 @@
               >
                 <div class="file-card-description">
                   <div class="file-card-title-container">
-                    <span class="dispute-issue-evidence-file-notes <%= noteLength ? '' : 'dispute-issue-evidence-file-notes--empty' %>"><%= noteLength %></span>
-                    <span class="dispute-issue-evidence-file-referenced hidden-print <%= hasDecision ? 'dispute-issue-evidence-file-referenced--decision' : ''%>"></span>
-                    <span class="dispute-issue-evidence-file-considered"></span>
-                    <span class="evidencePreview-filename-no-extension"><%= fileModel.getTrimmedName(30) %></span>
+                    <% if (!hideArbControls) { %>
+                      <span class="dispute-issue-evidence-file-notes <%= noteLength ? '' : 'dispute-issue-evidence-file-notes--empty' %>"><%= noteLength %></span>
+                      <span class="dispute-issue-evidence-file-referenced hidden-print <%= hasDecision ? 'dispute-issue-evidence-file-referenced--decision' : ''%>"></span>
+                      <span class="dispute-issue-evidence-file-considered"></span>
+                    <% } %>
+                    <span class="evidencePreview-filename-no-extension"><%= fileModel.getTrimmedName(hideArbControls ? 38 : 30) %></span>
                   </div>
                 </div>
               </div>

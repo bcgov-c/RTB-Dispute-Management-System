@@ -29,6 +29,9 @@ public class Startup
     {
         services.Configure<FactDisputeSummaryConfig>(Configuration.GetSection("FactDisputeSummaryConfig"));
         services.Configure<FactHearingSummaryConfig>(Configuration.GetSection("FactHearingSummaryConfig"));
+        services.Configure<FactIntakeProcessingConfig>(Configuration.GetSection("FactIntakeProcessingConfig"));
+        services.Configure<FactResolutionServiceConfig>(Configuration.GetSection("FactResolutionServiceConfig"));
+        services.Configure<FactIssueOutcomeConfig>(Configuration.GetSection("FactIssueOutcomeConfig"));
 
         services.AddControllers().AddNewtonsoftJson();
         services

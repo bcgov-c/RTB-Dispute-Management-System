@@ -1,0 +1,60 @@
+
+#blockEditor-modal {
+
+  .modal-dialog {
+    width: 1400px;
+    min-height: 700px;
+  }
+}
+
+.block-edit {
+
+  &__info-row { display: flex; justify-content: space-between; }
+  &__calendar-row { min-height: 100px; overflow-x: scroll; }
+  &__hearings-row {
+    min-height: 300px;
+
+    i { color: #a3a3a3; font-size: 16px; }
+  }
+  &__hearings-label {
+    width: fit-content;
+    padding: 4px 15px;
+    margin: 20px 0 10px 0;
+    color: #fff;
+    background-color: #e46a3f;
+  }
+
+  .glyphicon-scissors {
+    margin-right: 9px;
+    top: 3px;
+    margin-left: 6px;
+  }
+
+  &__block-info {
+    margin-bottom: 20px;
+  }
+
+  &__date-edit {
+    display: flex;
+
+    > div { margin-right: 5px; }
+  }
+
+  &__block-time-controls {
+    display: flex;
+    margin-top: 24px;
+    margin-left: 10px;
+    > div { margin-right: 5px; }
+  }
+
+  &__block-end-time,
+  &__block-start-time {
+    width: 180px;
+    .error-block { white-space: nowrap; }
+  }
+
+  /* Overwrite to hide user label from calendar */
+  .calendar-header-label-column, .calendar-grid-label-column { display: none; }
+  .calendar-header-time-wrapper, .calendar-grid-time-wrapper { margin-left:0; }
+}
+

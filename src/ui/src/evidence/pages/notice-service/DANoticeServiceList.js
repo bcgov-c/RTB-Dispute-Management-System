@@ -14,7 +14,7 @@ const NoticeServiceListView = Marionette.CollectionView.extend({
   emptyView: EmptyNoticeServiceItemView,
 
   childViewOptions() {
-    return { appModel: this.model };
+    return { appModel: this.model, serviceRoute: this.getOption('serviceRoute') };
   },   
 
 

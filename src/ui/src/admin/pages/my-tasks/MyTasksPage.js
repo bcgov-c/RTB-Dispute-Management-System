@@ -15,6 +15,7 @@ const loaderChannel = Radio.channel('loader');
 const taskChannel = Radio.channel('tasks');
 const sessionChannel = Radio.channel('session');
 const userChannel = Radio.channel('users');
+const configChannel = Radio.channel('config');
 
 export default TasksDisplayBaseView.extend({
   template,
@@ -64,11 +65,13 @@ export default TasksDisplayBaseView.extend({
 
   loadTasks(searchParams, onCompleteFn) {
     const userId = this.taskOwnerModel.getData();
+    searchParams = {...searchParams, ...{ ExcludeDisputeStatuses: configChannel.request('get', 'EXCLUDED_TASK_DISPUTE_STATUSES') }}
     searchParams = this.mixin_parseSearchParamsFromPage(searchParams);
     this.tasks_loaded = false;
     taskChannel.request('load:by:owner', userId, searchParams)
       .done(taskCollection => {
         this.tasks = taskCollection;
+        this.mixin_setupTasksListeners();
         this.tasks_loaded = true;
         
         if (_.isFunction(onCompleteFn)) {
@@ -192,6 +195,8 @@ export default TasksDisplayBaseView.extend({
         count: this.tasks.lastUsedFetchCount || this.tasks.DEFAULT_API_COUNT || 20
       });
     });
+
+    this.taskTypeFiltersModel.set('optionData', this.mixin_getTaskTypeFiltersWithCount(), { silent: true });
   },
 
   onRender() {

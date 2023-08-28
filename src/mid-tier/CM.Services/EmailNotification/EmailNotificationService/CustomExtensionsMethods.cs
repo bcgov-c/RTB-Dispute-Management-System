@@ -111,7 +111,7 @@ public static class CustomExtensionsMethods
     {
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddSingleton<IUserResolver, UserResolver>();
-        services.AddSingleton<ISystemSettingsService, SystemSettingsService>();
+        services.AddTransient<ISystemSettingsService, SystemSettingsService>();
 
         services.AddTransient<EmailNotificationIntegrationEventHandler, EmailNotificationIntegrationEventHandler>();
 

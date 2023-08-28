@@ -24,13 +24,16 @@ import QuickActionIcon from '../../static/Icon_Admin_QuickActionWHT.png';
 import PartyNames from '../dispute-overview/PartyNames';
 import { showQuickAccessModalWithEditCheck, isQuickAccessEnabled } from '../../components/quick-access';
 import { routeParse } from '../../routers/mainview_router';
+import TrialLogic_BIGEvidence from '../../../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
+import EvidencePageOtherDocsView from './EvidencePageOtherDocsView';
+import EvidencePageOtherDocs_model from './EvidencePageOtherDocs_model';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import template from './EvidencePage_template.tpl';
-import TrialLogic_BIGEvidence from '../../../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
 
 const PACKAGE_TYPE_CODE = 1;
 const ISSUE_TYPE_CODE = 2;
 const PARTY_TYPE_CODE = 3;
+const OTHER_DOCUMENTS_TYPE_CODE = 4;
 
 const FILTER_CLASS_SHOW_NAMES = 'filter-show-names';
 
@@ -66,7 +69,6 @@ export default PageView.extend({
     notesContainer: '.evidence-page-notes-container',
     evidenceContentContainer: '.evidence-page-files-container',
     filePackages: '.evidence-page-packages',
-
     evidenceViewer: '.evidence-page-file-preview',
     dupFilter: '.evidence-page-filter-dup',
     removedFilter: '.evidence-page-filter-removed',
@@ -77,7 +79,6 @@ export default PageView.extend({
     packageQuickActions: '.evidence-page-mark-all-evidence',
     markAllNotServed: '.mark-all-not-served',
     markAllAcknowledgedServed: '.mark-all-acknowledged-served'
-
   },
 
   regions: {
@@ -93,12 +94,11 @@ export default PageView.extend({
     dupFilterRegion: '@ui.dupFilter',
     thumbnailsFilterRegion: '.evidence-page-filter-thumbnails',
     namesFilterRegion: '.evidence-page-filter-names',
-
     showHearingToolsRegion: '.dispute-overview-claims-hearing-tools',
-
     filePackagesRegion: '@ui.filePackages',
     claimsRegion: '.evidence-page-claims',
-    partiesRegion: '.evidence-page-parties'
+    partiesRegion: '.evidence-page-parties',
+    otherDocumentsRegion: '.evidence-page-other-docs',
   },
 
   events: {
@@ -110,7 +110,6 @@ export default PageView.extend({
     'click @ui.addNote': 'clickAddNote',
     'click @ui.markAllNotServed': 'clickMarkAllNotServed',
     'click @ui.markAllAcknowledgedServed': 'clickMarkAllAcknowledgedServed',
-
     'click @ui.evidenceViewer': 'clickEvidenceViewer'
   },
 
@@ -253,7 +252,7 @@ export default PageView.extend({
   },
 
   clickMarkAllNotServed() {
-    const serviceUpdateFn = (serviceModel) => serviceModel.setToUnserved();
+    const serviceUpdateFn = (serviceModel) => serviceModel.setToUnserved({validation_status: configChannel.request('get', 'SERVICE_VALIDATION_INTERNAL_CONFIRMED')});
     const deficientReason = `Service record removed by ${sessionChannel.request('name')} on ${Formatter.toDateDisplay(Moment())} during "Mark All Evidence NOT Served" page action.`;
     const fileSaveFn = (fileModel) => Promise.all([ fileModel.save({ file_considered: false }) ]);
 
@@ -354,20 +353,17 @@ export default PageView.extend({
   },
 
   createSubModels() {
-    const viewRadio = this.model.get('sessionSettings')?.evidencePage?.filter_viewType;
-
-    let valueToUse = this.model.isMigrated() ? ISSUE_TYPE_CODE : PARTY_TYPE_CODE;
-    if (viewRadio && !(this.model.isMigrated() && viewRadio === PACKAGE_TYPE_CODE)) {
-      valueToUse = viewRadio;
-    }
-
+    const cachedRadioFilter = this.model.get('sessionSettings')?.evidencePage?.filter_viewType;
+    const defaultValue = this.model.isMigrated() ? ISSUE_TYPE_CODE : PARTY_TYPE_CODE;
+  
     this.viewTypeModel = new RadioModel({
       optionData: [
         ...(this.model.isMigrated() ? [] : [{ value: PACKAGE_TYPE_CODE, text: 'Packages/Service' }]),
         { value: ISSUE_TYPE_CODE, text: 'Issue' },
-        { value: PARTY_TYPE_CODE, text: 'Participant' }
+        { value: PARTY_TYPE_CODE, text: 'Participant' },
+        { value: OTHER_DOCUMENTS_TYPE_CODE, text: 'Submitted Documents' }
       ],
-      value: valueToUse
+      value: cachedRadioFilter || defaultValue
     });
 
     this.consideredFilterModel = new CheckboxModel({
@@ -507,6 +503,8 @@ export default PageView.extend({
         _fullDisputeClaims: this.disputeClaims.clone()
       };
     }, this));
+
+    this.otherDocsModel = new EvidencePageOtherDocs_model();
   },
 
   clearListeners() {
@@ -534,8 +532,8 @@ export default PageView.extend({
         this.model.checkEditInProgressPromise().then(
           () => {
             this.model.set({ sessionSettings: {
-              thumbnailsEnabled: !!this.thumbnailsFilterModel.getData(),
               ...this.model.get('sessionSettings'),
+              thumbnailsEnabled: this.thumbnailsFilterModel.getData(),
                 evidencePage: {
                   ...this.model.get('sessionSettings')?.evidencePage,
                   [disputeAttr]: !!value
@@ -561,7 +559,16 @@ export default PageView.extend({
     this.listenTo(this.referencedFilterModel, 'change:checked', createHideFilterHandlerFn('hideNotReferenced'));
 
     this.listenTo(this.notesFilterModel, 'change:checked', function(model, value) {
-      this.model.get('sessionSettings').evidencePage['hideNotes'] = value;
+      this.model.set({
+        sessionSettings: { 
+          ...this.model.get('sessionSettings'), 
+          evidencePage: {
+            ...this.model.get('sessionSettings')?.evidencePage,
+            hideNotes: value
+          }
+        }
+      });
+
       const ele = this.getUI('notesContainer');
       if (value) {
         ele.addClass('hidden');
@@ -571,7 +578,15 @@ export default PageView.extend({
     }, this);
 
     this.listenTo(this.namesFilterModel, 'change:checked', function(model, value) {
-      this.model.get('sessionSettings').evidencePage['showSubmitterName'] = value;
+      this.model.set({
+        sessionSettings: { 
+          ...this.model.get('sessionSettings'), 
+          evidencePage: {
+            ...this.model.get('sessionSettings')?.evidencePage,
+            showSubmitterName: value
+          }
+        }
+      });
       const ele = this.getUI('evidenceContentContainer');
       if (value) {
         ele.addClass(FILTER_CLASS_SHOW_NAMES);
@@ -646,6 +661,10 @@ export default PageView.extend({
     return this.viewTypeModel.getData() === PARTY_TYPE_CODE;
   },
 
+  isOtherDocsViewSelected() {
+    return this.viewTypeModel.getData() === OTHER_DOCUMENTS_TYPE_CODE;
+  },
+
   isRemovedFilterSelected() {
     return this.removedFilterModel.getData();
   },
@@ -693,7 +712,16 @@ export default PageView.extend({
   },
 
   onBeforeRender() {
-    this.model.get('sessionSettings').evidencePage.filter_viewType = this.viewTypeModel.getData();
+    this.model.set({
+      sessionSettings: { 
+        ...this.model.get('sessionSettings'), 
+        evidencePage: {
+          ...this.model.get('sessionSettings')?.evidencePage,
+          filter_viewType: this.viewTypeModel.getData()
+        }
+      }
+    });
+
     // Always prime the correct models for each render
     this._clearClaimEvidenceListeners();
     this._createClaimEvidenceModels();
@@ -797,12 +825,33 @@ export default PageView.extend({
       }));
     }
 
+    if (this.isOtherDocsViewSelected()) {
+      this.showChildView('otherDocumentsRegion', new EvidencePageOtherDocsView({
+        evidenceFilePreviewFn: (fileModel, disputeEvidenceModel, modalOptions={}) => {
+          const defaultOtherDocModalOptions = { openToNotes: false, disableNotes: true };
+          this.openEvidencePreviewModal(Object.assign({
+            fileModel,
+            model: disputeEvidenceModel,
+            navListData: this.otherDocsModel.toEvidenceListData(),
+            fileDupTranslations: this.fileDupTranslations,
+            hideArbControls: true,
+            getClaimTitleFn: (disputeEvidence) => this.otherDocsModel.getTitle(disputeEvidence),
+          }, Object.assign({}, modalOptions, defaultOtherDocModalOptions)));
+        },
+        showThumbnails,
+        showRemoved: true,
+        unitCollection: this.unitCollection,
+        fileDupTranslations: this.fileDupTranslations,
+        model: this.otherDocsModel,
+      }));
+    }
+
     // Perform this check in render so the evidence list data can be updated based on the filter displays
     this.toggleFiltersUI();
     loaderChannel.trigger('page:load:complete');
   },
 
-  openEvidencePreviewModal(modalViewOptions) {
+  openEvidencePreviewModal(modalViewOptions={}) {
     const modalPreview = new ModalEvidencePreview(modalViewOptions);
     modalChannel.request('add', modalPreview, { duration: 0, duration2: 25 });
     this.listenTo(modalPreview, 'removed:modal', this.clickRefresh, this);
@@ -836,6 +885,7 @@ export default PageView.extend({
     if (this.isPackageViewSelected()) collectionToUse = this.disputeFilePackages;
     else if (this.isIssueViewSelected()) collectionToUse = this.disputeClaims;
     else if (this.isPartiesViewSelected()) collectionToUse = this.disputeParties;
+    else if (this.isOtherDocsViewSelected()) collectionToUse = this.otherDocsModel;
     return collectionToUse;
   },
 
@@ -844,6 +894,7 @@ export default PageView.extend({
     if (this.isPackageViewSelected()) regionNameToUse = 'filePackagesRegion';
     else if (this.isIssueViewSelected()) regionNameToUse = 'claimsRegion';
     else if (this.isPartiesViewSelected()) regionNameToUse = 'partiesRegion';
+    else if (this.isOtherDocsViewSelected()) regionNameToUse = 'otherDocumentsRegion';
     return regionNameToUse;
   },
 
@@ -882,6 +933,7 @@ export default PageView.extend({
   },
 
   doesActiveFilterHaveNotConsideredFiles() {
+    if (this.isOtherDocsViewSelected()) return false;
     const collectionToUse = this._getCollectionToUse();
     let hasNotConsideredFiles = false;
     try {
@@ -897,6 +949,7 @@ export default PageView.extend({
   },
 
   doesActiveFilterHaveNotReferencedFiles() {
+    if (this.isOtherDocsViewSelected()) return false;
     const collectionToUse = this._getCollectionToUse();
     let hasNotReferencedFiles = false;
     try {
@@ -933,6 +986,7 @@ export default PageView.extend({
   templateContext() {
     const primaryApplicant = participantChannel.request('get:primaryApplicant');
     const latestHearing = hearingChannel.request('get:latest');
+    const RTB_OFFICE_TIMEZONE_STRING = configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING');
     return {
       isLoaded: this.packagesLoaded,
       Formatter,
@@ -942,12 +996,13 @@ export default PageView.extend({
       enableFileViewer: this.enableFileViewer,
       enableQuickAccess: isQuickAccessEnabled(this.model),
       showHearingTools: UAT_TOGGLING.SHOW_ARB_TOOLS,
-      applicantDeadline: latestHearing ? Formatter.toDateDisplay(latestHearing.getApplicantEvidenceDeadline()) : '<i>No hearing</i>',
-      respondentDeadline: latestHearing ? Formatter.toDateDisplay(latestHearing.getRespondentEvidenceDeadline()) : '<i>No hearing</i>',
+      applicantDeadline: latestHearing ? (Formatter.toDateDisplay(latestHearing.getApplicantEvidenceDeadline(), RTB_OFFICE_TIMEZONE_STRING) || '-') : '<i>No hearing</i>',
+      respondentDeadline: latestHearing ? (Formatter.toDateDisplay(latestHearing.getRespondentEvidenceDeadline(), RTB_OFFICE_TIMEZONE_STRING) || '-') : '<i>No hearing</i>',
       primaryApplicantDisplay: primaryApplicant ? `${primaryApplicant.getContactName()} (${primaryApplicant.isTenant() ? 'Tenant' : 'Landlord'})` : null,
       showPackageView: this.isPackageViewSelected(),
       showIssueView: this.isIssueViewSelected(),
       showPartiesView: this.isPartiesViewSelected(),
+      showOtherDocsView: this.isOtherDocsViewSelected(),
       hideNotes: this.areNotesFiltered(),
       filterClasses: this._getFilterClasses(),
       QuickActionIcon: QuickActionIcon,

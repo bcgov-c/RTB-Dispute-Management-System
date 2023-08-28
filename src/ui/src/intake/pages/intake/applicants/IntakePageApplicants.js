@@ -110,7 +110,7 @@ export default PageView.extend({
 
     const applicants = participantsChannel.request('get:applicants');
     this.intakeApplicants = new IntakeParticipantCollection(applicants.map(applicant => (
-      { participantModel: applicant, noPackageProvision: true })), { participantCollection: applicants });
+      { participantModel: applicant, noPackageProvision: true, useMailAddressValidation: true, useAddressValidation: true })), { participantCollection: applicants, noPackageProvision: true, useMailAddressValidation: true, useAddressValidation: true });
 
     const applicantCountModel = this.getPageItem('applicantCount').getModel();
     // Select the larger of the API-loaded applicants, or the current value of the user-answered question
@@ -723,7 +723,7 @@ export default PageView.extend({
       if (assistantCount.getModel().getData() === 'more' || Number(assistantCountValue) > 3) {
         assistantCount.subView.$el.hide();
         this.showPageItem('assistantCountDropdown', options);
-        if (this.getPageItem('assistantCountDropdown').stepComplete) {
+        if (this.getPageItem('assistantCountDropdown').stepComplete || !!Number(assistantCountValue)) {
           this.showPageItem('applicants', options);
           this.showNextButton(_.extend({}, options, {no_animate: true}));
         }
@@ -787,13 +787,15 @@ export default PageView.extend({
       }
     });
 
-    // Now check for deleted participants
-    _.each(this.intake_applicants_to_remove, function(intake_applicant_to_remove) {
-      console.log(`Examining for 'remove': `, intake_applicant_to_remove);
+    const removedIds = {};
+    this.intake_applicants_to_remove.forEach(intake_applicant_to_remove => {
       const applicant = intake_applicant_to_remove.get('participantModel');
       if (applicant.isNew()) {
         console.log(`[Warning] Trying to remove an applicant that has not been saved, skip removal`, applicant);
+      } else if (removedIds[applicant?.id]) {
+        console.log(`[Warning] Trying to remove the same applicant twice, skip removal`, applicant);
       } else {
+        removedIds[applicant?.id] = true;
         all_xhr.push(_.bind(participantsChannel.request, participantsChannel, 'delete:participant', applicant));
       }
     });

@@ -18,5 +18,10 @@ public class DisputeHearingMapping : Profile
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
             .ForMember(x => x.FileNumber, opt => opt.MapFrom(src => src.Dispute.FileNumber));
+
+        CreateMap<Data.Model.DisputeHearing, ExternalDisputeHearingResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.FileNumber, opt => opt.MapFrom(src => src.Dispute.FileNumber));
     }
 }

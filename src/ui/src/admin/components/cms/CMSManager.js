@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager for handling CMS functionality such as searching CMS file numbers and advanced CMS searches
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import CMSArchiveModel from './CMSArchive_model';

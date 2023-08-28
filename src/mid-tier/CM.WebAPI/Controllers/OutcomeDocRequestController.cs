@@ -7,7 +7,7 @@ using CM.Business.Services.OutcomeDocRequest;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -199,6 +199,19 @@ public class OutcomeDocRequestController : BaseController
         if (outcomeDocRequests != null)
         {
             return Ok(outcomeDocRequests);
+        }
+
+        return NotFound();
+    }
+
+    [HttpGet("/api/outcomedocrequests/externaloutcomedocrequests/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalOutcomeDocRequests(Guid disputeGuid)
+    {
+        var externalOutcomeDocRequests = await _outcomeDocRequestService.GetExternalOutcomeDocRequests(disputeGuid);
+        if (externalOutcomeDocRequests != null)
+        {
+            return Ok(externalOutcomeDocRequests);
         }
 
         return NotFound();

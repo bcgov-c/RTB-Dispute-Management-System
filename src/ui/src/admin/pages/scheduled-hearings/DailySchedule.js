@@ -18,6 +18,7 @@ import { routeParse } from '../../routers/mainview_router';
 import template from './DailySchedule_template.tpl';
 import CalendarLegend from '../../components/calendar-legend/CalendarLegend';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
+import ModalHoldHearing from '../../components/hearing/modals/modal-hold-hearing/ModalHoldHearing';
 
 const MENU_OPTION_CLASS_ADJOURNED_CHECK = 'calendar-grid-event-menu-item--adjourned-check';
 const MENU_OPTION_CLASS_ADJOURNED_CHECK_COMPLETE = 'calendar-grid-event-menu-item--adjourned-check-complete';
@@ -111,7 +112,8 @@ export default Marionette.View.extend({
     this.listenTo(this.calendarGridModel, 'calendar:menu:hearinghistory', (hearingId) => {
       Backbone.history.navigate(routeParse('scheduled_hearings_history_param_item', null, hearingId), { trigger: true });
     });
-    this.listenTo(this.calendarGridModel, 'calendar:menu:reservation', this.reserveHearing, this);
+    this.listenTo(this.calendarGridModel, 'calendar:menu:reservation', _.bind(this.loadHearingAndShowModal, this, ModalHoldHearing), this);
+    this.listenTo(this.calendarGridModel, 'calendar:menu:bookholdhearing', this.bookHoldHearing, this)
     this.listenTo(this.calendarGridModel, 'calendar:menu:cancelreservation', this.cancelHearingReservation, this);
     this.listenTo(this.calendarGridModel, 'calendar:menu:checkadjourned', this.checkAdjourned, this);
   },
@@ -121,11 +123,10 @@ export default Marionette.View.extend({
     return hearingLookups[hearingId];
   },
 
-  reserveHearing(hearingId) {
-    loaderChannel.trigger('page:load');
-    this._loadHearingForHearingActionModal(hearingId)
-      .then(() => new Promise((res, rej) => hearingChannel.request('reserve:hearing', hearingId).then(
-          res, generalErrorFactory.createHandler('HEARING.RESERVATION', rej))))
+  bookHoldHearing(hearingId) {
+    const bookHoldHearingModal = new ModalAssignHearingView();
+    
+    this._loadHearingForHearingActionModal(hearingId).then(() => new Promise((res, rej) => modalChannel.request('add', bookHoldHearingModal)))
     .finally(() => {
       this.render();
       loaderChannel.trigger('page:load:complete')
@@ -144,6 +145,7 @@ export default Marionette.View.extend({
   getCalendarItemMenuOptions(hearingModel) {
     if (!hearingModel) return [];
     
+    const isOnHoldWithFileNumber = this.model.get('hearing_reserved_dispute_guid');
     const isHearingDatePassed = !hearingModel.isActive();
     const isReserved = hearingModel.isReserved();
     const menuOptionsWithLinkedHearing = [
@@ -158,6 +160,7 @@ export default Marionette.View.extend({
     ];
     const menuOptionsWithoutLinkedHearing = [
       ...(!isReserved|| isHearingDatePassed ? [] : [{ menuLabel: "Cancel hold", event: "calendar:menu:cancelreservation" }]),
+      ...(!isReserved ? [] : [{ menuLabel: "Book Hold Hearing", event: "calendar:menu:assign" }]),
       ...(isHearingDatePassed || isReserved ? [] : [{ menuLabel: "Delete hearing", event: "calendar:menu:delete" }] ),
       ...(isReserved || isHearingDatePassed ? [] : [{ menuLabel: "Put on hold", event: "calendar:menu:reservation"}]),
       ...(isHearingDatePassed || isReserved ? [] : [{ menuLabel: "Book (assign)", event: "calendar:menu:assign" }] ),

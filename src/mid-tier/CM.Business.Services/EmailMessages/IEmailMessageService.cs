@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CM.Business.Entities.Models.EmailMessage;
 using CM.Business.Services.Base;
 using CM.Common.Utilities;
+using CM.Data.Model;
 
 namespace CM.Business.Services.EmailMessages;
 
@@ -29,4 +30,10 @@ public interface IEmailMessageService : IServiceBase, IDisputeResolver
     Task<bool> SetPickupMessageStatus(int emailMessageId);
 
     Task<bool> EmailMessageExists(int? associatedEmailId, Guid disputeGuid);
+
+    Task<bool> CreateAsync(Participant participant);
+
+    Task<bool> VerifyCode(Participant participant, EmailVerificationRequest request);
+
+    Task<ExternalEmailMessagesResponse> GetExternalDisputeEmailMessages(Guid disputeGuid, ExternalEmailMessagesRequest request, int count, int index);
 }

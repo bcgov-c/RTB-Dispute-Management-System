@@ -3,6 +3,7 @@ import Radio from 'backbone.radio';
 import DisputeNoticeView from './DisputeNotice';
 import ContextContainer from '../../components/context-container/ContextContainer';
 import template from './NoticeContainer_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const modalChannel = Radio.channel('modals');
 const disputeChannel = Radio.channel('dispute');
@@ -15,9 +16,17 @@ export default Marionette.View.extend({
 
   className: 'notice-container-component',
 
+  ui: {
+    collapse: '.page-section-title-container > .collapse-icon',
+  },
+
   regions: {
     disputeNoticeRegion: '.notice-container-notice',
-    amendmentNoticeRegion: '.notice-container-amendment'
+    amendmentNoticeRegion: '.notice-container-amendment',
+  },
+
+  events: {
+    'click @ui.collapse': 'clickCollapse',
   },
 
   initialize(options) {
@@ -31,8 +40,16 @@ export default Marionette.View.extend({
     this.disputeIsUnitType = dispute && dispute.isUnitType();
     this.disputeIsRentIncrease = dispute && dispute.isCreatedRentIncrease();
     this.hasAssociatedAmendmentNotice = this.noticeCollection.any(this._isAmendmentAssociatedToDisputeNotice, this);
+
+    this.collapseHandler = SessionCollapse.createHandler(dispute, 'Notice', 'noticeContainers', this.disputeNoticeId);
+    this.isCollapsed = this.collapseHandler?.get();
   },
 
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
+  },
 
   _isAmendmentAssociatedToDisputeNotice(model) {
     const parentNoticeId = model.get('parent_notice_id');
@@ -40,15 +57,12 @@ export default Marionette.View.extend({
   },
 
   _doesNoticeHaveSavedData(model) {
-    const notes = notesChannel.request('get:notice', model.get('notice_id'));
     /*
       Saved data is defined as a notice having:
       - any served services
-      - any notes
       - any saved notice_delivered_to value, EXCEPT if (notice==amendment AND notice_delivery_method === 'user submitted'
     */
     return model.getServedServices().length ||
-      notes.any((model) => !model.isNew()) ||
       ( this.hasAssociatedAmendmentNotice && (model.isDisputeNotice() || model.isOtherNotice()) ) ||
       (model.isAmendmentNotice() && model.isDeliveryMethodUser() ? false : model.get('notice_delivered_to'));      
   },
@@ -98,6 +112,7 @@ export default Marionette.View.extend({
 
   _createNoticeViewWithContextContainer(noticeViewOptions, model) {
     const modelId = model.id;
+    const disputeModel = disputeChannel.request('get');
     const view = ContextContainer.withContextMenuNotes(
       _.extend({
         wrappedContextContainerView: ContextContainer.withContextMenu({
@@ -122,7 +137,8 @@ export default Marionette.View.extend({
               cancelButtonText: 'Close'
             });
           },
-          disputeModel: disputeChannel.request('get')
+          disputeModel,
+          collapseHandler: SessionCollapse.createHandler(disputeModel, 'Notice', 'notices', modelId),
         }),
         notes: notesChannel.request('get:notice', modelId),
         noteCreationData: {
@@ -148,32 +164,37 @@ export default Marionette.View.extend({
 
     return view;
   },
+  
 
   onRender() {
     // Refresh this state on every render
     this.hasAssociatedAmendmentNotice = this.noticeCollection.any(this._isAmendmentAssociatedToDisputeNotice, this);
 
-    this.showChildView('disputeNoticeRegion', this._createNoticeViewWithContextContainer({}, this.model));
-
-    if (this.hasAssociatedAmendmentNotice) {
-      this.showChildView('amendmentNoticeRegion', new (
-        Marionette.CollectionView.extend({
-          template: _.noop,
-          childView: ContextContainer.ContextContainerWithNotesView,        
-          buildChildView: (child, ChildViewClass, childViewOptions) => {
-            return this._createNoticeViewWithContextContainer(childViewOptions, child);
-          }
-        }))({
-          collection: this.noticeCollection,
-          filter: _.bind(this._isAmendmentAssociatedToDisputeNotice, this),
-        })
-      );
+    if (!this.isCollapsed) {
+      this.showChildView('disputeNoticeRegion', this._createNoticeViewWithContextContainer({}, this.model));
+      if (this.hasAssociatedAmendmentNotice) {
+        this.showChildView('amendmentNoticeRegion', new (
+          Marionette.CollectionView.extend({
+            template: _.noop,
+            childView: ContextContainer.ContextContainerWithNotesView,        
+            buildChildView: (child, ChildViewClass, childViewOptions) => {
+              return this._createNoticeViewWithContextContainer(childViewOptions, child);
+            }
+          }))({
+            collection: this.noticeCollection,
+            filter: _.bind(this._isAmendmentAssociatedToDisputeNotice, this),
+          })
+        );
+      }
     }
   },
   
+  
   templateContext() {
     return {
-      containerTitle: this.containerTitle
+      containerTitle: this.containerTitle,
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 

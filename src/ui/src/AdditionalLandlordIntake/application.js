@@ -24,7 +24,7 @@ import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/theme.css';
 import 'jquery-ui/themes/base/datepicker.css';
-import 'trumbowyg/dist/ui/trumbowyg.min.css';
+import 'trumbowyg/dist/ui/trumbowyg.css';
 import 'trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 import 'trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
 import 'trumbowyg/dist/plugins/history/trumbowyg.history.min.js';
@@ -80,6 +80,7 @@ import LoginView from './pages/login/Login';
 import IntakeAriView from './pages/intake/IntakeAri';
 import IntakePfrView from './pages/intake/IntakePfr';
 import { ApplicationBaseModelMixin } from '../core/components/app/ApplicationBase';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 // Add site name
 var g = window || global;
@@ -248,6 +249,22 @@ const AppModel = Backbone.Model.extend({
   load() {
     const geozoneChannel = Radio.channel('geozone');
     const dfd = $.Deferred();
+
+    // Setup login and logout listeners - they will be triggered when `mixin_checkSiteVersionAndLogin` runs
+    this.listenTo(sessionChannel, 'login:complete', (options={}) => {
+      sessionChannel.request('clear:timers');
+      sessionChannel.request('create:timers');
+      if (!options?.skip_routing) {
+        loaderChannel.trigger('page:load');
+        Backbone.history.navigate('list', { trigger: true });
+      };
+    });
+    this.listenTo(sessionChannel, 'logout:complete', () => {
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('_dmsPaymentToken');
+      sessionChannel.request('clear:timers');
+      applicationChannel.request('clear');
+    });
 
     $.when(
       this.loadConfigs()
@@ -548,7 +565,7 @@ const AppModel = Backbone.Model.extend({
   loadClaimGroupParticipants(dispute_guid) {
     const dfd = $.Deferred();
 
-    participantsChannel.request('load', dispute_guid).then(claimGroupParticipantsResponse => {
+    participantsChannel.request('load', dispute_guid).then(([claimGroupParticipantsResponse]) => {
       if (!claimGroupParticipantsResponse || !claimGroupParticipantsResponse.length) {
         console.log("[Info] Creating claim group");
         this.checkAndCreateClaimGroup()
@@ -713,10 +730,26 @@ const App = Marionette.Application.extend({
     paymentsChannel.request('set:transaction:site:source', configChannel.request('get', 'PAYMENT_TRANSACTION_SITE_SOURCE_INTAKE'));
   },
 
+  initializeEventsAndAnimations() {
+    $.initializeCustomAnimations({
+      scrollableContainerSelector: '#intake-content'
+    });
+    $.initializeDatepickerScroll();
+  },
+
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
+    this.initializeEventsAndAnimations();
     this.initializeViews(IntakeAriView);
     this.initializeRoutersAndRouteListeners();
+    AnalyticsUtil.initializeAnalyticsTracking();
+  },
+
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_ADDITIONAL_INTAKE')
+    });
   },
 
   initializeViews(intakeViewClass) {
@@ -727,31 +760,15 @@ const App = Marionette.Application.extend({
     modalChannel.request('render:root');
   },
 
-  onLoginComplete(options) {
-    options = options || {};
-    sessionChannel.request('clear:timers');
-    sessionChannel.request('create:timers');
-
-    if (options.skip_routing) {
-      return;
-    }
-
-    loaderChannel.trigger('page:load:complete');
-
-    const renderFn = () => {
-      loaderChannel.trigger('page:load');
-      Backbone.history.navigate('list', { trigger: true });
-    };
-    
-    renderFn();
+  showDefaultView() {
+    loaderChannel.trigger('page:load');
+    Backbone.history.navigate('list', { trigger: true });
   },
 
   initializeRoutersAndRouteListeners() {
     new AppRouter({ controller: this });
 
     this.intakeViewRouter = new IntakeAriRouter({ controller: this.intakeView });
-
-    this.listenTo(sessionChannel, 'login:complete', this.onLoginComplete, this);
 
     // Go to correct page on load
     this.listenTo(applicationChannel, 'dispute:loaded:full', function(disputeModel) {
@@ -782,13 +799,6 @@ const App = Marionette.Application.extend({
 
       
     }, this);
-
-    this.listenTo(sessionChannel, 'logout:complete', function() {
-      localStorage.removeItem('authToken');
-      sessionStorage.removeItem('_dmsPaymentToken');
-      sessionChannel.request('clear:timers');
-      applicationChannel.request('clear');
-    });
 
     Backbone.history.start();
   },

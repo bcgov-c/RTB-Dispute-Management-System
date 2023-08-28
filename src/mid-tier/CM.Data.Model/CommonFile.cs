@@ -33,6 +33,8 @@ public class CommonFile : BaseEntity
     [Required]
     public string FilePath { get; set; }
 
+    public byte? FileStatus { get; set; }
+
     public bool? IsDeleted { get; set; }
 
     public virtual ICollection<EmailAttachment> EmailAttachments { get; set; }

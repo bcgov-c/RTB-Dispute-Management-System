@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - View used for rendering YES/NO button pairs.
  * @class core.components.question.QuestionView
  * @memberof core.components.question
  */
@@ -133,7 +134,7 @@ export default Marionette.View.extend({
   switchErrorToWarningUI(options) {
     options = options || {};
     const errorEle = this.getUI('error');
-    errorEle.addClass('intake-warning warning hidden-item');
+    errorEle.addClass('warning hidden-item');
 
     if (!options.no_animate) {
       animationChannel.request('queue', errorEle, 'slideDown', _.extend({duration: 400}, options));

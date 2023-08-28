@@ -3,6 +3,7 @@ import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import ExternalNoticeServiceModel from '../../components/external-api/ExternalNoticeService_model';
 import ModalMarkAsDeficientView from '../../../core/components/claim/ModalMarkAsDeficient';
+import FileDescriptionCollection from '../../../core/components/files/file-description/FileDescription_collection';
 import template from './DANoticeServiceListItem_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 
@@ -25,16 +26,17 @@ export default Marionette.View.extend({
   },
 
   clickEditNoticeService() {
-    const existingFileDescription = this.model.getServiceFileDescription();
+    const mainProofFileDescription = this.model.getServiceFileDescription();
+    const otherProofFileDescription = this.model.getOtherServiceFileDescription();
     
     let deleteServiceModalView;
-    if (this.existingFilesCount && existingFileDescription && !existingFileDescription.isNew()) {
+    if (this.existingFilesCount && ((!mainProofFileDescription?.get('is_deficient') && mainProofFileDescription) || (otherProofFileDescription && !otherProofFileDescription?.get('is_deficient')))) {
       deleteServiceModalView = new ModalMarkAsDeficientView({
         title: 'Delete previous service information?',
         topHtml: '<p>Warning: All previously added service information will be deleted and you will have to add it again.  A reason for this removal is required and will be stored with the removed file(s) for future reference.</p>',
         bottomHtml: `<p>Are you sure you would like to continue?</p>`,
         getRemovalReasonFn: (enteredReason) => `Notice Service record removed by external user ${sessionChannel.request('name')} (${this.appModel.get('accessCode')}) on ${Formatter.toDateDisplay(Moment())} - ${enteredReason}`,
-        model: existingFileDescription
+        collection: new FileDescriptionCollection([mainProofFileDescription, otherProofFileDescription])
       });
       modalChannel.request('add', deleteServiceModalView);
     } else if (this.isServed) {
@@ -73,13 +75,14 @@ export default Marionette.View.extend({
 
   _routeToEditNoticeServicePage() {
     this.appModel.set('noticeServiceToEdit', this.model);
-    Backbone.history.navigate('modify/notice/service', { trigger: true });
+    Backbone.history.navigate(this.getOption('serviceRoute') || 'notice/service', { trigger: true });
   },
 
   initialize(options) {
     this.mergeOptions(options, ['appModel']); 
-    
-    this.existingFilesCount = this.model.getServiceFileModels().filter(file => file.isUploaded()).length;
+    const mainProofFiles = this.model.getProofFileModels()?.filter(file => file.isUploaded());
+    const otherProofFiles = this.model.getOtherProofFileModels()?.filter(file => file.isUploaded());
+    this.existingFilesCount = mainProofFiles?.length + otherProofFiles?.length;
     this.isServed = this.model.isServed();
   },
 

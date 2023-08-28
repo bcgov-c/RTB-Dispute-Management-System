@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     dotnet = 'dotnet.exe'
-    ROOT_FOLDER = '\\\\COTTAGE.dmz\\RTB-DMS_PROD$\\dms-prod\\api'
+    ROOT_FOLDER = '\\\\COTTAGE.dmz\\RTB-DMS_PROD$\\dms-prod\\dms-services'
     TEMP_FOLDER = 'D:/Temp'
     BACKUP_FOLDER = 'D:/dms-build-backup'
   }

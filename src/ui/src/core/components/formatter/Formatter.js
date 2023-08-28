@@ -1,5 +1,5 @@
 /**
- * The Formatter singleton object contains various display and formatting methods.  It can be injected into HTML
+ * @fileoverview - The Formatter singleton object contains various display and formatting methods.  It can be injected into HTML
  * templates and those formatting methods can be directly invoked.
  * The Formatter can be obtained by using the formatterChannel, or `import`ing it directly.
  *
@@ -66,7 +66,7 @@ const Formatter = Marionette.Object.extend({
     return ifUnmodifiedDateString + '9999';
   },
 
-  toLeftPad(str, padding_character='0', padding_length=2) {
+  toLeftPad(str='', padding_character='0', padding_length=2) {
     return String(Array(padding_length).join(padding_character) + str).slice(-1*padding_length);
   },
 
@@ -120,16 +120,24 @@ const Formatter = Marionette.Object.extend({
     return this._toDateTimeDisplay(dateString, 'MMM D, YYYY', timezoneString);
   },
 
+  toFullDateDisplay(dateString, timezoneString) {
+    return this._toDateTimeDisplay(dateString, 'MMMM D, YYYY', timezoneString);
+  },
+
   toLastModifiedTimeDisplay(dateString, timezoneString) {
     return this._toDateTimeDisplay(dateString, 'ddd, hh:mmA', timezoneString);
   },
 
   toTimeDisplay(dateString, timezoneString) {
-    return this._toDateTimeDisplay(dateString, 'hh:mmA', timezoneString);
+    return this._toDateTimeDisplay(dateString, 'h:mm A', timezoneString);
   },
 
   toDateAndTimeDisplay(dateString, timezoneString) {
-    return this._toDateTimeDisplay(dateString, 'MMM D, YYYY h:mmA', timezoneString);
+    return this._toDateTimeDisplay(dateString, 'MMM D, YYYY h:mm A', timezoneString);
+  },
+
+  toFullDateAndTimeDisplay(dateString, timezoneString) {
+    return this._toDateTimeDisplay(dateString, 'MMMM D, YYYY, h:mm A', timezoneString);
   },
 
   toDateAndTimeWithSecondsDisplay(dateString, timezoneString) {
@@ -163,6 +171,10 @@ const Formatter = Marionette.Object.extend({
     return this._toDateTimeDisplay(dateString, periodFormatString);
   },
 
+  toIcsDateDisplay(dateString) {
+    return `${Moment(dateString).toISOString().replace(/\.\d{3}Z$/, '').replace(/[\.\-\:]/g, '')}Z`;
+  },
+
   toAmountDisplay(amount, no_cents) {
     if (amount === null || typeof amount === "undefined") {
       return amount;
@@ -180,9 +192,13 @@ const Formatter = Marionette.Object.extend({
     return '$' + comma_amount;
   },
 
-  toAmountDisplayWithNegative(amount, no_cents) {
+  toAmountDisplayWithNegative(amount, no_cents, use_html=true) {
     const absAmountDisplay = this.toAmountDisplay(Math.abs(amount), no_cents);
-    return amount < 0 ? `<span class="formatter-negative">(${absAmountDisplay})</span>` : absAmountDisplay;
+    if (amount < 0) {
+      return use_html ? `<span class="formatter-negative">(${absAmountDisplay})</span>` : `-${absAmountDisplay}`;
+    } else {
+      return absAmountDisplay;
+    }
   },
 
   toPartiesDisplay(applicants=[], respondents=[], options={}) {
@@ -196,6 +212,11 @@ const Formatter = Marionette.Object.extend({
     const respondentsDisplay = getPartyNamesFromParticipants(respondents);
     
     return `${options.uppercase && applicantsDisplay? applicantsDisplay.toUpperCase() : applicantsDisplay }&rarr;${options.uppercase && respondentsDisplay ? respondentsDisplay.toUpperCase() : respondentsDisplay}`;
+  },
+
+  toPercentageDisplay(dividend, divisor) {
+    if (!Number.isInteger(dividend) || !Number.isInteger(divisor) || divisor === 0) return NaN;
+    return `${((dividend / divisor) * 100).toFixed(1)}%`;
   },
   
   toIssueCodesDisplay(claimCollection) {
@@ -245,7 +266,7 @@ const Formatter = Marionette.Object.extend({
     const mappings = _.object([
       [String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_FIRST')), 'First day of the month'],
       [String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_LAST')), 'Last day of the month'],
-      [String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_MIDDLE')), 'Middle day of the month']
+      [String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_MIDDLE')), '15th day of the month']
     ]);
     return !$.trim(rent_interval) ? '-' : _.has(mappings, rent_interval) ? mappings[rent_interval] : rent_interval;
   },
@@ -457,6 +478,12 @@ const Formatter = Marionette.Object.extend({
   toScheduleRequestStatusDisplay(statusValue) {
     return configChannel.request('get', 'SCHEDULE_REQUEST_STATUS_DISPLAY')[statusValue];
  },
+
+ getProvinceStringFromAlphaCode(alphaCode='') {
+  if (!alphaCode) return;
+
+  return configChannel.request('get', 'PROVINCE_CODE_MAPPINGS')?.[`${alphaCode}`.toUpperCase()];
+ }
 
 });
 

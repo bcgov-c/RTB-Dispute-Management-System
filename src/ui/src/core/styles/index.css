@@ -143,6 +143,12 @@ a.footer-item:hover {
   cursor: pointer;
 }
 
+#menu .step.visited:not(.active):hover > span {
+  text-decoration: underline;
+  text-decoration-color: #fff;
+  cursor: pointer;
+}
+
 #menu .step.active {
   color: #e7ebef;
   background: 5px 6px #335c85 url("../static/Nav_Selected.png") no-repeat;
@@ -161,6 +167,18 @@ a.footer-item:hover {
   color: #b8b8b8;
   background-image: url('../static/Nav_CompletedDisabled.png');
   background-color: #888888;
+}
+
+#menu .menu-steps .step.unreachable, #menu .menu-steps .step.unreachable:hover {
+  color: #b8b8b8;
+  background-image: url('../static/Nav_CompletedDisabled.png');
+  background-color: #888888;
+}
+
+.menu-steps-title {
+  font-size: 14px;
+  color: #335c85;
+  line-height: 22px;
 }
 
 /* Page styles */
@@ -898,17 +916,41 @@ label {
 
 
 /* Address component */
+.address-error { height: fit-content; }
+.verified-address-wrapper { display: flex; align-items: center; font-size: 16px; }
+.verified-address--verified { color: #139b39; }
+.verified-address--unverified { color: #6d6d6d; }
+.verified-address-icon { margin-right: 5px; }
+.address-validated-icon { position: relative; bottom: 2px; }
+.province-container { min-width: 175px; }
+
 .intake-address-component .streetContainer, .intake-address-component .cityContainer, .intake-address-component .provinceContainer, .intake-address-component .countryDropdownContainer, .intake-address-component .countryTextContainer,
 .intake-address-component .postalCodeContainer,
 .intake-address-component .validateContainer{
   padding-left: 0;
 }
 
+.intake-address-component .provinceContainer {
+  min-width: 175px;
+}
+
+
+
 .intake-address-component .streetContainer .input-placeholder { padding-left: 0; }
 
 .intake-address-component .countryDropdownContainer {
   min-height: 70px;
 }
+
+.country-province-wrapper, .city-postal-wrapper { display: flex; }
+.countryTextContainer { margin-right: 15px; }
+.city-postal-wrapper { min-width: 460px; }
+.countryDropdownContainer { margin-right: 15px; min-width: 160px; }
+.cityContainer { margin-right: 15px; min-width: 210px; width: 65%; }
+.postalCodeContainer { margin-right: 10px; min-width: 120px; }
+.participant-mailing-address .postalCodeContainer { min-width: 200px; }
+.participant-mailing-address .cityContainer { width: 62%; }
+.participant-mailing-address .intake-address-component { padding-bottom: 20px; }
 
 
 .intake-address-component .validateContainer {
@@ -957,6 +999,11 @@ label {
   background-color: #7bbf6a;
   border-color: #7bbf6a;
   font-weight: 300 !important;
+}
+
+.city-postal-wrapper .btn-validate {
+  position: relative;
+  top: 9px;
 }
 
 .component-double-selector-single .first-dropdown-container { width: fit-content; }
@@ -1118,8 +1165,7 @@ label {
 
 .participant-use-mail-container {
   font-size: 17px;
-  margin-top: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
 }
 
 .participant-use-mail { margin-top: 10px; }
@@ -1655,6 +1701,7 @@ hr.title-underline {
 .hearing-priority-edit-warning { background-image: url('../static/Icon_Warning.jpg') !important; background-size: 18px; background-position: left; }
 
 .hearing-phone-number { margin-right: 5px; }
+.hearing-item-container .hearing-details { width:250px; vertical-align:top; }
 
 /* Hearing Display styles */
 .hearing-display-date-container {
@@ -1817,20 +1864,19 @@ hr.title-underline {
 /* Global error handling styles */
 .general-error-modal .modal-dialog { width: 100%; max-width: 1000px; }
 
+.page-view .claim-selection .page-item-container { padding-top: 10px; }
 
-/* Pandemic style changes (temporary) */
+.static-error-warning ul { padding-left: 20px; }
 
-.modal-pandemic-warning .modal-dialog { width: 97%; max-width: 1050px; }
-.modal-pandemic-warning .close-x { display: none !important; }
-.modal-pandemic-warning .sublist .sublist { padding-left: 30px; }
+.static-error-warning p { margin-bottom: 0; }
 
-.pandemic-warning-block, .static-error-warning {
+.static-error-warning {
   position: relative;
   background-color: #fff;
   background-image: url("../static/Icon_AlertLrg.png");
   background-position: left 15px center;
   background-repeat: no-repeat;
-  background-size: 60px;
+  background-size: 35px;
   max-width: 1230px;
   font-size: 16px;
   line-height: 26px;
@@ -1840,10 +1886,19 @@ hr.title-underline {
   padding: 8px 5px 5px 95px;
 }
 
-/* Fix spacing on pandemic warning */
-.page-view .claim-selection .page-item-container { padding-top: 10px; }
 
-.static-error-warning ul { padding-left: 20px; }
+.page-item-container > .warning {
+  margin: -20px 15px 20px 0px;
+  padding: 10px 10px 10px 50px;
+  line-height: 22px;
+  background-color: #fff6e5;
+  background-image: url("../static/Icon_Warning.png");
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  max-width: 1230px;
+  color: #666;
+  font-size: 16px;
+}
 
 /* File Preview Modal styles used in ModalFileViewer*/
 #fileViewer-modal .modal-dialog {
@@ -1920,12 +1975,13 @@ hr.title-underline {
   color: #4a698f;
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
 }
 
 .preview-content-toggle-text { margin-right: 20px; }
 
 .preview-content-toggle-item:last-child { margin-right: 0; }
-
+.preview-content-fallback { margin: 0 auto; }
 .preview-content-split-view { display: flex; align-items: center; margin-left: 20px; cursor: pointer; }
 .preview-content-split-view-text { margin-left: -10px; font-size: 18px; cursor: pointer; color: #337ab7; }
 
@@ -1946,8 +2002,8 @@ hr.title-underline {
 .preview-content-toggle-container { position: absolute; top: -40px; right: 0; width: fit-content; padding-right: 5px; }
 
 .preview-toggle-container { top: 5px; position: relative; display: flex; }
-#fileViewer-modal .filename-download{ display: flex; align-items: center; cursor: pointer; margin-right: 5px; font-size: 18px; background-image: url('../static/Icon_Viewer_Download.png'); background-repeat: no-repeat; background-position: left 5px center; padding-left: 50px;}
-#fileViewer-modal .file-metadata { display: flex; align-items: center; font-size: 16px;}
+#fileViewer-modal .filename-download, #externalFileViewer-modal .filename-download { display: flex; align-items: center; cursor: pointer; margin-right: 5px; font-size: 18px; background-image: url('../static/Icon_Viewer_Download.png'); background-repeat: no-repeat; background-position: left 5px center; padding-left: 50px;}
+#fileViewer-modal .file-metadata, #externalFileViewer-modal .file-metadata { display: flex; align-items: center; font-size: 16px;}
 #fileViewer-modal .preview-content-download-container { display: flex; min-width: 320px; align-items: center;}
 #fileViewer-modal .dispute-issue-evidence-file-details { height: 100%; display: flex; }
 
@@ -1963,23 +2019,11 @@ hr.title-underline {
 .image-toggle-fit--disabled { background-image: url('../static/Icon_Viewer_Fit_Off.png'); color: #cccccc; cursor: pointer; }
 .image-toggle-rotate-left { background-image: url('../static/Icon_Viewer_Rotate90L.png'); padding-left: 35px; margin-left: 10px; margin-right: 0; }
 .image-toggle-rotate-right { background-image: url('../static/Icon_Viewer_Rotate90R.png'); padding-left: 35px; }
+.image-toggle-zoom-icon { background-image: url('../static/Icon_Viewer_PointZoom_Off.png'); color: #ccc; cursor: auto; }
+
+.preview-content.image .zoom { cursor: url('../static/Icon_Viewer_PointZoom_On.png'), auto; }
 
 .dispute-issue-evidence-filesize { color: #8e8e8e; font-size: 14px; }
-
-@media (max-width: 767px) {
-  .pandemic-warning-block, .static-error-warning {
-    background-size: 40px;
-    padding-left: 50px;
-    background-position: left 5px center;
-  }
-
-  .modal-pandemic-warning .modal-dialog { margin: 10px 0 10px 5px; }
-
-  .modal-pandemic-warning .sublist { padding-left: 20px; }
-  .modal-pandemic-warning .sublist a { word-break: break-word; }
-}
-
-/* End Pandemic style changes */
 
 
 /* HIGH PRECEDENCE EMAIL STYLES */
@@ -1990,16 +2034,16 @@ hr.title-underline {
   font-size:16px;
 }
 .emailable-content td.email-content {
-  padding: 20px 24px 12px 24px; background-color: #FFF; color: #374550; font-size:16px;
+  padding: 20px 24px 12px 24px; background-color: #FFF; color: #222; font-size:16px;
 }
 .emailable-content .email-content h1 {
   font-size:21px; margin:20px 0px 4px 0px;
 }
 .emailable-content .email-content h2 {
-  color:#414141; font-size:18px; margin:20px 0px 4px 0px;
+  color:#0f0f0f; font-size:18px; margin:20px 0px 4px 0px;
 }
 .emailable-content .email-content p {
-  color:#414141; 	font-size:16px; line-height:20px;
+  color:#0f0f0f; 	font-size:16px; line-height:20px;
 }
 .emailable-content .email-content  a {
   color: #1268b5;
@@ -2014,6 +2058,21 @@ hr.title-underline {
 .emailable-content .ep-table-wrapper {
   margin-top:25px;
   margin-bottom:25px;
+}
+.emailable-content .h4 { color: #222; }
+
+.warning-alert {
+  background-color: #fbf3f2;
+  background-image: url("../static/Icon_AlertSml.png");
+  background-size: 20px 20px;
+  padding: 10px 5px 10px 30px;
+  background-position: left 5px center;
+  background-repeat: no-repeat;
+  color: #de2f3c; 
+  font-size: 18px; 
+  border: 1px solid #de2f3c;
+  margin-bottom: 10px;
+  background-position-y: 12px;
 }
 
 /* Desktop-only css */
@@ -2033,12 +2092,19 @@ hr.title-underline {
 
 /* Tablet breakpoint */
 @media (max-width: 991px) {
-
+  .city-postal-wrapper { flex-wrap: wrap; min-width: auto; }
+  .cityContainer { width: 100%; }
 }
 
 
 /* Mobile css */
 @media (max-width: 767px) {
+  .static-error-warning {
+    background-size: 40px;
+    padding-left: 50px;
+    background-position: left 5px center;
+  }
+  
   #main-content {
     bottom: 0;
   }
@@ -2088,6 +2154,10 @@ hr.title-underline {
   .intake-address-component .validateContainer {
     text-align: left;
   }
+  
+  .country-province-wrapper { flex-wrap: wrap; }
+
+  .verified-address-wrapper { flex-wrap: wrap; }
  
 
 
@@ -2110,8 +2180,6 @@ hr.title-underline {
   .file-name-size-status-progress-container { display: block; width: calc(100% - 40px); }
   .file-name-and-size { display:inline; }
   .file-added-name { display: inline; }
-
-  .file-status-and-upload { margin-top: 10px; }
 
   .file-upload-progress-container { width: 100%; }
 
@@ -2146,7 +2214,6 @@ hr.title-underline {
   #addFilesSave .xs-text { display: inline; }
   #addFilesSave .regular-text { display: none; }
 }
-
 
 @media screen and (max-width: 700px) {
 

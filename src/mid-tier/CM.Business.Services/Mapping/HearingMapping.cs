@@ -21,7 +21,8 @@ public class HearingMapping : Profile
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
             .ForMember(x => x.HearingStartDateTime, opt => opt.MapFrom(src => src.HearingStartDateTime.ToCmDateTimeString()))
-            .ForMember(x => x.HearingEndDateTime, opt => opt.MapFrom(src => src.HearingEndDateTime.ToCmDateTimeString()));
+            .ForMember(x => x.HearingEndDateTime, opt => opt.MapFrom(src => src.HearingEndDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.NotificationDeliveryDate, opt => opt.MapFrom(src => src.NotificationDeliveryDate.ToCmDateTimeString()));
 
         CreateMap<Hearing, DisputeListHearingResponse>()
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
@@ -38,7 +39,8 @@ public class HearingMapping : Profile
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
             .ForMember(x => x.HearingStartDateTime, opt => opt.MapFrom(src => src.HearingStartDateTime.ToCmDateTimeString()))
             .ForMember(x => x.HearingEndDateTime, opt => opt.MapFrom(src => src.HearingEndDateTime.ToCmDateTimeString()))
-            .ForMember(x => x.HearingReservedUntil, opt => opt.MapFrom(src => src.HearingReservedUntil.ToCmDateTimeString()));
+            .ForMember(x => x.HearingReservedUntil, opt => opt.MapFrom(src => src.HearingReservedUntil.ToCmDateTimeString()))
+            .ForMember(x => x.NotificationDeliveryDate, opt => opt.MapFrom(src => src.NotificationDeliveryDate.ToCmDateTimeString()));
 
         CreateMap<ImportScheduleRequest, HearingImport>();
 
@@ -59,5 +61,23 @@ public class HearingMapping : Profile
             .ForMember(x => x.LocalStartDateTime, opt => opt.MapFrom(src => src.LocalStartDateTime.ToCmDateTimeString()))
             .ForMember(x => x.LocalEndDateTime, opt => opt.MapFrom(src => src.LocalEndDateTime.ToCmDateTimeString()))
             .ForMember(x => x.HearingReservedUntil, opt => opt.MapFrom(src => src.HearingReservedUntil.ToCmDateTimeString()));
+
+        CreateMap<Hearing, OnHoldHearingResponse>()
+            .ForMember(x => x.HearingStartDateTime, opt => opt.MapFrom(src => src.HearingStartDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.HearingEndDateTime, opt => opt.MapFrom(src => src.HearingEndDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.LocalStartDateTime, opt => opt.MapFrom(src => src.LocalStartDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.LocalEndDateTime, opt => opt.MapFrom(src => src.LocalEndDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.HearingReservedUntil, opt => opt.MapFrom(src => src.HearingReservedUntil.ToCmDateTimeString()));
+
+        CreateMap<Hearing, ExternalDisputeHearingGetResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.HearingStartDateTime, opt => opt.MapFrom(src => src.HearingStartDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.HearingEndDateTime, opt => opt.MapFrom(src => src.HearingEndDateTime.ToCmDateTimeString()))
+            .ForMember(x => x.DialInNumber1, opt => opt.MapFrom(src => src.ConferenceBridge.DialInNumber1))
+            .ForMember(x => x.DialInDescription1, opt => opt.MapFrom(src => src.ConferenceBridge.DialInDescription1))
+            .ForMember(x => x.DialInNumber2, opt => opt.MapFrom(src => src.ConferenceBridge.DialInNumber2))
+            .ForMember(x => x.DialInDescription2, opt => opt.MapFrom(src => src.ConferenceBridge.DialInDescription2))
+            .ForMember(x => x.ParticipantCode, opt => opt.MapFrom(src => src.ConferenceBridge.ParticipantCode));
     }
 }

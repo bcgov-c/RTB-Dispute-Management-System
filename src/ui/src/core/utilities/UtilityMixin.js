@@ -197,5 +197,58 @@ export default {
     }
 
     return dateCursor;
+  },
+
+  util_loadDataURL(resourceUrl) {
+    return new Promise((res, rej) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = () => {
+        const reader = new FileReader();
+        reader.onloadend = () => res(reader.result);
+        reader.onerror = () => rej(reader?.result);
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.onerror = () => rej(false);
+      xhr.open('GET', resourceUrl);
+      xhr.responseType = 'blob';
+      xhr.send();
+    });
+    
+  },
+
+  util_reverseSortBy(sortByFunction) {
+    return function(left, right) {
+      var l = sortByFunction(left);
+      var r = sortByFunction(right);
+
+      if (l === void 0) return -1;
+      if (r === void 0) return 1;
+
+      return l < r ? 1 : l > r ? -1 : 0;
+    };
+  },
+
+  util_isNumeric(value) {
+    return !isNaN(parseFloat(value)) && isFinite(value);
+  },
+
+  util_getCookie(cookieName) {
+    const name = cookieName + "=";
+    const cDecoded = decodeURIComponent(document.cookie); //to be careful
+    const cArr = cDecoded .split('; ');
+    let res;
+    cArr.forEach(val => {
+        if (val.indexOf(name) === 0) res = val.substring(name.length);
+    })
+    return res;
+  },
+
+  util_setCookie(cookieData={}) {
+    if (!cookieData?.cookie) {
+      console.log('[WARNING] Cannot set cookie, no cookie data provided');
+      return;
+    }
+    const cookieStr = `${cookieData?.cookie};${cookieData?.expiryDate ? ` expires=${cookieData?.expiryDate}` : ''}`;
+    document.cookie = cookieStr;
   }
 };

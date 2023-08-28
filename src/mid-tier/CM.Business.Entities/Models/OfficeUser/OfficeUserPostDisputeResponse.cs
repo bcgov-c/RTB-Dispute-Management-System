@@ -57,4 +57,7 @@ public class OfficeUserPostDisputeResponse
 
     [JsonProperty("dispute_fees")]
     public List<OfficeUserDisputeFee> DisputeFees { get; set; }
+
+    [JsonProperty("tenancy_address_validated")]
+    public bool? TenancyAddressValidated { get; set; }
 }

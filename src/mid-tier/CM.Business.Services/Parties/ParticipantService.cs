@@ -11,6 +11,7 @@ using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 using CM.UserResolverService;
+using Polly;
 
 namespace CM.Business.Services.Parties;
 
@@ -47,6 +48,21 @@ public class ParticipantService : CmServiceBase, IParticipantService
             var nameAbbr = await GetNameAbbreviationAsync(participantRequest, disputeGuid);
             newParticipant.NameAbbreviation = nameAbbr.Truncate(NameAbbreviationLength);
 
+            newParticipant.EmailVerified = false;
+            newParticipant.EmailVerifyCode = StringHelper.GetRandomCode();
+
+            if (!string.IsNullOrEmpty(participantRequest.PrimaryPhone))
+            {
+                newParticipant.PrimaryPhoneVerified = false;
+                newParticipant.PrimaryPhoneVerifyCode = StringHelper.GetRandomCode();
+            }
+
+            if (!string.IsNullOrEmpty(participantRequest.SecondaryPhone))
+            {
+                newParticipant.SecondaryPhoneVerified = false;
+                newParticipant.SecondaryPhoneVerifyCode = StringHelper.GetRandomCode();
+            }
+
             var result = await UnitOfWork.ParticipantRepository.InsertAsync(newParticipant);
             var completeResult = await UnitOfWork.Complete();
             completeResult.AssertSuccess();
@@ -59,13 +75,13 @@ public class ParticipantService : CmServiceBase, IParticipantService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var participantExists = await UnitOfWork.ClaimGroupParticipantRepository.CheckParticipantExistence(id);
-        if (participantExists)
+        var participant = await UnitOfWork.ParticipantRepository.GetByIdAsync(id);
+        if (participant != null)
         {
             await UnitOfWork.ParticipantRepository.DeleteAsync(id);
             await SetDisputeUserInactive(id);
 
-            var marked = await MarkForDeleteChildEntities(id);
+            var marked = await MarkForDeleteChildEntities(id, participant.DisputeGuid);
 
             if (marked)
             {
@@ -91,17 +107,40 @@ public class ParticipantService : CmServiceBase, IParticipantService
         return -1;
     }
 
-    public async Task<Participant> PatchAsync(Participant participant, PartyPatchType patchType = PartyPatchType.Null)
+    public async Task<Participant> PatchAsync(Participant participant, PartyPatchType patchType = PartyPatchType.Null, bool abbrUpdate = false)
     {
-        var nameAbbr = await GetNameAbbreviationAsync(participant);
-        participant.NameAbbreviation = nameAbbr.Truncate(NameAbbreviationLength);
+        var party = await UnitOfWork.ParticipantRepository.GetNoTrackingByIdAsync(x => x.ParticipantId == participant.ParticipantId);
+
+        if (party.Email != participant.Email && !string.IsNullOrEmpty(participant.Email))
+        {
+            participant.EmailVerified = false;
+            participant.EmailVerifyCode = StringHelper.GetRandomCode();
+        }
+
+        if (party.PrimaryPhone.GetNumbers() != participant.PrimaryPhone.GetNumbers() && !string.IsNullOrEmpty(participant.PrimaryPhone))
+        {
+            participant.PrimaryPhoneVerified = false;
+            participant.PrimaryPhoneVerifyCode = StringHelper.GetRandomCode();
+        }
+
+        if (party.SecondaryPhone.GetNumbers() != participant.SecondaryPhone.GetNumbers() && !string.IsNullOrEmpty(participant.SecondaryPhone))
+        {
+            participant.SecondaryPhoneVerified = false;
+            participant.SecondaryPhoneVerifyCode = StringHelper.GetRandomCode();
+        }
+
+        if (abbrUpdate)
+        {
+            var nameAbbr = await GetNameAbbreviationAsync(participant);
+            participant.NameAbbreviation = nameAbbr.Truncate(NameAbbreviationLength);
+        }
 
         UnitOfWork.ParticipantRepository.Attach(participant);
 
         switch (patchType)
         {
             case PartyPatchType.SoftDelete:
-                await MarkForDeleteChildEntities(participant.ParticipantId);
+                await MarkForDeleteChildEntities(participant.ParticipantId, participant.DisputeGuid);
 
                 break;
             case PartyPatchType.SoftUndelete:
@@ -224,10 +263,42 @@ public class ParticipantService : CmServiceBase, IParticipantService
         return primaryApplicant != null;
     }
 
-    public async Task<bool> IsActiveParticipantExists(int descriptionBy)
+    public async Task<bool> IsActiveParticipantExists(int participantId)
     {
-        var exists = await UnitOfWork.ParticipantRepository.IsActiveParticipantExists(descriptionBy);
+        var exists = await UnitOfWork.ParticipantRepository.IsActiveParticipantExists(participantId);
         return exists;
+    }
+
+    public bool NeedAbbrUpdate(ParticipantRequest participantToPatch, Participant originalParty)
+    {
+        if (participantToPatch.ParticipantType != originalParty.ParticipantType)
+        {
+            if (participantToPatch.ParticipantType == (byte)ParticipantType.Business)
+            {
+                return StringHelper.IsDifferentInitials($"{originalParty.FirstName} {originalParty.LastName}", participantToPatch.BusinessName);
+            }
+            else
+            {
+                if (originalParty.ParticipantType == (byte)ParticipantType.Business)
+                {
+                    return StringHelper.IsDifferentInitials($"{participantToPatch.FirstName} {participantToPatch.LastName}", originalParty.BusinessName);
+                }
+                else
+                {
+                    return StringHelper.IsDifferentInitials($"{participantToPatch.FirstName} {participantToPatch.LastName}", $"{originalParty.FirstName} {originalParty.LastName}");
+                }
+            }
+        }
+        else if ((participantToPatch.ParticipantType != (byte)ParticipantType.Business &&
+                    (participantToPatch.FirstName[0] != originalParty.FirstName[0] ||
+                    participantToPatch.LastName[0] != originalParty.LastName[0])) ||
+                    (participantToPatch.ParticipantType == (byte)ParticipantType.Business &&
+                    StringHelper.IsDifferentInitials(participantToPatch.BusinessName, originalParty.BusinessName)))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     #region private
@@ -276,7 +347,7 @@ public class ParticipantService : CmServiceBase, IParticipantService
 
         var partiesCount = await UnitOfWork.ParticipantRepository.GetSameAbbreviationsCount(participantRequest.DisputeGuid, nameAbbreviation);
 
-        if (partiesCount > 1)
+        if (partiesCount > 0)
         {
             nameAbbreviation += (partiesCount + 1).ToString();
         }
@@ -335,7 +406,7 @@ public class ParticipantService : CmServiceBase, IParticipantService
         return evidenceCode;
     }
 
-    private async Task<bool> MarkForDeleteChildEntities(int id)
+    private async Task<bool> MarkForDeleteChildEntities(int id, Guid disputeGuid)
     {
         try
         {
@@ -351,12 +422,54 @@ public class ParticipantService : CmServiceBase, IParticipantService
             {
                 filePackageService.IsDeleted = true;
                 UnitOfWork.FilePackageServiceRepository.Attach(filePackageService);
+
+                await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = disputeGuid,
+                    ServiceType = ServiceType.FilePackage,
+                    ServiceChangeType = ServiceChangeType.DeleteRecord,
+                    ParticipantId = id,
+                    FilePackageServiceId = filePackageService.FilePackageServiceId,
+                    OtherParticipantRole = filePackageService.OtherParticipantRole,
+                    IsServed = filePackageService.IsServed,
+                    ServiceMethod = filePackageService.ServiceMethod != null ? (ServiceMethod)filePackageService.ServiceMethod : null,
+                    ReceivedDate = filePackageService.ReceivedDate,
+                    ServiceDateUsed = filePackageService.ServiceDateUsed,
+                    ServiceDate = filePackageService.ServiceDate,
+                    ServiceBy = filePackageService.ServedBy,
+                    ServiceComment = filePackageService.ServiceComment,
+                    ValidationStatus = filePackageService.ValidationStatus,
+                    ServiceDescription = filePackageService.ServiceDescription,
+                    OtherProofFileDescriptionId = filePackageService.OtherProofFileDescriptionId
+                });
             }
 
             foreach (var noticeService in noticeServices)
             {
                 noticeService.IsDeleted = true;
                 UnitOfWork.NoticeServiceRepository.Attach(noticeService);
+
+                await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = disputeGuid,
+                    ServiceType = ServiceType.Notice,
+                    ServiceChangeType = ServiceChangeType.DeleteRecord,
+                    ParticipantId = id,
+                    NoticeServiceId = noticeService.NoticeServiceId,
+                    OtherParticipantRole = noticeService.OtherParticipantRole,
+                    IsServed = noticeService.IsServed,
+                    ServiceMethod = noticeService.ServiceMethod != null ? (ServiceMethod)noticeService.ServiceMethod : null,
+                    ReceivedDate = noticeService.ReceivedDate,
+                    ServiceDateUsed = noticeService.ServiceDateUsed,
+                    ServiceDate = noticeService.ServiceDate,
+                    ServiceBy = noticeService.ServedBy,
+                    ServiceComment = noticeService.ServiceComment,
+                    ValidationStatus = noticeService.ValidationStatus,
+                    ServiceDescription = noticeService.ServiceDescription,
+                    OtherProofFileDescriptionId = noticeService.OtherProofFileDescriptionId
+                });
             }
 
             foreach (var fileDescriptionId in fileDescriptions)

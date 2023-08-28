@@ -11,9 +11,14 @@ const claimsContain = function(claim_codes, parsedClaims) {
   });
 };
 
-const PANDEMIC_RENT_INCREASE_ISSUE_STATIC_ERROR_HTML = `<p>The 2022 maximum rent increase is 1.5%. Annual rent increase notices must have an effective date no earlier than January 1, 2022. If a landlord does collect the increased amount during the period that rent increases are not allowed, the tenant can deduct the additional amount from future rent payments.</p>`;
-const PANDEMIC_LEARN_MORE_HTML = `<p>Learn more on <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/covid-19">our website</a>.</p>`;
-const PANDEMIC_RENT_INCREASE_LEARN_MORE_HTML = `<p>Learn more on <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/rent-increases">our website</a>.</p>`;
+const RENT_INCREASE_ISSUE_STATIC_ERROR_HTML = `<p>If you\'re disputing a rent increase, visit the <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/rent-increases">Residential Tenancy Branch website</a> to learn about the rules and maximum increase rates.</p>`;
+
+const OP_DR_DROPDOWN_CODES = {
+  '10_DAY': `10_DAY`,
+  '1_MONTH': `1_MONTH`,
+  '2_MONTH': `2_MONTH`,
+  '4_MONTH': `4_MONTH`,
+};
 
 // Config items for Intake Respondents page question items
 const config = {
@@ -27,9 +32,9 @@ const config = {
       return {
         linked_claims: this.linked_claims,
         question_claim_code: this.question_claim_code,
-        stepText: 'Is this is an urgent application about a tenant who poses an immediate and severe risk to the rental property, other occupants or the landlord?',
+        stepText: 'Is this an application for an early end to tenancy as it would be unreasonable, or unfair to the landlord or other occupants to wait for a Notice to End Tenancy for Cause to take effect?',
         stepComplete: questionModel.get('question_answer') !== null,
-        helpHtml: 'No other dispute issues can be checked with this type of application except to recover the filing fee.  You must provide evidence with this application to prove why this is urgent and how you cannot wait for a standard One Month Notice to End Tenancy for Cause to be issued.  This type of application does not require issuing a standard notice to end the tenancy.'
+        helpHtml: 'No other dispute issues can be selected with this type of application except to recover the filing fee. You must provide evidence with this application to prove why you cannot wait for a One Month Notice to End Tenancy for Cause to take effect.'
       };
     },
     question_options: {
@@ -49,14 +54,19 @@ const config = {
         linked_claims: this.linked_claims,
         stepText: 'Are you seeking possession of the rental unit or site through the direct request process?',
         stepComplete: questionModel.get('question_answer') !== null,
-        helpHtml: `The direct request process allows you to obtain an order of possession without a participatory hearing.  This is limited to service of a 10 Day Notice to End Tenancy when the tenant has not paid the rent or utilities and the tenant's deadline to dispute the notice has expired.  You may also apply for a monetary order for unpaid rent or utilities and recovery of the filing fee through this process.<br/><br/>You cannot submit your application until after the tenant deadline for disputing the notice or paying the unpaid rent and/or utilities has passed. ${WebLink.format({
+        helpHtml: `The direct request process allows you to obtain an order of possession without a participatory hearing. This applies to all notices to end tenancy except for the Two Month Notice for Landlord's Use of Property and the One Month Notice by a Strata Corporation, which must use the participatory hearing process. You may also apply for a monetary order for unpaid rent or utilities, if you issued a 10 Day notice, and recovery of the filing fee through this process.
+        <br/><br/>
+        You cannot submit your application until after the tenant deadline for disputing the notice has passed. ${WebLink.format({
           url: 'http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html',
           text: 'Calculate when you can make your application'
-        })}.<br/><br/>If the tenant has disputed the 10 Day Notice to End Tenancy, this application will be scheduled for a hearing with the tenant's application.<br/><br/>As this proceeding is restricted to evidence submitted by the landlord, there are very specific requirements.
-        Please review the second page of the 10 Day Notice to End Tenancy or learn more on ${WebLink.format({
+        })}.
+        <br/><br/>
+        If the tenant has disputed the Notice to End Tenancy, this application will be scheduled for a hearing with the tenant's application.
+        <br/><br/>
+        As this proceeding is restricted to evidence submitted by the landlord, there are very specific requirements. Learn more about the direct request process on ${WebLink.format({
           url: 'http://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online/direct-request',
           text: 'our website'
-        })}`
+        })}.`
       };
     },
     question_options: {
@@ -69,12 +79,12 @@ const config = {
   LandlordDirectRequestClaims: {
     type: 'claims',
     question_name: 'LandlordDirectRequestClaims',
-    selection_claims: [123, 124, 125, 126],
+    selection_claims: [123, 124, 125, 126],// R1.03.10:, 143, 144, 145, 146],
     page_item_options(parsedClaims) {
       return {
-        stepText: 'Please select the reason you issued the 10 Day Notice to End Tenancy:',
+        stepText: 'Please select the Notice to End Tenancy that you issued:',
         stepComplete: claimsContain(this.selection_claims, parsedClaims),
-        staticWarning: `You cannot submit an application for possession of a rental unit or site until after any applicable tenant deadline for disputing the notice or paying the unpaid rent and/or utilities has passed.&nbsp;<b>Your application may be dismissed if you file too early.</b>
+        staticWarning: `You cannot submit an application for possession of a rental unit or site until after any applicable tenant deadline for disputing the notice has passed.&nbsp;<b>Your application may be dismissed if you file too early.</b>
         ${WebLink.format({
           url: 'http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html',
           text: 'Use our tools to calculate when you can make your application'
@@ -82,13 +92,73 @@ const config = {
       };
     },
     claims_options(parsedClaims) {
-      return [{
-        claimCode: {
-          'rent-only': 123,
-          'utilities': 124,
+      const dispute = disputeChannel.request('get');
+      const isMHPTA = dispute.isMHPTA();
+      
+      const getSecondDropdownOptionsForNotice = (noticeSelection) => {
+        let hideSecondDropdown = true;
+        const returnData = {};
 
-          '_rent-only-money': [123, 125],
-          '_utilities-money': [124, 126],
+        if (noticeSelection === OP_DR_DROPDOWN_CODES['10_DAY']) {
+          hideSecondDropdown = false;
+          Object.assign(returnData, {
+            optionData: [{ value: 'rent-only', text: 'Rent Only (No Utilities)'},
+              { value: 'utilities', text: 'Utilities Only or Rent and Utilities'}],
+            labelText: 'Reason on the 10 day notice',
+            value: _.has(parsedClaims, 123) || _.has(parsedClaims, 125) ? 'rent-only' :
+                (_.has(parsedClaims, 124) || _.has(parsedClaims, 126) ? 'utilities' : null)
+          });
+        } else if (noticeSelection === OP_DR_DROPDOWN_CODES['1_MONTH']) {
+          hideSecondDropdown = false;
+
+          Object.assign(returnData, {
+            optionData: [{ value: 'other-cause', text: 'For Cause'},
+              { value: 'end-of-employment', text: 'For End of Employment'}],
+            labelText: 'Reason on the 1 month notice',
+            value: _.has(parsedClaims, 143) ? 'other-cause' :
+              _.has(parsedClaims, 144) ? 'end-of-employment' : null
+          });
+        } else if (noticeSelection === OP_DR_DROPDOWN_CODES['2_MONTH']) {
+          hideSecondDropdown = false;
+
+          Object.assign(returnData, {
+            optionData: [{ value: 'housing', text: 'Does not qualify for subsidized housing' }],
+            labelText: 'Reason on the 2 month notice',
+            value: _.has(parsedClaims, 145) ? 'housing' : null
+          });
+        } else if (noticeSelection === OP_DR_DROPDOWN_CODES['4_MONTH']) {
+          // Pass
+        }
+        
+        return Object.assign({
+          cssClass: hideSecondDropdown ? 'max-width-400 hidden' : 'max-width-400',
+          required: !hideSecondDropdown,
+        }, returnData);
+      };
+      const getThirdDropdownOptionsForNotice = (noticeSelection) => {
+        const hideThirdDropdown = noticeSelection !== OP_DR_DROPDOWN_CODES['10_DAY'];
+        return {
+          cssClass: hideThirdDropdown ? 'hold-security hidden' : 'hold-security',
+          required: !hideThirdDropdown,
+        };
+      };
+
+      const claimOptionsData = {
+        claimCode: {
+          [OP_DR_DROPDOWN_CODES['10_DAY']]: {
+            'rent-only': 123,
+            'utilities': 124,
+            'rent-only_monetary': 125,
+            'utilities_monetary': 126,
+          },
+          [OP_DR_DROPDOWN_CODES['1_MONTH']]: {
+            'other-cause': 143,
+            'end-of-employment': 144,
+          },
+          [OP_DR_DROPDOWN_CODES['2_MONTH']]: {
+            'housing': 145,
+          },
+          [OP_DR_DROPDOWN_CODES['4_MONTH']]: 146
         },
         checkboxOptions: {
           html: '-',
@@ -99,13 +169,51 @@ const config = {
           required: true,
           defaultBlank: true,
           cssClass: 'max-width-400',
-          optionData: [{ value: 'rent-only', text: 'Rent Only (No Utilities)'},
-              { value: 'utilities', text: 'Utilities Only or Rent and Utilities'}],
-          labelText: 'Reason on the 10 day notice',
-          value: _.has(parsedClaims, 123) || _.has(parsedClaims, 125) ? 'rent-only' :
-              (_.has(parsedClaims, 124) || _.has(parsedClaims, 126) ? 'utilities' : null)
+          optionData: [
+            { value: OP_DR_DROPDOWN_CODES['10_DAY'], text: '10 Day Notice'},
+            /** R1.03.10: 
+            { value: OP_DR_DROPDOWN_CODES['1_MONTH'], text: '1 Month Notice'},
+            ...(!isMHPTA ? [
+              { value: OP_DR_DROPDOWN_CODES['2_MONTH'], text: '2 Month Notice'},
+              { value: OP_DR_DROPDOWN_CODES['4_MONTH'], text: '4 Month Notice' }
+            ] : []),
+            */
+          ],
+          labelText: 'Issued Notice',
+          value: (
+            // 10 Day
+            _.has(parsedClaims, 123) || _.has(parsedClaims, 125) ||
+            _.has(parsedClaims, 124) || _.has(parsedClaims, 126) ? OP_DR_DROPDOWN_CODES['10_DAY']
+            :
+            // 1 Month
+            _.has(parsedClaims, 143) || _.has(parsedClaims, 144)  ? OP_DR_DROPDOWN_CODES['1_MONTH']
+            :
+            // 2 Month
+            _.has(parsedClaims, 145) ? OP_DR_DROPDOWN_CODES['2_MONTH']
+            :
+            // 4 Month
+            _.has(parsedClaims, 146) ? OP_DR_DROPDOWN_CODES['4_MONTH']
+            : null
+          )
         },
         secondDropdownOptions: {
+          required: true,
+          defaultBlank: true,
+          cssClass: 'max-width-400',
+          optionData: [],
+          labelText: '',
+          value: (
+            // 10 Day
+            _.has(parsedClaims, 123) || _.has(parsedClaims, 125) ? 'rent-only' :
+            _.has(parsedClaims, 124) || _.has(parsedClaims, 126) ? 'utilities' :
+            // 1 Month
+            _.has(parsedClaims, 143) ? 'other-cause' :
+            _.has(parsedClaims, 144) ? 'end-of-employment' :
+            // 2 Month
+            _.has(parsedClaims, 145) ? 'housing' : null
+          )
+        },
+        thirdDropdownOptions: {
           required: true,
           defaultBlank: true,
           cssClass: 'hold-security',
@@ -116,26 +224,55 @@ const config = {
             _.has(parsedClaims, 123) || _.has(parsedClaims, 124) ? 'no' : null
         },
 
-        getSelectedClaimCodeOverrideFn: (model) => {
-          const dropdownModel = model.get('dropdown');
-          const secondDropdownModel = model.get('secondDropdown');
-          const isRentOnly = dropdownModel && dropdownModel.getData() === 'rent-only';
-          const hasMoney = secondDropdownModel && secondDropdownModel.getData() === 'yes';
+        getDropdownChangeFn: (claimCheckboxModel, dropdownModel) => {
+          const firstDropdown = claimCheckboxModel.get('dropdown');
+          const secondDropdown = claimCheckboxModel.get('secondDropdown');
+          const thirdDropdown = claimCheckboxModel.get('thirdDropdown');
+
+          // Only trigger dropdown changes on the first dependent dropdown selection
+          if (dropdownModel !== firstDropdown) return;
+
+          const firstSelection = firstDropdown.getData();
+          secondDropdown.set(getSecondDropdownOptionsForNotice(firstSelection));
+          thirdDropdown.set(getThirdDropdownOptionsForNotice(firstSelection));
+
+          secondDropdown.trigger('render');
+          thirdDropdown.trigger('render');
+        },
+
+        getSelectedClaimCodeOverrideFn: (claimCheckboxModel) => {
+          const firstDropdown = claimCheckboxModel.get('dropdown');
+          const secondDropdown = claimCheckboxModel.get('secondDropdown');
+          const thirdDropdown = claimCheckboxModel.get('thirdDropdown');
+          const firstSelection = firstDropdown.getData();
+          const hasMonetary = thirdDropdown?.getData() === 'yes';
           const selectedClaimCodes = [];
-
-          if (isRentOnly) {
-            selectedClaimCodes.push(123);
-          } else {
-            selectedClaimCodes.push(124);
+          
+          if (firstSelection === OP_DR_DROPDOWN_CODES['10_DAY']) {
+            const isRentOnly = secondDropdown.getData() === 'rent-only';
+            selectedClaimCodes.push(isRentOnly ? 123 : 124);
+            if (hasMonetary) {
+              selectedClaimCodes.push(isRentOnly ? 125 : 126);
+            }
+          } else if (firstSelection === OP_DR_DROPDOWN_CODES['1_MONTH']) {
+            const isOtherCause = secondDropdown.getData() === 'other-cause';
+            selectedClaimCodes.push(isOtherCause ? 143 : 144);
+          } else if (firstSelection === OP_DR_DROPDOWN_CODES['2_MONTH']) {
+            const isHousing = secondDropdown.getData() === 'housing';
+            if (isHousing) {
+              selectedClaimCodes.push(145);
+            }
+          } else if (firstSelection === OP_DR_DROPDOWN_CODES['4_MONTH']) {
+            selectedClaimCodes.push(146);
           }
-
-          if (hasMoney) {
-            selectedClaimCodes.push(isRentOnly ? 125 : 126);
-          }
-
           return selectedClaimCodes;
         },
-      }];
+      };
+
+      // Set visibility of second/third dropdowns based on previous dropdown selections
+      Object.assign(claimOptionsData.secondDropdownOptions, getSecondDropdownOptionsForNotice(claimOptionsData?.dropdownOptions?.value));
+      Object.assign(claimOptionsData.thirdDropdownOptions, getThirdDropdownOptionsForNotice(claimOptionsData?.dropdownOptions?.value));
+      return [claimOptionsData];
     }
   },
 
@@ -241,9 +378,9 @@ const config = {
           required: true,
           defaultBlank: true,
           cssClass: 'max-width-400',
-          optionData: [{ value: 'other-cause', text: 'Other Cause (Not Employment)'},
-          { value: 'end-of-employment', text: 'End of Employment'}],
-          labelText: 'Reason on the one month notice form (RTB-33)',
+          optionData: [{ value: 'other-cause', text: 'For Cause'},
+          { value: 'end-of-employment', text: 'For End of Employment'}],
+          labelText: 'Reason on the one month notice form (RTB-33 or RTB-33s)',
           value: _.has(parsedClaims, 104) ? 'other-cause' : _.has(parsedClaims, 101) ? 'end-of-employment' : null
         }
       },
@@ -414,6 +551,51 @@ const config = {
     }
   },
 
+  LandlordSeekingOther: {
+    type: 'claimQuestion',
+    question_name: 'S5_LandlordSeekingOther',
+    linked_claims: 'LandlordSeekingOtherClaims',
+    page_item_options(questionModel) {
+      return {
+        linked_claims: this.linked_claims,
+        stepText: "Do you have other issues with the tenant not listed above?",
+        stepComplete: questionModel.get('question_answer') !== null,
+        helpHtml: "Select this issue only if none of the issues listed above apply to your situation.",
+      };
+    },
+    question_options: {
+      optionData: [{ name: 'landlord-seeking-repairs-no', value: "0", cssClass: 'option-button yes-no', text: 'NO'},
+          { name: 'landlord-seeking-repairs-yes', value: "1", cssClass: 'option-button yes-no', text: 'YES'}],
+      clearWhenHidden: true
+    }
+  },
+
+  LandlordSeekingOtherClaims: {
+    type: 'claims',
+    question_name: 'LandlordSeekingOtherClaims',
+    selection_claims: [133],
+    page_item_options(parsedClaims) {
+      return {
+        stepText: 'Please select any of the other issue(s) that apply to your dispute:',
+        stepComplete: claimsContain(this.selection_claims, parsedClaims),
+      };
+    },
+    claims_options(parsedClaims) {
+      const configORL = configChannel.request('get:issue', 133);
+      const dispute = disputeChannel.request('get');
+
+      return [{
+        hidden: !dispute.isMHPTA(),
+        claimCode: 133,
+        checkboxOptions: {
+          html: configORL.selectionTitle,
+          checked: _.has(parsedClaims, 133),
+          helpHtml: configORL.selectionHelp
+        }
+      }];
+    }
+  },
+
 
   // Tenant
 
@@ -449,14 +631,11 @@ const config = {
       return {
         linked_claims: this.linked_claims,
         question_claim_code: this.question_claim_code,
-        stepText: 'Do you need the landlord to make emergency repairs for health or safety reasons and have you contacted the landlord to make repairs which have not been completed?',
+        stepText: 'Do you meet the <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance#Emergency">requirements</a> to apply for an expedited hearing for an emergency repair?',
         stepComplete: questionModel.get('question_answer') !== null,
-        helpHtml: "No other dispute issues can be checked with this type of application except to recover the filing fee.<br/><br/>" +
-          "Select this issue if you are requesting emergency repairs that are necessary for health or safety or for the preservation or use of rental property.  These are typically limited to major leaks in pipes or the roof;  damaged or blocked water or sewer pipes or plumbing fixtures; necessary urgent repairs to the primary heating system or electrical system.<br/><br/>"+
-          `There are very specific requirements in order to be successful with this claim.  Learn more on ${WebLink.format({
-            url: 'http://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance#Emergency',
-            text: 'our website' })}.<br/><br/>` +
-          "If you have already completed and paid for emergency repairs and want compensation from your landlord please select the claim box for seeking monetary compensation, or, for requesting a rent reduction; do not choose the box for emergency repairs if they have already been done."
+        helpHtml: 'An emergency repair may qualify for an expedited hearing, which is a formal process to resolve extremely urgent and emergency disputes on short notice to the respondent. Learn more about <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/expedited-hearings">expedited hearings</a>.<br/><br/>' +
+          'No other dispute issues can be included with this type of application except to recover the filing fee.<br/><br/>'+
+          'If you have already completed and paid for emergency repairs and want compensation from your landlord please select the claim box for seeking monetary compensation. Do not choose the box for emergency repairs if they have already been done.'
       };
     },
     question_options: {
@@ -564,7 +743,7 @@ const config = {
       return {
         stepText: 'Select the landlord notice that you want to dispute:',
         stepComplete: claimsContain(this.selection_claims, parsedClaims),
-        staticError: `${PANDEMIC_RENT_INCREASE_ISSUE_STATIC_ERROR_HTML}${PANDEMIC_RENT_INCREASE_LEARN_MORE_HTML}`,
+        staticError: RENT_INCREASE_ISSUE_STATIC_ERROR_HTML,
         staticWarning: `If you are filing an application to dispute a notice to end tenancy after the dispute period indicated on the notice and requesting more time to file the application, you must indicate this when you choose your claim below.<br/><br/>Not sure if you're past the deadline to dispute the notice to end tenancy?&nbsp;<a class='static-external-link' url='http://www.housing.gov.bc.ca/rtb/WebTools/DisputeLandlordNotice.html' href='javascript:;'>Use our tools to calculate if the deadline to dispute the notice has passed.</a>`
       };
     },
@@ -620,8 +799,8 @@ const config = {
           required: true,
           defaultBlank: true,
           cssClass: 'max-width-400',
-          optionData: [{ value: 'other-cause', text: 'Other Cause (Not Employment)'},
-            { value: 'end-of-employment', text: 'End of Employment'}],
+          optionData: [{ value: 'other-cause', text: 'For Cause'},
+            { value: 'end-of-employment', text: 'For End of Employment'}],
           labelText: 'Reason on the one month notice',
           value: _.has(parsedClaims, 205) || _.has(parsedClaims, 231) ? 'other-cause' :
             (_.has(parsedClaims, 204) || _.has(parsedClaims, 232) ? 'end-of-employment' : null)
@@ -745,14 +924,14 @@ const config = {
   TenantSeekingMoneyClaims: {
     type: 'claims',
     question_name: 'TenantSeekingMoneyClaims',
-    selection_claims: [210, 211, 209, 202, 222, 243, 245],
+    selection_claims: [210, 211, 209, 202, 222, 243, 245, 246],
     page_item_options(parsedClaims) {
       const dispute = disputeChannel.request('get'),
         isPastTenancy = dispute.isPastTenancy();
       return {
         stepText: 'Select the money or rent issue(s) you want to resolve:',
         stepComplete: claimsContain(this.selection_claims, parsedClaims),
-        staticError: !isPastTenancy ? `${PANDEMIC_RENT_INCREASE_ISSUE_STATIC_ERROR_HTML}${PANDEMIC_RENT_INCREASE_LEARN_MORE_HTML}` : null
+        staticError: !isPastTenancy ? RENT_INCREASE_ISSUE_STATIC_ERROR_HTML : null
       };
     },
     claims_options(parsedClaims) {
@@ -763,6 +942,7 @@ const config = {
       const configDRI_ARIC = configChannel.request('get:issue', 245);
       const configRR = configChannel.request('get:issue', 222);
       const configMNETC = configChannel.request('get:issue', 243);
+      const configMNETVC = configChannel.request('get:issue', 246);
 
       const dispute = disputeChannel.request('get');
       const isPastTenancy = dispute.isPastTenancy();
@@ -809,8 +989,8 @@ const config = {
           required: true,
           defaultBlank: true,
           cssClass: 'max-width-400',
-          optionData: [{ value: 'standard', text: 'Standard Rent Increase' },
-            { value: 'ari-c', text: 'Additional Rent Increase (Capital Expenditures)' }],
+          optionData: [{ value: 'standard', text: 'Annual Allowable Rent Increase' },
+            { value: 'ari-c', text: 'Additional Rent Increase for Capital Expenditures' }],
           labelText: 'Type of rent increase',
           value: _.has(parsedClaims, 202) ? 'standard' : _.has(parsedClaims, 245) ? 'ari-c' : null
         }
@@ -833,7 +1013,17 @@ const config = {
           checked: _.has(parsedClaims, 243),
           helpHtml: configMNETC.issueHelp
         }
-      },    
+      },
+      {
+        hidden: isPastTenancy ? false : true,
+        claimCode: 246,
+        checkboxOptions: {
+          // NOTE: MNETVC uses the issue text/help for selection text/help as well
+          html: configMNETVC.issueTitle,
+          checked: _.has(parsedClaims, 246),
+          helpHtml: configMNETVC.issueHelp
+        }
+      },
     ];
     }
   },
@@ -1011,23 +1201,23 @@ const config = {
   TenantSeekingOtherClaims: {
     type: 'claims',
     question_name: 'TenantSeekingOtherClaims',
-    selection_claims: [216, 221, 212],
+    selection_claims: [216, 221, 212, 240],
     page_item_options(parsedClaims) {
       const dispute = disputeChannel.request('get'),
         isPastTenancy = dispute.isPastTenancy();
       return {
         stepText: 'Please select any of the other issue(s) that apply to your dispute:',
         stepComplete: claimsContain(this.selection_claims, parsedClaims),
-        staticError: !isPastTenancy ? `${PANDEMIC_RENT_INCREASE_ISSUE_STATIC_ERROR_HTML}${PANDEMIC_LEARN_MORE_HTML}` : null
+        staticError: !isPastTenancy ? RENT_INCREASE_ISSUE_STATIC_ERROR_HTML : null
       };
     },
     claims_options(parsedClaims) {
-      const configRPP = configChannel.request('get:issue', 216),
-        configAS = configChannel.request('get:issue', 221),
-        configOLC = configChannel.request('get:issue', 212);
-
-      const dispute = disputeChannel.request('get'),
-        isPastTenancy = dispute.isPastTenancy();
+      const configRPP = configChannel.request('get:issue', 216);
+      const configAS = configChannel.request('get:issue', 221);
+      const configOLC = configChannel.request('get:issue', 212);
+      const configOJT = configChannel.request('get:issue', 240);
+      const dispute = disputeChannel.request('get');
+      const isPastTenancy = dispute.isPastTenancy();
 
       return [{
         hidden: false,
@@ -1054,6 +1244,14 @@ const config = {
           html: configOLC.selectionTitle,
           checked: _.has(parsedClaims, 212),
           helpHtml: configOLC.selectionHelp
+        }
+      }, {
+        hidden: dispute.isMHPTA(),
+        claimCode: 240,
+        checkboxOptions: {
+          html: configOJT.selectionTitle,
+          checked: _.has(parsedClaims, 240),
+          helpHtml: configOJT.selectionHelp
         }
       }];
     }

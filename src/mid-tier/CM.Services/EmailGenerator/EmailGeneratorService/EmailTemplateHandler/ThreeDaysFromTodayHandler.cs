@@ -10,8 +10,8 @@ namespace CM.Services.EmailGenerator.EmailGeneratorService.EmailTemplateHandler;
 
 public class ThreeDaysFromTodayHandler : AbstractEmailMessageHandler
 {
-    public ThreeDaysFromTodayHandler(IUnitOfWork unitOfWork)
-        : base(unitOfWork)
+    public ThreeDaysFromTodayHandler(IUnitOfWork unitOfWork, int assignedTemplateId)
+        : base(unitOfWork, assignedTemplateId)
     {
     }
 

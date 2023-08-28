@@ -318,7 +318,7 @@ const ReviewPage = Marionette.View.extend({
     const taskDescription = [
       `A review request was submitted through the Dispute Access site. Submitter name ${this.model.get('submitterName')}, Initials: ${participantInitials}`,
       `Access code: ${this.model.get('accessCode')}. Date Request Submitted: ${Formatter.toDateDisplay(Moment())}.`, 
-      `See the the outcome document request section of the documents view for more information.`,
+      `See the outcome document request section of the documents view for more information.`,
     ].join(TASK_DESCRIPTION_SEPARATION_CHARACTERS);;
 
     const taskData = {
@@ -504,7 +504,7 @@ const ReviewPage = Marionette.View.extend({
 
   renderJsxLogoutButton() {
     if (this.currentStep === STEP_4) {
-      return <span class="receipt-logout-btn" onClick={() => this.logout()}>Logout</span>
+      return <span className="receipt-logout-btn" onClick={() => this.logout()}>Logout</span>
     }
   }
 

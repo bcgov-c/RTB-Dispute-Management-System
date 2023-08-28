@@ -2,6 +2,7 @@
  * @class core.components.input.InputView
  * @memberof core.components.input
  * @augments Marionette.View
+ * @fileoverview - Customizable Input View. Wraps a <input> with options to provide extra functionality such as date, time, postal code, phone, currency, and password.
  */
 
 import Radio from 'backbone.radio';
@@ -62,6 +63,9 @@ export default ViewMixin.extend({
   onInputBlur() {
     this.removeErrorStyles();
     this.getUI('input').val($.trim(this.getUI('input').val()));
+    if (this.getUI('input').val() === '' && this.model.isTime()) {
+      this.inputChanged();
+    }
     if (!this.model.isDate() && !this.model.isTime()) {
       // Don't handle any input blurs if datepicker/timepicker mode was open, because the click into calendar datepicker causes a blur
       this.inputChanged();
@@ -239,28 +243,28 @@ export default ViewMixin.extend({
   },
 
   _renderAsDate() {
+    // Mobile dates are handled with native datepicker
+    if (this.model.get('isMobile')) return;
+
     const inputEle = this.getUI('input');
-    
-    if (!this.model.get('isMobile')) {
-      inputEle.datepicker(Object.assign({
-        showWeeks: true,
-        changeYear: this.model.get('showYearDate'),
-        dateFormat: 'M d, yy',
-        maxDate: this.model.get('maxDate') ? new Date(this.model.get('maxDate')) : this.model.get('allowFutureDate') ? new Date(8640000000000000) : new Date(),
-        minDate: (this.model.get('minDate') ? new Date(this.model.get('minDate')) : null),
-        onSelect: (value) => this.model.trigger('update:input', value)
-      },
-        this.model.get('yearRange') ? { yearRange: this.model.get('yearRange') } : null
-      ));
-      this.$('.input-group-addon').off('click.input_date');
-      this.$('.input-group-addon').on('click.input_date', function() {
-        const input_group_ele = $(this).closest('.input-group')
-        if (input_group_ele.hasClass('disabled')) {
-          return;
-        }
-        input_group_ele.find('input').datepicker("show");
-      });
-    }
+    inputEle.datepicker(Object.assign({
+      showWeeks: true,
+      changeYear: this.model.get('showYearDate'),
+      dateFormat: 'M d, yy',
+      maxDate: this.model.get('maxDate') ? new Date(this.model.get('maxDate')) : this.model.get('allowFutureDate') ? new Date(8640000000000000) : new Date(),
+      minDate: (this.model.get('minDate') ? new Date(this.model.get('minDate')) : null),
+      onSelect: (value) => this.model.trigger('update:input', value)
+    },
+      this.model.get('yearRange') ? { yearRange: this.model.get('yearRange') } : null
+    ));
+    this.$('.input-group-addon').off('click.input_date');
+    this.$('.input-group-addon').on('click.input_date', function() {
+      const input_group_ele = $(this).closest('.input-group')
+      if (input_group_ele.hasClass('disabled')) {
+        return;
+      }
+      input_group_ele.find('input').datepicker("show");
+    });
   },
 
   _renderAsTime() {

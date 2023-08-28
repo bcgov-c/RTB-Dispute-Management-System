@@ -177,7 +177,7 @@ export default Backbone.Model.extend({
     }
     const beforeAfterText = offsetDays !== null && offsetDays >= 0 ? 'before' : 'after';
     const offsetToHearing = offsetDays !== null ? Math.abs(offsetDays) : null;
-    const showOffsetWarning = offsetDays !== null && date_offset_warning_threshold ? offsetDays <= date_offset_warning_threshold : false;
+    const showOffsetWarning = offsetDays !== null && date_offset_warning_threshold ? offsetDays < date_offset_warning_threshold : false;
     const offsetDisplay = latestHearing && filesInPackage ? ` / <span class="${showOffsetWarning?'error-red':''}">${offsetToHearing} day${offsetToHearing===1?'':'s'} ${beforeAfterText} latest hearing</span>` : '';
 
     const matchingUnit = creatorModel && this.get('unitCollection') && this.get('unitCollection').find(unit => unit.hasParticipantId(creatorModel.get('participant_id')));

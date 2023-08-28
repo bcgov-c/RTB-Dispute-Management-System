@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - View that displays HTML Footer for DA and OS sites containing links 
  * @class core.components.footer.FooterView
  * @memberof core.components.footer
  * @augments Marionette.View

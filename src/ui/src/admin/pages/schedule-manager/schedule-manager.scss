@@ -142,6 +142,11 @@ $SCHEDULE-MANAGER-WIDTH: 1700px;
       img { margin-right: 10px; }
       span { position:relative; top:2px; }
     }
+
+    &__hearing-generation {
+      @extend .sm-page__working-sched__bulk-add-blocks;
+      margin-left: 0;
+    }
   }
   
   &__view-type select { width: 175px; }

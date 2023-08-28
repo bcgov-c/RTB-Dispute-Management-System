@@ -23,5 +23,11 @@ public class SubstitutedServiceMapping : Profile
             .ForMember(x => x.SubServiceExpiryDate, opt => opt.MapFrom(src => src.SubServiceExpiryDate.ToCmDateTimeString()));
 
         CreateMap<SubstitutedServicePostRequest, Data.Model.SubstitutedService>();
+
+        CreateMap<Data.Model.SubstitutedService, ExternalSubstitutedServiceResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.SubServiceEffectiveDate, opt => opt.MapFrom(src => src.SubServiceEffectiveDate.ToCmDateTimeString()))
+            .ForMember(x => x.SubServiceExpiryDate, opt => opt.MapFrom(src => src.SubServiceExpiryDate.ToCmDateTimeString()));
     }
 }

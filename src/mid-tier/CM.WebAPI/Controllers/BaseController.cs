@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using CM.Business.Services;
 using CM.Business.Services.Base;
 using CM.Common.Utilities;
+using CM.ServiceBase.ApiKey;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CM.WebAPI.Controllers;
@@ -97,11 +102,71 @@ public class BaseController : Controller
         }
     }
 
-    protected async Task<IActionResult> MakeRequest(Uri apiBaseUri, string httpMethod, string route, Dictionary<string, string> postParams = null)
+    protected async Task<IActionResult> SendRequest<T>(Uri apiBaseUri, string httpMethod, string route, object request, Dictionary<string, string> postParams = null)
     {
         using var client = new HttpClient();
 
         var requestMessage = new HttpRequestMessage(new HttpMethod(httpMethod), new Uri(apiBaseUri, route));
+        requestMessage.Content = httpMethod == "PATCH" ? request.GetContent("application/json-patch+json") : request.GetContent();
+        if (postParams != null)
+        {
+            requestMessage.Content = new FormUrlEncodedContent(postParams);
+        }
+
+        AddApiToken(HttpContext, client);
+        var response = await client.SendAsync(requestMessage);
+
+        try
+        {
+            CopyFromTargetResponseHeaders(HttpContext, response);
+
+            var apiResponse = await response.Content.ReadFromJsonAsync<T>();
+            return Ok(apiResponse);
+        }
+        catch (Exception exc)
+        {
+            return BadRequest(exc.Message);
+        }
+    }
+
+    protected async Task<IActionResult> GetRequest(Uri apiBaseUri, string route, int? count, int? index, List<KeyValuePair<string, string>> query = null)
+    {
+        using var client = new HttpClient();
+        AddApiToken(HttpContext, client);
+
+        var uri = new Uri(apiBaseUri, route).ToString();
+
+        if (count.HasValue && index.HasValue)
+        {
+            var pagingQuery = string.Format("?count={0}&index={1}", count, index);
+            uri += pagingQuery;
+        }
+
+        var fullUri = QueryHelpers.AddQueryString(uri, query);
+
+        var response = await client.GetAsync(fullUri);
+
+        var apiResponse = await response.Content.ReadAsStreamAsync();
+
+        try
+        {
+            CopyFromTargetResponseHeaders(HttpContext, response);
+            return Ok(apiResponse);
+        }
+        catch (Exception exc)
+        {
+            return BadRequest(exc.Message);
+        }
+    }
+
+    protected async Task<IActionResult> MakeRequest(Uri apiBaseUri, string httpMethod, string route, Dictionary<string, string> postParams = null)
+    {
+        using var client = new HttpClient();
+        AddApiToken(HttpContext, client);
+
+        var fullUri = new Uri(apiBaseUri, route).ToString();
+
+        var requestMessage = new HttpRequestMessage(new HttpMethod(httpMethod), new Uri(fullUri));
 
         if (postParams != null)
         {
@@ -123,11 +188,13 @@ public class BaseController : Controller
         }
     }
 
-    protected async Task<IActionResult> MakeRequestWithAttachment(Uri apiBaseUri, string httpMethod, string route, Dictionary<string, string> postParams = null)
+    protected async Task<IActionResult> MakeRequestWithAttachment(Uri apiBaseUri, string httpMethod, string route, object request, Dictionary<string, string> postParams = null)
     {
         using var client = new HttpClient();
+        AddApiToken(HttpContext, client);
 
         var requestMessage = new HttpRequestMessage(new HttpMethod(httpMethod), new Uri(apiBaseUri, route));
+        requestMessage.Content = httpMethod == "PATCH" ? request.GetContent("application/json-patch+json") : request.GetContent();
 
         if (postParams != null)
         {
@@ -153,6 +220,14 @@ public class BaseController : Controller
         }
 
         return BadRequest();
+    }
+
+    private static void AddApiToken(HttpContext context, HttpClient client)
+    {
+        var appSettings = context.RequestServices.GetRequiredService<IOptions<ApiKeySettings>>();
+        var apiKey = appSettings.Value.ApiKey;
+
+        client.DefaultRequestHeaders.Add("x-api-key", apiKey);
     }
 
     private void CopyFromTargetResponseHeaders(HttpContext context, HttpResponseMessage responseMessage)

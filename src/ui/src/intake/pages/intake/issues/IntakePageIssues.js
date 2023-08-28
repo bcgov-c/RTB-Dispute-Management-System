@@ -10,13 +10,6 @@ import template from './IntakePageIssues_template.tpl';
 import TrialLogic_BIGEvidence from '../../../../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
 import ModalIntakeIssueIntervention from '../../../../core/components/trials/BIGEvidence/ModalIntakeIssueIntervention';
 
-const URGENT_TENANT_POSSESSION_MODAL_WARNING_HTML = "<p>By selecting this issue you may get an expedited hearing.  Select this issue only if you have been denied access to the rental unit or site by your landlord and you urgently require an order of possession. If you have additional issues, you may complete a separate application for dispute resolution for those issues as no other issues can be combined with an expedited hearing for a tenant's order of possession.</p><p>If this is not an urgent application press cancel. If you are certain this is an urgent application press continue.</p>";
-const URGENT_TENANT_REPAIRS_MODAL_WARNING_HTML = `
-  <p>By selecting this issue you may get an expedited hearing.  If you want to request a rent reduction for repairs that the landlord is taking too long to complete, or for repairs you have already paid for, you should complete an application for monetary compensation or a reduction in rent, as monetary claims cannot be combined with an expedited hearing for emergency repairs.</p>
-  <p>If this is not an urgent application press cancel. If you are certain this is an urgent application press continue.</p>
-  <p><a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/repairs-and-maintenance">Click here</a> for information on emergency repairs.</p>
-`;
-
 const RENT_REPAIRS_REDUCTION_MODAL_INFO_HTML = `<p>You may request a rent reduction if you have asked your landlord in writing to make repairs but the repairs have not been completed.  If you would like to include a request for rent reduction in your application, select "Include".  If you do not want to include a request for rent reduction in your application select "Don't Include".</p>`
 
 const CLAIM_CODE_RR = 222;
@@ -51,6 +44,8 @@ export default PageView.extend({
     LandlordSeekingMoveOutClaims: "#p4-LandlordSeekingMoveOutClaims",
     LandlordSeekingMoney: "#p4-LandlordSeekingMoney",
     LandlordSeekingMoneyClaims: "#p4-LandlordSeekingMoneyClaims",
+    LandlordSeekingOther: "#p4-LandlordSeekingOther",
+    LandlordSeekingOtherClaims: "#p4-LandlordSeekingOtherClaims",
 
     TenantUrgentPossession: '#p4-TenantUrgentPossession',
     TenantUrgentRepairs: '#p4-TenantUrgentRepairs',
@@ -204,9 +199,9 @@ export default PageView.extend({
   showModalLandlordUrgentIssue(questionName, options) {
     modalChannel.request('show:standard', {
       title: 'Confirm Application Urgency',
-      bodyHtml: `<p>You should only file an urgent application when it would be unreasonable or unfair to wait for the standard notice to end tenancy timeline.</p>
-        <p>If you select this option you must provide evidence with this application to prove why this is urgent and how you cannot wait for a standard Notice to End Tenancy to be issued.  No other dispute issues can be included with this type of application except a request to recover filing fees.</p>
-        <p>If you have other issues or this is not an urgent application press cancel.  If you are certain this is an urgent application press continue.</p>`,
+      bodyHtml: `<p>You should only file an urgent application when it would be unreasonable or unfair to wait for a One Month Notice to End Tenancy for Cause to take effect.</p>
+        <p>If you select this option you must provide evidence with this application to prove why you cannot wait for a One Month Notice to End Tenancy for Cause to take effect. No other dispute issues can be included with this type of application except to recover the filing fee.</p>
+        <p>If this is not an urgent application press cancel. If you are certain that this is an urgent application, press continue.</p>`,
       onContinueFn: _.bind(function(modalView) {
         modalView.close();
         this.deselectAndHideItem('LandlordDirectRequest', options);
@@ -215,6 +210,8 @@ export default PageView.extend({
         this.deselectAndHideItem('LandlordSeekingMoveOutClaims', options);
         this.deselectAndHideItem('LandlordSeekingMoney', options);
         this.deselectAndHideItem('LandlordSeekingMoneyClaims', options);
+        this.deselectAndHideItem('LandlordSeekingOther', options);
+        this.deselectAndHideItem('LandlordSeekingOtherClaims', options);
 
         this.updateClaimsCount();
         this.showNextButton(_.extend({}, options, {no_animate: true}));
@@ -229,10 +226,44 @@ export default PageView.extend({
   },
 
   showModalTenantUrgentIssue(questionName, options) {
+    const dispute = disputeChannel.request('get');
     const isUrgentPossession = questionName === 'TenantUrgentPossession';
+    const URGENT_TENANT_REPAIRS_MODAL_WARNING_HTML = `
+    <p>
+      Emergency repairs must meet both criteria:
+      <ol>
+        <li>Are the repairs urgent? <i>(If a long time has passed since the repair was needed, this may mean it is not urgent)</i> <b>and</b></li>
+        <li>
+          For at least one of the following reasons:
+          <ul>
+            ${!dispute.isMHPTA() ? `
+            <li>major leaks in pipes or the roof,</li>
+            <li>damaged or blocked water or sewer pipes or plumbing fixtures,</li>
+            <li>the primary heating system,</li>
+            <li>damaged or defective locks that give access to a rental unit, or</li>
+            <li>the electrical systems</li> ` 
+            : `
+            <li>major leaks in pipes,</li>
+            <li>damaged or blocked water or sewer pipes, or</li>
+            <li>the electrical systems</li> `
+            }
+          </ul>
+        </li>
+      </ol>
+    </p>
+    `;
+    const  URGENT_TENANT_POSSESSION_MODAL_WARNING_HTML = `
+    <p>
+      By selecting this issue you may get an expedited hearing.  Select this issue only if you have been denied access to the rental unit or site by your landlord and you urgently require an order of possession. 
+      If you have additional issues, you may complete a separate application for dispute resolution for those issues as no other issues can be combined with an expedited hearing for a tenant's order of possession.
+    </p>
+    <p>If this is not an urgent application press cancel. If you are certain this is an urgent application press continue.</p>`;
     modalChannel.request('show:standard', {
       title: 'Confirm Issue Selection',
+      primaryButtonText: isUrgentPossession ? 'Continue' : 'I have evidence of my emergency',
+      cancelButtonText: 'Cancel',
       bodyHtml: isUrgentPossession ? URGENT_TENANT_POSSESSION_MODAL_WARNING_HTML : URGENT_TENANT_REPAIRS_MODAL_WARNING_HTML,
+      
       onContinueFn: _.bind(function(modalView) {
         modalView.close();
         if (isUrgentPossession) {
@@ -347,6 +378,8 @@ export default PageView.extend({
         this.deselectAndHideItem('LandlordSeekingMoveOutClaims', options);
         this.deselectAndHideItem('LandlordSeekingMoney', options);
         this.deselectAndHideItem('LandlordSeekingMoneyClaims', options);
+        this.deselectAndHideItem('LandlordSeekingOther', options);
+        this.deselectAndHideItem('LandlordSeekingOtherClaims', options);
 
         this.showNextButton(_.extend({}, options, {no_animate: true}));
       } else if (answer === "0") {
@@ -389,6 +422,18 @@ export default PageView.extend({
 
     const landlordSeekingMoney = this.getPageItem('LandlordSeekingMoney');
     this.listenTo(landlordSeekingMoney, 'itemComplete', function(options) {
+      const answer = landlordSeekingMoveOut.getModel().get('question_answer');
+      const dispute = disputeChannel.request('get');
+      if (dispute.isMHPTA() && !dispute.isPastTenancy()) {
+        this.showPageItem('LandlordSeekingOther', _.extend({}, options, {
+          no_animate: answer === "1" ? true : (_.has(options, 'no_animate') ? options.no_animate : false) })); 
+      } else {
+        this.showNextButton(options);
+      }
+    }, this);
+
+    const landlordSeekingOther = this.getPageItem('LandlordSeekingOther');
+    this.listenTo(landlordSeekingOther, 'itemComplete', function(options) {
       this.showNextButton(options);
     }, this);
   },

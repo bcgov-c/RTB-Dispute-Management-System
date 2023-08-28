@@ -45,7 +45,7 @@ const CreateEmail_EmailInputs = Marionette.View.extend({
 
     // Only include attachments where the file can be found in DMS
     this.emailAttachmentFiles = new FileCollection(this.draftEmailModel ? this.draftEmailModel.getAttachments().map(attachment => attachment.getFileModel()).filter(a => a) : []);
-    this.maxFileSizeBytes = configChannel.request('get', 'EMAIL_ATTACHMENT_MAX_FILESIZE_BYTES');
+    this.maxFileSizeBytes = configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES');
     this.allParticipants = participantsChannel.request('get:all:participants', { include_removed: false });
     this.customRecipientList = [];
     this.insertedTemplateId = this.draftEmailModel ? this.draftEmailModel?.get('assigned_template_id') : null;
@@ -181,9 +181,12 @@ const CreateEmail_EmailInputs = Marionette.View.extend({
   getTemplateTypeDropdownOptions() {
     const activeTemplateIds = (this.templateCategoryModel.getSelectedOption() || {})._templateIds || [];
     const loadedTemplates = emailsChannel.request('get:templates').filter(t => activeTemplateIds.includes(t.get('assigned_template_id')));
+
     loadedTemplates.sort((a, b) => (
       this.CUSTOM_EMAIL_TEMPLATE_ASSIGNED_IDS.includes(a.get('assigned_template_id')) ? 1 :
       this.CUSTOM_EMAIL_TEMPLATE_ASSIGNED_IDS.includes(b.get('assigned_template_id')) ? -1 :
+
+      a?.config?.sortOrder !== b?.config?.sortOrder ? Number(a?.config?.sortOrder||0) - Number(b?.config?.sortOrder||0) :
       Number(a) - Number(b)
     ));
     return loadedTemplates.map(t => ({ text: `${t.get('template_title')}`, value: String(t.get('assigned_template_id')), _emailTemplate: t }));
@@ -300,7 +303,7 @@ const CreateEmail_EmailInputs = Marionette.View.extend({
         filesChannel.request('load:files', disputeGuid, { FileTypes: [this.FILE_TYPE_NOTICE], no_cache: true }),
         filesChannel.request('load:linkfiles', disputeGuid, { no_cache: true }),
         filesChannel.request('load:filedescriptions', disputeGuid, { no_cache: true }),
-        noticeChannel.request('load:dispute:notices', disputeGuid)
+        noticeChannel.request('load', disputeGuid, { no_cache: true })
       ]).then(([fileCollection, linkedFileCollection, fileDescriptionCollection, noticeCollection]) => {
         noticeCollection?.forEach(notice => {
           if (!notice.get('notice_file_description_id') || !notice.isDisputeNotice()) return;

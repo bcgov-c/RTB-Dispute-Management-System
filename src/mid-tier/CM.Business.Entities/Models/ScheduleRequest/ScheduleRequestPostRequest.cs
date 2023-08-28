@@ -36,4 +36,8 @@ public class ScheduleRequestPostRequest
     [JsonProperty("request_note")]
     [StringLength(500)]
     public string RequestNote { get; set; }
+
+    [JsonProperty("request_json")]
+    [JsonValidation]
+    public string RequestJson { get; set; }
 }

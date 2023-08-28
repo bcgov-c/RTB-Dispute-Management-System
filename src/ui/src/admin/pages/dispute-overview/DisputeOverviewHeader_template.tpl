@@ -22,6 +22,7 @@
   <b class="dispute-overview-header-border"></b>
   <div class="dispute-overview-header-item dispute-overview-header-comms">
     <div class="dispute-overview-header-icon header-comms-icon"></div>
+    <% if (numGeneralNotes) print('<span class="dispute-overview-header-item-badge"></span>') %>
     <span>Communications</span>
   </div>
   <b class="dispute-overview-header-border"></b>

@@ -18,15 +18,16 @@
             <label class="general-modal-label">Dispute Process: </label><span class="general-modal-value"> <%= Formatter.toProcessDisplay(disputeProcess)%></span>
           </div>
           <div class="use-special-instructions"></div>
+          <div class="notice-single-generation"></div>
         </div>
         <div class="special-instructions"></div>
         <div class="notice-buttons clearfix">
           <div class="clearfix">
             <div class="float-left">
               <% if (hideUnitInfo && respondents.length) { %>
-                This dispute has&nbsp;<b><%= respondents.length %> tenant<%= respondents.length===1?'':'s' %></b>.  Separate notices will be generated for each tenant.  This preview shows the&nbsp;<b>first notice</b>.
+                This dispute has&nbsp;<b><%= respondents.length %> tenant<%= respondents.length===1?'':'s' %></b>.  Separate notices will be generated for each <% if (generationCount === 1) { print('tenant') } else { print('group of <b>'+ generationCount +'</b> tenants') } %>.  This preview shows the first tenant notice.
               <% } else if (rentIncreaseUnits.length) { %>
-                This dispute has&nbsp;<b><%= rentIncreaseUnits.length %> unit<%= rentIncreaseUnits.length===1?'':'s' %></b>.  Separate notices will be generated for each unit.  This preview shows the&nbsp;<b>first notice</b>.
+                This dispute has&nbsp;<b><%= rentIncreaseUnits.length %> unit<%= rentIncreaseUnits.length===1?'':'s' %></b>.  Separate notices will be generated for each <% if (generationCount === 1) { print('unit') } else { print('group of <b>'+ generationCount +'</b> units') } %>.  This preview shows the first unit notice.
               <% } %>
             </div>
             <div class="spacer-block-10"></div>
@@ -62,7 +63,7 @@
         <% } %>
         
         <% if (disputeProcess && (hideUnitInfo || rentIncreaseUnits.length)) { %>
-          <div id="notice-preview"></div>
+          <div id="notice-preview" class="previewableContainer"></div>
         <% } else if (!disputeProcess) { %>
           <div class="error-block warning">A process must be assigned to this dispute for notice to be generated.</div>
         <% } else if (!hideUnitInfo) { %>

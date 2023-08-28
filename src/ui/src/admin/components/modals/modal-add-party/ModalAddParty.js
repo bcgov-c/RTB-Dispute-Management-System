@@ -101,8 +101,11 @@ export default Marionette.View.extend({
       participantTypeUI: configChannel.request('get', 'PARTICIPANT_TYPE_UI_ALL'),
       participantModel: this.participantModel,
       noEmailOptOut: true,
-      isRespondent: this.participantType === 'Respondent'
+      isRespondent: this.participantType === 'Respondent',
+      useMailAddressValidation: false
     });
+
+    this.intakeParticipantModel.get('addressModel').setToRequired();
 
     if (this.intakeParticipantModel.get('isRespondent')) {
       this.intakeParticipantModel.get('hearingOptionsByModel').set('cssClass', 'optional-input');
@@ -153,6 +156,14 @@ export default Marionette.View.extend({
       this.amendmentByModel.set({
         optionData: this.getAmendmentParticipantOptionData(participantChannel.request(`get:${checked ? 'respondents' : 'applicants'}`)),
         value: null,
+      });
+      this.amendmentByModel.trigger('render');
+    });
+
+    this.listenTo(this.amendmentRtbInitModel, 'change:checked', (model, checked) => {
+      this.amendmentByModel.set({
+        required: !checked,
+        cssClass: checked ? 'optional-input' : ''
       });
       this.amendmentByModel.trigger('render');
     });

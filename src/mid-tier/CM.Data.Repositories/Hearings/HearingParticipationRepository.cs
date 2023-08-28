@@ -46,9 +46,16 @@ public class HearingParticipationRepository : CmRepository<HearingParticipation>
         return res;
     }
 
-    public async Task<List<HearingParticipation>> GetHearingParticipationListAsync(int hearingId)
+    public async Task<List<HearingParticipation>> GetHearingParticipationsAsync(int hearingId, ParticipationStatus? status = null)
     {
-        var hearingParticipationList = await Context.HearingParticipations.Where(c => c.HearingId == hearingId && c.ParticipationStatus == (byte)ParticipationStatus.Participated).ToListAsync();
+        if (status == null)
+        {
+            return await GetHearingParticipationsAsync(hearingId);
+        }
+
+        var hearingParticipationList = await Context.HearingParticipations
+            .Where(c => c.HearingId == hearingId && c.ParticipationStatus == (byte)ParticipationStatus.Participated)
+            .ToListAsync();
 
         return hearingParticipationList;
     }
@@ -68,5 +75,14 @@ public class HearingParticipationRepository : CmRepository<HearingParticipation>
         var res = await Context.HearingParticipations.FirstOrDefaultAsync(c => c.HearingId == hearingId);
 
         return res;
+    }
+
+    private async Task<List<HearingParticipation>> GetHearingParticipationsAsync(int hearingId)
+    {
+        var hearingParticipationList = await Context.HearingParticipations
+            .Where(c => c.HearingId == hearingId)
+            .ToListAsync();
+
+        return hearingParticipationList;
     }
 }

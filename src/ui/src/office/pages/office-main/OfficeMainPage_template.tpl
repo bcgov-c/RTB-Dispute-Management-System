@@ -9,10 +9,26 @@
   <div class="da-access-actions-container">
       <% if (hasMenuActions) { %>
         <div class="da-access-actions-info">The following options are available for this dispute file.&nbsp;<span class="external-link <%= showExternalLinkMsg ? '' : 'hidden'%>"></span><span class="<%= showExternalLinkMsg ? '' : 'hidden'%>">Links are processed through the DisputeAccess site</span></div>
-        <div class="error-block warning <%= isFileNumberSearch ? '' : 'hidden' %>">
+        <div class="error-block warning office-file-search-warning <%= isFileNumberSearch ? '' : 'hidden' %>">
           <b>File Number searches will show limited options - Search by Access Code above to view all options.</b>
           <p>If the participant does not know their access code, use the&nbsp;<span class="office-view-access-code general-link">Access Code Lookup</span>.</p>
         </div>
+        <% if (showArsDeadlineWarning) { %>
+          <div class="warning-alert">
+            <span>
+              Let the applicant know that they must declare service to the Residential Tenancy Branch that they have served the Notice of Dispute Resolution Proceeding Package to at least one respondent using the link below to record service of notice to respondents before&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('service_deadline_date')) %></b>&nbsp;or their hearing and application will be adjourned.
+            </span>
+          </div>
+        <% } %>
+        <% if (showArsReinstatementDeadlineWarning) { %>
+          <div class="warning-alert">
+            <span>
+              Let the applicant know that this dispute has been adjourned because they did not declare service to at least one respondent before the declaration deadline&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('service_deadline_date')) %></b>.
+              If they have served the respondent(s), they may request to reinstate their hearing by providing proof of service RTB-55 using the request reinstatement link below until&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('second_service_deadline_date')) %></b>.
+              If the dispute is not reinstated by this time, their dispute will be deemed withdrawn.
+            </span>
+          </div>
+        <% } %>
         <div class="da-access-menu-container">
             <% if (canDaUpdateContactInfo) { %>
               <div class="da-access-menu-item da-access-menu--da-contact">
@@ -20,6 +36,15 @@
                 <div class="da-access-menu-item-inner">
                   <div class="da-access-menu-title">I want to update my contact information</div>
                   <div class="da-access-menu-subtitle">Use this option to add or update your email address and phone number so that you can be contacted by the Residential Tenancy Branch about your dispute.</div>
+                </div>
+              </div>
+            <% } %>
+            <% if (canDaRequestReinstatement) { %>
+              <div class="da-access-menu-item da-access-menu--da--reinstatement">
+                <div class="da-access-menu-icon"><span></span></div>
+                <div class="da-access-menu-item-inner">
+                  <div class="da-access-menu-title">I want to request to reinstate my dispute</div>
+                  <div class="da-access-menu-subtitle">Use this option to upload your proof of service RTB-55</div>
                 </div>
               </div>
             <% } %>

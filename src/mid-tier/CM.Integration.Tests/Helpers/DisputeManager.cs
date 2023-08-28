@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using CM.Business.Entities.Models.Dispute;
 using CM.Business.Entities.Models.IntakeQuestion;
+using CM.Data.Model;
 using CM.Integration.Tests.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 
@@ -56,6 +57,11 @@ public static class DisputeManager
             patchDoc.Replace(e => e.TenancyCity, request.TenancyCity);
         }
 
+        if (request.TenancyCountry != null)
+        {
+            patchDoc.Replace(e => e.TenancyCountry, request.TenancyCountry);
+        }
+
         if (request.TenancyZipPostal != null)
         {
             patchDoc.Replace(e => e.TenancyZipPostal, request.TenancyZipPostal);
@@ -64,6 +70,11 @@ public static class DisputeManager
         if (request.TenancyGeozoneId != null)
         {
             patchDoc.Replace(e => e.TenancyGeozoneId, request.TenancyGeozoneId);
+        }
+
+        if (request.CreationMethod != null)
+        {
+            patchDoc.Replace(e => e.CreationMethod, request.CreationMethod);
         }
 
         return client.PatchAsync<DisputeResponse>(RouteHelper.PatchDispute + disputeGuid, patchDoc);
@@ -103,5 +114,18 @@ public static class DisputeManager
     public static EntityWithStatus<List<IntakeQuestionResponse>> GetIntakeQuestion(HttpClient client, Guid disputeGuid)
     {
         return client.GetAsync<List<IntakeQuestionResponse>>(RouteHelper.GetIntakeQuestion + disputeGuid);
+    }
+
+    public static EntityWithStatus<List<DisputeUserGetResponse>> GetDisputeUsers(HttpClient client, Guid disputeGuid)
+    {
+        return client.GetAsync<List<DisputeUserGetResponse>>(RouteHelper.GetDisputeUsersByGuid + disputeGuid);
+    }
+
+    public static EntityWithStatus<DisputeUserGetResponse> UpdateDisputeUser(HttpClient client, int disputeUserId, DisputeUserPatchRequest request)
+    {
+        var patchDoc = new JsonPatchDocument<DisputeUserPatchRequest>();
+        patchDoc.Replace(e => e.IsActive, request.IsActive);
+
+        return client.PatchAsync<DisputeUserGetResponse>(RouteHelper.PatchDisputeUser + disputeUserId, patchDoc);
     }
 }

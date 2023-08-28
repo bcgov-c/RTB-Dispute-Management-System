@@ -62,7 +62,7 @@ public class DisputeResponse : CommonResponse
     public byte? TenancyGeozoneId { get; set; }
 
     [JsonProperty("tenancy_address_validated")]
-    public byte? TenancyAddressValidated { get; set; }
+    public bool? TenancyAddressValidated { get; set; }
 
     [JsonProperty("cross_app_file_number")]
     public int? CrossAppFileNumber { get; set; }
@@ -171,4 +171,19 @@ public class DisputeListResponseEntity : DisputeResponse
 
     [JsonProperty("claim_groups")]
     public List<DisputeAccessClaimGroup> ClaimGroups { get; set; }
+
+    [JsonProperty("latest_notice_id")]
+    public int? LatestNoticeId { get; set; }
+
+    [JsonProperty("latest_notice_delivery_date")]
+    public string LatestNoticeDeliveryDate { get; set; }
+
+    [JsonProperty("latest_notice_has_service_deadline")]
+    public bool? LatestNoticeHasServiceDeadline { get; set; }
+
+    [JsonProperty("latest_notice_service_deadline_date")]
+    public string LatestNoticeServiceDeadlineDate { get; set; }
+
+    [JsonProperty("latest_notice_second_service_deadline_date")]
+    public string LatestNoticeSecondServiceDeadlineDate { get; set; }
 }

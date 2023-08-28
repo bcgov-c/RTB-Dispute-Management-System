@@ -4,10 +4,15 @@ import InputModel from '../../../../core/components/input/Input_model';
 import InputView from '../../../../core/components/input/Input';
 import DropdownModel from '../../../../core/components/dropdown/Dropdown_model';
 import DropdownView from '../../../../core/components/dropdown/Dropdown';
+import CheckboxView from '../../../../core/components/checkbox/Checkbox';
+import TextareaView from '../../../../core/components/textarea/Textarea';
+import TextareaModel from '../../../../core/components/textarea/Textarea_model';
+import CheckboxModel from '../../../../core/components/checkbox/Checkbox_model';
+import ModalReportViewer from '../../reports/ModalReportViewer';
+import NoThumbnailIcon from '../../../static/NoThumbnail.png';
 import { SYSTEM_USER_NAMES } from '../../../../core/components/user/UserManager';
 import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
 import template from './ModalUpdateUser_template.tpl';
-import NoThumbnailIcon from '../../../static/NoThumbnail.png';
 import '../admin-update-user.css';
 
 const DROPDOWN_YES_CODE = '1';
@@ -18,13 +23,15 @@ const configChannel = Radio.channel('config');
 const userChannel = Radio.channel('users');
 const loaderChannel = Radio.channel('loader');
 const Formatter = Radio.channel('formatter').request('get');
+const modalChannel = Radio.channel('modals');
+const reportsChannel = Radio.channel('reports');
 
 export default ModalBaseView.extend({
   template,
   id: 'editUser-modal',
   regions : {
+    userActiveRegion: '.user-is-active-checkbox',
     displayNameRegion : '.display-name-input',
-    activeBoxRegion: '.account-active-drop-box',
     usernameRegion: '.username-input',
     roleGroupRegion: '.role-group',
     subRoleGroupRegion: '.role-sub-group',
@@ -39,18 +46,21 @@ export default ModalBaseView.extend({
     scheduleManagerRegion: '.schedule-manager',
     schedulingRulesRegion:'.scheduling-rules',
     dashboardAccessRegion: '.dashboard-access',
-    ceuAccessRegion: '.ceu-access'
+    specialAccessRegion: '.ceu-access',
+    adminNoteRegion: '.admin-note'
   },
 
   ui() {
     return _.extend({}, ModalBaseView.prototype.ui, {
       save: '.btn-update',
+      activeToggle: '.user-is-active-checkbox'
     });
   },
 
   events() {
     return _.extend({}, ModalBaseView.prototype.events, {
       'click @ui.save': 'clickSave',
+      'click @ui.activeToggle': 'openSearchModel'
     });
   },
 
@@ -61,8 +71,8 @@ export default ModalBaseView.extend({
     }, this);
 
     if (is_valid) {
-      _.each([this.displayNameModel, this.emailModel, this.cellphoneModel, this.accountActiveModel,
-            this.roleTypeModel, this.roleSubgroupTypeModel, this.schedulerModel, this.engagementTypeModel, this.managerModel, this.scheduleManagerModel, this.schedulingRulesModel, this.dashboardAccessModel, this.ceuAccessModel], function(model) {
+      _.each([this.displayNameModel, this.emailModel, this.cellphoneModel,
+            this.roleTypeModel, this.roleSubgroupTypeModel, this.schedulerModel, this.engagementTypeModel, this.managerModel, this.scheduleManagerModel, this.schedulingRulesModel, this.dashboardAccessModel, this.specialAccessModel, this.userAdminNoteModel], function(model) {
         const changed_attrs = model.getPageApiDataAttrs();
         this.model.set(changed_attrs, {silent: true});
         this.model.getRole().set(changed_attrs, {silent: true});
@@ -78,6 +88,27 @@ export default ModalBaseView.extend({
           const handler = generalErrorFactory.createHandler('ADMIN.USER.UPDATE', () => this.close());
           handler(err);
         });
+    }
+  },
+
+  async openSearchModel() {
+    // NOTE: Load all report metadata when opening CEU search
+    const modalDescription = `The User ${this.model.get('user_name')} cannot be set to inactive due to the following DMS items that are still associated to his user account. 
+    You must remove all items from this user in order to set this account inactive.`;
+    loaderChannel.trigger('page:load');
+    await reportsChannel.request('load');
+    loaderChannel.trigger('page:load:complete');
+    const reports = reportsChannel.request('get');
+    const userWorkReportTitles = configChannel.request('get', 'USER_WORK_REPORT__SEARCH')?.map(data => data.reportTitle) || [];
+    const userWorkReports = userWorkReportTitles.map(reportTitle => {
+      return reports.find(r => r.get('title') === reportTitle);
+    });
+    const reportContents = await userWorkReports?.[0]?.load([this.model.id])
+    if (reportContents?.length) {
+      modalChannel.request('add', new ModalReportViewer({ availableReports: userWorkReports, reportContents, modalDescription, useFormBuilder: false }));
+    } else {
+      this.userActiveModel.set({ checked: !this.userActiveModel.getData() });
+      this.getChildView('userActiveRegion').render();
     }
   },
 
@@ -118,53 +149,46 @@ export default ModalBaseView.extend({
 
   _getManagers(typeFilter, subTypeFilter) {
     return this.userList.filter((user) => {
-      return ((user.getRoleId() === Number(typeFilter) || !typeFilter) && (user.getRoleSubtypeId() === Number(subTypeFilter) || !subTypeFilter))
+      return ((user.getRoleId() === Number(typeFilter) || !typeFilter) && (user.getRoleSubtypeId() === Number(subTypeFilter) || !subTypeFilter) && (user.isActive() || (!user.isActive() && user.id === this.model.getManagedById())))
     })
     .map((user) => {
       return { value: user.get('user_id'), text: user.getUsername() };
     })
   },
 
-  setDefaultManagerValue() {
-    if (this.managerModel.getData()) return;
-
-    const admin = configChannel.request('get', 'USER_ROLE_GROUP_ADMIN');
-    const informationOfficer = configChannel.request('get', 'USER_ROLE_GROUP_IO');
-    const supervisor = configChannel.request('get', 'USER_SUBGROUP_SUPERVISOR');
-    const arb = configChannel.request('get', 'USER_ROLE_GROUP_ARB');
-    const teamLead = configChannel.request('get', 'USER_SUBGROUP_ARB_LEAD');
-    
-    if (this.model.getRoleId() === admin || this.model.getRoleId() === informationOfficer) {//Defaults = Information Officer - Supervisor
-      this.managerTypeModel.set({ value: informationOfficer });
-      this.managerSubTypeModel.set({ value: supervisor });
-      this.managerModel.set({ disabled: false });
-      this.setAndReRenderManagerModel();
-    } else if (this.model.getRoleId() === arb) {//Defaults = Arbitrator - Team Lead
-      this.managerTypeModel.set({ value: arb });
-      this.managerSubTypeModel.set({ value: teamLead });
-      this.managerModel.set({ disabled: false });
-      this.setAndReRenderManagerModel();
-    }
-  },
-
   setTypeAndSubTypeManagers() {
     const manager = userChannel.request('get:user', Number(this.managerModel.getData()));
 
-    if (!manager) return;
-    this.managerTypeModel.set({ value: manager.getRoleId() });
-    this.managerTypeModel.trigger('render');
-    
+    if (manager) {
+      this.managerTypeModel.set({ value: manager.getRoleId() });
+      this.managerTypeModel.trigger('render');
+    }
+
     const rolesSubGroupToDisplay = this._roleSubGroupsToDisplay(this._getSubGroupsFromRoleType(this.managerTypeModel.getData()));
     this.managerSubTypeModel.set({
       disabled: (!rolesSubGroupToDisplay || !rolesSubGroupToDisplay.length),
       optionData: rolesSubGroupToDisplay && rolesSubGroupToDisplay.length ? rolesSubGroupToDisplay : [{value:-1, text: 'foo'}],
-      value: manager.getRoleSubtypeId() || null,
+      value: manager ? manager.getRoleSubtypeId() : null,
     });
     this.managerSubTypeModel.trigger('render');
   },
 
+  createActiveChangeStatusListeners() {
+    this.listenTo(this.userActiveModel,'change:checked', (model, value) => {
+      this.model.set({ is_active: value ? 1 : 0 });
+    })
+  },
+
   createSubModels() {
     const rolesSubGroupToDisplay = this._roleSubGroupsToDisplay(this._getSubGroupsFromRoleType(this.model.getRole().get('role_group_id')));
+    const userRoles = this.model.get('internal_user_roles') || {};
+
+    this.userActiveModel = new CheckboxModel({
+      html: `<span>Active DMS User?</span>`,
+      disabled: true,
+      checked: !!this.model.get('is_active'),
+      apiMapping: 'is_active'
+    });
 
     this.usernameModel = new InputModel({
       labelText: 'User Name (Login)',
@@ -195,15 +219,7 @@ export default ModalBaseView.extend({
       errorMessage: "Enter a phone number",
       value: this.model.get('mobile'),
       apiMapping: 'mobile'
-    });
-
-    this.accountActiveModel = new DropdownModel({
-      labelText: 'Account Active/Enabled',
-      optionData: this._getActiveDropBoxOptions(),
-      value: this.model.get('is_active') ? 1 : 0,
-      defaultBlank: false,
-      apiMapping: 'is_active'
-    });     
+    });   
 
     this.roleTypeModel = new DropdownModel({
       labelText: 'Role Group',
@@ -256,6 +272,7 @@ export default ModalBaseView.extend({
       disabled: false,
       value: null,
       labelText: 'Manager Type',
+      defaultBlank: true,
     });
 
     this.managerSubTypeModel = new DropdownModel({
@@ -304,14 +321,22 @@ export default ModalBaseView.extend({
       apiMapping: 'dashboard_access'
     });
 
-    this.ceuAccessModel = new DropdownModel({
-      optionData: [{value: DROPDOWN_NO_CODE, text: 'No'}, {value: DROPDOWN_YES_CODE, text: 'Yes'}],
+    const USER_ROLE_SUB_TYPE_DISPLAY = configChannel.request('get', 'USER_ROLE_SUB_TYPE_DISPLAY');
+    this.specialAccessModel = new DropdownModel({
+      optionData: Object.keys(USER_ROLE_SUB_TYPE_DISPLAY).map(value => ({ value: String(value), text: USER_ROLE_SUB_TYPE_DISPLAY[value] })),
       required: true,
-      labelText: 'CEU Access',
-      defaultBlank: false,
-      value: this.model.getRoleAccessSubtype() ? DROPDOWN_YES_CODE : DROPDOWN_NO_CODE,
+      labelText: 'Special Access Rules',
+      defaultBlank: true,
+      value: this.model.getRoleAccessSubtype() ? String(this.model.getRoleAccessSubtype()) : null,
       apiMapping: 'access_sub_types'
+    });
 
+    this.userAdminNoteModel = new TextareaModel({
+      labelText: 'User Administration Note',
+      value: this.model.getRoleNote(),
+      apiMapping: 'role_note',
+      max: configChannel.request('get', 'USER_ROLE_NOTE_MAX'),
+      countdown: true
     })
   },
 
@@ -357,18 +382,18 @@ export default ModalBaseView.extend({
    initialize() {
     this.userList = userChannel.request('get:all:users').filter(user => !(SYSTEM_USER_NAMES || []).includes(user.get('user_name')) );
     this.createSubModels();
-    this.setDefaultManagerValue();
     this.setTypeAndSubTypeManagers();
+    this.createActiveChangeStatusListeners();
     this.managerModel.set({ optionData: this._getManagers(this.managerTypeModel.getData(), this.managerSubTypeModel.getData()) });
   },
 
   onRender() {
-    this.views_to_validate = ['activeBoxRegion', 'usernameRegion', 'roleGroupRegion', 'subRoleGroupRegion', 'displayNameRegion', 'engagementTypeRegion', 'managerTypeRegion', 'managerSubTypeRegion', 'managerRegion', 'scheduleManagerRegion', 'schedulingRulesRegion'];
+    this.views_to_validate = ['usernameRegion', 'roleGroupRegion', 'subRoleGroupRegion', 'displayNameRegion', 'engagementTypeRegion', 'managerTypeRegion', 'managerSubTypeRegion', 'managerRegion', 'scheduleManagerRegion', 'schedulingRulesRegion'];
 
+    this.showChildView('userActiveRegion', new CheckboxView({model: this.userActiveModel}))
     this.showChildView('emailAddressRegion',  new InputView({model: this.emailModel}));
     this.showChildView('mobilePhoneRegion', new InputView({model: this.cellphoneModel}));
     this.showChildView('displayNameRegion', new InputView({model: this.displayNameModel}));
-    this.showChildView('activeBoxRegion', new DropdownView({model: this.accountActiveModel}));
     this.showChildView('usernameRegion', new InputView({model: this.usernameModel}));
     this.showChildView('roleGroupRegion', new DropdownView({model: this.roleTypeModel}));
     this.showChildView('adminAccessRegion', new DropdownView({model: this.adminAccessModel}));
@@ -381,7 +406,8 @@ export default ModalBaseView.extend({
     this.showChildView('scheduleManagerRegion', new DropdownView({ model: this.scheduleManagerModel }));
     this.showChildView('schedulingRulesRegion', new DropdownView({ model: this.schedulingRulesModel }));
     this.showChildView('dashboardAccessRegion', new DropdownView({ model: this.dashboardAccessModel }));
-    this.showChildView('ceuAccessRegion', new DropdownView({ model: this.ceuAccessModel }));
+    this.showChildView('specialAccessRegion', new DropdownView({ model: this.specialAccessModel }));
+    this.showChildView('adminNoteRegion', new TextareaView({ model: this.userAdminNoteModel }));
     
     this.setupListeners();
   },

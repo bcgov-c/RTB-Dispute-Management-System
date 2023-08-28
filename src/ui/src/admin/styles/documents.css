@@ -68,13 +68,14 @@
   margin-top: 12px;
 }
 
-#documents-dispute-files { margin-bottom: 40px; }
 .dispute-documents-list .standard-list-empty { padding: 0; }
-.dispute-documents-list { margin-top: 20px; }
+.document-list-items { margin: 5px 0 40px 0; }
+
+.collapsed .dispute-files-filters-container { display: none; }
 
 .outcome-documents-container .context-container { margin-bottom: 30px; }
 
-.deficient-dispute-documents-list-container { margin-bottom: 0; }
+.deficient-dispute-documents-list-container { margin-top: 5px; margin-bottom: 0; }
 .dispute-doc-deficient-reason { padding-bottom: 5px; white-space: pre-wrap; }
 
 .deficient-dispute-documents-list .dispute-file-contents { margin-bottom: 0; }
@@ -281,7 +282,7 @@
 .dispute-outcome-doc-section-public .outcome-doc-file-visible { margin-right: auto; width: 145px; }
 
 .dispute-outcome-doc-section-public .dispute-outcome-doc-files-header .outcome-doc-file-status { position:relative; left: 20px; }
-
+.dispute-outcome-doc-section-public__error.error-block.warning { margin-top: 3px; max-width: 100%; }
 
 
 /* Delivery styles */
@@ -359,7 +360,7 @@
 .outcome-doc-delivery-method-container { display: flex; flex-grow: 1; margin-right: 20px !important; }
 .outcome-doc-delivery-method { min-width: 115px; max-width: 115px; }
 .outcome-doc-delivery-details-container { display: flex; flex-grow: 1; margin-right: 30px !important; }
-.outcome-doc-delivery-sent-container { display: flex; min-width: 150px; max-width: 150px; margin-left: auto; }
+.outcome-doc-delivery-sent-container { display: flex; min-width: 240px; max-width: 240px; margin-left: auto; }
 .outcome-doc-delivery-is-sent { display: none; }
 .outcome-doc-delivery-is-sent span { padding-left: 35px!important; }
 .outcome-doc-delivery-delivery-date { display: none; min-width: 160px; width: 160px; }
@@ -442,7 +443,6 @@
 .outcome-doc-delivery-details { display: inline-block; flex-grow: 1; white-space: break-spaces;}
 .outcome-doc-delivery-details .rtb-editable-component-label { min-width: 65px; }
 
-.delivery-sent-edit .dispute-outcome-doc-group-add-other-delivery,
 .delivery-sent-edit .dispute-outcome-doc-section-priority-container,
 .delivery-sent-edit .dispute-outcome-doc-section-checkbox { display: none !important; }
 

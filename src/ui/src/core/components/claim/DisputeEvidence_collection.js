@@ -30,12 +30,13 @@ export default Backbone.Collection.extend({
   // options.skip_evidence_codes is a list of codes to ignore when filling / syncing this list
   // options.skip_remedy_id is a boolean to denote whether or not to add the remedy id into created DisputeEvidences.
   //   - By default, the first remedy id will be used, if skip_remedy_id != true
-  syncModelDataWithDisputeClaim(disputeClaim, options) {
+  // options.fileDescriptions - will use this file description collection for associating evidence data with the claims
+  // options.linkFiles - will use this link file collection for associating evidence data with the claims
+  syncModelDataWithDisputeClaim(disputeClaim, options={}) {
     if (!disputeClaim) {
       console.log(`[Error] No dispute claim provided, can't create adjoining dispute evidence`);
       return;
     }
-    options = options || {}
     const skip_evidence_codes = options.skip_evidence_codes || null;
     const skip_remedy_id = options.skip_remedy_id || false;
       
@@ -57,7 +58,7 @@ export default Backbone.Collection.extend({
       return;
     }
 
-    const file_descriptions_for_claim = filesChannel.request('get:filedescriptions:claim', claim_id);
+    const file_descriptions_for_claim = filesChannel.request('get:filedescriptions:claim', claim_id, null, options);
 
     const associatedEvidence = _.filter(issue_config.associatedEvidence, function(issue_evidence_config) {
       return _.isEmpty(skip_evidence_codes) || !_.contains(skip_evidence_codes, issue_evidence_config.id);
@@ -73,7 +74,7 @@ export default Backbone.Collection.extend({
             required: issue_evidence_config.required
           }, disputeClaim.isDirectRequest() ? { mustUploadNow: true } : {}));
       } else {
-        const all_dispute_file_descriptions = filesChannel.request('get:filedescriptions'),
+        const all_dispute_file_descriptions = filesChannel.request('get:filedescriptions', options),
           matching_file_descriptions = all_dispute_file_descriptions.where({ claim_id: claim_id, description_code: issue_evidence_config.id }),
           evidence_config = configChannel.request('get:evidence', issue_evidence_config.id),
           matching_file_description = matching_file_descriptions && matching_file_descriptions.length ? matching_file_descriptions[0] : null;
@@ -86,7 +87,7 @@ export default Backbone.Collection.extend({
           title: evidence_config.title,
           category: evidence_config.category,
           file_description: matching_file_description,
-          files: matching_file_description ? filesChannel.request('get:filedescription:files', matching_file_description) : null
+          files: matching_file_description ? filesChannel.request('get:filedescription:files', matching_file_description, options) : null
         },
           skip_remedy_id ? {} : { remedy_id },
           disputeClaim.isDirectRequest() ? { mustUploadNow: true } : {}

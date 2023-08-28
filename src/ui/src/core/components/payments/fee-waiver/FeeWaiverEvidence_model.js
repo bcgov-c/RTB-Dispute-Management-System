@@ -7,18 +7,18 @@ const paymentsChannel = Radio.channel('payments');
 const participantsChannel = Radio.channel('participants');
 
 export default UploadModel.extend({
-  initialize() {
+  initialize(options={}) {
     UploadModel.prototype.initialize.call(this);
-    const evidenceData = this.getFeeWaiverEvidenceData();
+    const evidenceData = this.getFeeWaiverEvidenceData(options);
     this.set('evidenceCollection', new DisputeEvidenceCollection(evidenceData));
   },
 
-  getFeeWaiverEvidenceData() {
+  getFeeWaiverEvidenceData(options={}) {
     const fee_waiver_evidence_config = paymentsChannel.request('get:payment:evidence:config');
     const filteredFeeWaiverConfig = _.filter(fee_waiver_evidence_config, config => $.trim(config.title).toLowerCase().indexOf('fee waiver,') !== -1)
 
     return _.map(filteredFeeWaiverConfig, function(config) {
-      const matching_file_description = filesChannel.request('get:filedescription:code', config.id);
+      const matching_file_description = !options?.resetEvidence ? filesChannel.request('get:filedescription:code', config.id) : null;
       return {
         evidence_id: config.id,        
         description_by: !matching_file_description ? participantsChannel.request('get:primaryApplicant:id') : null,

@@ -1,15 +1,17 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
+using CM.ServiceBase.Exceptions;
 using CM.Services.EmailGenerator.EmailGeneratorService.Tags;
 
 namespace CM.Services.EmailGenerator.EmailGeneratorService.EmailTemplateHandler;
 
 public class ApplicationEvidenceLaterListHandler : AbstractEmailMessageHandler
 {
-    public ApplicationEvidenceLaterListHandler(IUnitOfWork unitOfWork)
-        : base(unitOfWork)
+    public ApplicationEvidenceLaterListHandler(IUnitOfWork unitOfWork, int assignedTemplateId)
+        : base(unitOfWork, assignedTemplateId)
     {
     }
 
@@ -30,6 +32,11 @@ public class ApplicationEvidenceLaterListHandler : AbstractEmailMessageHandler
 
             foreach (var fileDescription in fileDescriptions)
             {
+                if (string.IsNullOrEmpty(fileDescription.Title) && TagDictionary.TagIsExists(htmlBody, TagDictionary.GetTag(Tag.EvidenceProvidedLater)))
+                {
+                    throw new TagValueMissingException("Tag Value is Missing", dispute.DisputeGuid, AssignedTemplateId, new string[] { TagDictionary.GetTag(Tag.EvidenceProvidedLater) });
+                }
+
                 fileDescriptionSnippet.Append($"<li style=\"padding: 4px 0px 0px 0px; margin: 0px; list - style - type: square; color: #8e8e8e; font-size:16px; line-height: 21px;\"> {fileDescription.Title}</li>");
             }
 

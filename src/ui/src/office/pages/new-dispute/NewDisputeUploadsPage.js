@@ -13,7 +13,7 @@ import ExternalDisputeStatusModel from '../../components/external-api/ExternalDi
 import template from './NewDisputeUploadsPage_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 
-const FORM_EVIDENCE_HELP = `Upload the main application form(s) and related forms i.e. schedule of parties for additional parties, other issue form for additional issues).
+const FORM_EVIDENCE_HELP = `Upload the main application form(s) and related forms (e.g. RTB-26 Schedule of parties form, Other Issues form, or RTB-13 Application for Substituted Service form).
 <br/>DO NOT UPLOAD EVIDENCE FILES HERE - SEPARATE THEM FROM THE APPLICATION FORMS`;
 const BULK_EVIDENCE_HELP = `Upload evidence, evidence worksheets (i.e. monetary order worksheets, direct request worksheets) and tenancy agreements here.
 <br/>DO NOT UPLOAD APPLICATION FORMS HERE`;

@@ -1,4 +1,5 @@
-﻿using DataWarehouseReporting.GraphQL.Resolvers;
+﻿using DataWarehouseReporting.Data.Models;
+using DataWarehouseReporting.GraphQL.Resolvers;
 using DataWarehouseReporting.GraphQL.Types;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,10 @@ public static class GraphQlExtension
         services.AddScoped<DimTimeQueryResolver>();
         services.AddScoped<FactDisputeSummaryQueryResolver>();
         services.AddScoped<FactHearingSummaryQueryResolver>();
+        services.AddScoped<FactResolutionServiceQueryResolver>();
+        services.AddScoped<FactIntakeProcessingQueryResolver>();
         services.AddScoped<FactTimeStatisticQueryResolver>();
+        services.AddScoped<FactIssueOutcomeQueryResolver>();
         services.AddScoped<LoadingHistoryQueryResolver>();
 
         services.AddScoped<SettingsType>();
@@ -27,6 +31,9 @@ public static class GraphQlExtension
         services.AddScoped<FactDisputeSummaryType>();
         services.AddScoped<FactHearingSummaryType>();
         services.AddScoped<FactTimeStatisticType>();
+        services.AddScoped<FactResolutionServiceType>();
+        services.AddScoped<FactIntakeProcessingType>();
+        services.AddScoped<FactIssueOutcomeType>();
         services.AddScoped<LoadingHistoryType>();
 
         services.AddScoped<DisputeCreationMethodEnum>();

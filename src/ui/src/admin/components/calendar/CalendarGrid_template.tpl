@@ -52,10 +52,20 @@
             <% _.escape.each(headerLabelData, function(labelData, labelIndex) { %>
             <% var currentCellId = String(labelIndex)+String(rowEventIndex) %>
             <% var blockData = rowData.getBlockData(labelIndex, rowEventIndex) || {} %>
+            <% var prevBlockData = rowData.getBlockData(labelIndex-1, rowEventIndex) || {} %>
+            <% var nextBlockData = rowData.getBlockData(labelIndex+1, rowEventIndex) || {} %>
+            <% var currPos = Number(labelIndex); %>
+            <% var showBackgroundClass = blockData && 
+              (!blockData.startMinutes || (blockData.startPos && blockData.startPos < currPos)) &&
+              (!blockData.endMinutes || (blockData.endPos && blockData.endPos > currPos))
+            %>
+            <% var isLowerCol = labelIndex < numLowerCols %>
             <% var isColPrintable = printableColumns && printableColumns.indexOf(labelIndex) !== -1 %>
-            <li id="cell-<%= currentCellId %>" class="calendar-grid-time-item <%= (labelIndex === 0) ? 'no-left-border' : (labelIndex === borderCol) ? 'double-left-border' : ''
-              %> <%= blockData && !blockData.startMinutes && !blockData.endMinutes ? blockData.class : '' %> <%= isColPrintable ? '' : 'hidden-print' %>">
-                <span>&nbsp;</span>
+            <li id="cell-<%= currentCellId %>" class="calendar-grid-time-item
+              <%= isLowerCol ? 'lower-col' : '' %>
+              <%= (labelIndex === 0) ? 'no-left-border' : (labelIndex === borderCol) ? 'double-left-border' : ''
+              %> <%= showBackgroundClass ? blockData.class : '' %> <%= isColPrintable ? '' : 'hidden-print' %>"
+            >   
                 <% if (rowData.events && rowData.events.length > 0) {%>
                   <% _.escape.each(rowData.events, function(event) { %>
                     <% if (event.positionId === currentCellId) { %>
@@ -67,12 +77,19 @@
                   <% }); %>
                 <% } %>
                 
-                <% if (blockData && blockData.startMinutes) { %>
-                  <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
-                <% } %>
-                <% if (blockData && blockData.endMinutes) { %>
-                  <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
-                <% } %>
+                <div class="calendar-grid-time-item--block-offsets">
+                  <% if (blockData && blockData.startMinutes && currPos === blockData.startPos) { %>
+                    <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
+                  <% } else if (nextBlockData && nextBlockData.startMinutes && nextBlockData.startPos === currPos) { %>
+                  <div class="calendar-grid-time-item--block-start-offset <%= nextBlockData.class %>"></div>
+                  <% } %>
+
+                  <% if (blockData && blockData.endMinutes && currPos === blockData.endPos) { %>
+                      <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
+                  <% } else if (prevBlockData && prevBlockData.endMinutes && prevBlockData.endPos === currPos) { %>
+                    <div class="calendar-grid-time-item--block-end-offset <%= prevBlockData.class %>"></div>
+                  <% } %>
+                </div>
             </li>
             <% }); %>
           </ul>

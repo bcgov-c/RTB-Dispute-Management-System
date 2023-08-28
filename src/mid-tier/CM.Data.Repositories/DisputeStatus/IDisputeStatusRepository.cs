@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CM.Business.Entities.Models.Dashboard;
 using CM.Business.Entities.SharedModels;
@@ -29,6 +30,8 @@ public interface IDisputeStatusRepository : IRepository<Model.DisputeStatus>
 
     Task<List<Model.DisputeStatus>> GetStatusesByStatusStartDate(DateTime startDate, DateTime endDate);
 
+    Task<List<Model.DisputeStatus>> GetAllStatusesByStatusStartDate(DateTime startDate, DateTime endDate);
+
     Task<Model.DisputeStatus> GetOldestStatus(int[] oldStatuses);
 
     Task<List<Model.DisputeStatus>> GetDisputeStatuses(int[] statuses);
@@ -48,4 +51,10 @@ public interface IDisputeStatusRepository : IRepository<Model.DisputeStatus>
     Task<bool> IsClosedForSubmission(Guid disputeGuid);
 
     Task<List<Model.DisputeStatus>> GetStatusesByGuids(List<Guid> disputeGuids);
+
+    Task<int> GetWaitingForDecisionsCount();
+
+    Task<List<Model.DisputeStatus>> GetAllWithDisputeAsync();
+
+    Task<int> GetStatusesCount(Expression<Func<Model.DisputeStatus, bool>> expression);
 }

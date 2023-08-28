@@ -2,6 +2,7 @@
  * @class core.components.files.FileView
  * @memberof core.components.files
  * @augments Marionette.View
+ * @fileoverview - View that displays a file. Supports pre and post uploaded file display, file downloading, 
  */
 
 import Marionette from 'backbone.marionette';

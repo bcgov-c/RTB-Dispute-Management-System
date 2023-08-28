@@ -7,11 +7,9 @@ namespace CM.WebAPI.WebApiHelpers.CustomHealthChecks;
 
 public class FfmpegHealthCheck : IHealthCheck
 {
-    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var healthStatus = AudioConversionUtils.IsHealthy() ? HealthStatus.Healthy : HealthStatus.Unhealthy;
-        var value = new HealthCheckResult(healthStatus);
-
-        return Task.FromResult(value);
+        var healthStatus = await AudioConversionUtils.IsHealthy() ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+        return new HealthCheckResult(healthStatus);
     }
 }

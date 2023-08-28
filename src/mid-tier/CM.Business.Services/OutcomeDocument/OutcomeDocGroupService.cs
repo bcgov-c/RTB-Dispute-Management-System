@@ -112,4 +112,17 @@ public class OutcomeDocGroupService : CmServiceBase, IOutcomeDocGroupService
 
         return lastModifiedDate;
     }
+
+    public async Task<List<ExternalOutcomeDocGroupResponse>> GetExternalOutcomeDocGroups(Guid disputeGuid, ExternalOutcomeDocGroupRequest request)
+    {
+        var outcomeDocGroups =
+            await UnitOfWork.OutcomeDocGroupRepository.GetExternalOutcomeDocGroups(disputeGuid, request);
+
+        if (outcomeDocGroups != null)
+        {
+            return MapperService.Map<List<OutcomeDocGroup>, List<ExternalOutcomeDocGroupResponse>>(outcomeDocGroups);
+        }
+
+        return new List<ExternalOutcomeDocGroupResponse>();
+    }
 }

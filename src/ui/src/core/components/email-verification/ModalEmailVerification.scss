@@ -1,0 +1,35 @@
+.email-verification {
+
+  &__verification-code { 
+    margin: 20px 0;
+
+    input {
+      width: 150px;
+    }
+    
+    &__resend {
+      color: #38598a;
+    }
+  }
+
+  &__update-wrapper {
+    margin: 20px 0;
+  }
+
+  &__verified {
+    margin: 20px 0;
+  }
+
+  &__update-email { width: 400px; }
+  &__confirm-update-email { width: 400px; }
+  &__go-back::before { content: 'Go back to confirm email' }
+}
+
+@media (min-width: 991px) {
+  .email-verification { min-width: 900px; };
+}
+
+@media (max-width: 767px) {
+  .email-verification__update-email, .email-verification__confirm-update-email { width: 100%; }
+  .email-verification__go-back::before { content: 'Go back' }
+}

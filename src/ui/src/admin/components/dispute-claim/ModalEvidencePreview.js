@@ -7,10 +7,9 @@ import NoteCollection from '../note/Note_collection';
 import RadioIconView from '../../../core/components/radio/RadioIcon';
 import RadioModel from '../../../core/components/radio/Radio_model';
 import EvidencePreviewList from '../dispute-claim/EvidencePreviewList';
+import { FilePreviewContent } from '../../../core/components/file-viewer/FilePreviewContent';
 import template from './ModalEvidencePreview_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
-
-import { FilePreviewContent } from '../../../core/components/file-viewer/FilePreviewContent';
 
 const SHOW_LIST_CLASS = 'evidencePreview-show-list';
 const EVIDENCE_CODE_LIST = 1;
@@ -88,16 +87,12 @@ export default ModalBaseView.extend({
 
       'click @ui.decisionNotePrev': function(ev) {
         ev.preventDefault();
-        //isReferenced
-        //this.navFileModels.filter(fileModel => fileModel.getDecisionNotes().any(note => !note.isNew()));
         const navFileModelsWithDecision = this.navFileModels.filter(fileModel => fileModel.isReferenced());
         this.clickNavButtonPrev(navFileModelsWithDecision);
       },
 
       'click @ui.decisionNoteNext': function(ev) {
         ev.preventDefault();
-        //isReferenced
-        //this.navFileModels.filter(fileModel => fileModel.getDecisionNotes().any(note => !note.isNew()));
         const navFileModelsWithDecision = this.navFileModels.filter(fileModel => fileModel.isReferenced());
         this.clickNavButtonNext(navFileModelsWithDecision);
       }
@@ -155,14 +150,12 @@ export default ModalBaseView.extend({
    * @param {Boolean} openToNotes
    */
   initialize(options) {
-    this.mergeOptions(options, ['fileModel', 'navListData', 'claimCollection', 'fileDupTranslations', 'hideDups', 'openToNotes']);
+    this.mergeOptions(options, ['fileModel', 'navListData', 'claimCollection', 'fileDupTranslations', 'hideDups', 'hideArbControls', 'openToNotes', 'disableNotes', 'getClaimTitleFn']);
     this.loaded = false;
     // Allow a claim collection to be passed in, otherwise use the default claims on the dispute
     if (!this.claimCollection) {
       this.claimCollection = claimsChannel.request('get');
     }
-
-    this.once('shown:modal', this.setDynamicContentHeightInRender, this);
 
     const currentUser = sessionChannel.request('get:user');
     this.hasArbPermissions = currentUser && currentUser.isArbitrator();
@@ -173,7 +166,8 @@ export default ModalBaseView.extend({
         { iconClass: 'evidencePreview-list', value: EVIDENCE_CODE_LIST },
         { iconClass: 'evidencePreview-note', value: EVIDENCE_CODE_NOTES }
       ],
-      value: this.openToNotes ? EVIDENCE_CODE_NOTES : EVIDENCE_CODE_LIST
+      value: this.openToNotes ? EVIDENCE_CODE_NOTES : EVIDENCE_CODE_LIST,
+      valuesToDisable: this.disableNotes ? [EVIDENCE_CODE_NOTES] : [],
     });
     
     this.createSubModels();
@@ -243,7 +237,6 @@ export default ModalBaseView.extend({
     this.navEvidenceModels = [];
     this.navFileModels = [];
     this.fileIdToEvidenceLookup = {};
-
     _.each(this.navListData, listDataItem => {
       _.each(listDataItem.data, evidenceData => {
         if (evidenceData.evidenceModel) {
@@ -259,11 +252,7 @@ export default ModalBaseView.extend({
   },
 
   setupListeners() {
-    // If FileContent is opened in a modal, have to make sure to init draggable functionality after modal opens
-    this.stopListening(this, 'shown:modal');
-    this.listenTo(this, 'shown:modal', () => {
-      if (this.contentView && this.contentView.isRendered()) this.contentView.initDraggableImage();
-    });
+    this.once('shown:modal', () => this.setDynamicContentHeightInRender());
 
     this.listenTo(this.listNotesToggleModel, 'change:value', function(model, value) {
       const notesEle = this.getUI('notes');
@@ -334,8 +323,9 @@ export default ModalBaseView.extend({
       showArrows: true,
       showDetailedNames: true,
       showSubmitterInfo: true,
-      showArbControls: true,
+      showArbControls: !this.hideArbControls,
       fileDupTranslations: this.fileDupTranslations,
+      enableFilePreview: false,
       hideDups: this.hideDups,
       clickReferencedFn: (fileModel, fileReferenced) => {
         const existingDecisionNote = this.decisionNotes.at(0)
@@ -426,7 +416,8 @@ export default ModalBaseView.extend({
       highlightedFileId: this.fileModel.id,
       listData: this.navListData,
       evidenceModels: this.navEvidenceModels,
-      fileModels: this.navFileModels
+      fileModels: this.navFileModels,
+      hideArbControls: this.hideArbControls,
     }));
 
     this.stopListening(region.currentView, 'update:preview');
@@ -470,7 +461,7 @@ export default ModalBaseView.extend({
       SHOW_LIST_CLASS,
       RELATIVE_PDF_VIEWER_PATH: '../Common/pdfjs/web/viewer.html',
       isRemoved: (matchingClaim && matchingClaim.isAmendRemoved()) || this.model.isParticipantRemoved(),
-      claimTitle: matchingClaim ? matchingClaim.getClaimTitleWithCode() : 'Other supporting information',
+      claimTitle: matchingClaim?.getClaimTitleWithCode() || this.getClaimTitleFn?.(this.model) || 'Other supporting information',
       showNotes: this.showNotes,
       showDecisionNotes: this.showDecisionNotes,
       

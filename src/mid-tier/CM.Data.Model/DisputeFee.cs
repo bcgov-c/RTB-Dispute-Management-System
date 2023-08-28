@@ -24,6 +24,8 @@ public class DisputeFee : BaseEntity
 
     public int? PayorId { get; set; }
 
+    public Participant Payor { get; set; }
+
     public decimal? AmountDue { get; set; }
 
     public byte? MethodPaid { get; set; }
@@ -40,4 +42,6 @@ public class DisputeFee : BaseEntity
     public string PaymentOverrideCode { get; set; }
 
     public ICollection<PaymentTransaction> PaymentTransactions { get; set; }
+
+    public virtual ICollection<DisputeVerification> DisputeVerifications { get; set; }
 }

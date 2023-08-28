@@ -143,7 +143,7 @@ const IntakeCeuPageContraventionInfo = CeuPage.extend({
     if (visible_error_eles.length === 0) {
       console.log(`[Warning] Page not valid, but no visible error message found`);
     } else {
-      animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {is_page_item: true});
+      animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {force_scroll: true, is_page_item: true});
     }
   },
 

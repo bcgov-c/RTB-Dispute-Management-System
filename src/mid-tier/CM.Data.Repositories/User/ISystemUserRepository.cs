@@ -27,4 +27,6 @@ public interface ISystemUserRepository : IRepository<SystemUser>
     Task<int[]> GetAvailableUsersAsync(byte roleGroup, byte? roleSubgroup);
 
     Task<int> GetArbitratorUserId();
+
+    Task<List<SystemUser>> GetUsers(IEnumerable<int> usersId);
 }

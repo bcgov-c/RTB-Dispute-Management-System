@@ -1,5 +1,5 @@
 {
-    "version": "0.1",
+    "version": "0.2",
     "language": "en",
     "dictionaries": ["npm", "csharp", "fonts"],
     "words": [],
@@ -59,7 +59,38 @@
         "Hmmtt",
         "acodec",
         "libmp",
-		"Childs"
+		"Childs",
+        "Swashbuckle",
+        "Siteminder",
+        "Newtonsoft",
+        "Geozone",
+        "ACCESSCODE",
+        "ASPNETCORE",
+        "autotext",
+        "userdisplayname",
+        "Datetime",
+        "Antiforgery",
+        "disputefees",
+        "Filenumber",
+        "accesscoderecovery",
+        "Setted",
+        "vipsthumbnail",
+        "sheetcollection",
+        "useremail",
+        "customobject",
+        "openxmlformats",
+        "Respawn",
+        "timeframe",
+        "thesheet",
+        "userguid",
+        "officedocument",
+        "remoteoffice",
+        "noprint",
+        "nokey",
+        "reportemail",
+        "Referer",
+	    "Stylesheet",
+        "Analyse"
     ],
     "ignorePaths": ["node_modules/**", "**/Migrations/**", "**/obj/**", "**/bin/**"],
     "ignoreRegExpList": [
@@ -68,5 +99,10 @@
         "\\`([^\\`].*?)\\`", // inline code blocks. h/t https://stackoverflow.com/questions/41274241/how-to-capture-inline-markdown-code-but-not-a-markdown-code-fence-with-regex
         "\\{%.*%\\}", // liquid syntax
         "/^\\s*```[\\s\\S]*?^\\s*```/gm" // Another attempt at markdown code blocks. https://github.com/streetsidesoftware/vscode-spell-checker/issues/202#issuecomment-377477473
+    ],
+    "languageSettings": [
+        {
+            "languageId": "csharp"
+        }
     ]
 }

@@ -142,4 +142,29 @@ public class NoticeRepository : CmRepository<Model.Notice>, INoticeRepository
 
         return notice;
     }
+
+    public async Task<Model.Notice> GetLastNotice(Guid disputeGuid, NoticeTypes[] types)
+    {
+        if (types == null || types.Length == 0)
+        {
+            return await GetLastNotice(disputeGuid);
+        }
+
+        var lastNotice = await Context.Notices
+            .Where(x => x.DisputeGuid == disputeGuid && types.Contains((NoticeTypes)x.NoticeType))
+            .OrderByDescending(x => x.NoticeId)
+            .FirstOrDefaultAsync();
+
+        return lastNotice;
+    }
+
+    private async Task<Model.Notice> GetLastNotice(Guid disputeGuid)
+    {
+        var lastNotice = await Context.Notices
+            .Where(x => x.DisputeGuid == disputeGuid)
+            .OrderByDescending(x => x.NoticeId)
+            .FirstOrDefaultAsync();
+
+        return lastNotice;
+    }
 }

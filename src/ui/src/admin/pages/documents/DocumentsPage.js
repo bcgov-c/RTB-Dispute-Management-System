@@ -18,7 +18,9 @@ import { showQuickAccessModalWithEditCheck, isQuickAccessEnabled } from '../../c
 import { routeParse } from '../../routers/mainview_router';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import template from './DocumentsPage_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
+const emailsChannel = Radio.channel('emails');
 const notesChannel = Radio.channel('notes');
 const loaderChannel = Radio.channel('loader');
 const filesChannel = Radio.channel('files');
@@ -48,6 +50,8 @@ export default PageView.extend({
     providedByRegion: '.file-provided-by-container',
     addFileButton: '.add-file-button button',
     legacyWarning: '.documents-page-legacy-service-portal-warning',
+    collapse: '#documents-dispute-files .collapse-icon',
+    collapse2: '.deficient-dispute-documents-list-container .collapse-icon',
   },
 
   regions: {
@@ -55,12 +59,10 @@ export default PageView.extend({
     fileTypeRegion: '.file-type-container',
     fileTitleRegion: '@ui.fileTitleRegion',
     documentListRegion: '.dispute-documents-list',
-    deficientdocumentListRegion: '.deficient-dispute-documents-list',
+    deficientDocumentListRegion: '.deficient-dispute-documents-list',
     customFileTitleRegion: '@ui.customFileTitleRegion',
     providedByRegion: '@ui.providedByRegion',
-
     outcomeDocsRegion: '.outcome-documents-section',
-
     docsRequestsRegion: '.doc-requests-container'
   },
 
@@ -71,6 +73,8 @@ export default PageView.extend({
     'click @ui.close': 'clickClose',
     'click @ui.addFileButton': 'clickAddFile',
     'click @ui.completenessCheck': 'completenessCheck',
+    'click @ui.collapse': 'clickCollapse',
+    'click @ui.collapse2': 'clickCollapse2',
   },
 
   completenessCheck() {
@@ -138,7 +142,7 @@ export default PageView.extend({
         processing_options: {
           errorModalTitle: 'Adding Documents',
           checkForDisputeDuplicates: false,
-          maxNonVideoFileSize: 50 * 1024 * 1024 // 50MB
+          maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES')
         },
         fileType: configChannel.request('get', 'FILE_TYPE_USER_EXTERNAL_NON_EVIDENCE')
       });
@@ -156,6 +160,18 @@ export default PageView.extend({
       addFileFn,
       () => this.model.showEditInProgressModalPromise()
     );
+  },
+
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
+  },
+
+  clickCollapse2() {
+    this.isCollapsed2 = !this.isCollapsed2;
+    this.collapseHandler2.update(this.isCollapsed2);
+    this.render();
   },
 
   validateAndShowErrors() {
@@ -190,7 +206,10 @@ export default PageView.extend({
       documentsChannel.request('load', disputeGuid),
       documentsChannel.request('load:requests', disputeGuid),
       notesChannel.request('load', disputeGuid),
-      this.loadPrimaryDisputeOutcomeDocsAndFiles()
+      noticeChannel.request('load:subservices', disputeGuid),
+      this.loadPrimaryDisputeOutcomeDocsAndFiles(),
+      emailsChannel.request('load:templates'),
+      emailsChannel.request('load', disputeGuid)
     ).done(() => {
       this.outcomeDocGroupCollection = documentsChannel.request('get:all');
       this.isLoaded = true;
@@ -277,7 +296,7 @@ export default PageView.extend({
 
     const dfd = $.Deferred();
     this.files_loaded = false;
-    filesChannel.request('load:full', disputeChannel.request('get:id'))
+    filesChannel.request('load', disputeChannel.request('get:id'))
       .done(() => {
         this.setDocumentFieldsFromFileDescriptions();
         this.files_loaded = true;
@@ -323,6 +342,13 @@ export default PageView.extend({
     this.docRequestsCollection = documentsChannel.request('get:requests');
 
     this.isLoaded = false
+
+    this.collapseHandler = SessionCollapse.createHandler(this.model, 'Documents', 'Files');
+    this.isCollapsed = this.collapseHandler?.get();
+
+    // TODO: Should make a repeated docs container for some of these so the page doesn't need to deal with the handler?
+    this.collapseHandler2 = SessionCollapse.createHandler(this.model, 'Documents', 'DeficientFiles');
+    this.isCollapsed2 = this.collapseHandler2?.get();
 
     this.createSubModels();
     this.setupListeners();
@@ -408,9 +434,12 @@ export default PageView.extend({
       return;
     }
     
+    // Filter "general" Amendments RTB-42L, RTB-42T and RTB-42O - those are added elsewhere in the system with context
+    const codesToFilter = configChannel.request('get', 'AMENDMENT_FORM_CODES') || [];
     const config_to_use = configChannel.request('get:evidence:category', value) || {};
+    
     this.fileTitleDropdownModel.set({
-      optionData: Object.keys(config_to_use).filter(key => config_to_use[key].title && config_to_use[key].id)
+      optionData: Object.keys(config_to_use).filter(key => !codesToFilter.includes(config_to_use[key].id) && config_to_use[key].title && config_to_use[key].id)
         .map(key => {
           const config_item = config_to_use[key];
           return { text: config_item.title, value: String(config_item.id), customTitle: config_item.customTitle };
@@ -487,28 +516,38 @@ export default PageView.extend({
     }));
     
     this.showChildView('disputeFlags', new DisputeFlags());
+    this.renderDisputeFiles();
+    
+    this.showChildView('outcomeDocsRegion', new DisputeOutcomeDocGroupsView({
+      collection: this.outcomeDocGroupCollection,
+      primaryFileModelLookup: this.primaryFileModelLookup,
+      primaryOutcomeDocGroupModels: this.primaryOutcomeDocGroupModels,
+    }));
+    this.showChildView('docsRequestsRegion', new DisputeDocRequestsView({ disputeModel: this.model, collection: this.docRequestsCollection }));
+
+    this.renderDeficientDocs();
+
+    loaderChannel.trigger('page:load:complete');
+  },
+
+  renderDisputeFiles() {
+    if (this.isCollapsed) return;
+
     this.showChildView('fileTypeRegion', new DropdownView({ model: this.fileTypeDropdownModel }));
     this.showChildView('fileTitleRegion', new DropdownView({ model: this.fileTitleDropdownModel }));
     this.showChildView('customFileTitleRegion', new InputView({ model: this.customFileTitleInputModel }));
     this.showChildView('providedByRegion', new DropdownView({ model: this.providedByDropdownModel }));
     
-    // Notice File + Category Code 7 - ID Plus Code 
-    // Notice Service (proof of service) + Category Code 7
-    // Amendments (RTB-42L, RTB-42T) + Category Code 7
-    // Sub-Service (RTB-13) +
-    const codesToFilter = [72, 74, 75];
-    const categoriesToFilter = ['EVIDENCE_CATEGORY_OUTCOME_DOC_REQUEST'].map(code => configChannel.request('get', code));
+    const categoriesToFilter = ['EVIDENCE_CATEGORY_OUTCOME_DOC_REQUEST', 'EVIDENCE_CATEGORY_NOTICE'].map(code => configChannel.request('get', code));
     const notices = noticeChannel.request('get:all');
     const filePackages = filesChannel.request('get:filepackages');
+    
     this.showChildView('documentListRegion', new DocumentDisputeFiles({
       collection: this.disputeEvidenceCollection,
       showControls: true,
       docFilter: (model) => {
         // Don't show any evidence.  It should all be displayed on the Admin Evidence page.
         if (model.isEvidence()) return false;
-
-        // Filter Amendments (RTB-42L, RTB-42T) and Sub-Service (RTB-13). Those are displayed elsewhere in the system
-        if (_.contains(codesToFilter, model.getDescriptionCode())) return false;
 
         // Filter invalid categories
         if (_.contains(categoriesToFilter, model.getDescriptionCategory())) return false;
@@ -529,20 +568,14 @@ export default PageView.extend({
         return !isAssociatedToNotice && !isAssociatedToFilePackage;
       }
     }));
-    this.showChildView('deficientdocumentListRegion', new DocumentDisputeFiles({
+  },
+
+  renderDeficientDocs() {
+    if (this.isCollapsed2) return;
+    this.showChildView('deficientDocumentListRegion', new DocumentDisputeFiles({
       collection: this.deficientDocumentsEvidenceCollection,
       emptyMessage: 'No documents have been removed and marked deficient.'
     }));
-
-  
-    this.showChildView('outcomeDocsRegion', new DisputeOutcomeDocGroupsView({
-      collection: this.outcomeDocGroupCollection,
-      primaryFileModelLookup: this.primaryFileModelLookup,
-      primaryOutcomeDocGroupModels: this.primaryOutcomeDocGroupModels,
-    }));
-    this.showChildView('docsRequestsRegion', new DisputeDocRequestsView({ disputeModel: this.model, collection: this.docRequestsCollection }));
-
-    loaderChannel.trigger('page:load:complete');
   },
 
   templateContext() {
@@ -555,6 +588,10 @@ export default PageView.extend({
       showCustomTitleEditor: this.showCustomTitleEditor,
       showProvidedByEditor: this.showProvidedByEditor,
       enableQuickAccess: isQuickAccessEnabled(this.model),
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
+      enableCollapse2: !!this.collapseHandler2,
+      isCollapsed2: this.isCollapsed2,
     };
   }
 

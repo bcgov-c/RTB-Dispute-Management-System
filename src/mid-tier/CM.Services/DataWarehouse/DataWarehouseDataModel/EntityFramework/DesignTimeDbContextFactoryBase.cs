@@ -12,7 +12,6 @@ public abstract class DesignTimeDbContextFactoryBase<TContext> :
 {
     public TContext CreateDbContext(string[] args)
     {
-        ////Debugger.Launch();
         return Create(
             Directory.GetCurrentDirectory(),
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));

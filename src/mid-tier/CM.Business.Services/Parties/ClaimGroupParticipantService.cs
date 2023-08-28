@@ -156,6 +156,15 @@ public class ClaimGroupParticipantService : CmServiceBase, IClaimGroupParticipan
                 IsServed = null
             };
             await UnitOfWork.NoticeServiceRepository.InsertAsync(newNoticeService);
+
+            await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = disputeGuid,
+                    ServiceType = ServiceType.Notice,
+                    ServiceChangeType = ServiceChangeType.CreateRecord,
+                    ParticipantId = participantId
+                });
         }
 
         await UnitOfWork.Complete();
@@ -174,6 +183,15 @@ public class ClaimGroupParticipantService : CmServiceBase, IClaimGroupParticipan
                 IsDeleted = false
             };
             await UnitOfWork.FilePackageServiceRepository.InsertAsync(newFilePackageService);
+
+            await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = disputeGuid,
+                    ServiceType = ServiceType.FilePackage,
+                    ServiceChangeType = ServiceChangeType.CreateRecord,
+                    ParticipantId = participantId
+                });
         }
 
         await UnitOfWork.Complete();

@@ -48,7 +48,7 @@
           <span class="signature-cropper-info"></span>
         </div>
         <div class="signature-inputs">
-          <div class="signature-arb hidden"></div>
+          <div class="signature-user hidden"></div>
           <div class="signature-file-name-wrapper">
             <div class="signature-file-name"></div>
             <span class="signature-file-extension"><%= fileExtension %></span>

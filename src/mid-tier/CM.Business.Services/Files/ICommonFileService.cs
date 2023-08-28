@@ -30,4 +30,6 @@ public interface ICommonFileService : IServiceBase
     Task<CommonFileResponse> PatchFileInfo(CommonFile commonFile);
 
     Task<bool> FileExists(int commonFileId);
+
+    Task<CommonFileExternalResponse> GetExternalCommonFiles(int count, int index);
 }

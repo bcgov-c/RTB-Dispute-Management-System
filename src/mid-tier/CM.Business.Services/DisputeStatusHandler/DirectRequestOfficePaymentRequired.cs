@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using CM.Business.Services.Base;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
@@ -28,7 +29,7 @@ public class DirectRequestOfficePaymentRequired : DisputeTransition
             AssignedTemplateId = AssignedTemplate.DirectRequestOfficePaymentRequired
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -54,7 +55,7 @@ public class DirectRequestOfficePaymentRequired2 : DisputeTransition
             AssignedTemplateId = AssignedTemplate.DirectRequestOfficePaymentRequired
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -80,6 +81,6 @@ public class DirectRequestOfficePaymentRequired3 : DisputeTransition
             AssignedTemplateId = AssignedTemplate.DirectRequestOfficePaymentRequired
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }

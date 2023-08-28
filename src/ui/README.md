@@ -1,30 +1,45 @@
-# DMS UI
+# DMS SYSTEM
 
-[![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
+## Overview
 
-The DMS is a full-featured Dispute Management System with a UI that is based on JavaScript and JavaScript frameworks.  This readme is for the DMS UI (User Interface).  A Readme document and architecture diagram is also available in the [main DMS solution readme](../../README.md) and separate mid-tier documentation is available in the [DMS mid-tier readme](../../src/mid-tier/README.md)
+The Dispute Management System (DMS) is a suite of sites and features that enables robust dispute resolutions within an organization.
 
-![DMS System](../../DMS_Devices.jpg)
+## Sites and Features
+<b>Admin</b>
 
-## The 7 DMS Sites
+Full-featured case management system for internal staff.  Includes scheduling, in-depth dispute management, and work tracking.
 
-**Admin:** This is the fully-featured case management system for internal staff.  This includes automated delivery and notifications, notice generation, decision generation, complex dispute management, staff and hearing scheduling, work assignment and tracking, etc.
+<b>Office Submissions</b>
 
-**Office Submissions:** This is a site for remote office staff that allows them to perform common front-desk actions on disputes files for in-person actions and submissions. This includes new applications, digitized paper and form-based submissions, and front-desk payments, etc.
+Internal site for support staff to perform actions on a dispute on behalf of an external user. New disputes can also be created here on behalf of a user.
 
-**Online Intake (3 Sites):** These are sites that provide guided intuitive applications for service.  The 3 sites address general applications, specialized applications, and the submission of compliance and enforcement complaints.
+<b>Online Intake</b>
 
-**Dispute Access:** This is an external access site that allows guided intuitive digital submissions based on specific dispute file criteria. Common actions include submitting digital evidence, indicating service and document disclosure, submitting amendments, submitting substituted service requests, submitting requests for corrections, clarifications and reviews, updating contact information, etc.
+Multi-step online intake for landlords and tenants to initiate residential tenancy disputes. Features user authentication and online payment integration and fee waivers.
 
-**Posted Decisions:** This is a public site for searching anonymized decisions from resolved DMS files
+<b>Additional Landlord Intake</b>
 
-## Building the DMS UI
+Multi-step online intake for landlords to create two types of non-standard applications: an application for rent increase due to eligible capital expenditures, and application for vacant possession of unit for renovations or repairs.
 
+<b>Compliance and Enforcement Unit (CEU) Intake</b>
+
+Multi-step online intake to report issues that are outside the purview of the Residential Tenancy Branch (RTB) and within the scope of the CEU group.
+
+<b>Dispute Access</b>
+
+External access site for users to add or modify information on an in-flight dispute. Common actions include adding evidence, updating contact information, validating proof of notice.
+
+
+<b>Posted Decisions</b>
+
+A public site for searching final anonymized decisions added in the Admin site.
+
+---
+
+## Build / Install
 This project uses `npm` and `yarn` for package dependency management.
 
-## DMS UI Installation Dependencies
-
-A list of dependent packages and their licensing is available in the [dependentpackage_licenses](dependentpackage_licenses.txt) text document.
+### Installing Dependencies
 
 First install yarn packages.
 ```shell
@@ -38,7 +53,7 @@ Then run npm install for packages.
 npm install
 ```
 
-### DMS UI Builds, Development servers, Pipelines
+### Builds, Development servers, Pipelines
 
 The commands to run and build the site(s) are located in package.json, and can be modified as needed.  These built-in commands share a similar syntax:
 
@@ -61,7 +76,7 @@ The commands to run and build the site(s) are located in package.json, and can b
 `prod` : The production environment. Code is minified.<br/>
 
 
-### DMS UI Development server commands
+#### Development server commands
 To start a webpack dev server to run your app locally on some pre-defined ports, you can use yarn commands formatted like: ```dev:<site>```.
 
 For example, to run Admin in webpack dev server:
@@ -70,7 +85,7 @@ For example, to run Admin in webpack dev server:
 $ yarn dev:admin
 ```
 
-### DMS UI Builds commands
+#### Builds commands
 Sites can be built individual or at once. Builds create a version of the app and will output everything into the `public/` folder.  Build commands for a specific site are formatted like: ```build:<site>:<environment>```, and the commands to build all sites are formatted like: ```build:<environment>```.
 
 For example, to create a PreProd build of the standard Online Intake:
@@ -83,20 +98,11 @@ Or, to build all sites for production:
 ```shell
 # yarn build:<environment>
 $ yarn build:prod
+
 ```
 
-### DMS UI Linter
+### Linter
 
 ```shell
 $ yarn lint
 ```
-
-## DMS UI License
-
-![MIT License](../../DMS_MIT_Permissions_Conditions_Limitations.png)
-
-MIT: with a license and copyright notice, and a promotion and advertising notice.  See the [LICENSE](../../LICENSE) for details.
-
-## DMS UI Contributions and Contact
-
-This is an unsupported open-source repository that was published to share the code base with those that may benefit from its public availability.  We are initiating engagement with the broader dispute resolution marketplace to seek open-source sharing and contribution opportunities.  Our intent is to create a community of suitable co-investors and contributors that will achieve significant cost savings and technological innovation through open-source sharing.  If you are a resolution organization interested in leveraging the DMS solution, please contact Hive One through our justice services web site www.hive1-js.com and we will add you to our list that we are vetting for suitability as the second and third movers (that will be critical to the establishment a viable and sustainable community).

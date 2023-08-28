@@ -9,7 +9,7 @@ const loaderChannel = Radio.channel('loader');
 export default AvailableHearingListItemView.extend({
 
   initialize(options) {
-    this.mergeOptions(options, ['hearingModel', 'parentModalView']);
+    this.mergeOptions(options, ['hearingModel', 'parentModalView', 'deleteAfterReschedule']);
 
     this.resultsCollection = this.model.collection;
     AvailableHearingListItemView.prototype.initialize.call(this, options);
@@ -41,7 +41,7 @@ export default AvailableHearingListItemView.extend({
 
     dfdHearingModel.done(() => {
       this.hearingModel.trigger('close:modal');
-      const confirmationModal = new ModalHearingRescheduleConfirmView({ model: this.hearingModel, rescheduleHearingModel: this.model });
+      const confirmationModal = new ModalHearingRescheduleConfirmView({ model: this.hearingModel, rescheduleHearingModel: this.model, deleteAfterReschedule: this.deleteAfterReschedule });
       modalChannel.request('add', confirmationModal);
       loaderChannel.trigger('page:load:complete');
     })

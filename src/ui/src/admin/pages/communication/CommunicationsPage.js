@@ -90,16 +90,16 @@ export default PageView.extend({
       noticeChannel.request('load', dispute_guid),
       hearingChannel.request('load', dispute_guid),
       statusChannel.request('load:status', dispute_guid)
-      ).done(() => {
+    ).done(() => {
+      this.communications_loaded = true;
+      this.render();
+    })
+    .fail(
+      generalErrorFactory.createHandler('ADMIN.COMMUNICATIONS.LOAD', () => {
         this.communications_loaded = true;
         this.render();
       })
-      .fail(
-        generalErrorFactory.createHandler('ADMIN.COMMUNICATIONS.LOAD', () => {
-          this.communications_loaded = true;
-          this.render();
-        })
-      );
+    );
   },
 
   onRender() {

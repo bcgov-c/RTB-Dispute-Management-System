@@ -7,7 +7,7 @@ namespace CM.Business.Entities.Models.ScheduleRequest;
 public class ScheduleRequestPatchRequest
 {
     [JsonProperty("request_owner")]
-    public int RequestOwnerId { get; set; }
+    public int? RequestOwnerId { get; set; }
 
     [JsonProperty("request_type")]
     public byte RequestType { get; set; }
@@ -25,4 +25,8 @@ public class ScheduleRequestPatchRequest
     [JsonProperty("request_note")]
     [StringLength(500)]
     public string RequestNote { get; set; }
+
+    [JsonProperty("request_json")]
+    [JsonValidation]
+    public string RequestJson { get; set; }
 }

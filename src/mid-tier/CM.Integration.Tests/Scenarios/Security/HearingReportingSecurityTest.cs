@@ -52,6 +52,12 @@ public partial class SecurityTests
         var hReportingDailyResponse = HearingReportingManager.GetDailyHearings(Client, new DateTime(2050, 1, 5), new HearingReportingRequest());
         hReportingDailyResponse.CheckStatusCode();
 
+        var ownerHearingsDetailGetResponse = HearingReportingManager.GetOwnerHearingsDetail(Client, Data.HearingUsers[0].SystemUserId, new OwnerHearingsDetailRequest());
+        ownerHearingsDetailGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        var availableHearingsGetResponse = HearingReportingManager.GetAvailableHearings(Client, new AvailableHearingsRequest());
+        availableHearingsGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -63,6 +69,12 @@ public partial class SecurityTests
 
         hReportingDailyResponse = HearingReportingManager.GetDailyHearings(Client, new DateTime(2050, 1, 5), new HearingReportingRequest());
         hReportingDailyResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        ownerHearingsDetailGetResponse = HearingReportingManager.GetOwnerHearingsDetail(Client, Data.HearingUsers[0].SystemUserId, new OwnerHearingsDetailRequest());
+        ownerHearingsDetailGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        availableHearingsGetResponse = HearingReportingManager.GetAvailableHearings(Client, new AvailableHearingsRequest());
+        availableHearingsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -77,6 +89,12 @@ public partial class SecurityTests
         hReportingDailyResponse = HearingReportingManager.GetDailyHearings(Client, new DateTime(2050, 1, 5), new HearingReportingRequest());
         hReportingDailyResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        ownerHearingsDetailGetResponse = HearingReportingManager.GetOwnerHearingsDetail(Client, Data.HearingUsers[0].SystemUserId, new OwnerHearingsDetailRequest());
+        ownerHearingsDetailGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        availableHearingsGetResponse = HearingReportingManager.GetAvailableHearings(Client, new AvailableHearingsRequest());
+        availableHearingsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -88,5 +106,11 @@ public partial class SecurityTests
 
         hReportingDailyResponse = HearingReportingManager.GetDailyHearings(Client, new DateTime(2050, 1, 5), new HearingReportingRequest());
         hReportingDailyResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        ownerHearingsDetailGetResponse = HearingReportingManager.GetOwnerHearingsDetail(Client, Data.HearingUsers[0].SystemUserId, new OwnerHearingsDetailRequest());
+        ownerHearingsDetailGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        availableHearingsGetResponse = HearingReportingManager.GetAvailableHearings(Client, new AvailableHearingsRequest());
+        availableHearingsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }

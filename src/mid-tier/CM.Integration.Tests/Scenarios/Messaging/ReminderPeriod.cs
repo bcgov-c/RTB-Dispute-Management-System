@@ -8,5 +8,17 @@ public enum ReminderPeriod
 
     ParticipatoryHearingReminderPeriod = 3,
 
-    ParticipatoryEmergRespondentEvidenceReminderPeriod = 5
+    ParticipatoryEmergRespondentEvidenceReminderPeriod = 5,
+
+    MhvAppCnFirstScheduleReminderPeriod = 30,
+
+    MhvAppNotLinkedFirstScheduleReminderPeriod = 30,
+
+    MhvAppLinkedFirstScheduleReminderPeriod = 30,
+
+    MhvAppCnFinalScheduleReminderPeriod = 10,
+
+    MhvAppNotLinkedFinalScheduleReminderPeriod = 10,
+
+    MhvAppLinkedFinalScheduleReminderPeriod = 10
 }

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Modal that contains functionality for selecting a file through file explorer or drag and drop, and uploading file. Also contains description and file title renaming.
+ * TODO: unclear if this was supposed to be the base for ModalAddFiles? possible refactor opportunity? If not then additional description should be added here to differentiate the two add file modals, E.G When should one be used vs other.
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../modals/ModalBase';
 import FilesView from '../../files/Files';
@@ -250,6 +254,14 @@ export default ModalBaseView.extend({
 
     return is_valid;
   },
+
+  /**
+   * @param {FileCollection} files - file collection to add files to
+   * @param {Object} [processing_options] - can pass in the following processing options: videoFileTypes|allowedFileTypes|invalidFileTypes|maxVideoFileSize|maxNonVideoFileSize|minFileSize //TODO: refactor to camelCase
+   * @param {} description //TODO: unused?
+   * @param {FileCollection} [inUseFiles] - checks the file selected in file upload against passed in file list for duplicates
+   * @param {Boolean} [showDelete] - Displays delete button to remove displayed files in file upload
+  */
 
   initialize(options) {
     this.mergeOptions(options, ['files', 'title', 'processing_options', 'description',

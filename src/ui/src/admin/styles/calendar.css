@@ -28,7 +28,7 @@
   background-size: 17px 17px!important;
   cursor: pointer;
   height: 100%;
-  width: 18px;
+  width: 16px;
   margin: 3px -2px;
 }
 
@@ -83,6 +83,7 @@
 .today-calendar-grid-time-item .calendar-grid-time-item--block-start-offset,
 .today-calendar-grid-time-item .calendar-grid-time-item--block-end-offset { margin-top: 0; }
 
+.today-calendar-grid-event-container { position: absolute; }
 .today-calendar-grid-event-container > div {
   float: left;
   margin: -2px 0 -8px 0px;
@@ -153,6 +154,7 @@
     height: 38px;
 }
 
+.today-calendar-grid-time-ul { position: relative; }
 .calendar-header-time-ul, .calendar-grid-time-ul, .today-calendar-grid-time-ul {
     display: flex;
     list-style: none;
@@ -214,8 +216,10 @@
 .calendar-grid-time-item--block-start-offset.other,
 .calendar-grid-time-item--block-end-offset.other { background-color: #cfcfcf; }
 
-.calendar-grid-time-item--block-start-offset { height:100%; margin-top: -20px; width:50%; margin-left:50%; }
-.calendar-grid-time-item--block-end-offset { height:100%; margin-top: -20px; width:50%; }
+.calendar-grid-time-item--block-start-offset { height:100%; width:50%; float:right; }
+.calendar-grid-time-item--block-end-offset { height:100%; width:50%; float:left; }
+
+.calendar-grid-time-item--block-offsets { width:100%; height: 100%; }
 
 .calendar-header-time-item-container{ color: #808080!important; float: right; font-size: 16px; }
 .calender-grid-container { margin: 0px; width: 100%; position: sticky; }
@@ -239,17 +243,19 @@
 
 .calendar-grid-label-item--disabled { color: #c84b4b; text-decoration: line-through; font-style: italic; }
 
+.calendar-grid-event-container  { position: absolute; }
 .calendar-grid-event-container > div {
     float: left;
-    margin: -22px 0 -13px -1px;
+    /*margin: -22px 0 -13px -1px;*/
+    margin: -2px 0 0 -1px;
     padding: 5px 0px;
     text-align: left;
     width: 100%;
     max-height: 38px;
     z-index: 10;
 }
-.calendar-grid-event { height: 30px; padding: 5px 5px 5px 10px; position: relative; border-right: 1px solid white; }
-.calendar-grid-event-container--today > div { margin-top: -20px!important; }
+.calendar-grid-event { display: flex; height: 30px; padding: 5px 5px 5px 10px; position: relative; border-right: 1px solid white; }
+.calendar-grid-event-container--today > div { margin-top: 0; }
 .calendar-grid-event-container--today > div > .calendar-grid-event { height: 30px!important; margin-top: -1px; }
 .calendar-grid-event-text {
   color: #ffffff!important;
@@ -263,6 +269,19 @@
   white-space: nowrap;
   overflow: hidden;
 }
+
+.calendar-on-hold-filenumber { 
+  position: relative;
+  left: -6px;
+  font-size: 15px;
+  width: 75%;
+  display: flex;
+  justify-content: center;
+  color: grey;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+ }
+    
 .calendar-grid-time-header-item--border {
   background: transparent;
   border: 4px solid #3d5a8c;
@@ -302,13 +321,18 @@ div.calendar-grid-event-floating-menu:hover + .calendar-grid-event-menu-icon { b
 .calendar-grid-event-menu-item { cursor: pointer; user-select: none; border-bottom: 1px solid #494949; color: #ffffff!important; font-size: 14px; padding: 5px 5px 5px 10px; }
 .calendar-grid-event-menu-item:hover { background-color: #9a9a9a!important; }
 
-/* Adding support for popup going the other way */
+/* Adding support for popup going other directions */
 .lower-row div.calendar-grid-event-floating-menu {
   position: absolute;
   bottom: 10px;  
   right: 0px;
   margin: 0;
   border-top: 1px solid #333;
+}
+.lower-col div.calendar-grid-event-floating-menu {
+  position: absolute;
+  border-top: 1px solid #333;
+  left: -12px;
 }
 
 .calendar-grid-link-menu {
@@ -319,7 +343,7 @@ div.calendar-grid-event-floating-menu:hover + .calendar-grid-event-menu-icon { b
   background: transparent;
   padding: 5px;
 }
-.calendar-grid-hold-img { position: relative; bottom: 3px; right: 7px; width: 25px; height: 26px; }
+.calendar-grid-hold-img { position: relative; bottom: 0; right: 7px; width: 18px; height: 19px; }
 .calendar-grid-link-menu img { width: 12px!important; }
 .calendar-grid-link-menu-icon { background-color: #666666!important; cursor: pointer; color: #ffffff!important; height: 30px!important; position: absolute; left: 0px; top: 2px; padding: 3px 5px; z-index: 9; }
 .calendar-grid-link-menu-icon:hover { background-color: #666666!important; }

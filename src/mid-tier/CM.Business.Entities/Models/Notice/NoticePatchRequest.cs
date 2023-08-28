@@ -9,26 +9,6 @@ public class NoticePatchRequest
     [JsonProperty("parent_notice_id")]
     public int? ParentNoticeId { get; set; }
 
-    [JsonProperty("notice_file1_id")]
-    [Range(1, int.MaxValue)]
-    public int? NoticeFile1Id { get; set; }
-
-    [JsonProperty("notice_file2_id")]
-    [Range(1, int.MaxValue)]
-    public int? NoticeFile2Id { get; set; }
-
-    [JsonProperty("notice_file3_id")]
-    [Range(1, int.MaxValue)]
-    public int? NoticeFile3Id { get; set; }
-
-    [JsonProperty("notice_file4_id")]
-    [Range(1, int.MaxValue)]
-    public int? NoticeFile4Id { get; set; }
-
-    [JsonProperty("notice_file5_id")]
-    [Range(1, int.MaxValue)]
-    public int? NoticeFile5Id { get; set; }
-
     [JsonProperty("notice_title")]
     [Required]
     [StringLength(100)]
@@ -76,4 +56,16 @@ public class NoticePatchRequest
     [JsonProperty("notice_delivered_to_other")]
     [StringLength(100)]
     public string NoticeDeliveredToOther { get; set; }
+
+    [JsonProperty("has_service_deadline")]
+    public bool? HasServiceDeadline { get; set; }
+
+    [JsonProperty("service_deadline_days")]
+    public int? ServiceDeadlineDays { get; set; }
+
+    [JsonProperty("service_deadline_date")]
+    public DateTime? ServiceDeadlineDate { get; set; }
+
+    [JsonProperty("second_service_deadline_date")]
+    public DateTime? SecondServiceDeadlineDate { get; set; }
 }

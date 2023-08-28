@@ -12,5 +12,5 @@ public interface IFactDisputeSummaryRepository : IDwRepository<DataWarehouseData
 
     Task<DataWarehouseDataModel.Models.FactDisputeSummary> GetByFileNumber(Guid disputeGuid);
 
-    Task<List<Guid>> GetDelayedDisputes(int dateDelay);
+    Task<List<Guid>> GetAllDisputes();
 }

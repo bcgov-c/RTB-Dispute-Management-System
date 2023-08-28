@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Model containing helper functions used for parsing and setting ARI and PFR data
+ */
 import Backbone from 'backbone';
 
 export default Backbone.Model.extend({

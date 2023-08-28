@@ -25,13 +25,15 @@ const ModalExternalLogin = ModalBaseView.extend({
     const daExternalEvidence = configChannel.request('get', 'EXTERNAL_DA_ACTION_EVIDENCE');
     const daExternalNotice = configChannel.request('get', 'EXTERNAL_DA_ACTION_NOTICE');
     const daExternalSubServ = configChannel.request('get', 'EXTERNAL_DA_ACTION_SUBSERV');
+    const daExternalReinstate = configChannel.request('get', 'EXTERNAL_DA_ACTION_REINSTATEMENT');
     this.actionNameDisplays = {
       [daExternalContact]: 'I want to update my contact information',
       [daExternalEvidence]: 'I want to submit evidence',
       [daExternalNotice]: 'I want to record the service of notice to respondents',
-      [daExternalSubServ]: 'I want to submit a request for substituted service'
+      [daExternalSubServ]: 'I want to submit a request for substituted service',
+      [daExternalReinstate]: 'I want to request to reinstate my dispute',
     };
-    this.showDates = this.model.get('extActionId') === daExternalEvidence;
+    this.showDates = this.model.get('extActionId') === daExternalEvidence && this.model.get('extSiteId') === configChannel.request('get', 'MAINTENANCE_SYSTEM_ID_OFFICE');
     this.isDateRequired = false;
 
     this.createSubModels();

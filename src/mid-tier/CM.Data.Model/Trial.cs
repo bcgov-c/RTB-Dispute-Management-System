@@ -11,6 +11,8 @@ public class Trial : BaseEntity
 
     public Guid? AssociatedTrialGuid { get; set; }
 
+    public Trial AssociatedTrial { get; set; }
+
     public bool OptinRequired { get; set; }
 
     public byte TrialType { get; set; }
@@ -53,4 +55,6 @@ public class Trial : BaseEntity
     public virtual ICollection<TrialIntervention> TrialInterventions { get; set; }
 
     public virtual ICollection<TrialOutcome> TrialOutcomes { get; set; }
+
+    public virtual ICollection<Trial> RelatedTrials { get; set; }
 }

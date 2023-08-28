@@ -19,5 +19,9 @@ public class EmailAttachmentMapping : Profile
         CreateMap<Data.Model.EmailAttachment, PickupEmailAttachmentResponse>()
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<Data.Model.EmailAttachment, ExternalEmailAttachmentResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
     }
 }

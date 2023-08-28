@@ -24,7 +24,7 @@ import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/theme.css';
 import 'jquery-ui/themes/base/datepicker.css';
-import 'trumbowyg/dist/ui/trumbowyg.min.css';
+import 'trumbowyg/dist/ui/trumbowyg.css';
 import 'trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 import 'trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
 import 'trumbowyg/dist/plugins/history/trumbowyg.history.min.js';
@@ -68,6 +68,9 @@ import '../core/components/email/EmailsManager';
 import '../core/components/dispute-flags/DisputeFlagManager';
 import { loadAndCheckMaintenance } from '../core/components/maintenance/MaintenanceChecker';
 import '../core/components/trials/TrialsManager';
+import '../core/components/hearing/HearingsManager';
+import '../core/components/notice/NoticeManager';
+import '../core/components/documents/DocumentsManager';
 
 import AppRouter from './routers/app_router';
 import { IntakeRouter } from './routers/intake_router';
@@ -78,6 +81,12 @@ import DisputeListPageView from './pages/dispute-list/DisputeListPage';
 import LoginView from './pages/login/Login';
 import IntakeView from './pages/intake/Intake';
 import { ApplicationBaseModelMixin } from '../core/components/app/ApplicationBase';
+
+import IntakeDisputeView from './pages/dispute-viewer/IntakeDisputeView';
+import { IntakeDisputeViewRouter } from './routers/intake_dispute_view_router';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
+import ModalModalIVDInfo from './pages/dispute-viewer/ModalIVDInfo';
+import UtilityMixin from '../core/utilities/UtilityMixin';
 
 // Add site name
 var g = window || global;
@@ -103,6 +112,7 @@ const _hotReloadDependencies = [
   '../core/components/timers/TimerManager',
   '../core/components/status/StatusManager',
   '../core/components/payments/PaymentManager',
+  '../core/components/dispute-flags/DisputeFlagManager',
   '../core/components/maintenance/MaintenanceChecker',
   './routers/app_router',
   './routers/intake_router',
@@ -127,6 +137,11 @@ const sessionChannel = Radio.channel('session');
 const paymentsChannel = Radio.channel('payments');
 const applicationChannel = Radio.channel('application');
 const trialsChannel = Radio.channel('trials');
+const emailsChannel = Radio.channel('emails');
+const hearingChannel = Radio.channel('hearings');
+const documentsChannel = Radio.channel('documents');
+const noticeChannel = Radio.channel('notice');
+const flagsChannel = Radio.channel('flags');
 
 const config_paths = [
   // Deployment site variables
@@ -138,6 +153,8 @@ const config_paths = [
   require('../core/config/required_intake_questions.json'),
   require('../core/config/config_status_rules.json'),
   require('../core/config/config_flags.json'),
+  require('../core/config/config_subservice.json'),
+  require('../core/config/config_outcome_docs.json'),
 ];
 
 const HEADER_TITLE_TEXT = `Residential Tenancies - Application&nbsp;<span class="mobile-sub-banner">for Dispute Resolution</span>`
@@ -173,6 +190,7 @@ const AppModel = Backbone.Model.extend({
     applicationChannel.reply('load:dispute:minimal', this.loadDisputeMinimal, this);
     applicationChannel.reply('load:dispute:full', this.loadDisputeFull, this);
     applicationChannel.reply('load:dispute:full:promise', this.loadDisputeFullPromise, this);
+    applicationChannel.reply('load:ivd:data', this.loadIvdData, this);
     applicationChannel.reply('clear', this.clearLoadedInfo, this);
     applicationChannel.reply('add:scroll', this.addOnScroll, this);
     applicationChannel.reply('remove:scroll', this.removeOnScroll, this);
@@ -217,6 +235,10 @@ const AppModel = Backbone.Model.extend({
     paymentsChannel.request('clear');
     menuChannel.request('clear');
     trialsChannel.request('clear');
+    hearingChannel.request('clear');
+    noticeChannel.request('clear');
+    documentsChannel.request('clear');
+    emailsChannel.request('clear');
   },
 
   minimumLoadTimePromise() {
@@ -248,7 +270,25 @@ const AppModel = Backbone.Model.extend({
     const geozoneChannel = Radio.channel('geozone');
     const dfd = $.Deferred();
 
-    $.when(
+    // Setup login and logout listeners - they will be triggered when `mixin_checkSiteVersionAndLogin` runs
+    this.listenTo(sessionChannel, 'login:complete', (options={}) => {
+      sessionChannel.request('clear:timers');
+      sessionChannel.request('create:timers');  
+
+      if (!options?.skip_routing) {
+        loaderChannel.trigger('page:load');
+        Backbone.history.navigate('list', { trigger: true });  
+      }
+    });
+    this.listenTo(sessionChannel, 'logout:complete', () => {
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('_dmsPaymentToken');
+      localStorage.removeItem('_dmsDaAuthToken');
+      sessionChannel.request('clear:timers');
+      applicationChannel.request('clear');
+    });
+    
+    $.whenAll(
       this.loadConfigs()
         .then(geozoneChannel.request.bind(geozoneChannel, 'load'), () => sessionChannel.trigger('redirect:config:error'))
         .then(_.bind(this.mixin_checkSiteVersionAndLogin, this)),
@@ -341,6 +381,27 @@ const AppModel = Backbone.Model.extend({
     }).fail(dfd.reject);
 
     return dfd.promise();
+  },
+
+  async loadIvdData(disputeGuid) {
+    await applicationChannel.request('load:dispute:full:promise', disputeGuid);
+    const applicantIds = [...participantsChannel.request('get:applicants')?.models, ...participantsChannel.request('get:removed')?.filter(participant => participant.isApplicant())]?.map(p => p.id);
+    return Promise.all([
+      hearingChannel.request('load:external', disputeGuid),
+      
+      noticeChannel.request('load:external', disputeGuid),
+      noticeChannel.request('load:subservices:external', disputeGuid),
+
+      documentsChannel.request('load:requests:external', disputeGuid),
+
+      emailsChannel.request('load:external', disputeGuid, applicantIds),
+      emailsChannel.request('load:receipts:external', disputeGuid, applicantIds),
+
+      flagsChannel.request('load',disputeGuid),
+
+      filesChannel.request('load:commonfiles:external'),
+      documentsChannel.request('load:external', disputeGuid, applicantIds),
+    ]);
   },
 
   /**
@@ -526,7 +587,7 @@ const AppModel = Backbone.Model.extend({
   loadClaimGroupParticipants(dispute_guid) {
     const dfd = $.Deferred();
 
-    participantsChannel.request('load', dispute_guid).then(claimGroupParticipantsResponse => {
+    participantsChannel.request('load', dispute_guid).then(([claimGroupParticipantsResponse]) => {
       if (!claimGroupParticipantsResponse || !claimGroupParticipantsResponse.length) {
         console.log("[Info] Creating claim group");
         this.checkAndCreateClaimGroup()
@@ -686,34 +747,43 @@ const App = Marionette.Application.extend({
     });
   },
 
+  initializeEventsAndAnimations() {
+    $.initializeCustomAnimations({
+      scrollableContainerSelector: '#intake-content'
+    });
+    $.initializeDatepickerScroll();
+  },
+
   initializeSiteDependentData() {
     paymentsChannel.request('set:transaction:site:source', configChannel.request('get', 'PAYMENT_TRANSACTION_SITE_SOURCE_INTAKE'));
   },
 
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
-    this.initializeViews(IntakeView);
+    this.initializeEventsAndAnimations();
+    this.initializeViews(IntakeView, IntakeDisputeView);
     this.initializeRoutersAndRouteListeners();
     this.model.mixin_checkClientTimeSyncAndLogout();
+    AnalyticsUtil.initializeAnalyticsTracking();
   },
 
-  initializeViews(intakeViewClass) {
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_INTAKE')
+    });
+  },
+
+  initializeViews(intakeViewClass, disputeViewClass) {
     this.showView(new RootLayout({ model: this, showHeader: true, showFooter: true, headerText: HEADER_TITLE_TEXT, showHeaderProblemButton: true }));
     this.intakeView = new intakeViewClass({ parent: this });
+    if (disputeViewClass) this.intakeDisputeView = new disputeViewClass({ parent: this });
 
     // Once the views have been initialized, setup the modal container
     modalChannel.request('render:root');
   },
 
-  onLoginComplete(options) {
-    options = options || {};
-    sessionChannel.request('clear:timers');
-    sessionChannel.request('create:timers');
-
-    if (options.skip_routing) {
-      return;
-    }
-
+  showDefaultView() {
     Backbone.history.navigate('list', { trigger: true });
   },
 
@@ -721,8 +791,7 @@ const App = Marionette.Application.extend({
   initializeRoutersAndRouteListeners() {
     new AppRouter({ controller: this });
     this.intakeViewRouter = new IntakeRouter({ controller: this.intakeView });
-
-    this.listenTo(sessionChannel, 'login:complete', this.onLoginComplete, this);
+    this.intakeDisputeViewRouter = new IntakeDisputeViewRouter({ controller: this.intakeDisputeView });
 
     // Go to correct page on load
     this.listenTo(applicationChannel, 'dispute:loaded:full', function(disputeModel) {
@@ -741,14 +810,6 @@ const App = Marionette.Application.extend({
       }
     }, this);
 
-    this.listenTo(sessionChannel, 'logout:complete', function() {
-      localStorage.removeItem('authToken');
-      sessionStorage.removeItem('_dmsPaymentToken');
-      localStorage.removeItem('_dmsDaAuthToken');
-      sessionChannel.request('clear:timers');
-      applicationChannel.request('clear');
-    });
-
     Backbone.history.start();
   },
 
@@ -765,10 +826,19 @@ const App = Marionette.Application.extend({
     menuChannel.trigger('disable:mobile');
     // Clear any existing dispute
     applicationChannel.request('clear');
+    const renderIVDModal = () => {
+      if (!Boolean(UtilityMixin.util_getCookie("hasSeenPortalNotificaton"))) {
+        let maxExpiry = new Date();
+        maxExpiry.setMonth( maxExpiry.getMonth() + 12 );//set token expiry to save token on browser close
+        UtilityMixin.util_setCookie({ cookie: 'hasSeenPortalNotificaton=true', expiryDate: maxExpiry.toUTCString() });
+        modalChannel.request('add', new ModalModalIVDInfo());
+      }
+    }
     // Load the disputes list and show page
     disputeChannel.request('load:disputes', { creationMethod: configChannel.request('get', 'DISPUTE_CREATION_METHOD_INTAKE') })
       .done((disputeListCollection) => {
         loaderChannel.trigger('page:load:complete');
+        renderIVDModal();
         this.renderMainContent(new DisputeListPageView({
           total_available_records: disputeListCollection.totalAvailable,
           collection: disputeListCollection
@@ -803,9 +873,11 @@ const App = Marionette.Application.extend({
   },
 
   showIntakeView() {
-    // Keep IntakeView around since it is the controller for the router
-    // Render it each time
     this.renderMainContent( this.intakeView.render() );
+  },
+
+  showIntakeDisputeView() {
+    this.renderMainContent( this.intakeDisputeView.render() );
   },
 
   /* Functions for the router to test the intake page for completeness and handle re-routing */
@@ -842,9 +914,12 @@ const _webpackSetupHotModuleReloadHandlers = () => {
     console.log(`[DMS_HMR] Re-loading intake view..`);
 
     // Re-initialize IntakeView with the newly imported intake view
-    app.initializeViews(IntakeView);
+    app.initializeViews(IntakeView, IntakeDisputeView);
     if (app.intakeViewRouter) {
       app.intakeViewRouter.changeController(app.intakeView);
+    }
+    if (app.intakeDisputeViewRouter) {
+      app.intakeDisputeViewRouter.changeController(app.intakeDisputeView);
     }
 
     Backbone.history.loadUrl(Backbone.history.fragment);

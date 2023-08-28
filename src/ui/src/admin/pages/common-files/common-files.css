@@ -58,6 +58,7 @@
 
 .common-files-checkbox {
   margin-right: 20px;
+  margin-left: 10px;
 }
 
 .common-files-checkbox-label {
@@ -100,15 +101,9 @@
 
 .file-display-name {
   font-size: 17px;
-  cursor: pointer;
   margin: 0 5px;
   text-overflow: ellipsis;
   overflow: hidden;
-}
-
-.file-display-name:hover {
-  text-decoration: underline;
-  color: #23527c;
 }
 
 .file-display-created {

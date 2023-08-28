@@ -4,7 +4,6 @@ using CM.Business.Entities.Models.SchedulePeriod;
 using CM.Business.Services.SchedulePeriod;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 

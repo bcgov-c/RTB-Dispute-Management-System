@@ -30,5 +30,5 @@ public class OfficeUserPatchDisputeResponse
     public int? SubmittedBy { get; set; }
 
     [JsonProperty("tenancy_address_validated")]
-    public byte? TenancyAddressValidated { get; set; }
+    public bool? TenancyAddressValidated { get; set; }
 }

@@ -8,6 +8,7 @@ import ExternalParticipantModel from '../../../../evidence/components/external-a
 import { ReceiptContainer } from '../../../../core/components/receipt-container/ReceiptContainer';
 import ViewMixin from '../../../../core/utilities/ViewMixin';
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
+import ApplicantViewDispute from '../../../../core/components/ivd/ApplicantViewDispute';
 
 const emailsChannel = Radio.channel('emails');
 const configChannel = Radio.channel('config');
@@ -188,13 +189,14 @@ const ReviewPageStepThreeAndFour = Marionette.View.extend({
     const isLandlord = !this.participant || this.participant.isLandlord();
     const isApplicant = this.participant && this.participant.isApplicant();
     const participantInitials = this.participant && this.participant.getInitialsDisplay() ? this.participant.getInitialsDisplay()  : '-';
+    const showIVDReceiptLanguage = ApplicantViewDispute.isIvdEnabled();
     const { docRequestModel } = this.receiptData;
 
     return (
       <>
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 10px 0px' }}>
-          The following was submitted to the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
-        </p>
+        The following was submitted to the Residential Tenancy Branch.{showIVDReceiptLanguage ? <span> You can view your submitted request and outcome by <a href={configChannel.request('get', 'INTAKE_URL')} target="_blank" rel="noopener noreferrer">logging in online with the BceID that was used to create this application</a>.</span> : ''} For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
+	    </p>
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px' }}> <span className="er-label" style={{ padding: '0px 5px 0px 0px', color: '#8d8d8d' }}>File number: </span>&nbsp; <b>{this.dispute.get('file_number')}</b></p>
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px' }}> <span className="er-label" style={{ padding: '0px 5px 0px 0px', color: '#8d8d8d' }}>Access code: </span>&nbsp; <b>{this.dispute.get('accessCode')}</b></p>
         <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px' }}> <span className="er-label" style={{ padding: '0px 5px 0px 0px', color: '#8d8d8d' }}>Added for: </span>&nbsp; { isApplicant ? 'Applicant' : 'Respondent'} { isLandlord ? 'Landlord' : 'Tenant' } - Initials { participantInitials }</p>
@@ -280,7 +282,7 @@ const ReviewPageStepThreeAndFour = Marionette.View.extend({
           {renderJsxStepOneQuestionOne()}
           <p className="er-subheader" style={{borderBottom: '1px solid #e3e3e3', margin: '25px 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}><span className="er-darktext" style={{ color: '#292929' }}>Unable to attend due to circumstances outside of your control? <b>&nbsp;{stepTwoQuestionOneData.questionModel.getData() === YES_CODE ? 'Yes' : 'No'}</b> </span></p>
           {renderJsxStepTwoQuestionOne()}
-          <p className="er-subheader" style={{borderBottom: '1px solid #e3e3e3', margin: '25px 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}><span className="er-darktext" style={{ color: '#292929' }}>New relevant evidence not available at time of hearing? <b>&nbsp;{stepTwoQuestionTwoData.questionModel.getData() === YES_CODE ? 'Yes' : 'No'}</b> </span></p>
+          <p className="er-subheader" style={{borderBottom: '1px solid #e3e3e3', margin: '25px 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}><span className="er-darktext" style={{ color: '#292929' }}>New and relevant evidence not available at time of hearing? <b>&nbsp;{stepTwoQuestionTwoData.questionModel.getData() === YES_CODE ? 'Yes' : 'No'}</b> </span></p>
           {renderJsxStepTwoQuestionTwo()}
           <p className="er-subheader" style={{borderBottom: '1px solid #e3e3e3', margin: '25px 0px 10px 0px', padding: '5px 5px 2px 0px', color: '#8d8d8d' }}><span className="er-darktext" style={{ color: '#292929' }}>False information was submitted? <b>&nbsp;{stepTwoQuestionThreeData.questionModel.getData() === YES_CODE ? 'Yes' : 'No'}</b> </span></p>
           {renderJsxStepTwoQuestionThree()}

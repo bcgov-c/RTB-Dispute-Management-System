@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays participation information for a hearing participant
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import DropdownView from '../../../core/components/dropdown/Dropdown';
@@ -61,6 +64,10 @@ export default Marionette.View.extend({
     return return_obj;
   },
 
+  /**
+   * @param {String} viewMode - view|edit triggers the UI to change between edit and display mode
+   * @param {UnitModel} matchingUnit
+   */
   initialize(options) {
     this.mergeOptions(options, ['viewMode', 'matchingUnit']);
 
@@ -120,13 +127,15 @@ export default Marionette.View.extend({
     });
 
     this.participantOtherName = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Participant Full Name',
       errorMessage: `Please enter participant full name`,
       required: true,
       maxLength: this.HEARING_PARTICIPATION_NAME_MAX_LENGTH,
       value: this.model.get('other_participant_name'),
-      apiMapping: 'other_participant_name'
+      apiMapping: 'other_participant_name',
+      maxWords: configChannel.request('get', 'HEARING_PARTICIPANT_MAX_NUM_WORDS'),
     });
 
     this.participantOtherTitle = new InputModel({

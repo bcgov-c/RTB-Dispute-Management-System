@@ -104,10 +104,11 @@
 
 .dashboard-dispute-optional-filters { display: flex; margin-top: 10px; margin-left: 20px; }
 
-.dashboard-source-filter { width: 210px; }
+.dashboard-process-filter { max-width: 175px; margin-right: 10px; }
+.dashboard-source-filter { max-width: 175px; }
 .dashboard-urgency-filter { margin-left: 10px; width: 130px; }
 
-.dashboard-dispute-sort { margin-left: 40px; width: 250px; }
+.dashboard-dispute-sort { margin-left: 20px; width: 240px; }
 .dashboard-dispute-sort > .intake-dropdown-component > div { display: flex; flex-wrap: nowrap; }
 .dashboard-dispute-sort .dropdown-display-title { white-space: nowrap; display: inline-block; margin-right: 10px; }
 

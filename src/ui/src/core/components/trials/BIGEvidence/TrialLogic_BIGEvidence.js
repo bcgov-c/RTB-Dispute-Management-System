@@ -78,6 +78,9 @@ const _addParticipantIntervention = (participantModel, interventionData={}) => {
 };
 
 const canViewArbRating = (dispute) => {
+  // DMS-7323: Never show the Arb Rating modal - Initial Trial01 has ended
+  return false;
+  
   const loggedInUser = sessionChannel.request('get:user');
   const disputeTrialModel = getDisputeTrialModel();
   if (!dispute
@@ -167,6 +170,7 @@ export default {
       const getRole = () => configChannel.request('get', isTreatment ? 'TRIAL_DISPUTE_ROLE_TREATMENT' : 'TRIAL_DISPUTE_ROLE_CONTROL');
 
       if (SHOW_TRIALS_INTAKE_CONTROL) {
+        loaderChannel.trigger('page:load:complete');
         const modalView = modalChannel.request('show:standard', {
           title: 'UAT Trial Control',
           bodyHtml: `<p>On UAT sites you can set whether an opt-in dispute file will be part of the treatment group or the control group. Once set this value cannot be modified. This feature will not appear on preprod or production environments.</p>`,
@@ -178,7 +182,10 @@ export default {
             _modalView.close();
           }
         });
-        modalView.once('removed:modal', () => res(getRole()));
+        modalView.once('removed:modal', () => {
+          loaderChannel.trigger('page:load');
+          res(getRole())
+        });
       } else {
         isTreatment = flipCoin();
         res(getRole());

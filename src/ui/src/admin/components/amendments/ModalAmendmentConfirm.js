@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Simple modal that saves amendment information upon confirm button press
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../core/components/modals/ModalBase';
 import InputModel from '../../../core/components/input/Input_model';
@@ -47,13 +50,17 @@ export default ModalBaseView.extend({
     ));
   },
 
-  initialize(options) {
+  initialize(options={}) {
     if (!options || !options.title || !options.bodyHtml) {
       const error_msg = `[Error] Missing required attributes for change amendment modal`;
       throw error_msg;
     }
-
-    this.mergeOptions(options, ['title', 'bodyHtml']);
+    /**
+     * @param {String} title
+     * @param {String} bodyHtml
+     * @param {Boolean} isRtbInitiated - Sets is_internally_initiated field
+     */
+    this.mergeOptions(options, ['title', 'bodyHtml', 'isRtbInitiated']);
     this.createAmendmentModels();
     this.setupListeners();
   },
@@ -62,23 +69,24 @@ export default ModalBaseView.extend({
     this.amendmentByModel = new DropdownModel({
       optionData: this.getAmendmentParticipantOptionData(participantChannel.request(`get:applicants`)),
       labelText: "Amendment By",
-      required: true,
       defaultBlank: true,
       value: null,
+      required: !this.isRtbInitiated,
+      cssClass: this.isRtbInitiated ? 'optional-input' : null,
       apiMapping: 'amendment_submitter_id'
     });
 
     this.amendmentRtbInitModel = new CheckboxModel({
       html: 'RTB Initiated',
       required: false,
-      checked: false,
-      apiMapping: 'is_internally_initiated'
+      checked: !!this.isRtbInitiated,
+      apiMapping: 'is_internally_initiated',
     });
 
     this.amendmentRespondentInitModel = new CheckboxModel({
       html: 'Respondent Initiated',
       required: false,
-      checked: false
+      checked: false,
     });
 
     this.amendmentNoteModel = new InputModel({
@@ -91,7 +99,7 @@ export default ModalBaseView.extend({
   },
 
   getAmendmentParticipantOptionData(participants) {
-    return (participants || []).filter(p => !p.isNew()).map(p => ({ value: p.id, text: p.getContactName() }) );
+    return (participants || []).filter(p => !p.isNew()).map(p => ({ value: String(p.id), text: p.getContactName() }) );
   },
 
   setupListeners() {
@@ -99,6 +107,14 @@ export default ModalBaseView.extend({
       this.amendmentByModel.set({
         optionData: this.getAmendmentParticipantOptionData(participantChannel.request(`get:${checked ? 'respondents' : 'applicants'}`)),
         value: null,
+      });
+      this.amendmentByModel.trigger('render');
+    });
+
+    this.listenTo(this.amendmentRtbInitModel, 'change:checked', (model, checked) => {
+      this.amendmentByModel.set({
+        required: !checked,
+        cssClass: checked ? 'optional-input' : ''
       });
       this.amendmentByModel.trigger('render');
     });

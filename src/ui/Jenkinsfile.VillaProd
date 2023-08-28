@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     dotnet = 'dotnet.exe'
-    ROOT_FOLDER = '\\\\COTTAGE.dmz\\RTB-DMS_PROD$\\dms-prod\\ui'
+    ROOT_FOLDER = '\\\\COTTAGE.dmz\\RTB-DMS_PROD$\\dms-prod'
     TEMP_FOLDER = 'D:/Temp'
     BACKUP_FOLDER = 'D:/dms-build-backup'
   }
@@ -32,7 +32,15 @@ pipeline {
     stage('Build') {
       steps {
         bat 'yarn build:prod'
-        configFileProvider([configFile(fileId: 'prod-ui-configuration.json', targetLocation: 'siteconfig')]) {}
+      }
+    }
+    
+    // NOTE: siteconfig/ folder must exist in env.ROOT_FOLDER for the file to be properly moved
+    stage('Configuration') {
+      steps {
+        dir("${env.ROOT_FOLDER}"){
+          configFileProvider([configFile(fileId: 'prod-ui-configuration.json', targetLocation: 'siteconfig')]) {}
+        }
       }
     }
 
@@ -50,7 +58,15 @@ pipeline {
     stage('Backup') {
       steps {
         fileOperations([
-          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui")
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Admin", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/Admin"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/DisputeAccess", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/DisputeAccess"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Intake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/Intake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/OfficeSubmissio", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/OfficeSubmissio"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/AdditionalLandlordIntake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/AdditionalLandlordIntake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/PostedDecisions", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/PostedDecisions"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Common", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/Common"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/CeuIntake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/CeuIntake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/siteconfig", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-prod-ui/siteconfig")
         ])
       }
     }

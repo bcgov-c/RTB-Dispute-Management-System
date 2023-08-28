@@ -6,7 +6,7 @@
 
 import Marionette from 'backbone.marionette';
 import DropdownView from './Dropdown';
-//import template from './DropdownCollectionView_template.tpl';
+//import template from './DropdownCollectionView_template.tpl';//TODO: cleanup?
 
 const dropdownErrorClass = 'dropdown-error-block';
 

@@ -18,9 +18,6 @@ public sealed class FactTimeStatisticType : ObjectGraphType<FactTimeStatistic>
         Field(x => x.AssociatedDate).Description("The date that the 24 hour period relates to, e.g. 2021-01-18 ");
         Field(x => x.AssociatedDateId).Description("The ID of the associated date of the data for time grouping");
         Field(x => x.AssociatedOffice).Description("The ID of the office (1=RTB BC - PST)");
-        Field(x => x.AvgNext10DeferredHearingDays).Description("The average days until the next 10 deferred hearings are available - after 21 days from now rounded to the nearest whole days");
-        Field(x => x.AvgNext10EmergHearingDays).Description("The average days until the next 10 emergency hearings are available - after 8 days from now rounded to the nearest whole days");
-        Field(x => x.AvgNext10StandardHearingDays).Description("The average days until the next 10 standard hearings are available - after 21 days from now rounded to the nearest whole days");
         Field(x => x.ClarificationRequests).Description("The count of clarification requests that were submitted in the last day (24 hours)");
         Field(x => x.CorrectionRequests).Description("The count of correction requests that were submitted in the last day (24 hours)");
         Field(x => x.DeferredDisputesPaid).Description("The total number of deferred dispute applications paid in the last day (24 hours). ");
@@ -80,5 +77,19 @@ public sealed class FactTimeStatisticType : ObjectGraphType<FactTimeStatistic>
         Field(x => x.StatusWithdrawn).Description("The total number of disputes set to a final status of withdrawn in the last day (24 hours)");
         Field(x => x.SubServicesSubmitted).Description("The total number of substituted service applications submitted in last day (24 hours)");
         Field(x => x.TenantDisputesPaid).Description("The total number of tenant disputes applications paid in the last day (24 hours)");
+        Field(x => x.Stage2UnassignedDeferred, true).Description("The total number of Stage 2 unassigned disputes where the dispute urgency is deferred");
+        Field(x => x.Stage2UnassignedStandard, true).Description("The total number of Stage 2 unassigned disputes where the dispute urgency is standard");
+        Field(x => x.Stage2UnassignedUrgent, true).Description("The total number of Stage 2 unassigned disputes where the dispute urgency is urgent");
+        Field(x => x.WaitTimeDaysDeferred, true).Description("The days from today + 23 days from now for service, on which, if all current deferred unassigned disputes were booked, the next available deferred hearing slot is available and a new dispute could be booked – if the system cannot cannot calculate this it will store 0");
+        Field(x => x.WaitTimeDaysStandard, true).Description("The days from today + 23 days from now for service, on which, if all current deferred unassigned disputes were booked, the next available deferred hearing slot is available and a new dispute could be booked – if the system cannot cannot calculate this it will store 0");
+        Field(x => x.WaitTimeDaysUrgent, true).Description("The days from today + 10 days from now for service, on which, if all current deferred unassigned disputes were booked, the next available deferred hearing slot is available and a new dispute could be booked – if the system cannot cannot calculate this it will store 0");
+        Field(x => x.NonParticipatoryWaitingDecision, true).Description("The total number of non-participatory disputes that are currently waiting for an adjudicator decision at the time the loader ran.");
+        Field(x => x.NonParticipatoryWaitingDecisionOldest, true).Description("The age of the oldest StatusStartDate in the NonParticipatoryWaitingDecision List at the time the loader ran.");
+        Field(x => x.NonParticipatoryClosed, true).Description("The total number of non-participatory disputes that were closed in the last 24 hours");
+        Field(x => x.StatusAdjourned, true).Description("The count of disputes were adjourned in the last 24 hours");
+        Field(x => x.ParticipatoryWaitArsDeadline, true).Description("A count of participatory files in waiting proof of service status at the time the loader ran");
+        Field(x => x.ParticipatoryMissArsDeadline, true).Description("A count of total participatory files that transitioned from 4:41 to 4:93 in the past 24 hours");
+        Field(x => x.ParticipatoryWaitReinstateDeadline, true).Description("A count of participatory files in an adjourned applicant inaction status at the time the loader ran");
+        Field(x => x.ParticipatoryMissReinstateDeadline, true).Description("A count of the total participatory files that transitioned from 4:93 to 4:90 in the past 24 hours.");
     }
 }

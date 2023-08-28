@@ -1,46 +1,50 @@
 using System.Threading;
-using CM.Business.Entities.Models.CronJobHistory;
-using CM.Business.Services.CronJobHistory;
-using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Serilog;
 
 namespace CM.Scheduler.Task.Infrastructure;
 
 public class JobListener : IJobListener
 {
-    public JobListener(IServiceScopeFactory serviceScopeFactory)
+    public JobListener(ILogger logger)
     {
-        ServiceScopeFactory = serviceScopeFactory;
+        Logger = logger;
     }
 
-    public string Name => "JobListenerName";
+    public string Name => "MainJobListener";
 
-    private IServiceScopeFactory ServiceScopeFactory { get; }
+    private ILogger Logger { get; }
 
-    public System.Threading.Tasks.Task JobToBeExecuted(IJobExecutionContext context, CancellationToken cancellationToken = default)
+    public System.Threading.Tasks.Task JobToBeExecuted(IJobExecutionContext context, CancellationToken cancellationToken = new())
     {
+        Logger.Warning("Job {JobName} is about to be executed", context.JobDetail.Key.Name);
         return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    public System.Threading.Tasks.Task JobExecutionVetoed(IJobExecutionContext context, CancellationToken cancellationToken = default)
+    public System.Threading.Tasks.Task JobExecutionVetoed(IJobExecutionContext context, CancellationToken cancellationToken = new())
     {
+        Logger.Warning("Job {JobName} was vetoed", context.JobDetail.Key.Name);
         return System.Threading.Tasks.Task.CompletedTask;
     }
 
-    public System.Threading.Tasks.Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken cancellationToken = default)
+    public System.Threading.Tasks.Task JobWasExecuted(
+        IJobExecutionContext context,
+        JobExecutionException jobException,
+        CancellationToken cancellationToken = new())
     {
-        using var scope = ServiceScopeFactory.CreateScope();
-
-        var service = scope.ServiceProvider.GetRequiredService<ICronJobHistoryService>();
-
-        var request = new CronJobRequest
+        if (jobException != null)
         {
-            JobStart = context.FireTimeUtc.DateTime,
-            JobRunTime = context.JobRunTime,
-            JobName = context.JobDetail.Key.Name,
-            JobResult = context.Result != null && (bool)context.Result
-        };
-        service.CreateAsync(request);
+            Logger.Error(jobException.InnerException,
+                "Job {JobName} was failed in {JobRunTime} seconds",
+                context.JobDetail.Key.Name,
+                context.JobRunTime.TotalSeconds);
+
+            return System.Threading.Tasks.Task.CompletedTask;
+        }
+
+        Logger.Warning("Job {JobName} was executed in {JobRunTime} seconds",
+            context.JobDetail.Key.Name,
+            context.JobRunTime.TotalSeconds);
 
         return System.Threading.Tasks.Task.CompletedTask;
     }

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all admin amendments. Includes functionality for changing of any party or claim info. 
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import DisputeModel from '../../../core/components/dispute/Dispute_model';
@@ -181,8 +184,9 @@ const AmendmentsManager = Marionette.Object.extend({
     const oldAddressDisputeModel = new DisputeModel(_.extend( disputeModel.toJSON(), disputeModel.getApiSnapshotOfData() ));
     return this._createAmendment(_.extend({
       amendment_change_html: _.template(amendment_config.change_html_template)({
-        oldAddress: oldAddressDisputeModel.getAddressStringWithUnit(),
-        newAddress: disputeModel.getAddressStringWithUnit()
+        oldAddress: oldAddressDisputeModel.getFullAddressString(),
+        newAddress: disputeModel.get('tenancy_address') ? disputeModel.getFullAddressString() : `<i>Address removed</i>`,
+        
       })
     }, amendment_config, other_amendment_data));
   },
@@ -208,7 +212,7 @@ const AmendmentsManager = Marionette.Object.extend({
     return this._createAmendment(_.extend({
       amendment_change_html: _.template(amendment_data.change_html_template)({
         oldValue: oldPartyModel.getAddressStringWithUnit(),
-        newValue: partyModel.getAddressStringWithUnit(),
+        newValue: partyModel.get('address') ? partyModel.getAddressStringWithUnit() : `<i>Address removed</i>`,
         applicantDisplay: partyModel.getDisplayName()
       })
     }, amendment_data));
@@ -221,7 +225,7 @@ const AmendmentsManager = Marionette.Object.extend({
     return this._createAmendment(_.extend({
       amendment_change_html: _.template(amendment_data.change_html_template)({
         oldValue: oldPartyModel.hasMailAddress() ? oldPartyModel.getMailingAddressString() : null,
-        newValue: partyModel.getMailingAddressString(),
+        newValue: partyModel.hasMailAddress() ? partyModel.getMailingAddressString() : `<i>Mailing address removed</i>`,
         applicantDisplay: partyModel.getDisplayName()
       })
     }, amendment_data));

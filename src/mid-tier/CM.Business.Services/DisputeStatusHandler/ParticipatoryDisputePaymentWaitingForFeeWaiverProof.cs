@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using CM.Business.Services.Base;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
@@ -34,7 +35,7 @@ public class ParticipatoryDisputePaymentWaitingForFeeWaiverProof : DisputeTransi
             AssignedTemplateId = AssignedTemplate.ParticipatoryDisputePaymentWaitingForFeeWaiverProof
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -66,7 +67,7 @@ public class ParticipatoryDisputePaymentWaitingForFeeWaiverProof2 : DisputeTrans
             AssignedTemplateId = AssignedTemplate.ParticipatoryDisputePaymentWaitingForFeeWaiverProof
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -98,6 +99,6 @@ public class ParticipatoryDisputePaymentWaitingForFeeWaiverProof3 : DisputeTrans
             AssignedTemplateId = AssignedTemplate.ParticipatoryDisputePaymentWaitingForFeeWaiverProof
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }

@@ -65,11 +65,12 @@ const IntakeAriPagePaymentReceipt = PageView.extend({
       emailSubject: `File number ${dispute.get('file_number')}: ${RECEIPT_TITLE} Receipt`,
       containerTitle: RECEIPT_TITLE,
       displayHtml: this.receiptPageHtml(),
-      hideSubmissionText: true,
+      hideSubmissionText: false,
       emailUpdateParticipantId: primaryApplicant ? primaryApplicant.id : null,
       autoSendEmail: false,
       participantSaveModel: ParticipantModel,
-      messageSubType: configChannel.request('get', activePayment.isApproved() ? 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_PAID' : 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_UNPAID')
+      messageSubType: configChannel.request('get', activePayment.isApproved() ? 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_PAID' : 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_UNPAID'),
+      displayJunkMailMsg: true,
     }));
   },
 

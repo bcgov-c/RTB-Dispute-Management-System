@@ -11,7 +11,6 @@ using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -100,6 +99,17 @@ public class NoticeController : BaseController
             }
         }
 
+        if (request.HasServiceDeadline.HasValue && request.HasServiceDeadline.Value &&
+            (!request.ServiceDeadlineDays.HasValue && !request.ServiceDeadlineDate.HasValue))
+        {
+            return BadRequest(ApiReturnMessages.DeliveryDeadlineIssue);
+        }
+
+        if (request.SecondServiceDeadlineDate.HasValue && request.SecondServiceDeadlineDate <= DateTime.UtcNow)
+        {
+            return BadRequest(ApiReturnMessages.SecondServiceDeadlineDateIssue);
+        }
+
         DisputeSetContext(disputeGuid);
         var newNotice = await _noticeService.CreateAsync(disputeGuid, request);
         EntityIdSetContext(newNotice.NoticeId);
@@ -164,6 +174,24 @@ public class NoticeController : BaseController
                 }
             }
 
+            var hasServiceDeadline = notice.GetValue<bool?>("/has_service_deadline");
+            if (hasServiceDeadline.Exists && hasServiceDeadline.Value.Value)
+            {
+                var serviceDeadlineDays = notice.GetValue<int?>("/service_deadline_days");
+                var serviceDeadlineDate = notice.GetValue<DateTime?>("/service_deadline_date");
+                if (((!serviceDeadlineDays.Exists || !serviceDeadlineDays.Value.HasValue) && !originalNotice.ServiceDeadlineDays.HasValue) &&
+                    ((!serviceDeadlineDate.Exists || !serviceDeadlineDate.Value.HasValue) && !originalNotice.ServiceDeadlineDate.HasValue))
+                {
+                    return BadRequest(ApiReturnMessages.DeliveryDeadlineIssue);
+                }
+            }
+
+            var secondServiceDeadlineDate = notice.GetValue<DateTime?>("/second_service_deadline_date");
+            if (secondServiceDeadlineDate.Exists && secondServiceDeadlineDate.Value.HasValue && secondServiceDeadlineDate.Value <= DateTime.UtcNow)
+            {
+                return BadRequest(ApiReturnMessages.SecondServiceDeadlineDateIssue);
+            }
+
             await DisputeResolveAndSetContext(_noticeService, noticeId);
             _mapper.Map(noticeToPatch, originalNotice);
             var result = await _noticeService.PatchAsync(originalNotice);
@@ -218,6 +246,25 @@ public class NoticeController : BaseController
     public async Task<IActionResult> GetByDisputeGuid(Guid disputeGuid)
     {
         var notices = await _noticeService.GetByDisputeGuidAsync(disputeGuid);
+        if (notices != null)
+        {
+            return Ok(notices);
+        }
+
+        return NotFound();
+    }
+
+    [HttpGet("/api/externaldisputenotices/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalDisputeNotices(Guid disputeGuid)
+    {
+        var disputeExists = await _disputeService.DisputeExistsAsync(disputeGuid);
+        if (!disputeExists)
+        {
+            return BadRequest(ApiReturnMessages.InvalidDisputeGuid);
+        }
+
+        var notices = await _noticeService.GetExternalDisputeNotices(disputeGuid);
         if (notices != null)
         {
             return Ok(notices);

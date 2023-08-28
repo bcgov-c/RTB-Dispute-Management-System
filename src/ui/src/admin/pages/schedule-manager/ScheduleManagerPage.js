@@ -21,6 +21,7 @@ import { routeParse } from '../../routers/mainview_router';
 import './schedule-manager.scss';
 import HeaderImg from '../../static/Icon_Header_CommonFiles.png';
 import BulkAddImg from '../../static/Icon_WS_BulkAdd.png';
+import HearingGenerationImg from '../../static/Icon_WS_Generate.png'
 import AddSMIcon from '../../static/Icon_AdminPage_AddSMReq.png';
 
 const MANAGER_CODE_ALL = '0';
@@ -392,7 +393,6 @@ const ScheduleManagerPage = PageView.extend({
     this._updateRouting('schedule_manager_requests_item');
     const scheduleRequestsPage = new MyScheduleRequestPage({
       tableView: ScheduleManagerRequestsTable,
-      filterToCurrentUser: false,
       getCurrentFilters: () => this.getScheduleRequestFilters(),
     });
     this.listenToOnce(scheduleRequestsPage.scheduleRequestCollection, 'update:view', () => {
@@ -562,6 +562,11 @@ const ScheduleManagerPage = PageView.extend({
         <div className="sm-page__working-sched__bulk-add-blocks hidden-item">
           <div className="sm-page__working-sched__bulk-add-blocks__btn" onClick={() => this.model.trigger('show:bulk')}>
             <img src={BulkAddImg} /><span>Bulk Add Blocks</span>
+          </div>
+        </div>
+        <div className="sm-page__working-sched__hearing-generation">
+          <div className="sm-page__working-sched__hearing-generation__btn" onClick={() => this.model.trigger('show:hearingGeneration')}>
+            <img src={HearingGenerationImg} /><span>Hearing Generation</span>
           </div>
         </div>
       </>

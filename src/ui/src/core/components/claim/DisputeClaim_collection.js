@@ -32,6 +32,41 @@ export default Backbone.Collection.extend({
 
     this.claim_source = options.claim_source;
     this.remedy_source = options.remedy_source;
+    
+    this.multi_unit_issue_codes = [
+      "ARI_E_ISSUE_CODE",
+      "ARI_C_ISSUE_CODE",
+      "PFR_ISSUE_CODE",
+    ].map(c => configChannel.request('get', c)).filter(a => a);
+    this.op_issue_codes = [...(configChannel.request('get', 'tenant_cn_issue_codes')||[]), ...(configChannel.request('get', 'landlord_op_issue_codes')||[])];
+    this.mn_issue_codes = configChannel.request('get', 'mn_issue_codes');
+    this.other_issue_codes = configChannel.request('get', 'other_issue_codes');
+  },
+
+  comparator(model) {
+    // Sort order:
+    // Any multi-unit issues (ARI-C, PFR, ARI-E,)
+    // Possession (OP, CN)
+    // Monetary (MN) (no fee recovery issues)
+    // Other (misc)
+    // Fee Recovery (FFL, FFT)
+    // NOTE: Each category also has a left-right sort for each issue. This is the order they appear in the "_codes" list
+    const SORT_OFFSETS = {
+      UNIT: 1000,
+      POSSESSION: 2000,
+      MONETARY: 3000,
+      OTHER: 4000,
+      FEE_RECOVERY: 5000,
+      _FALLBACK: 6000,
+    };
+    const claimCode = model?.claim?.get('claim_code');
+    if (this.multi_unit_issue_codes?.includes(claimCode)) return SORT_OFFSETS.UNIT+this.multi_unit_issue_codes?.indexOf(claimCode);
+    else if (this.op_issue_codes?.includes(claimCode)) return SORT_OFFSETS.POSSESSION+this.op_issue_codes?.indexOf(claimCode);
+    else if (this.mn_issue_codes?.includes(claimCode)) return SORT_OFFSETS.MONETARY+this.mn_issue_codes?.indexOf(claimCode);
+    else if (this.other_issue_codes?.includes(claimCode)) return SORT_OFFSETS.OTHER+this.other_issue_codes?.indexOf(claimCode);
+    else if (model.isFeeRecovery()) return SORT_OFFSETS.FEE_RECOVERY;
+    else if (Number.isInteger(claimCode)) return SORT_OFFSETS.FEE_RECOVERY - 1; // If no matches, return the issue at the end, just before fee recovery
+    else return SORT_OFFSETS._FALLBACK;
   },
 
   getTotalAmountClaimed() {
@@ -96,9 +131,9 @@ export default Backbone.Collection.extend({
   },
 
 
-  createClaimWithRemedy(dispute_claim_data) {
+  createClaimWithRemedy(dispute_claim_data={}, remedy_data={}) {
     const disputeClaimModel = this.createClaim(dispute_claim_data);
-    disputeClaimModel.addRemedy(this.getEmptyRemedyData());
+    disputeClaimModel.addRemedy(Object.assign({}, this.getEmptyRemedyData(), remedy_data));
     return disputeClaimModel;
   },
 

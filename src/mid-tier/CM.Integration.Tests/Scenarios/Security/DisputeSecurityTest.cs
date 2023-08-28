@@ -14,6 +14,8 @@ public partial class SecurityTests
     [Fact]
     public void CheckDisputeSecurity()
     {
+        var disputeUserId = 0;
+
         // LOGIN AS STAFF
         Client.Authenticate(Users.Admin, Users.Admin);
 
@@ -44,6 +46,14 @@ public partial class SecurityTests
         var disputeIntakeQuestionGetResponse = DisputeManager.GetIntakeQuestion(Client, Data.IntakeQuestion.DisputeGuid);
         disputeIntakeQuestionGetResponse.CheckStatusCode();
 
+        var disputeUsersGetResponse = DisputeManager.GetDisputeUsers(Client, Data.Disputes[0].DisputeGuid);
+        disputeUsersGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        var disputeUserPatchResponse = DisputeManager.UpdateDisputeUser(Client, disputeUsersGetResponse.ResponseObject[0].DisputeUserId, new DisputeUserPatchRequest() { IsActive = true });
+        disputeUserPatchResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        disputeUserId = disputeUsersGetResponse.ResponseObject[0].DisputeUserId;
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -73,6 +83,12 @@ public partial class SecurityTests
 
         disputeIntakeQuestionGetResponse = DisputeManager.GetIntakeQuestion(Client, Data.IntakeQuestion.DisputeGuid);
         disputeIntakeQuestionGetResponse.CheckStatusCode();
+
+        disputeUsersGetResponse = DisputeManager.GetDisputeUsers(Client, Data.Disputes[0].DisputeGuid);
+        disputeUsersGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        disputeUserPatchResponse = DisputeManager.UpdateDisputeUser(Client, disputeUserId, new DisputeUserPatchRequest() { IsActive = true });
+        disputeUserPatchResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS UNAUTHORIZED EXTERNAL USER //
         Client.Authenticate(Users.User2, Users.User2);
@@ -129,6 +145,12 @@ public partial class SecurityTests
         disputeIntakeQuestionGetResponse = DisputeManager.GetIntakeQuestion(Client, Data.IntakeQuestion.DisputeGuid);
         disputeIntakeQuestionGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        disputeUsersGetResponse = DisputeManager.GetDisputeUsers(Client, Data.Disputes[0].DisputeGuid);
+        disputeUsersGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        disputeUserPatchResponse = DisputeManager.UpdateDisputeUser(Client, disputeUserId, new DisputeUserPatchRequest() { IsActive = true });
+        disputeUserPatchResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -158,5 +180,11 @@ public partial class SecurityTests
 
         disputeIntakeQuestionGetResponse = DisputeManager.GetIntakeQuestion(Client, Data.IntakeQuestion.DisputeGuid);
         disputeIntakeQuestionGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        disputeUsersGetResponse = DisputeManager.GetDisputeUsers(Client, Data.Disputes[0].DisputeGuid);
+        disputeUsersGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        disputeUserPatchResponse = DisputeManager.UpdateDisputeUser(Client, disputeUserId, new DisputeUserPatchRequest() { IsActive = true });
+        disputeUserPatchResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 }

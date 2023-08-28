@@ -1,0 +1,495 @@
+{
+  "LANDING_REPORTS__GENERAL": [{
+    "reportTitle": "ISWT_02_CurrentUnassignedTable",
+    "title": "Current Unassigned",
+    "expectedColumns": 2,
+    "expectedRows": 8,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_06_UnassignedAgeTable",
+    "title": "Unassigned Age",
+    "expectedColumns": 3,
+    "expectedRows": 6,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_01_CurrentWaitTable",
+    "title": "All Booked Estimated Wait Times",
+    "expectedColumns": 4,
+    "expectedRows": 4,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_09_AvgNext10WaitTimes",
+    "title": "Average Next 10 Avail Hearings",
+    "expectedColumns": 3,
+    "expectedRows": 4,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_11_FutureAvailHearings",
+    "title": "Future Available Hearings",
+    "expectedColumns": 3,
+    "expectedRows": 4,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_07_IncompleteTaskTable",
+    "title": "Incomplete Tasks",
+    "expectedColumns": 3,
+    "expectedRows": 6,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_10_AdjudicatorQueue",
+    "title": "Unassigned Adjudicator Queue",
+    "expectedColumns": 2,
+    "expectedRows": 2,
+    "type": "table"
+  }, {
+    "reportTitle": "ISWT_04_12WeekUnassignedGraph",
+    "title": "Historical 12-week Average Daily Unassigned Queue Size",
+    "graphColors": ["rgb(191, 150, 7)"],
+    "displayLabel": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_12WeekAvgUnassignedQueue",
+    "expectedColumns": 2,
+    "type": "line",
+    "placeholderReport": "Year-Week,AvgQueueSize\r\n0,0\r\n0,0"
+  },
+  {
+    "reportTitle": "ISWT_05_12WeekIntakeProcessingGraph",
+    "title": "Historical 12-Week Intake Processing Velocity",
+    "graphColors": ["rgb(140, 116, 31)", "rgb(187, 143, 0)", "rgb(124, 96, 0)", "rgb(20, 20, 20)"],
+    "displayLabel": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_12WeekIntakeProcessingVelocity",
+    "expectedColumns": 5,
+    "type": "line",
+    "placeholderReport": "Year-Week,PaperUpdate,OnlineUpdate,PaperDR,OnlineDR,Online,Paper,AllAvg\r\n0,0,0,0,0,0,0,0\r\n0,0,0,0,0,0,0,0"
+  },
+  {
+    "reportTitle": "ISWT_08_12WeekProcessingGraph",
+    "title": "Historical 12-Week Intake Processing Times Min (<60 min)",
+    "graphColors": ["rgb(191, 150, 7)", "rgb(250, 203, 14)", "rgb(60, 118, 184)", "rgb(73, 113, 158)", "rgb(118, 173, 64)", "rgb(84, 122, 47)", "rgb(20, 20, 20)"],
+    "displayLabel": false,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_12WeekIntakeProcessingTime",
+    "expectedColumns": 8,
+    "type": "line",
+    "placeholderReport": "Year-Week,NeedsUpdate,Withdrawn,Processed,Total\r\n0,0,0,0,0\r\n0,0,0,0,0"
+  }
+  ],
+  
+  "LANDING_REPORTS__ARB": [{
+    "reportTitle": "L2AGP_BG1-HearingsPerDayWorked",
+    "title": "Last 6 Months - Hearings per Day",
+    "displayLabel": true,
+    "showLegend": false,
+    "graphColors": ["rgb(127, 59, 1)"],
+    "downloadFilename": "DMSGraphData_HearingsPerDayWorked",
+    "expectedColumns": 5,
+    "columnsToDisplay": [0, 4],
+    "type": "bar",
+    "placeholderReport": "Username,SystemUserId,BookedHearings,ArbWorkingDays,HearPerDay\r\nArb-Avg,0,0,0,0\r\nThis-Arb,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_TG1-HearingsPerDayWorked",
+    "title": "Last 6 Months - Hearings per Day",
+    "displayLabel": true,
+    "showLegend": false,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_HearingsPerDayWorkedTrend",
+    "graphColors": ["rgb(127, 59, 1)"],
+    "expectedColumns": 6,
+    "columnsToDisplay": [0, 5],
+    "type": "line",
+    "placeholderReport": "Month,Username,SystemUserId,BookedHearings,ArbWorkingDays,HearPerDay\r\n0,This-Arb,0,0,0,0\r\n0,This-Arb,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_BG2-PercentAdjourned",
+    "title": "Last 6 Months - Percentage Adjourned",
+    "displayLabel": true,
+    "showLegend": false,
+    "graphColors": ["rgb(237, 125, 49)"],
+    "downloadFilename": "DMSGraphData_PercentageAdjourned",
+    "expectedColumns": 4,
+    "columnsToDisplay": [0, 3],
+    "type": "bar",
+    "placeholderReport": "Username,TotalHearings,UniqueHearings,PercentAdjourned\r\nArb-Avg,0,0,0\r\nThis-Arb,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_TG2-PercentAdjourned",
+    "title": "Last 6 Months - Percentage Adjourned Trend (Not ARI-C or PFR)",
+    "displayLabel": true,
+    "showLegend": false,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_PercentageAjournedTrend",
+    "graphColors": ["rgb(237, 125, 49)"],
+    "expectedColumns": 5,
+    "columnsToDisplay": [1, 4],
+    "type": "line",
+    "placeholderReport": "Username,Month,TotalHearings,UniqueHearings,PercentAdjourned\r\nThis-Arb,0,0,0,0\r\nThis-Arb,0,0,0,0\r\nThis-Arb,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_BG3-PercentGrantedCCR",
+    "title": "Last 6 Months - Percentage Granted Correction/Clarification and Review Consideration (On-line Requests Only)",
+    "displayLabel": true,
+    "downloadFilename": "DMSGraphData_PercentGrantedCCR",
+    "graphColors": ["rgb(166, 166, 166)", "rgb(38, 38, 38)"],
+    "expectedColumns": 7,
+    "columnsToDisplay": [0, 5, 6],
+    "type": "bar",
+    "placeholderReport": "Username,CorrClar,Review,TotalDecisions,AllPercent,CCPercent,RevPercent\r\nArb-Avg,0,0,0,0,0,0\r\nArbDaniel,0,0,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_TG3-PercentGrantedCCR",
+    "title": "Last 6 Months - Percentage Granted Correction/Clarification and Review Consideration Trend (On-line Requests Only)",
+    "displayLabel": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "DMSGraphData_PercentageAjournedTrend",
+    "graphColors": ["rgb(166, 166, 166)", "rgb(38, 38, 38)"],
+    "expectedColumns": 7,
+    "columnsToDisplay": [0, 5, 6],
+    "type": "line",
+    "placeholderReport": "Month,CorrClar,Review,TotalDecisions,AllPercent,CCPercent,RevPercent\r\n0,0,0,0,0,0,0\r\n0,0,0,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_BG4-DecSetsPerDayWorked",
+    "title": "Last 6 Months - Decisions per Day (Outcome Document Sets)",
+    "displayLabel": true,
+    "showLegend": false,
+    "downloadFilename": "DMSGraphData_DecSetsPerDayWorked",
+    "graphColors": ["rgb(32, 56, 100)"],
+    "expectedColumns": 4,
+    "columnsToDisplay": [0, 3],
+    "type": "bar",
+    "placeholderReport": "Username,Month,TotalHearings,UniqueHearings,PercentAdjourned\r\nThis-Arb,0,0,0,0\r\nThis-Arb,0,0,0,0\r\nThis-Arb,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_BG5-ArbIssueOutcomes",
+    "title": "Last 3 Months - Issue Outcome Percentage",
+    "displayLabel": true,
+    "showLegend": false,
+    "downloadFilename": "DMSGraphData_ArbIssueOutcomes",
+    "graphColors": ["rgb(192, 0, 0)", "rgb(84, 130, 53)", "rgb(166, 166, 166)", "rgb(112, 173, 71)"],
+    "expectedColumns": 6,
+    "columnsToDisplay": [1, 5],
+    "type": "bar",
+    "placeholderReport": "Username,CorrClar,Review,TotalDecisions,AllPercent,CCPercent,RevPercent\r\n0,Arb-Avg,0,0,0,0,0\r\n0,This-Arb,0,0,0,0,0"
+  }, {
+    "reportTitle": "L2AGP_BG6-ArbDaysCloseFiles",
+    "title": "Last 3 Months - Days to Close Dispute from Hearing Date",
+    "displayLabel": true,
+    "showLegend": false,
+    "downloadFilename": "DMSGraphData_ArbDaysCloseFiles",
+    "graphColors": ["rgb(56, 87, 35)", "rgb(132, 60, 12)", "rgb(127, 127, 127)"],
+    "expectedColumns": 6,
+    "columnsToDisplay": [1, 5],
+    "type": "bar",
+    "placeholderReport": "Username,CorrClar,Review,TotalDecisions,AllPercent,CCPercent,RevPercent\r\n0,Arb-Avg,0,0,0,0,0\r\n0,This-Arb,0,0,0,0,0"
+  }
+  ],
+
+  "LANDING_REPORTS__ADJ": [{
+    "reportTitle": "AdjGP_TB1-AdjudicatorQueues",
+    "title": "Adjudicator Queue",
+    "expectedColumns": 3,
+    "expectedRows": 5,
+    "type": "table"
+  }, {
+    "reportTitle": "AdjGP_BG2-VacationTrend",
+    "title": "Full 6-Month Adjudicator Vacation Days",
+    "displayLabel": true,
+    "showLegend": true,
+    "downloadFilename": "AdjGP_BG2-VacationTrend",
+    "graphColors": ["rgb(127,127, 127)", "rgb(76, 115, 199)"],
+    "expectedColumns": 3,
+    "columnsToDisplay": [0, 1, 2],
+    "type": "bar",
+    "maintainAspectRatio": false,
+    "placeholderReport": "Month,All-Adj,This-Adj\r\n0,0,0\r\n0,0,0\r\n0,0,0\r\n0,0,0\r\n0,0,0"
+  }, {
+    "reportTitle": "AdjGP_TG3-DirectRequestDecisions",
+    "title": "Full 6-Month Adjudicator Direct Request Decisions (Decided and Adjourned)",
+    "displayLabel": true,
+    "showLegend": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "AdjGP_TG3-DirectRequestDecisions",
+    "graphColors": ["rgb(73, 73, 73)", "rgb(166, 166, 166)", "rgb(68, 114, 196)", "rgb(143, 170, 220)"],
+    "expectedColumns": 5,
+    "columnsToDisplay": [0, 1, 2, 3, 4],
+    "maintainAspectRatio": false,
+    "type": "line",
+    "placeholderReport": "Month,All-Adj_LLDecisions,All-Adj_TnTDecisions,This-Adj_LLDecisions,This-Adj_TnTDecisions\r\n0,0,0,0,0\r\n0,0,0,0,0"
+  }, {
+    "reportTitle": "AdjGP_TG4-PercentAdjourned",
+    "title": "6-Month Target Adjudicator Direct Request Decisions Percent Adjourned",
+    "displayLabel": true,
+    "showLegend": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "AdjGP_TG4-PercentAdjourned",
+    "graphColors": ["rgb(191, 144, 0)", "rgb(112, 48, 160)", "rgb(255, 192, 0)", "rgb(204, 51, 153)"],
+    "expectedColumns": 9,
+    "columnsToDisplay": [0,9,10,11,12],
+    "maintainAspectRatio": false,
+    "type": "line",
+    "placeholderReport": "Month,All-Adj_LLDecided,All-Adj_LLAdjourn,All-Adj_TnTDecided,All-Adj_TnTAdjourn,This-Adj_LLDecided,This-Adj_LLAdjourn,This-Adj_TnTDecided,This-Adj_TnTAdjourn,All-Adj_%LLAdjourn,All-Adj_%TnTAdjourn,This-Adj_%LLAdjourn,This-Adj_%TnTAdjourn\r\n0,0,0,0,0,0,0,0,0,0,0,0,0\r\n0,0,0,0,0,0,0,0,0,0,0,0,0"
+  }, {
+    "reportTitle": "AdjGP_TG5-RevConSubServe",
+    "title": "Full 6-Month Review Consideration and Substituted Service Decisions",
+    "displayLabel": true,
+    "showLegend": true,
+    "displayTrendlineForLabelName": [],
+    "downloadFilename": "AdjGP_TG5-RevConSubServe",
+    "graphColors": ["rgb(166, 166, 166)", "rgb(68, 114, 196)", "rgb(89, 89, 89)", "rgb(237, 125, 49)"],
+    "expectedColumns": 5,
+    "columnsToDisplay": [0, 1, 2, 3, 4],
+    "maintainAspectRatio": false,
+    "type": "line",
+    "placeholderReport": "Month,All-AdjRevCon,This-AdjRevCon,All-AdjRevSS,This-AdjSS\r\n0,0,0,0,0\r\n0,0,0,0,0"
+  }, {
+    "reportTitle": "AdjGP_BG6_IssueOutcomes",
+    "title": "3 Month Closed Files - All vs Target Adjudicator Percent Issue Outcomes",
+    "displayLabel": true,
+    "showLegend": true,
+    "downloadFilename": "AdjGP_BG6_IssueOutcomes",
+    "graphColors": ["rgb(56, 87, 35)", "rgb(127, 127, 127)", "rgb(132, 60, 12)"],
+    "expectedColumns": 10,
+    "columnsToDisplay": [2,7,8,9],
+    "maintainAspectRatio": false,
+    "type": "bar",
+    "placeholderReport": "Username,IssueType,ConcatNameType,TotalIssues,Granted,NotDecided,DisWOLeave,Grant%,NotDecided%,DisWOLeave%\r\nAll-Adj,LLMN,All-Adj_LLMN,0,0,0,0,0.0,0,0\r\nAll-Adj,LLOP,All-Adj_LLOP,0,0,0,0,0,0.0,0.0\r\nAll-Adj,TTMN,All-Adj_TTMN,0,0,0,0,0.0,0.0,0\r\nArbDallas,LLMN,ArbDall_LLMN,0,0,0,0,0.0,0,0.0\r\nArbDallas,LLOP,ArbDall_LLOP,0,0,0,0,0,0.0,0.0\r\nArbDallas,TTMN,ArbDall_TTMN,0,0,0,0,0.0,0.0,0"
+  }
+  ],
+
+  "LANDING_REPORTS__IO": [
+    {
+      "reportTitle": "IOGP_TB1-6MonthIntakeProcessing",
+      "title": "6 Month Intake Processing",
+      "expectedColumns": 2,
+      "expectedRows": 12,
+      "type": "table"
+    },
+    {
+      "reportTitle": "IOGP_TG1-6MonthIntakeProcessingTrend",
+      "title": "This IO 6-Month Total Intake Processed Trend",
+      "displayLabel": true,
+      "showLegend": false,
+      "displayTrendlineForLabelName": [],
+      "downloadFilename": "IOGP_TG1-6MonthIntakeProcessingTrend",
+      "graphColors": ["rgb(68, 114, 196)", "rgb(89, 89, 89)"],
+      "expectedColumns": 3,
+      "columnsToDisplay": [1, 2],
+      "maintainAspectRatio": false,
+      "type": "line",
+      "placeholderReport": "Username,Month,TotalProcessed\r\nThis-IO,0,0\r\nThis-IO,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG2a-6MonthComparitiveBySource",
+      "title": "Comparitive 6-Month Percent Processed by Source",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG2a-6MonthComparitiveBySource",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 8,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,5,6,7],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "placeholderReport": "Username,TotalCount,TotalOnlineCount,TotalPaperCount,TotalOtherCount,%Online,%Paper,%Other\r\nAvg-IO,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0",
+      "type": "bar"
+    },
+    {
+      "reportTitle": "IOGP_BG2b-6MonthComparitiveByUrgency",
+      "title": "Comparitive 6-Month Percent Processed by Urgency",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG2b-6MonthComparitiveByUrgency",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 8,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,5,6,7],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,TotalCount,TotalUrgentCount,TotalStandardCount,TotalDeferCount,%Urgent,%Standard,%Defer\r\nAvg-IO,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG2c-6MonthComparitiveByHearingLinking",
+      "title": "Comparitive 6-Month Percent Processed by Hearing Linking",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG2c-6MonthComparitiveByHearingLinking",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 6,
+      "rowsToDisplay": [0,4,5,6],
+      "columnsToDisplay": [0,1,2],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,TotalCount,TotalSingleCount,TotalCrsRptCount,%Single,%CrossRepeat\r\nAvg-IO,0,0,0,0,0\r\nThis-IO,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG3-6MonthComparitiveProcessTime45m",
+      "title": "Comparitive 6-Month Percent Processed Min by Source under 45 Min",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG3-6MonthComparitiveProcessTime45m",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 10,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,7,8,9],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,OnlineCount,PaperCount,OtherCount,TotalOnlineTime,TotalPaperTime,TotalOtherTime,AvgOnlineTime,AvgPaperTime,AvgOtherTime\r\nAvg-IO,0,0,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_TG3-6MonthComparitiveProcessTrend45m",
+      "title": "This IO 6-Month IO Average Processing Min Trend By Source under 45 Min",
+      "displayLabel": true,
+      "showLegend": true,
+      "displayTrendlineForLabelName": [],
+      "downloadFilename": "IOGP_TG3-6MonthComparitiveProcessTrend45m",
+      "graphColors": ["rgb(127, 59, 1)", "rgb(190, 89, 0)"],
+      "expectedColumns": 8,
+      "columnsToDisplay": [1,6,7],
+      "maintainAspectRatio": false,
+      "type": "line",
+      "placeholderReport": "Username,Month,OnlineCount,PaperCount,TotalOnlineTime,TotalPaperTime,AvgOnlineTime,AvgPaperTime\r\nThis-IO,0,0,0,0,0,0,\r\nThis-IO,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG4-6MonthComparativeProcessOutcome",
+      "title": "Comparitive 6-Month IO Percentage Processing Outcome",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG4-6MonthComparativeProcessOutcome",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 8,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,5,6,7],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,TotalCount,ToHearingCount,WithdrawnCount,NeedsUpdateCount,%ToHear,%Withdrawn,%NeedsUpdate\r\nAvg-IO,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_TG4-6MonthProcessOutcomeTrend",
+      "title": "This IO 6-Month IO Percentage Processing Outcome Under 45 Minutes",
+      "displayLabel": true,
+      "showLegend": true,
+      "displayTrendlineForLabelName": [],
+      "downloadFilename": "IOGP_TG4-6MonthProcessOutcomeTrend",
+      "graphColors": ["rgb(124, 96, 0)","rgb(241,168,0)","rgb(187, 143, 0)"],
+      "expectedColumns": 9,
+      "columnsToDisplay": [1,6,7,8],
+      "maintainAspectRatio": false,
+      "type": "line",
+      "placeholderReport": "Username,Month,TotalCount,ToHearingCount,WithdrawnCount,NeedsUpdateCount,%ToHear,%Withdrawn,%NeedsUpdate\r\nThis-IO,0,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG5-6MonthComparativeProcessOverUnder45m",
+      "title": "6 Month Percent Processed Over/Under 45 Min",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG5-6MonthComparativeProcessOverUnder45m",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 10,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,4,5],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,TotalCount,CountOver45,CountUnder45,%Over45,%Under45\r\nAvg-IO,0,0,0,0,0\r\nThis-IO,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_TG5-6MonthOverUnder45mProcessTrend",
+      "title": "This IO 6-Month Percentage Processing Outcome Under 45 Minutes",
+      "displayLabel": true,
+      "showLegend": true,
+      "displayTrendlineForLabelName": [],
+      "downloadFilename": "IOGP_TG4-6MonthProcessOutcomeTrend",
+      "graphColors": ["rgb(184, 0, 0)","rgb(89, 130, 48)"],
+      "expectedColumns": 5,
+      "columnsToDisplay": [1, 5, 6],
+      "maintainAspectRatio": false,
+      "type": "line",
+      "placeholderReport": "Username,Month,TotalCount,CountOver45,CountUnder45,%Over45,%Under45\r\nThis-IO,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_TB6-6MonthCompleteTaskCounts",
+      "title": "6 Month Completed Tasks",
+      "expectedColumns": 2,
+      "expectedRows": 7,
+      "type": "table"
+    },
+    {
+      "reportTitle": "IOGP_TB9-2MonthNotesCounts",
+      "title": "2 Month Notes",
+      "expectedColumns": 2,
+      "expectedRows": 4,
+      "type": "table"
+    },
+    {
+      "reportTitle": "IOGP_TG6-6MonthCompleteTaskTrend",
+      "title": "6-Month Tasks Completed Trend",
+      "displayLabel": true,
+      "showLegend": false,
+      "displayTrendlineForLabelName": [],
+      "downloadFilename": "IOGP_TG6-6MonthCompleteTaskTrend",
+      "graphColors": ["rgb(68, 114, 196)"],
+      "expectedColumns": 3,
+      "columnsToDisplay": [1,2],
+      "maintainAspectRatio": false,
+      "type": "line",
+      "placeholderReport": "Username,Month,TotalTasks\r\nThis-IO,0,0\r\nThis-IO,0,0\r\nThis-IO,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG7-6MonthComparativeTaskTimes",
+      "title": "Comparitive 6-Month Under 2 Hr Task Time (Minutes)",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG7-6MonthComparativeTaskTimes",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 13,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,9,10,11,12],
+      "swapColumnsForRows": true,
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,AdjournCount,AdjournTime,SubServeCount,SubServeTime,AmendCount,AmendTime,PU-NotifyCount,PU-NotifyTime,AdjournMin,SubServeMin,PU-NotifyMin,AmendMin\r\nAvg-IO,0,0,0,0,0,0,0,0,0,0,0,0\r\nThis-IO,0,0,0,0,0,0,0,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG8-6MonthOverUnder2hTaskTrend",
+      "title": "Comparitive 6-Month Percent Under/Over 2 Hr Task Times",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG8-6MonthOverUnder2hTaskTrend",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 6,
+      "swapColumnsForRows": true,
+      "columnsToDisplay": [0,1,2],
+      "rowsToDisplay": [0,4,5],
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,TotalTasks,TasksUnder2hr,TasksOver2hr,%Under2hr,%Over2hr\r\nAvg-IO,0,0,0,0,0\r\nThis-IO,0,0,0,0,0"
+    },
+    {
+      "reportTitle": "IOGP_BG9-2MonthComparitiveNotesPerWeekDay",
+      "title": "Comparitive 2-Month Notes per Assigned Dispute File",
+      "displayLabel": true,
+      "showLegend": true,
+      "downloadFilename": "IOGP_BG9-2MonthComparitiveNotesPerWeekDay",
+      "graphColors": ["rgb(89, 89, 89)", "rgb(68, 114, 196)"],
+      "expectedColumns": 5,
+      "columnsToDisplay": [0,4],
+      "maintainAspectRatio": false,
+      "type": "bar",
+      "placeholderReport": "Username,WeekDays,CountIO,Notes,NotesPerDay\r\nAvg-IO,0,0,0,0\r\nThis-IO,0,0,0,0"
+    }
+    
+  ],
+
+  "REPORT_VIEWER__CEU_SEARCH": [{
+    "reportTitle": "CEU File Number Search"
+  }, {
+    "reportTitle": "CEU Name Search"
+  }, {
+    "reportTitle": "CEU Business Name Search"
+  }, {
+    "reportTitle": "CEU Address Search"
+  }],
+
+  "USER_WORK_REPORT__SEARCH": [{
+    "reportTitle": "User Assigned Work Search"
+  }]
+}

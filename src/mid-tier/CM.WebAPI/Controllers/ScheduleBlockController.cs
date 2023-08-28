@@ -2,13 +2,11 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.ScheduleBlock;
-using CM.Business.Services.Hearings;
 using CM.Business.Services.ScheduleBlock;
 using CM.Business.Services.SchedulePeriod;
 using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -18,7 +16,6 @@ namespace CM.WebAPI.Controllers;
 [Route("api/schedulemanager")]
 public class ScheduleBlockController : BaseController
 {
-    private readonly IHearingService _hearingService;
     private readonly IMapper _mapper;
     private readonly IScheduleBlockService _scheduleBlockService;
     private readonly ISchedulePeriodService _schedulePeriodService;
@@ -30,13 +27,11 @@ public class ScheduleBlockController : BaseController
     public ScheduleBlockController(IScheduleBlockService scheduleBlockService,
         ISchedulePeriodService schedulePeriodService,
         IUserService userService,
-        IHearingService hearingService,
         IMapper mapper)
     {
         _scheduleBlockService = scheduleBlockService;
         _schedulePeriodService = schedulePeriodService;
         _userService = userService;
-        _hearingService = hearingService;
         _mapper = mapper;
     }
 
@@ -54,11 +49,6 @@ public class ScheduleBlockController : BaseController
         if (schedulePeriod == null)
         {
             return BadRequest(ApiReturnMessages.InvalidSchedulePeriod);
-        }
-
-        if (schedulePeriod.PeriodEnd <= DateTime.UtcNow)
-        {
-            return BadRequest(ApiReturnMessages.PastSchedulePeriod);
         }
 
         if (schedulePeriod.PeriodStatus == PeriodStatus.Inactive)
@@ -88,11 +78,6 @@ public class ScheduleBlockController : BaseController
             }
         }
 
-        if (request.BlockStart < DateTime.UtcNow)
-        {
-            return BadRequest(ApiReturnMessages.PastBlockStart);
-        }
-
         if (request.BlockStart >= request.BlockEnd)
         {
             return BadRequest(ApiReturnMessages.BlockStartAfterEnd);
@@ -106,11 +91,6 @@ public class ScheduleBlockController : BaseController
         if (!(request.BlockStart.ToLocalTime().TimeOfDay >= _time1 && request.BlockStart.ToLocalTime().TimeOfDay <= _time2))
         {
             return BadRequest(ApiReturnMessages.InvalidStartLocalTimePeriod);
-        }
-
-        if (request.BlockEnd < DateTime.UtcNow)
-        {
-            return BadRequest(ApiReturnMessages.PastBlockEnd);
         }
 
         if (request.BlockEnd < schedulePeriod.PeriodStart || request.BlockEnd > schedulePeriod.PeriodEnd)
@@ -173,16 +153,6 @@ public class ScheduleBlockController : BaseController
             var(existsBlockStart, blockStartValue) = request.GetValue<string>("/block_start");
             var(existsBlockEnd, blockEndValue) = request.GetValue<string>("/block_end");
 
-            if (existsBlockStart || existsBlockEnd)
-            {
-                var hearingsExists = await _hearingService.IsAssignedHearings(originalBlock.SystemUserId, originalBlock.BlockStart);
-
-                if (hearingsExists)
-                {
-                    return BadRequest(ApiReturnMessages.AssignedHearings);
-                }
-            }
-
             if (existsBlockStart && existsBlockEnd)
             {
                 if (Convert.ToDateTime(blockEndValue) <= Convert.ToDateTime(blockStartValue))
@@ -193,11 +163,6 @@ public class ScheduleBlockController : BaseController
 
             if (existsBlockStart)
             {
-                if (Convert.ToDateTime(blockStartValue) < DateTime.UtcNow)
-                {
-                    return BadRequest(ApiReturnMessages.PastBlockStartPatch);
-                }
-
                 if (Convert.ToDateTime(blockStartValue) < originalBlock.SchedulePeriod.PeriodStart || Convert.ToDateTime(blockStartValue) > originalBlock.SchedulePeriod.PeriodEnd)
                 {
                     return BadRequest(ApiReturnMessages.ScheduleStartOutOfPeriod);
@@ -220,11 +185,6 @@ public class ScheduleBlockController : BaseController
                 {
                     return BadRequest(ApiReturnMessages.InvalidEndLocalTimePeriod);
                 }
-            }
-
-            if (originalBlock.BlockEnd <= DateTime.UtcNow)
-            {
-                return BadRequest(ApiReturnMessages.PastBlockPatch);
             }
 
             if (originalBlock.SchedulePeriod.PeriodStatus == PeriodStatus.Inactive)
@@ -264,7 +224,7 @@ public class ScheduleBlockController : BaseController
             if (result != null)
             {
                 EntityIdSetContext(scheduleBlockId);
-                return Ok(_mapper.Map<Data.Model.ScheduleBlock, ScheduleBlockPatchResponse>(result));
+                return Ok(result);
             }
         }
 
@@ -283,21 +243,9 @@ public class ScheduleBlockController : BaseController
 
         var scheduleBlock = await _scheduleBlockService.GetNoTrackingScheduleBlockAsync(scheduleBlockId);
 
-        if (scheduleBlock.BlockStart <= DateTime.UtcNow)
-        {
-            return BadRequest(ApiReturnMessages.PastBlockDelete);
-        }
-
         if (scheduleBlock.SchedulePeriod.PeriodStatus == PeriodStatus.Inactive)
         {
             return BadRequest(ApiReturnMessages.InactiveSchedulePeriod);
-        }
-
-        var hearingsExists = await _hearingService.IsAssignedHearings(scheduleBlock.SystemUserId, scheduleBlock.BlockStart);
-
-        if (hearingsExists)
-        {
-            return BadRequest(ApiReturnMessages.AssignedHearings);
         }
 
         var result = await _scheduleBlockService.DeleteAsync(scheduleBlockId);

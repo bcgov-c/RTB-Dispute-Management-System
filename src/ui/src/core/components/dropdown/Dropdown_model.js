@@ -6,6 +6,19 @@
 
 import Backbone from 'backbone';
 
+/**
+ * @param {Function} [beforeClick] - Callback function that is returned before click function is executed
+ * @param {Object[]} optionData - Object array containing name (optional), value (required), cssClass (optional), text (required)
+ * @param {String|Number|Boolean} [value] - Active value displayed in the dropdown - value must be one of the dropdown options
+ * @param {String} [labelText] - Label that sits above dropdown
+ * @param {Boolean} [defaultBlank] - If false the first entry in the dropdown will be displayed, otherwise blank will be shown 
+ * @param {Boolean} [clearWhenHidden] TODO: unused?
+ * @param {String} [customLink] - Displays clickable custom link above dropdown
+ * @param {Function} [customLinkFn] - Callback function for when customLink is clicked
+ * @param {Boolean} [showRemovalButton] - Shows removal button that removes items from dropdown
+ * @param {Boolean} [displayTitle] - Title above dropdown and label
+ */
+
 export default Backbone.Model.extend({
   defaults: {
     beforeClick: null,

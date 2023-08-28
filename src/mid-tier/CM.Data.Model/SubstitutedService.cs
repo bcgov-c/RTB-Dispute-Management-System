@@ -9,6 +9,8 @@ public class SubstitutedService : BaseEntity
 
     public Guid DisputeGuid { get; set; }
 
+    public Dispute Dispute { get; set; }
+
     public bool? IsDeleted { get; set; }
 
     public int ServiceByParticipantId { get; set; }

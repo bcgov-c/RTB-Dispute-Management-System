@@ -16,8 +16,13 @@ export default Marionette.CollectionView.extend({
   childViewOptions() {
     return {
       baseName: this.getOption('baseName'),
+      noHeader: this.getOption('noHeader'),
       enableUnitType: this.getOption('enableUnitType'),
       enableKnownContact: this.getOption('enableKnownContact'),
+      enablePackageMethod: this.getOption('enablePackageMethod'),
+      packageMethodOptional: this.getOption('packageMethodOptional'),
+      disableEmailOptOut: this.getOption('disableEmailOptOut'),
+      hideAddressLink: this.getOption('hideAddressLink'),
     };
   },
 

@@ -272,6 +272,7 @@ export default {
       .done(() => {
         noticeFileDescription.save()
           .done(() => {
+            filesChannel.request('add:filedescription', noticeFileDescription);
             this.model.set({ notice_file_description_id: noticeFileDescription.id })
             dfd.resolve(noticeFileDescription)
           })

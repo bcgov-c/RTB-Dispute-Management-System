@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays a list of matching disputes related to search querry
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';

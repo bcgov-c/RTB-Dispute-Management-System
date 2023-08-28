@@ -13,8 +13,15 @@ import ModalAmendmentConfirmView from '../../components/amendments/ModalAmendmen
 import ModalManageSubServiceView from './modals/ModalManageSubService';
 import DoubleSelectorModel from '../../../core/components/double-selector/DoubleSelector_model';
 import DoubleSelectorView from '../../../core/components/double-selector/DoubleSelector';
+import IconAddressNotVerified from '../../../core/static/Icon_Admin_AddressNotVerified.png';
+import IconAddressVerified from '../../../core/static/Icon_Admin_AddressVerified.png'
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import Backbone from 'backbone';
+import Email_model from '../../../core/components/email/Email_model';
+import EmailTemplateFormatter from '../../../core/components/email/EmailTemplateFormatter';
+import Editor_model from '../../../core/components/editor/Editor_model';
+import EditorView from '../../../core/components/editor/Editor';
+import ModalManualVerification from '../../../core/components/email-verification/ModalManualVerification';
 
 const claimsChannel = Radio.channel('claims');
 const filesChannel = Radio.channel('files');
@@ -27,6 +34,7 @@ const modalChannel = Radio.channel('modals');
 const noticeChannel = Radio.channel('notice');
 const Formatter = Radio.channel('formatter').request('get');
 const sessionChannel = Radio.channel('session');
+const emailsChannel = Radio.channel('emails');
 
 export default Marionette.View.extend({
   template,
@@ -95,7 +103,7 @@ export default Marionette.View.extend({
     const files = filesChannel.request('get:files');
     const modal = new ModalAmendmentConfirmView({
       title: `Delete ${this.model.getDisplayName()}?`,
-      bodyHtml: `<p>Warning - this will remove <b>${this.model.getDisplayName()}</b> and store the change as an amendment.  Amendments must be served to responding parties.  After removing this participant, they will be indicated as removed through amendment in the dispute view, but will no longer be viewable there.  Any evidence associated to this participant will still be visible in the evidence view but it will be displayed as removed.`
+      bodyHtml: `<p>Warning - this will remove <b>${this.model.getDisplayName()}</b> and store the change as an amendment.  Amendments must be served to responding parties unless they are RTB Initiated.  After removing this participant, they will be indicated as removed through amendment in the dispute view, but will no longer be viewable there.  Any evidence associated to this participant will still be visible in the evidence view but it will be displayed as removed.`
         + `&nbsp;Once removed, this participant will be removed from the dispute view and listed at the top as removed.  This action cannot be undone.</p>`
         + `<p>Associated evidence: <b>${files.filter(f => {
           const fileDescriptions = filesChannel.request('get:filedescriptions:from:file', f);        
@@ -291,6 +299,137 @@ export default Marionette.View.extend({
     }));
   },
 
+  async onMenuEmailVerificationInstructions() {
+    modalChannel.request('show:standard', {
+      title: 'Send Email Confirmation Instructions',
+      bodyHtml: `<p>This process will send email confirmation instructions to your email: <b>${this.model.get('email')}</b></p>`,
+      continueButtonText: 'Close',
+      onContinue: async (modalView) => {
+        modalView.close();
+
+        loaderChannel.trigger('page:load');
+        await emailsChannel.request('load:templates');
+        this.generateAndSendEmail()
+          .then(() => modalChannel.request('show:standard', {
+            modalCssClasses: 'email-verification-instructions',
+            title: 'Email Confirmation Instructions',
+            bodyHtml: `<p>Email Confirmation Instructions have been sent to: <b>${this.model.get('email')}</b></p>`,
+            continueButtonText: 'Close',
+            hideCancelButton: true,
+            onContinue(modalView) { modalView.close() }
+          }))
+          .catch(generalErrorFactory.createHandler('ADMIN.EMAIL.SEND'))
+          .finally(() => loaderChannel.trigger('page:load:complete'));
+      }
+    });
+  },
+
+  onMenuEmailManualVerification() {
+    const modalManualVerification = new ModalManualVerification({ participant: this.model });
+
+    modalChannel.request('add', modalManualVerification);
+    
+    this.listenTo(modalManualVerification, 'removed:modal', () => {
+      loaderChannel.trigger('page:load');
+      this.model.fetch().always(() => {
+        this.render();
+        loaderChannel.trigger('page:load:complete');
+      })
+    });
+  },
+
+  // TODO: Should generating an email with content be centralized?
+  // Seems like a lot of boilerplate actions needed to format the content to sent
+  generateAndSendEmail() {
+    const templateModel = emailsChannel.request('get:templates').find(t => t.get('assigned_template_id') === configChannel.request('get', 'EMAIL_TEMPLATE_EMAIL_VERIFICATION_INSTRUCTIONS'));
+    if (!templateModel) return;
+
+    const emailModel = new Email_model({
+      assigned_template_id: this.templateId,
+      message_type: configChannel.request('get', 'EMAIL_MESSAGE_TYPE_CUSTOM'),
+      send_status: configChannel.request('get', 'EMAIL_SEND_STATUS_UNSENT'),
+      is_active: false,
+      dispute_guid: this.dispute.id,
+      email_from: configChannel.request('get', 'EMAIL_FROM_DEFAULT'),
+      email_to: this.model.get('email'),
+      participant_id: this.model.id,
+      recipient_group: templateModel.get('default_recipient_group'),
+      
+      // TODO: This fallback can be removed once using real instructions template
+      subject: EmailTemplateFormatter.applyConversionsTo(templateModel.get('subject_line')||'') || `VERIFICATION TEST`,
+    });
+
+    const prepareEmailForSend = () => {
+      const emailContentModel = new Editor_model({
+        required: true,
+        withTable: true,
+        isEmailable: true,
+        disabled: true,
+        value: null
+      });
+  
+      const editorView = new EditorView({ model: emailContentModel }).render();
+      EmailTemplateFormatter.load(EmailTemplateFormatter.getEmailContentFromHtml(templateModel.get('template_html')));
+      let htmlToUse = '';
+      try {
+        htmlToUse = EmailTemplateFormatter.getMergedHtml();
+      } catch (err) {
+        htmlToUse = '';
+      }
+      emailContentModel.trigger('update:input', htmlToUse);
+      const messageContent = editorView.prepareEmailForSend();
+      const fullMessageHtml = templateModel.get('template_html');
+      
+      const tempEle = $('<div></div>');
+      tempEle.append($(fullMessageHtml));
+      const mainContent = tempEle.find(`.${EmailTemplateFormatter.EMAIL_CONTENT_CLASS}`);
+      mainContent.html(messageContent);
+      tempEle.find(`.${EmailTemplateFormatter.EMAIL_ONLY_CLASS}`).css('display' ,'block');
+      let finalHtmlToSave = `<html className="en">${tempEle.html()}</html>`;
+      finalHtmlToSave = EmailTemplateFormatter.applyConversionsTo(finalHtmlToSave);
+      
+      emailModel.set('html_body', finalHtmlToSave);
+
+      return emailModel;
+    };
+
+    // Email attachments
+    const createEmailAttachmentsPromise = () => {
+      const attachmentsToCreate = [];
+      // Add all common file attachments
+      templateModel.getAttachmentCommonFileIds()?.forEach(commonFileId => {
+        attachmentsToCreate.push({
+          attachment_type: configChannel.request('get', 'EMAIL_ATTACHMENT_TYPE_COMMONFILE'),
+          common_file_id: commonFileId,
+        })
+      });
+
+      /*
+      Add any custom dispute file attachments?
+      attachmentsToCreate.push({
+        attachment_type: configChannel.request('get', 'EMAIL_ATTACHMENT_TYPE_FILE'),
+        file_id: .id
+      })
+      */
+      return Promise.all(attachmentsToCreate.map(attachment => emailModel.createAttachment(attachment)));
+    };
+
+    return new Promise((res, rej) => {
+      prepareEmailForSend(); 
+      emailModel.save()
+        .then(() => {
+          // TODO: Will template have any common files or dispute files?
+          return createEmailAttachmentsPromise();
+        })
+        .then(() => {
+          emailModel.set('is_active', true);
+          return emailModel.save(emailModel.getApiChangesOnly());
+        })
+        .then(() => res())
+        .catch(rej)
+    });
+  },
+
   _openManageSubservice() {
     loaderChannel.trigger('page:load');
     // Always refresh the subservices on click to open sub services
@@ -333,7 +472,7 @@ export default Marionette.View.extend({
       const modal = new ModalAmendmentConfirmView({
         title: `Change ${this.model.getDisplayName()}?`,
         bodyHtml: `<p>Warning - this will change <b>${this.model.getDisplayName()}</b>, and store the change as an amendment.`
-          + `&nbsp;Amendments must be served to responding parties.</p>`
+          + `&nbsp;Amendments must be served to responding parties unless they are RTB Initiated.</p>`
           + `<p>Are you sure you want to make this amendment?`,
       });
   
@@ -373,6 +512,7 @@ export default Marionette.View.extend({
   },
 
   onMenuAmendMailingAdd() {
+    this.mailAddressEditModel.set({ isOptional: false });
     this.switchToAmendState(this.amendAddMailingEditGroup);
   },
 
@@ -386,6 +526,10 @@ export default Marionette.View.extend({
 
   onMenuEditPostNotice() {
     this.switchToPostNoticeEditState();
+  },
+
+  onMenuCancel() {
+    this.mailAddressEditModel.set({ isOptional: true });
   },
 
   switchToAmendState(amendEditGroup) {
@@ -580,6 +724,7 @@ export default Marionette.View.extend({
     });
 
     this.participantBusinessContactFirstNameEditModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Business Contact First Name',
       errorMessage: `Please enter the contact's first name`,
@@ -589,6 +734,7 @@ export default Marionette.View.extend({
     });
 
     this.participantBusinessContactLastNameEditModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Business Contact Last Name',
       errorMessage: `Please enter the contact's last name`,
@@ -598,6 +744,7 @@ export default Marionette.View.extend({
     });
 
     this.participantFirstNameEditModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'First Name',
       errorMessage: `Please enter the first name`,
@@ -607,6 +754,7 @@ export default Marionette.View.extend({
     });
 
     this.participantLastNameEditModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Last Name',
       errorMessage: `Please enter the last name`,
@@ -656,15 +804,21 @@ export default Marionette.View.extend({
       province: 'province_state',
       unitType: 'unit_type',
       unitText: 'unit_text',
+      addressIsValidated: 'address_is_validated'
     };
     this.addressEditModel = new AddressModel({
       json: _.mapObject(participantAddressApiMappings, function(val) { return this.model.get(val); }, this),
       apiMapping: participantAddressApiMappings,
       name: this.cid + '-address',
-      useDefaultProvince: false,
-      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX')
+      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX'),
+      showUpdateControls: false,
+      required: true,
+      useAddressValidation: false,
+      useCPToolBackup: false,
+      selectProvinceAndCountry: true,
+      isOptional: true,
     });
-    this.addressEditModel.setToOptional();
+
     if ($.trim(this.model.get('country')) === '') {
       this.addressEditModel.get('countryDropdownModel').set('value', '');
     }
@@ -755,24 +909,38 @@ export default Marionette.View.extend({
       city: 'mail_city',
       postalCode: 'mail_postal_zip',
       country: 'mail_country',
-      province: 'mail_province_state'
+      province: 'mail_province_state',
+      addressIsValidated: 'mail_address_is_validated',
     };
     this.mailAddressEditModel = new AddressModel({
       name: this.cid + '-mailing-address',
-      useDefaultProvince: false,
       json: _.mapObject(participantMailingAddressApiMappings, function(val) { return this.model.get(val); }, this),
       apiMapping: participantMailingAddressApiMappings,
-      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX')
+      streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX'),
+      showUpdateControls: false,
+      useAddressValidation: false,
+      useCPToolBackup: false,
+      selectProvinceAndCountry: true,
+      isOptional: true,
     });
-    this.mailAddressEditModel.setToOptional();
+
     if ($.trim(this.model.get('mail_country')) === '') {
       this.mailAddressEditModel.get('countryDropdownModel').set('value', '');
     }
+
     if ($.trim(this.model.get('mail_province_state')) === '') {
       this.mailAddressEditModel.get('provinceDropdownModel').set('value', '');
     }
-    this.mailAddressEditModel.get('streetModel').set('labelText', 'Mail Street Address');
 
+    _.each(_.keys(this.mailAddressEditModel.attributes), (attr) => {
+      const mailAddressSubmodel = this.mailAddressEditModel.get(attr);
+      if (mailAddressSubmodel && mailAddressSubmodel instanceof Backbone.Model) {
+        const labelText = mailAddressSubmodel.get('labelText');
+        if (labelText) {
+          mailAddressSubmodel.set('labelText', 'Mail ' + labelText);
+        }
+      }
+    });
 
     this.touAcceptedEditModel = new DropdownModel({
       optionData: [{ value: 'false', text: 'No' }, { value: 'true', text: 'Yes' }],
@@ -804,6 +972,9 @@ export default Marionette.View.extend({
   },
 
   onRender() {
+    let partyNameDisplay = `${this.model.getDisplayName()} <span>(${this.model.getInitialsDisplay()})</span>`;
+    if (this.isHearingToolsActive) partyNameDisplay = partyNameDisplay.toUpperCase();
+
     this.showChildView('participantType', new EditableComponentView({
       state: 'view',
       label: 'Type',
@@ -816,7 +987,7 @@ export default Marionette.View.extend({
     this.showChildView('businessName', new EditableComponentView({
       state: 'view',
       label: 'Name',
-      view_value: this.getBusinessName(),
+      view_value: partyNameDisplay, // NOTE: This view value is only shown when type is business
       subView: new InputView({
         model: this.participantBusinessNameEditModel
       })
@@ -831,7 +1002,7 @@ export default Marionette.View.extend({
       })
     }));
 
-    // Only show the last name value when editting.  The full contact name is in the first name model component
+    // Only show the last name value when editing.  The full contact name is in the first name model component
     this.showChildView('businessContactLastName', new EditableComponentView({
       state: 'hidden',
       label: null,
@@ -841,21 +1012,20 @@ export default Marionette.View.extend({
       })
     }));
 
-
     this.showChildView('firstName', new EditableComponentView({
       state: 'view',
       label: 'Name',
-      view_value: !this.model.isBusiness() ? ( this.isHearingToolsActive && this.model.getContactName()? this.model.getContactName().toUpperCase() : this.model.getContactName() ) : null,
+      view_value: partyNameDisplay, // NOTE: This view value is only shown when type is individual
       subView: new InputView({
         model: this.participantFirstNameEditModel
       })
     }));
 
-    // Only show the last name value when editting.  The full contact name is in the first name model component
+    // Only show the last name value when editing.  The full contact name is in the first name model component
     this.showChildView('lastName', new EditableComponentView({
       state: 'hidden',
       label: null,
-      view_value: this.isHearingToolsActive && this.model.get('last_name')? this.model.get('last_name').toUpperCase() : this.model.get('last_name'),
+      view_value: null,
       subView: new InputView({
         model: this.participantLastNameEditModel
       })
@@ -871,17 +1041,16 @@ export default Marionette.View.extend({
     this.showChildView('addressRegion', new EditableComponentView({
       state: 'view',
       label: this.matchingUnit ? 'Unit' : null,
-      view_value: this.addressEditModel.getAddressString(),
+      view_value: this.addressEditModel.getAddressString() ? `<img class="address-validated-icon" src="${this.model.get('address_is_validated') ? IconAddressVerified : IconAddressNotVerified}" />&nbsp;${this.addressEditModel.getAddressString()}` : null,
       subView: new AddressView({
         model: this.addressEditModel
       })
     }));
 
-
     this.showChildView('emailRegion', new EditableComponentView({
       state: 'view',
       label: 'Email',
-      view_value: this.model.get('email'),
+      view_value: this.model.get('email') ? `<img class="address-validated-icon" src="${this.model.get('email_verified') ? IconAddressVerified : IconAddressNotVerified}" />&nbsp;${this.model.get('email')}` : this.model.get('email'),
       subView: new EmailView({
         model: this.participantEmailEditModel
       })
@@ -948,7 +1117,7 @@ export default Marionette.View.extend({
     this.showChildView('mailAddressRegion', new EditableComponentView({
       state: 'view',
       label: 'Mail',
-      view_value: this.model.hasMailAddress() ? this.mailAddressEditModel.getAddressString() : null,
+      view_value: this.model.hasMailAddress() ? `<img class="address-validated-icon" src="${this.model.get('mail_address_is_validated') ? IconAddressVerified : IconAddressNotVerified}" />&nbsp;${this.mailAddressEditModel.getAddressString()}` : null,
       subView: new AddressView({
         model: this.mailAddressEditModel
       })

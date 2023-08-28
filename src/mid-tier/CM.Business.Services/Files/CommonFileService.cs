@@ -8,6 +8,7 @@ using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
+using Microsoft.VisualBasic.FileIO;
 
 namespace CM.Business.Services.Files;
 
@@ -163,6 +164,31 @@ public class CommonFileService : CmServiceBase, ICommonFileService
         var file = await UnitOfWork.CommonFileRepository.GetByIdAsync(commonFileId);
 
         return file != null;
+    }
+
+    public async Task<CommonFileExternalResponse> GetExternalCommonFiles(int count, int index)
+    {
+        if (count == 0)
+        {
+            count = int.MaxValue;
+        }
+
+        var response = new CommonFileExternalResponse();
+        var(commonFiles, totalCount) = await UnitOfWork.CommonFileRepository.GetExternalFiles(count, index);
+
+        if (commonFiles != null)
+        {
+            foreach (var commonFile in commonFiles)
+            {
+                var commonFileResponse = MapperService.Map<CommonFile, ExternalCommonFile>(commonFile);
+                commonFileResponse.FileUrl = await GetFileUrl(commonFile);
+                response.ExternalCommonFiles.Add(commonFileResponse);
+            }
+
+            response.TotalAvailableRecords = totalCount;
+        }
+
+        return response;
     }
 
     private async Task<string> GetFileUrl(CommonFile file)

@@ -47,6 +47,11 @@ const IntakeReviewReceipt = Marionette.View.extend({
       model: claimsChannel.request('get:supporting')
     }));
   },
+  
+  template() {
+    return this.renderJsxReviewReceiptHtml();
+  },
+
 
   renderJsxReviewReceiptHtml() {
     const dispute = disputeChannel.request('get');
@@ -55,123 +60,12 @@ const IntakeReviewReceipt = Marionette.View.extend({
 
     const applicantTypeDisplay = isLandlordApplication ? 'Landlord' : 'Tenant';
     const actTypeDisplay = dispute.isMHPTA() ? 'MHPTA (Manufactured home or trailer)' : 'RTA (Residential)';
-    const addressDisplay = dispute.getAddressStringWithUnit();
+    const addressDisplay = dispute.getCompleteAddress();
     const tenancyStatusDisplay = isPastTenancy ? 'Tenant has moved out' : 'Tenant is still living in or renting the unit or site';
 
-    // Applicant / Respondent info:
-    const PARTICIPANT_TYPE_DISPLAY = configChannel.request('get', 'PARTICIPANT_TYPE_DISPLAY');
     const applicants = participantsChannel.request('get:applicants');
-    const primaryApplicantId = participantsChannel.request('get:primaryApplicant:id');
     const respondents = this.respondents;
     const showEdit = this.showEdit;
-
-    const renderJsxReviewApplicants = () => {
-      return (
-        applicants.map((applicant, index) =>  {
-          const isPrimary = primaryApplicantId && applicant.get('participant_id') === primaryApplicantId;
-          const isBusiness = applicant.isBusiness();
-          const typeDisplay = PARTICIPANT_TYPE_DISPLAY[applicant.get('participant_type')];
-          return <div className="clearfix" style={{ marginBottom: "20px" }} key={index}>
-            <p className="er-subheader" style={{ borderBottom: "1px solid #e3e3e3", margin: "5px 0px 10px 0px", padding: "5px 5px 2px 0px", color: "#8d8d8d" }}>{(isLandlordApplication ? 'Landlord ' : 'Tenant ') + (index+1)  }</p>
-            <div style={{ margin: "10px 10px 0 0" }}>
-              <div>
-                {isPrimary ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px'}}><strong>Primary applicant contact</strong></span></p>
-                : null }
-                <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Name:</span><b>{applicant.getDisplayName()}</b></p>
-                <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Type:</span>{typeDisplay}</p>
-                { isPrimary ?
-                <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Receive Notice of Dispute Resolution Proceeding package by:</span>{Formatter.toHearingOptionsByDisplay(applicant.get('package_delivery_method'))}</p>
-                : null }
-
-                { applicant.get('address') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>
-                    {applicant.getAddressStringWithUnit()}
-                  </p>
-                : null }
-
-                { applicant.get('mail_address') ? 
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>
-                    Mail: {applicant.getMailingAddressString()}
-                  </p>
-                : null }
-
-              </div>
-
-              <div>
-                { isBusiness ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Business Contact:</span><b>{applicant.getContactName()}</b></p>
-                : null }
-
-                { applicant.get('email') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Email:</span>{applicant.get('email')}</p>
-                : null }
-
-                { applicant.get('fax') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Fax:</span>{applicant.get('fax')}</p>
-                : null }
-
-                { applicant.get('primary_phone') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Daytime Phone:</span>{applicant.get('primary_phone')}</p>
-                : null }
-
-                { applicant.get('secondary_phone') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Other Phone:</span>{applicant.get('secondary_phone')}</p>
-                : null }
-              </div>
-            </div>
-          </div>
-         })
-      )
-    }
-
-    const renderJsxReviewRespondents = () => {
-      return (
-        respondents.map((applicant, index) => {
-          const isBusiness = applicant.isBusiness();
-          const typeDisplay = PARTICIPANT_TYPE_DISPLAY[applicant.get('participant_type')];
-          return <div className="clearfix" style={{ marginBottom: "20px" }} key={index}>
-            <p className="er-subheader" style={{ borderBottom: "1px solid #e3e3e3", margin: "5px 0px 10px 0px", padding: "5px 5px 2px 0px", color: "#8d8d8d" }}>{( isLandlordApplication ? 'Tenant ' : 'Landlord ') + (index+1)}</p>
-            <div style={{ margin: "10px 10px 0 0" }}>
-              <div>
-                <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Name:</span><b>{applicant.getDisplayName()}</b></p>
-                <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Type:</span>{typeDisplay}</p>
-
-                { applicant.get('address') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>{applicant.getAddressStringWithUnit()}</p>
-                : null }
-
-                { applicant.get('mail_address') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>{applicant.getMailingAddressString()}</p>
-                : null }
-              </div>
-
-              <div>
-                { isBusiness ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Business Contact:</span><b>{applicant.getContactName()}</b></p>
-                : null }
-
-                { applicant.get('email') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Email:</span>{applicant.get('email')}</p>
-                : null }
-
-                { applicant.get('fax') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Fax:</span>{applicant.get('fax')}</p>
-                : null }
-
-                { applicant.get('primary_phone') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Daytime Phone:</span>{applicant.get('primary_phone')}</p>
-                : null }
-
-                { applicant.get('secondary_phone') ?
-                  <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Other Phone:</span>{applicant.get('secondary_phone')}</p>
-                : null }
-              </div>
-            </div>
-          </div>
-         })
-      )
-    }
 
     return (
       <>
@@ -200,7 +94,7 @@ const IntakeReviewReceipt = Marionette.View.extend({
           { showEdit ? <a href="#page/2" className={`review-edit-button hidden-print`}>edit</a> : null }
 
           <div>
-              {renderJsxReviewApplicants()}
+            {applicants.map(this.renderJsxParty.bind(this))}
           </div>
         </div>
 
@@ -209,7 +103,7 @@ const IntakeReviewReceipt = Marionette.View.extend({
           { showEdit ? <a href="#page/4" className={`review-edit-button hidden-print`}>edit</a> : null }
 
           <div>
-            {renderJsxReviewRespondents()}
+            {respondents.map(this.renderJsxParty.bind(this))}
           </div>
         </div>
 
@@ -225,10 +119,37 @@ const IntakeReviewReceipt = Marionette.View.extend({
       </>
     )
   },
-  
-  template() {
-    return this.renderJsxReviewReceiptHtml();
-  },
+
+  renderJsxParty(participant, index) {
+    const isLandlord = participant?.isLandlord();
+    const PARTICIPANT_TYPE_DISPLAY = configChannel.request('get', 'PARTICIPANT_TYPE_DISPLAY');
+    const isBusiness = participant.isBusiness();
+    const typeDisplay = PARTICIPANT_TYPE_DISPLAY[participant.get('participant_type')];
+    const primaryApplicantId = participantsChannel.request('get:primaryApplicant:id');
+    const isPrimary = primaryApplicantId && participant.get('participant_id') === primaryApplicantId
+    return <div className="clearfix" style={{ marginBottom: "20px" }} key={index}>
+      <p className="er-subheader" style={{ borderBottom: "1px solid #e3e3e3", margin: "5px 0px 10px 0px", padding: "5px 5px 2px 0px", color: "#8d8d8d" }}>{( isLandlord ? 'Landlord ' : 'Tenant ') + (index+1)}</p>
+      <div style={{ margin: "10px 10px 0 0" }}>
+        <div>
+          {isPrimary ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px'}}><strong>Primary applicant contact</strong></span></p> : null}
+          <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Name:</span><b>{participant.getDisplayName()}</b></p>
+          <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Type:</span>{typeDisplay}</p>
+          {isBusiness ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Business Contact:</span><b>{participant.getContactName()}</b></p> : null}
+          {isPrimary ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Receive Notice of Dispute Resolution Proceeding package by:</span>{Formatter.toHearingOptionsByDisplay(participant.get('package_delivery_method'))}</p> : null}
+          {participant.get('address') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>{participant.getAddressStringWithUnit()}</p> : null}
+          {participant.get('mail_address') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}>{participant.getMailingAddressString()}</p> : null}
+        </div>
+
+        <div>
+          {participant.get('email') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Email:</span>{participant.get('email')}</p> : null}
+          {participant.get('primary_phone') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Daytime Phone:</span>{participant.get('primary_phone')}</p> : null}
+          {participant.get('secondary_phone') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Other Phone:</span>{participant.get('secondary_phone')}</p> : null}
+          {participant.get('fax') ? <p className="er-text" style={{textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 5px 0px'}}> <span className="er-label" style={{padding: '0px 5px 0px 0px', color: '#8d8d8d'}}>Fax:</span>{participant.get('fax')}</p> : null}
+        </div>
+      </div>
+    </div>
+    
+  }
 });
 
 _.extend(IntakeReviewReceipt.prototype, ViewJSXMixin);

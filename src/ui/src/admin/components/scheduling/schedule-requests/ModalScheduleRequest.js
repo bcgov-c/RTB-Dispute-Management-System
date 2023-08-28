@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal that displays fields to create a schedule request
+ */
 import Backbone from 'backbone';
 import React from 'react';
 import Radio from 'backbone.radio';

@@ -165,7 +165,7 @@ export default PageView.extend({
     const dispute = disputeChannel.request('get'),
       status = dispute && dispute.getStatus(),
       updateDisputeStatusFn = (dispute_status)  => _.bind(dispute.saveStatus, dispute, {dispute_status}),
-      createPaymentFn = (request_str) => _.bind(paymentsChannel.request, paymentsChannel, request_str),
+      createPaymentFn = (request_str, options) => _.bind(paymentsChannel.request, paymentsChannel, request_str, options),
       payment_method_value = this.getPageItem('paymentMethod').getModel().getData(),
       activePayment = paymentsChannel.request('get:payment:intake'),
       last_transaction_method = activePayment ? activePayment.get('transaction_method') : null,
@@ -180,7 +180,7 @@ export default PageView.extend({
         all_xhr.push( updateDisputeStatusFn(STATUS_PAYMENT_REQUIRED) );
       }
     } else if (payment_method_value !== last_transaction_method && payment_method_value === configChannel.request('get', 'PAYMENT_METHOD_OFFICE')) {
-      all_xhr.push(createPaymentFn('create:payment:office:intake'));
+      all_xhr.push(createPaymentFn('create:payment:office:intake', { transaction_amount: paymentsChannel.request('get:fee:intake')?.get('amount_due') }));
       
       if (status !== STATUS_OFFICE_PAYMENT_REQUIRED) {
         all_xhr.push( updateDisputeStatusFn(STATUS_OFFICE_PAYMENT_REQUIRED) );

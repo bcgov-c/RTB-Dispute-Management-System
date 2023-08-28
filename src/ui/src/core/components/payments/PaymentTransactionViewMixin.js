@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Contains payment helper functions for use in payment views
+ */
 import Radio from 'backbone.radio';
 import DropdownModel from '../dropdown/Dropdown_model';
 import InputModel from '../input/Input_model';

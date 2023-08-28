@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Alternative Root Layout View used in DA and OS. Displays a HTML Header, Footer, and main content. Contains basic hide/show functions.
+ */
 import Marionette from 'backbone.marionette';
 
 import template from './FloatingRootLayout_template.tpl';

@@ -20,7 +20,9 @@ public class NoticeMapping : Profile
         CreateMap<Data.Model.Notice, NoticeResponse>()
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
-            .ForMember(x => x.NoticeDeliveredDate, opt => opt.MapFrom(src => src.NoticeDeliveredDate.ToCmDateTimeString()));
+            .ForMember(x => x.NoticeDeliveredDate, opt => opt.MapFrom(src => src.NoticeDeliveredDate.ToCmDateTimeString()))
+            .ForMember(x => x.ServiceDeadlineDate, opt => opt.MapFrom(src => src.ServiceDeadlineDate.ToCmDateTimeString()))
+            .ForMember(x => x.SecondServiceDeadlineDate, opt => opt.MapFrom(src => src.SecondServiceDeadlineDate.ToCmDateTimeString()));
 
         CreateMap<NoticeServiceRequest, Data.Model.NoticeService>();
         CreateMap<NoticeServicePatchRequest, Data.Model.NoticeService>();
@@ -40,6 +42,21 @@ public class NoticeMapping : Profile
             .ForMember(x => x.ServiceDate, opt => opt.MapFrom(src => src.ServiceDate.ToCmDateTimeString()));
 
         CreateMap<Data.Model.NoticeService, DisputeAccessNoticeService>()
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ServiceDate, opt => opt.MapFrom(src => src.ServiceDate.ToCmDateTimeString()))
+            .ForMember(x => x.ServiceDeadlineDate, opt => opt.MapFrom(src => src.Notice.ServiceDeadlineDate.ToCmDateTimeString()))
+            .ForMember(x => x.ServiceDeadlineDays, opt => opt.MapFrom(src => src.Notice.ServiceDeadlineDays))
+            .ForMember(x => x.HasServiceDeadline, opt => opt.MapFrom(src => src.Notice.HasServiceDeadline))
+            .ForMember(x => x.SecondServiceDeadlineDate, opt => opt.MapFrom(src => src.Notice.SecondServiceDeadlineDate.ToCmDateTimeString()));
+
+        CreateMap<Data.Model.Notice, ExternalNoticeResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.NoticeDeliveredDate, opt => opt.MapFrom(src => src.NoticeDeliveredDate.ToCmDateTimeString()))
+            .ForMember(x => x.ServiceDeadlineDate, opt => opt.MapFrom(src => src.ServiceDeadlineDate.ToCmDateTimeString()));
+
+        CreateMap<Data.Model.NoticeService, ExternalNoticeServiceResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
             .ForMember(x => x.ServiceDate, opt => opt.MapFrom(src => src.ServiceDate.ToCmDateTimeString()));
     }

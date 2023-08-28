@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Net;
 using CM.Common.ChunkedFileUpload;
 using CM.Common.Utilities;
 using CM.Data.Model;
-using CM.Scheduler.Task.Infrastructure;
-using CM.Scheduler.Task.Jobs;
 using CM.ServiceBase;
+using CM.ServiceBase.ApiKey;
 using CM.Storage;
 using CM.Storage.Config;
 using CM.WebAPI.Configuration;
@@ -14,11 +12,9 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Quartz;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -39,6 +35,7 @@ public class Startup
     {
         services.AddOptions();
         services.Configure<StorageSettings>(Configuration.GetSection("StorageSettings"));
+        services.Configure<ApiKeySettings>(Configuration.GetSection("ApiKeySettings"));
 
         var serviceList = Configuration.GetSection("Services");
         services.Configure<ServiceList>(serviceList);
@@ -91,7 +88,7 @@ public class Startup
 
         app.UseDataBaseMigrations<CaseManagementContext>(Configuration);
 
-        ConfigureScheduler(app);
+        app.ConfigureAdHocFileCleanupScheduler();
 
         app.UseEnableRequestBuffering();
         app.UseErrorWrappingMiddleware();
@@ -101,14 +98,14 @@ public class Startup
         {
             endpoints.MapControllers();
 
+            endpoints.MapHealthChecks("/check", new HealthCheckOptions
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+
             if (Configuration.GetSection("HealthServices").Exists())
             {
-                endpoints.MapHealthChecks("/check", new HealthCheckOptions
-                {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-
                 endpoints.MapHealthChecksUI(options =>
                 {
                     options.UIPath = Configuration["HealthServices:health-ui"];
@@ -118,7 +115,7 @@ public class Startup
             }
         });
 
-        UseForwardHeaders(app);
+        app.UseForwardHeaders(Configuration);
 
         app.UseSwagger();
         app.UseSwaggerUI(c =>
@@ -126,45 +123,5 @@ public class Startup
             c.DocExpansion(DocExpansion.None);
             c.SwaggerEndpoint("../swagger/v1/swagger.json", "Case Management V1");
         });
-    }
-
-    private void ConfigureScheduler(IApplicationBuilder app)
-    {
-        var scheduler = app.ApplicationServices.GetService<IScheduler>();
-
-        scheduler.StartScheduledJob<ParticipatoryHearingReminderJob>(Configuration["Scheduler:HearingReminderCronSchedule"], "HearingReminderJob");
-        scheduler.StartScheduledJob<ParticipatoryApplicantEvidenceReminderJob>(Configuration["Scheduler:ApplicantEvidenceReminderCronSchedule"], "ApplicantEvidenceReminderJob");
-        scheduler.StartScheduledJob<ParticipatoryRespondentEvidenceReminderJob>(Configuration["Scheduler:RespondentEvidenceReminderCronSchedule"], "RespondentEvidenceReminderJob");
-        scheduler.StartScheduledJob<ParticipatoryEmergRespondentEvidenceReminderPeriodJob>(Configuration["Scheduler:RespondentEmergEvidenceReminderCronSchedule"], "RespondentEmergEvidenceReminderJob");
-        scheduler.StartScheduledJob<ReconciliationReportJob>(Configuration["Scheduler:ReconciliationReportCronSchedule"], "ReconciliationReportJob");
-        scheduler.StartScheduledJob<DisputeAbandonedDueToApplicantInactionJob>(Configuration["Scheduler:AbandonedDisputesNotificationSchedule"], "AbandonedDisputesNotificationJob");
-        scheduler.StartScheduledJob<DisputeAbandonedForNoPaymentJob>(Configuration["Scheduler:DisputeAbandonedForNoPaymentSchedule"], "DisputeAbandonedForNoPaymentJob");
-        scheduler.StartScheduledJob<FactDisputeSummaryJob>(Configuration["Scheduler:FactDisputeSummarySchedule"], "FactDisputeSummaryJob");
-        scheduler.StartScheduledJob<DisputeAbandonedForNoServiceJob>(Configuration["Scheduler:DisputeAbandonedForNoPaymentSchedule"], "DisputeAbandonedForNoServiceJob");
-        scheduler.StartScheduledJob<ColdStorageScheduleJob>(Configuration["Scheduler:ColdStorageSchedule"], "ColdStorageScheduleJob");
-        scheduler.StartScheduledJob<FactTimeStatisticsJob>(Configuration["Scheduler:FactTimeStatisticsSchedule"], "FactTimeStatisticsJob");
-        scheduler.StartScheduledJob<FactIntakeProcessingJob>(Configuration["Scheduler:FactIntakeProcessingSchedule"], "FactIntakeProcessingSchedule");
-        scheduler.StartScheduledJob<FactHearingSummaryJob>(Configuration["Scheduler:FactHearingSummarySchedule"], "FactHearingSummaryJob");
-        scheduler.StartScheduledJob<AricParticipatoryApplicantEvidenceReminderJob>(Configuration["Scheduler:AricApplicantEvidenceReminderCronSchedule"], "AricApplicantEvidenceReminderJob");
-        scheduler.StartScheduledJob<PfrParticipatoryApplicantEvidenceReminderJob>(Configuration["Scheduler:PfrApplicantEvidenceReminderCronSchedule"], "PfrApplicantEvidenceReminderJob");
-        scheduler.StartScheduledJob<HearingRecordingTransferJob>(Configuration["Scheduler:HearingRecordingTransferCronSchedule"], "HearingRecordingTransferJob");
-    }
-
-    private void UseForwardHeaders(IApplicationBuilder app)
-    {
-        if (Configuration.GetSection("ForwardProxies").Exists())
-        {
-            var options = new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.All,
-                RequireHeaderSymmetry = false,
-                ForwardLimit = null
-            };
-
-            var proxyIp = Configuration["ForwardProxies:IP"];
-            options.KnownProxies.Add(IPAddress.Parse(proxyIp));
-
-            app.UseForwardedHeaders(options);
-        }
     }
 }

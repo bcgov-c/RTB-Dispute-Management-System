@@ -6,7 +6,10 @@
           <div class="modal-close-icon-lg close-x"></div>
         </div>
         <div class="modal-body">
-
+          <% if (instructionsText) { %>
+            <p class=""><%= instructionsText %></p>
+            <div class="spacer-block-10"></div>
+          <% } %>
           <div class="dispute-party-column left-column">
             <div>
               <label class="general-modal-label">Creation Method:</label>&nbsp;<span class="general-modal-value"><%= creationMethodDisplay || '-' %></span>

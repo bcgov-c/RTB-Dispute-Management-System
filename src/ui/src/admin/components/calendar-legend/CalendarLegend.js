@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays color coded hearing types for display above calendar views.
+ */
 import Marionette from 'backbone.marionette';
 import React from 'react';
 import HearingHoldSMLIcon from '../../static/Icon_HearingHold_SML.png';

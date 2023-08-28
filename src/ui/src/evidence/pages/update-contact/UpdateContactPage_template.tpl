@@ -131,6 +131,10 @@
 
 <div class="da-update-contact-confirm-email-container <%= showConfirmEmail ? '' : 'hidden-item' %>">
   <div class="spacer-block-20"></div>
+  <p class="<%= isInitialRespondentLogin ? '' : 'hidden' %>">
+    You will be receiving e-mails directly from the Residential Tenancy Branch with important information and documents. 
+    It is important to check your Junk e-mail folders and add noreply.rtb@gov.bc.ca to your preferred contacts when possible.
+  </p>
   <div class="dac__contact__page-instructions">Please enter your email address again</div> 
   <div class="da-update-contact-confirm-email"></div>
 </div>

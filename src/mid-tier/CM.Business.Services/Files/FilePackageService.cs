@@ -165,6 +165,18 @@ public class FilePackageService : CmServiceBase, IFilePackageService
                 IsDeleted = false
             };
             await UnitOfWork.FilePackageServiceRepository.InsertAsync(newFilePackageService);
+
+            await UnitOfWork.Complete();
+
+            await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = filePackageResult.DisputeGuid,
+                    ServiceType = ServiceType.FilePackage,
+                    ServiceChangeType = ServiceChangeType.CreateRecord,
+                    ParticipantId = participantId,
+                    FilePackageServiceId = newFilePackageService.FilePackageServiceId
+                });
         }
 
         await UnitOfWork.Complete();

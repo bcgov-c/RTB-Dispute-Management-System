@@ -21,6 +21,7 @@ import { routeParse } from '../../routers/mainview_router';
 import template from './DisputeOverview_template.tpl';
 import TrialLogic_BIGEvidence from '../../../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
 import ModalAutoAssignUnassignedDispute from './modals/ModalAutoAssignUnassignedDispute';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const modalChannel = Radio.channel('modals');
 const configChannel = Radio.channel('config');
@@ -289,7 +290,8 @@ export default PageView.extend({
         menu_states: this._getMenuStates(),
         menu_events: this._getMenuTransitions(),
         contextRender: () => this.render(),
-        disputeModel: this.model
+        disputeModel: this.model,
+        collapseHandler: SessionCollapse.createHandler(this.model, 'DisputeView', 'overview'),
       }),
       notes: notesChannel.request('get:disputeinfo', this.model.id),
       noteCreationData: {

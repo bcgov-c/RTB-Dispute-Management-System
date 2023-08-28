@@ -1,18 +1,18 @@
-# DMS Mid-Tier
+# DMS CaseManagement API
 
 [![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
+![APM](https://img.shields.io/apm/l/vim-mode)
 
-The DMS is a full-featured Dispute Management System with a mid-tier based on a .NET core 6.x engine. It can be compiled for x64 processors on Linux, macOS and Windows.  This readme is specific to the DMS mid-tier.  A general readme document and architecture diagram is available in the [main DMS solution readme.md](../../README.md) and separate UI documentation is available in the [DMS UI (User Interface) readme.md](../../src/ui/README.md)
+<img src="https://static.wixstatic.com/media/46f106_25f15fc848a64a108492dee03a9ee7ef~mv2.png/v1/fill/w_900,h_627,al_c,q_90,enc_auto/DMS-Mobile-Desktop-Laptop-Phone.png">
+CaseManagement is a full-featured Dispute Management System based on dotnetcore engine. It can be compiled for x64 processors on Linux, macOS and Windows. 
 
-![DMS System](../../DMS_Devices.jpg)
 
-
-DMS Technology Stack
+Technology Stack
 -----------------
 
 | Layer   | Technology | 
 | ------- | ------------ |
-| Langauage and framework | C# - .NET core 6.0 |
+| Langauage and framework | C# - dotnetcore 6.0 |
 | Application Server | Kestrel, IIS |
 | API protocol | REST, GraphQL |
 | Data Storage | PostgreSQL |
@@ -32,7 +32,7 @@ DMS Technology Stack
 | SSH.NET | StyleCop | CsvHelper | Diacritics |
 | AWSSDK | Bogus | OpenXml | Ocelot |
 
-## DMS Installation Prerequisites
+## Installing Prerequisites
 
 Make sure you have installed:
 * [dotnetcore 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
@@ -40,26 +40,25 @@ Make sure you have installed:
 * [RabbitMQ](https://www.rabbitmq.com/download.html)
 * [libvips](https://github.com/libvips/libvips/releases)
 * [ffmpeg](https://ffmpeg.org/download.html)
-* [wkhtmltopdf](https://wkhtmltopdf.org)
 
-## Building the DMS Mid-Tier
+## Building CaseManagement
 
-* Clone DMS CaseManagement
+* Clone DMS CaseManagement through ```git clone https://github.com/HiveOne/dispute-cm-mid-tier.git```
 * Open `CaseManagement.sln` in Visual Studio
 * Build Solution or from command line ```dotnet build CaseManagement.sln```
 
-## Running the DMS Mid-Tier Tests
+## Running CaseManagement Tests
 * Goto ```CM.Integration.Tests\```
 * Run ```dotnet test```
 
-## Configuring the DMS Mid-Tier
+## Configuring CaseManagement
 
 1. Go to CM.WebAPI/secrets and CM.Services/```ServiceName```/secrets folder
 2. Clone appsettings.Template as appsettings.json (in the same location)
 3. Open appsettings.json for edit
 4. Set appropriate values - according to your configuration 
 
-## Running the DMS Mid-Tier
+## Running CaseManagement
 
 The list of services included in DMS Solution:
 * CM.WebAPI
@@ -74,12 +73,20 @@ The list of services included in DMS Solution:
 * CM.Services/ReconciliationReportGenerator
 * CM.Services/ReconciliationReportSender
 
-## DMS Mid-Tier License
+## Contribute
 
-![MIT License](../../DMS_MIT_Permissions_Conditions_Limitations.png)
+Contributions to DMS CaseManagement are welcome. Here is how you can contribute to DMS CaseManagement:
 
-MIT: with a license and copyright notice, and a promotion and advertising notice.  See the [LICENSE.txt](../../LICENSE) for details.
+* [Submit bugs](https://github.com/HiveOne/dispute-cm-mid-tier/issues) and help us verify fixes.
+* [Submit pull requests](https://github.com/HiveOne/dispute-cm-mid-tier/pulls) for bug fixes and features and discuss existing proposals
 
-## DMS Mid-Tier Contributions and Contact
+## License
 
-This is an unsupported open-source repository that was published to share the code base with those that may benefit from its public availability.  We are initiating engagement with the broader dispute resolution marketplace to seek open-source sharing and contribution opportunities.  Our intent is to create a community of suitable co-investors and contributors that will achieve significant cost savings and technological innovation through open-source sharing.  If you are a resolution organization interested in leveraging the DMS solution, please contact Hive One through our justice services web site www.hive1-js.com and we will add you to our list that we are vetting for suitability as the second and third movers (that will be critical to the establishment a viable and sustainable community).
+Code licensed under the [MIT License](https://github.com/HiveOne/dispute-cm-mid-tier/blob/master/LICENSE.txt).
+
+## Contact Us
+
+If you have questions about CaseManagement, or you would like to reach out to us about an issue you're having or for development advice as you work on a CaseManagement issue, you can reach us as follows:
+
+* Open an [issue](https://github.com/HiveOne/dispute-cm-mid-tier/issues/new) and prefix the issue title with [Question]. See [Question](https://github.com/HiveOne/dispute-cm-mid-tier/issues?q=label%3AQuestion) tag for already-opened questions.
+

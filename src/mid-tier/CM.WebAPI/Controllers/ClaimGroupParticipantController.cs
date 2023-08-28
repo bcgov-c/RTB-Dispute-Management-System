@@ -8,7 +8,6 @@ using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 

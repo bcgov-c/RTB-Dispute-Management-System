@@ -15,5 +15,10 @@ public class SubmissionReceiptMapping : Profile
             .ForMember(x => x.ReceiptDate, opt => opt.MapFrom(src => src.ReceiptDate.ToCmDateTimeString()))
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<Data.Model.SubmissionReceipt, ExternalSubmissionReceipt>()
+            .ForMember(x => x.ReceiptDate, opt => opt.MapFrom(src => src.ReceiptDate.ToCmDateTimeString()))
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
     }
 }

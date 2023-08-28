@@ -11,13 +11,16 @@ using CM.Data.Repositories.CustomDataObject;
 using CM.Data.Repositories.Dispute;
 using CM.Data.Repositories.DisputeFlag;
 using CM.Data.Repositories.DisputeHearing;
+using CM.Data.Repositories.DisputeLink;
 using CM.Data.Repositories.DisputeProcessDetail;
 using CM.Data.Repositories.DisputeStatus;
+using CM.Data.Repositories.DisputeVerification;
 using CM.Data.Repositories.EmailAttachment;
 using CM.Data.Repositories.EmailMessage;
 using CM.Data.Repositories.EmailTemplate;
 using CM.Data.Repositories.ExcludeWord;
 using CM.Data.Repositories.ExternalCustomDataObject;
+using CM.Data.Repositories.ExternalErrorLog;
 using CM.Data.Repositories.ExternalFile;
 using CM.Data.Repositories.FilePackageService;
 using CM.Data.Repositories.Files;
@@ -28,16 +31,20 @@ using CM.Data.Repositories.InternalUserRole;
 using CM.Data.Repositories.Maintenance;
 using CM.Data.Repositories.Notes;
 using CM.Data.Repositories.Notice;
+using CM.Data.Repositories.OnlineMeeting;
 using CM.Data.Repositories.OutcomeDocRequest;
 using CM.Data.Repositories.OutcomeDocument;
+using CM.Data.Repositories.ParticipantIdentity;
 using CM.Data.Repositories.Parties;
 using CM.Data.Repositories.Payment;
+using CM.Data.Repositories.Poll;
 using CM.Data.Repositories.Remedy;
 using CM.Data.Repositories.Role;
 using CM.Data.Repositories.ScheduleBlock;
 using CM.Data.Repositories.SchedulePeriod;
 using CM.Data.Repositories.ScheduleRequest;
 using CM.Data.Repositories.Search;
+using CM.Data.Repositories.ServiceAuditLog;
 using CM.Data.Repositories.SiteVersion;
 using CM.Data.Repositories.SubmissionReceipt;
 using CM.Data.Repositories.SubstitutedService;
@@ -50,6 +57,7 @@ using CM.Data.Repositories.TrialIntervention;
 using CM.Data.Repositories.TrialOutcome;
 using CM.Data.Repositories.TrialParticipant;
 using CM.Data.Repositories.User;
+using CM.Data.Repositories.VerificationAttempt;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CM.Data.Repositories.UnitOfWork;
@@ -201,6 +209,24 @@ public interface IUnitOfWork
     ITrialOutcomeRepository TrialOutcomeRepository { get; }
 
     ICustomConfigObjectRepository CustomConfigObjectRepository { get; }
+
+    IServiceAuditLogRepository ServiceAuditLogRepository { get; }
+
+    IExternalErrorLogRepository ExternalErrorLogRepository { get; }
+
+    IPollRepository PollRepository { get; }
+
+    IPollResponseRepository PollResponseRepository { get; }
+
+    IParticipantIdentityRepository ParticipantIdentityRepository { get; }
+
+    IOnlineMeetingRepository OnlineMeetingRepository { get; }
+
+    IDisputeLinkRepository DisputeLinkRepository { get; }
+
+    IDisputeVerificationRepository DisputeVerificationRepository { get; }
+
+    IVerificationAttemptRepository VerificationAttemptRepository { get; }
 
     Task<int> Complete(bool withNoTracking = false);
 

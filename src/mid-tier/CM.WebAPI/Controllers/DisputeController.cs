@@ -7,10 +7,10 @@ using CM.Business.Entities.Models.Dispute;
 using CM.Business.Services.DisputeServices;
 using CM.Business.Services.Notice;
 using CM.Business.Services.Parties;
+using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -24,13 +24,20 @@ public class DisputeController : BaseController
     private readonly IMapper _mapper;
     private readonly INoticeService _noticeService;
     private readonly IParticipantService _participantService;
+    private readonly IUserService _userService;
 
-    public DisputeController(IDisputeService disputeService, IParticipantService participantService, INoticeService noticeService, IMapper mapper)
+    public DisputeController(
+        IDisputeService disputeService,
+        IParticipantService participantService,
+        INoticeService noticeService,
+        IMapper mapper,
+        IUserService userService)
     {
         _disputeService = disputeService;
         _participantService = participantService;
         _noticeService = noticeService;
         _mapper = mapper;
+        _userService = userService;
     }
 
     [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.User })]
@@ -94,11 +101,15 @@ public class DisputeController : BaseController
         }
 
         var(exists, value) = request.GetValue<int>("/owner_system_user_id");
-        if (exists && value == (int)Roles.ExternalUser)
+        if (exists)
         {
-            if (!await ValidateDisputeOwner(disputeGuid, value))
+            var ownerUser = await _userService.GetSystemUser(value);
+            if (ownerUser.SystemUserRoleId == (int)Roles.ExternalUser)
             {
-                return BadRequest(ApiReturnMessages.OwnerNotAssociated);
+                if (!await ValidateDisputeOwner(disputeGuid, value))
+                {
+                    return BadRequest(ApiReturnMessages.OwnerNotAssociated);
+                }
             }
         }
 
@@ -156,15 +167,14 @@ public class DisputeController : BaseController
         }
         else
         {
-            if (request.Status == null && request.Stage == null && (request.Process == null && request.Owner == null))
+            if (request.Status == null && request.Stage == null && request.Process == null && request.Owner == null)
             {
                 return BadRequest(ApiReturnMessages.AtLeastOne);
             }
         }
 
         DisputeSetContext(disputeGuid);
-        var userId = GetLoggedInUserId();
-        var result = await _disputeService.PostDisputeStatusAsync(request, disputeGuid, userId);
+        var result = await _disputeService.PostDisputeStatusAsync(request, disputeGuid);
         if (result != null)
         {
             EntityIdSetContext(result.DisputeStatusId);
@@ -185,6 +195,54 @@ public class DisputeController : BaseController
         }
 
         return NotFound();
+    }
+
+    [AuthorizationRequired(new[] { RoleNames.Admin })]
+    [HttpGet("disputeusers/{disputeGuid:Guid}")]
+    public async Task<IActionResult> GetDisputeUsers(Guid disputeGuid)
+    {
+        var disputeUsers = await _disputeService.GetDisputeUsers(disputeGuid);
+        if (disputeUsers != null)
+        {
+            return Ok(disputeUsers);
+        }
+
+        return NotFound();
+    }
+
+    [AuthorizationRequired(new[] { RoleNames.Admin })]
+    [HttpPatch("disputeuseractive/{disputeUserId:int}")]
+    [ApplyConcurrencyCheck]
+    public async Task<IActionResult> PatchDisputeUser(int disputeUserId, [FromBody] JsonPatchDocumentExtension<DisputeUserPatchRequest> request)
+    {
+        if (Request.Headers.ContainsKey(ApiHeader.IfUnmodifiedSince))
+        {
+            var ifUnmodifiedSince = DateTime.Parse(Request.Headers[ApiHeader.IfUnmodifiedSince]);
+            if (await _disputeService.IsDisputeUserModified(disputeUserId, ifUnmodifiedSince))
+            {
+                return StatusConflicted();
+            }
+        }
+
+        var originalDisputeUser = await _disputeService.GetDisputeUser(disputeUserId);
+
+        var newDisputeUser = _mapper.Map<DisputeUser, DisputeUserPatchRequest>(originalDisputeUser);
+        request.ApplyTo(newDisputeUser);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        _mapper.Map(newDisputeUser, originalDisputeUser);
+        var resultDispute = await _disputeService.PatchDisputeUserAsync(originalDisputeUser);
+
+        if (resultDispute != null)
+        {
+            return Ok(resultDispute);
+        }
+
+        return BadRequest(request);
     }
 
     private async Task<bool> ValidateDisputeOwner(Guid disputeGuid, int disputeOwnerId)

@@ -4,6 +4,7 @@ import Radio from 'backbone.radio';
 import RadioModel from '../../../../core/components/radio/Radio_model';
 import RadioView from '../../../../core/components/radio/Radio';
 import InputModel from '../../../../core/components/input/Input_model';
+import FileModel from '../../../../core/components/files/File_model';
 import InputView from '../../../../core/components/input/Input';
 import TextareaModel from '../../../../core/components/textarea/Textarea_model';
 import TextareaView from '../../../../core/components/textarea/Textarea';
@@ -124,7 +125,7 @@ export default Marionette.View.extend({
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['hearingImportModel']);
+    this.mergeOptions(options, ['importHearingsFile', 'hearingImportModel', 'startDate', 'endDate']);
 
     this.importing = false;
     this.createSubModels();
@@ -143,7 +144,7 @@ export default Marionette.View.extend({
       labelText: 'First Day of Import',
       errorMessage: 'Enter the first day',
       allowFutureDate: true,
-      value: null
+      value: this.startDate || null
     });
 
     this.endDateModel = new InputModel({
@@ -151,7 +152,7 @@ export default Marionette.View.extend({
       labelText: 'Last Day of Import (inclusive)',
       errorMessage: 'Enter the final day',
       allowFutureDate: true,
-      value: null
+      value: this.endDate || null
     });
 
     this.processNoteModel = new TextareaModel({
@@ -269,6 +270,7 @@ export default Marionette.View.extend({
         maxNumberOfFiles: 1
       }
     });
+
     this.listenTo(this.fileUploader, 'change:files', this._checkAndStartImportProcess, this);
   },
 
@@ -278,6 +280,12 @@ export default Marionette.View.extend({
     
     this.showChildView('uploaderRegion', this.fileUploader);
     this.showChildView('noteRegion', new TextareaView({ model: this.processNoteModel }));
+
+    if (this.importHearingsFile) {
+      const fileModel = new FileModel(this.fileUploader.file_creation_fn(this.importHearingsFile))
+      this.fileUploader.files.add(fileModel);
+      this._checkAndStartImportProcess();
+    }
   },
 
   renderType() {

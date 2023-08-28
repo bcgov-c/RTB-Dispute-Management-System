@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Core View that is used as a base for other DMS pages to extend from. Provides styling and functions.
+ */
 
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';

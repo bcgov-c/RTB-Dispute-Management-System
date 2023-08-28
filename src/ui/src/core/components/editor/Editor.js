@@ -2,6 +2,7 @@
  * @class core.components.editor.EditorView
  * @memberof core.components.editor
  * @augments Marionette.View
+ * @fileoverview - View that utilizes the trumbowyg npm package to create a text editor
  */
 
 import ViewMixin from '../../utilities/ViewMixin';

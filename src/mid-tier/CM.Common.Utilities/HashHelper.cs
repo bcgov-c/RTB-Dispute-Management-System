@@ -29,24 +29,19 @@ public static class HashHelper
         var clearBytes = Encoding.Unicode.GetBytes(password);
         using var encrypt = Aes.Create();
 
-        if (encrypt != null)
+        var pdb = new Rfc2898DeriveBytes(username, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        encrypt.Key = pdb.GetBytes(32);
+        encrypt.IV = pdb.GetBytes(16);
+        using var ms = new MemoryStream();
+
+        using (var cs = new CryptoStream(ms, encrypt.CreateEncryptor(), CryptoStreamMode.Write))
         {
-            var pdb = new Rfc2898DeriveBytes(username, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-            encrypt.Key = pdb.GetBytes(32);
-            encrypt.IV = pdb.GetBytes(16);
-            using var ms = new MemoryStream();
-
-            using (var cs = new CryptoStream(ms, encrypt.CreateEncryptor(), CryptoStreamMode.Write))
-            {
-                cs.Write(clearBytes, 0, clearBytes.Length);
-                cs.Close();
-            }
-
-            var cipherPassword = Convert.ToBase64String(ms.ToArray());
-            return cipherPassword;
+            cs.Write(clearBytes, 0, clearBytes.Length);
+            cs.Close();
         }
 
-        return string.Empty;
+        var cipherPassword = Convert.ToBase64String(ms.ToArray());
+        return cipherPassword;
     }
 
     public static string DecryptPassword(string cipherPassword, string username)
@@ -55,24 +50,19 @@ public static class HashHelper
         var cipherBytes = Convert.FromBase64String(cipherPassword);
         using var encrypt = Aes.Create();
 
-        if (encrypt != null)
+        var pdb = new Rfc2898DeriveBytes(username, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        encrypt.Key = pdb.GetBytes(32);
+        encrypt.IV = pdb.GetBytes(16);
+        using var ms = new MemoryStream();
+
+        using (var cs = new CryptoStream(ms, encrypt.CreateDecryptor(), CryptoStreamMode.Write))
         {
-            var pdb = new Rfc2898DeriveBytes(username, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-            encrypt.Key = pdb.GetBytes(32);
-            encrypt.IV = pdb.GetBytes(16);
-            using var ms = new MemoryStream();
-
-            using (var cs = new CryptoStream(ms, encrypt.CreateDecryptor(), CryptoStreamMode.Write))
-            {
-                cs.Write(cipherBytes, 0, cipherBytes.Length);
-                cs.Close();
-            }
-
-            var password = Encoding.Unicode.GetString(ms.ToArray());
-            return password;
+            cs.Write(cipherBytes, 0, cipherBytes.Length);
+            cs.Close();
         }
 
-        return string.Empty;
+        var password = Encoding.Unicode.GetString(ms.ToArray());
+        return password;
     }
 
     public static string GetMd5Hash(string input)

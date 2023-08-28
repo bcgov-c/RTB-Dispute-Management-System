@@ -47,70 +47,30 @@ public class ConferenceBridgeRepository : CmRepository<Model.ConferenceBridge>, 
         return conferenceBridges;
     }
 
-    public async Task<List<Model.ConferenceBridge>> GetAccordingScheduleForCheck(int? systemUserId, TimeSpan? time)
+    public async Task<IList<Model.ConferenceBridge>> GetAvailableBridges(DateTime dateTime)
     {
-        if (time == null)
-        {
-            throw new ArgumentNullException(nameof(time), "Time cannot be null");
-        }
-
-        var conferenceBridges = await Context.ConferenceBridges.AsNoTracking()
-            .Where(x => x.PreferredOwner == systemUserId)
+        var hearings = await Context
+            .Hearings
+            .Where(x => x.LocalStartDateTime.HasValue && x.LocalStartDateTime.Value.Date == dateTime.Date && x.ConferenceBridgeId.HasValue)
             .ToListAsync();
+        var confBridges = hearings.Select(x => x.ConferenceBridgeId.Value);
 
-        var conferenceBridgesFiltered = conferenceBridges
-            .Where(x => x.PreferredStartTime.HasValue && x.PreferredStartTime.Value.TimeOfDay == time)
-            .ToList();
+        var bridges = await Context.ConferenceBridges
+        .Where(x => !confBridges.Contains(x.ConferenceBridgeId) && x.BridgeStatus != (byte?)BridgeStatus.Inactive)
+        .ToListAsync();
 
-        return conferenceBridgesFiltered;
+        return bridges;
     }
 
-    public async Task<List<Model.ConferenceBridge>> GetAccordingSchedule(int? systemUserId, TimeSpan? time)
+    public async Task<bool> IsBridgeBooked(int conferenceBridgeId, DateTime startTime)
     {
-        List<Model.ConferenceBridge> conferenceBridges;
+        var isBooked = await Context
+            .Hearings
+            .AnyAsync(x => x.LocalStartDateTime.HasValue &&
+                        x.LocalStartDateTime.Value.Date == startTime.Date &&
+                        x.ConferenceBridgeId.HasValue &&
+                        x.ConferenceBridgeId == conferenceBridgeId);
 
-        if (!time.HasValue && !systemUserId.HasValue)
-        {
-            conferenceBridges = await Context.ConferenceBridges.AsNoTracking()
-                .Where(x => x.PreferredOwner == null && !x.PreferredStartTime.HasValue)
-                .ToListAsync();
-        }
-        else if (!time.HasValue && systemUserId.HasValue)
-        {
-            conferenceBridges = await Context.ConferenceBridges.AsNoTracking()
-                .Where(x => x.PreferredOwner == systemUserId && !x.PreferredStartTime.HasValue)
-                .ToListAsync();
-        }
-        else
-        {
-            conferenceBridges = await Context.ConferenceBridges.AsNoTracking()
-                .Where(x => x.PreferredOwner == systemUserId)
-                .ToListAsync();
-
-            conferenceBridges = conferenceBridges
-                .Where(x => x.PreferredStartTime.HasValue && x.PreferredStartTime.Value.TimeOfDay == time)
-                .ToList();
-        }
-
-        return conferenceBridges;
-    }
-
-    public async Task<List<Model.ConferenceBridge>> GetOpenConferenceBridges()
-    {
-        var conferenceBridges = await Context.ConferenceBridges.AsNoTracking()
-            .Where(x => x.PreferredOwner == null)
-            .ToListAsync();
-
-        return conferenceBridges;
-    }
-
-    public async Task<int[]> GetActiveConferenceBridges()
-    {
-        var conferenceBridges = await Context.ConferenceBridges
-            .Where(x => x.BridgeStatus == (int)BridgeStatus.Active)
-            .Select(c => c.ConferenceBridgeId)
-            .ToListAsync();
-
-        return conferenceBridges.ToArray();
+        return isBooked;
     }
 }

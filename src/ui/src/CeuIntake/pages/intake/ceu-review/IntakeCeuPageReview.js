@@ -9,6 +9,8 @@ import PageItemView from '../../../../core/components/page/PageItem';
 import IntakeCeuDataParser from '../../../../core/components/custom-data-objs/ceu/IntakeCeuDataParser';
 import Checkbox from '../../../../core/components/checkbox/Checkbox';
 import Checkbox_model from '../../../../core/components/checkbox/Checkbox_model';
+import Input_model from '../../../../core/components/input/Input_model';
+import Input from '../../../../core/components/input/Input';
 import UploadViewMixin from '../../../../core/components/upload/UploadViewMixin';
 import UploadMixin_model from '../../../../core/components/upload/UploadMixin_model';
 import FeeWaiverEvidence from '../../../../core/components/payments/fee-waiver/FeeWaiverEvidence';
@@ -83,6 +85,8 @@ const IntakeCeuPageReview = CeuPage.extend({
     this.evidenceUploadCollection = new DisputeEvidence_collection(Object.values(disputeEvidencesLookup));
     this.evidenceUploadCollection.forEach(ev => this.uploadModel.addPendingUpload(ev));
 
+    this.showExtraEmail = !this.applicants.find(p => p.get('p_is_primary_applicant') && p.get('p_email'));
+
     this.createPageItems();
     this.setupListeners();
 
@@ -96,16 +100,33 @@ const IntakeCeuPageReview = CeuPage.extend({
   },
 
   createPageItems() {
+    this.emailModel = new Input_model({
+      labelText: null,
+      inputType: 'email',
+      required: true,
+      errorMessage: 'Enter email address'
+    });
+
+    if (this.showExtraEmail) {
+      this.addPageItem('emailRegion', new PageItemView({
+        stepText: `Please enter your email address. The CEU will send a confirmation email when they have received your complaint. The CEU may use this email for communication if they are unable to reach the primary complainant by phone.`,
+        helpHtml: `The CEU requires a valid email address from one of the complainants to send a confirmation email with your file number. The CEU may also use this email if numerous attempts to call the primary complainant have gone unanswered. You cannot submit a complaint without an email address at this time.`,
+        subView: new Input({ model: this.emailModel }),
+        stepComplete: this.emailModel.isValid(),
+        forceVisible: true,
+      }));
+    }
+
     this.touCheckboxModel = new Checkbox_model({
       html: `I confirm that I have reviewed the information above, and it is correct. I understand I will not be able to return to this intake form and change any information.`,
       checked: false,
       required: true,
     });
-    // Create rental address component
     this.addPageItem('touRegion', new PageItemView({
       stepText: null,
       subView: new Checkbox({ model: this.touCheckboxModel }),
-      stepComplete: this.touCheckboxModel.isValid()
+      stepComplete: this.touCheckboxModel.isValid(),
+      forceVisible: true,
     }));
 
     this.first_view_id = 'touRegion';
@@ -156,7 +177,7 @@ const IntakeCeuPageReview = CeuPage.extend({
       if (visible_error_eles.length === 0) {
         console.log(`[Warning] Page not valid, but no visible error message found`);
       } else {
-        animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {is_page_item: true, scrollOffset: 50});
+        animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {force_scroll: true, is_page_item: true});
       }
       return;
     }
@@ -165,6 +186,7 @@ const IntakeCeuPageReview = CeuPage.extend({
     const reference_id = `CEU_${Moment().format('YYYY')}_${this.model.id}`;
     const saveData = {
       g_complaint_urgency_rating: urgency,
+      g_contact_email: this.showExtraEmail ? this.emailModel.getData() : null,
       g_submitted_date: Moment().toISOString(),
       reference_id,
     };
@@ -206,6 +228,10 @@ const IntakeCeuPageReview = CeuPage.extend({
     loaderChannel.trigger('page:load');
     const uploads = filesChannel.request('get:pending:ceu');
     
+    // Remove the last section from the reference id to remove the file number -
+    // the PDF generator auto-adds the file number and date to the PDF title
+    const pdfTitle = `${this.model.get('reference_id')}`.split('_').slice(0,-1).join('_');
+    
     // Add uploaded files back to the JSON and save -
     Object.keys(uploads).forEach(key => {
       const uploadData = uploads[key];
@@ -238,12 +264,12 @@ const IntakeCeuPageReview = CeuPage.extend({
 
     const receiptHtml = wordTemplate({
       title: this.model.get('reference_id'),
-      bodyHtmlString: renderToString(this.receiptRenderPdfHtml()),
+      bodyHtmlString: renderToString(this.receiptRenderPdfHtml({ showIntakeMode: true })),
     });
 
     filesChannel.request('upload:pdf:ceu', this.model, {
       html_for_pdf: receiptHtml,
-      file_title: this.model.get('reference_id'),
+      file_title: pdfTitle,
     })
     .then(fileModel => {
       IntakeCeuDataParser.parseFromCustomDataObj(this.model);
@@ -310,6 +336,7 @@ const IntakeCeuPageReview = CeuPage.extend({
   },
 
   regions: {
+    emailRegion: '.intake-ceu-review__email',
     touRegion: '.intake-ceu-review__tou',
     filesRegion: '.intake-ceu-review__upload__files'
   },
@@ -320,9 +347,10 @@ const IntakeCeuPageReview = CeuPage.extend({
       <div className="step-description evidence-info-heading">
         <p>Ensure your information is complete and accurate. <b>Submitted complaints cannot be changed.</b> To make changes now, use the 'Back' button at the bottom of the page.</p>
         <p>The Residential Tenancy Branch Compliance and Enforcement Unit will review your submitted complaint and contact you if more information is required.</p>
+        <div className="intake-ceu-review__email"></div>
       </div>
 
-      {this.receiptRenderPageHtml({ showIntakeNav: true })}
+      {this.receiptRenderPageHtml({ showIntakeMode: true, showIntakeNav: true })}
 
       <div className="intake-ceu-review__tou"></div>
 

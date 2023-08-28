@@ -38,7 +38,8 @@ public class WorkflowReportsService : IWorkflowReportsService
             EvidenceOverrideOn = await _workflowReportsRepository.GetEvidenceOverrideOn(disputeGuid),
             MissingKeyFileInfo = await _workflowReportsRepository.GetMissingKeyFileInfo(disputeGuid),
             DocumentsMissingDeliveries = await _workflowReportsRepository.GetDocumentsMissingDeliveries(disputeGuid),
-            MissingEvidenceService = await _workflowReportsRepository.GetMissingEvidenceService(disputeGuid)
+            MissingEvidenceService = await _workflowReportsRepository.GetMissingEvidenceService(disputeGuid),
+            MissingNoticeServiceConfirmations = await _workflowReportsRepository.GetMissingNoticeServiceConfirmations(disputeGuid)
         };
 
         workflowReportsResponse.TotalIncompleteItems = workflowReportsResponse.FutureHearings +
@@ -57,7 +58,8 @@ public class WorkflowReportsService : IWorkflowReportsService
                                                        workflowReportsResponse.EmailWithErrors +
                                                        workflowReportsResponse.UnpaidFees +
                                                        workflowReportsResponse.DocumentsMissingDeliveries +
-                                                       workflowReportsResponse.MissingEvidenceService;
+                                                       workflowReportsResponse.MissingEvidenceService +
+                                                       workflowReportsResponse.MissingNoticeServiceConfirmations;
 
         return workflowReportsResponse;
     }

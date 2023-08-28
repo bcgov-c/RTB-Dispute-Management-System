@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles retrieval of all search data
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';
@@ -179,7 +182,7 @@ const SearchManager = Marionette.Object.extend({
     const default_count = 999990;
     searchParams = _.extend({
       index: default_index,
-      count: default_count
+      count: default_count,
     }, searchParams);
     const dfd = $.Deferred();
 

@@ -85,9 +85,9 @@ public static class StringExtensions
         if (phone != null)
         {
             var phoneHint = new StringBuilder();
-            phoneHint.Append(phone.Substring(0, 2));
+            phoneHint.Append(phone.AsSpan(0, 2));
             phoneHint.Append("**");
-            phoneHint.Append(phone.Substring(phone.Length - 2, 2));
+            phoneHint.Append(phone.AsSpan(phone.Length - 2, 2));
             return phoneHint.ToString();
         }
 
@@ -127,6 +127,16 @@ public static class StringExtensions
         }
 
         return nameAbbreviation.Length != 0 ? nameAbbreviation.ToString().ToUpper() : null;
+    }
+
+    public static string GetNumbers(this string input)
+    {
+        if (!string.IsNullOrEmpty(input))
+        {
+            return new string(input.Where(c => char.IsDigit(c)).ToArray());
+        }
+
+        return null;
     }
 
     public static string GetPhoneNumber(this string input)

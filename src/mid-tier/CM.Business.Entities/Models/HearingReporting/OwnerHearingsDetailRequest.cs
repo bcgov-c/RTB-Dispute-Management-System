@@ -10,6 +10,7 @@ public class OwnerHearingsDetailRequest
     [JsonProperty("start_date")]
     public DateTime StartDate { get; set; }
 
+    [Required]
     [JsonProperty("end_date")]
-    public DateTime? EndDate { get; set; }
+    public DateTime EndDate { get; set; }
 }

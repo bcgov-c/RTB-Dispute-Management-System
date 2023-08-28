@@ -122,4 +122,15 @@ public class OutcomeDocRequestService : CmServiceBase, IOutcomeDocRequestService
 
         return null;
     }
+
+    public async Task<List<ExternalOutcomeDocRequestGetResponse>> GetExternalOutcomeDocRequests(Guid disputeGuid)
+    {
+        var outcomeDocRequests = await UnitOfWork.OutcomeDocRequestRepository.GetByDisputeWithChild(disputeGuid);
+        if (outcomeDocRequests != null)
+        {
+            return MapperService.Map<List<Data.Model.OutcomeDocRequest>, List<ExternalOutcomeDocRequestGetResponse>>(outcomeDocRequests);
+        }
+
+        return null;
+    }
 }

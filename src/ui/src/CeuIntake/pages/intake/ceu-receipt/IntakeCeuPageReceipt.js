@@ -36,7 +36,7 @@ const IntakeCeuPageReceipt = CeuPage.extend({
     this.showChildView('receiptContainerRegion', new ReceiptContainer({
       emailSubject: `File number ${this.model.get('reference_id')}: ${RECEIPT_TITLE} Receipt`,
       containerTitle: RECEIPT_TITLE,
-      displayHtml: this.receiptRenderPageHtml(),
+      displayHtml: this.receiptRenderPageHtml({ showIntakeMode: true }),
       submissionMessage: `Be sure to print a copy of this page for your records as a proof of your submission. Once you leave this page, you will not be able to return.`,
       enableLogout: true,
       logoutWarningFn: () => new Promise(res => (

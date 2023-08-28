@@ -1,5 +1,5 @@
 /**
- * This is the main abstraction for working with claims.  Wraps a single {@link core.components.claim.ClaimModel|ClaimModel}
+ * @fileoverview - This is the main abstraction for working with claims.  Wraps a single {@link core.components.claim.ClaimModel|ClaimModel}
  * but also has references to nested {@link core.components.claim.ClaimDetailModel|ClaimDetailModels},
  * {@link core.components.remedy.Remedy|Remedies} and {@link core.components.remedy.RemedyDetailModel|RemedyDetailModels}
  * @class core.components.claim.DisputeClaimModel
@@ -17,6 +17,7 @@ const participantsChannel = Radio.channel('participants');
 const configChannel = Radio.channel('config');
 
 export default Backbone.Model.extend({
+  idAttribute: 'claim_id',
   
   claim_group_id: null,
   claim: null,
@@ -87,7 +88,7 @@ export default Backbone.Model.extend({
 
   isLandlordDeposit() {
     return this.claim.isLandlordDeposit();
-  },  
+  },
 
   isOLRD() {
     return this.claim.isOLRD();
@@ -129,8 +130,8 @@ export default Backbone.Model.extend({
     return this.claim.isRemoved();
   },
 
-  isAmendRemoved() {
-    return this.claim.isAmendRemoved();
+  isDeleted() {
+    return this.claim.isDeleted();
   },
 
   isAmendRemoved() {
@@ -145,6 +146,14 @@ export default Backbone.Model.extend({
       || (this.getApplicantsRemedy() || emptyGetObj).get('is_amended')
       || (this.getApplicantsRemedyDetail() || emptyGetObj).get('is_amended')
     );
+  },
+  
+  isRetainSecurityDeposit() {
+    return this.claimConfig?.id && this.claimConfig?.id === configChannel.request('get', 'LL_RETAIN_SECURITY_DEPOSIT_CODE');
+  },
+
+  isAlwaysAwarded() {
+    return !!(this.claimConfig || {}).alwaysAwarded;
   },
 
   isReverseAward() {
@@ -332,9 +341,13 @@ export default Backbone.Model.extend({
   allOutcomesRemoved() {
     return this.getAllRemedies().all(remedy => remedy.isOutcomeRemoved());
   },
-
+  
   hasOutcomeAmend() {
     return this.getAllRemedies().any(remedy => remedy.isOutcomeAmend());
+  },
+
+  hasOutcomeNotDecided() {
+    return this.getAllRemedies().any(remedy => remedy.isOutcomeIncludedAndNotDecided());
   },
   
   hadStaffActivity() {
@@ -350,8 +363,16 @@ export default Backbone.Model.extend({
     return this.getAllRemedies().any(remedy => remedy.isOutcomeDismissed());
   },
 
+  hasOutcomeDismissedWithLeave() {
+    return this.getAllRemedies().any(remedy => remedy.isOutcomeDismissedWithLeave());
+  },
+
   hasOutcomeDismissedWithoutLeave() {
     return this.getAllRemedies().any(remedy => remedy.isOutcomeDismissedWithoutLeave());
+  },
+
+  hasOutcomeNoJurisdiction() {
+    return this.getAllRemedies().any(remedy => remedy.isOutcomeNoJurisdiction());
   },
 
   hasOutcomeAwarded() {

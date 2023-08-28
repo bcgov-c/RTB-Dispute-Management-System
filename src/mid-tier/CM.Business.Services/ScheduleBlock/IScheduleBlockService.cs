@@ -12,7 +12,7 @@ public interface IScheduleBlockService : IServiceBase
 
     Task<Data.Model.ScheduleBlock> GetNoTrackingScheduleBlockAsync(int scheduleBlockId);
 
-    Task<Data.Model.ScheduleBlock> PatchAsync(Data.Model.ScheduleBlock originalBlock);
+    Task<ScheduleBlockPatchResponse> PatchAsync(Data.Model.ScheduleBlock originalBlock);
 
     Task<bool> DeleteAsync(int scheduleBlockId);
 

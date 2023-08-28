@@ -11,11 +11,18 @@ const typeRegex = {
   html__restricted_chars: '\\<\\>'
 };
 
+/**
+ * @param {Boolean} [restrictHtml] - Prevents/stops valid html from being entered
+ * @param {Boolean} [showInputEntry] - Whether or not to show as input or text display
+ * @param {String} [countdown] - Displays remaining characters that can be entered (whatever the max value is set to)
+ * @param {Boolean} [showValidate] - Displays clickable button that triggers validation when clicked
+ */
+
 export default Backbone.Model.extend({
   defaults: {
     labelText: '',
     value: '',
-    helpName: null,
+    helpName: null, //TODO: unused?
     helpHtml: null,
     restrictHtml: true,
     max: 1000,

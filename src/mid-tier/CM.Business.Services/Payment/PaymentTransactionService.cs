@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using System.Web;
 using AutoMapper;
 using CM.Business.Entities.Models.Payment;
+using CM.Business.Services.Base;
 using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.Payment;
 
@@ -110,7 +110,7 @@ public class PaymentTransactionService : CmServiceBase, IPaymentTransactionServi
                 message.ParticipantId = (int)disputeFee.PayorId;
             }
 
-            Publish(message);
+            message.Publish(Bus);
         }
 
         if (result != null)
@@ -220,7 +220,7 @@ public class PaymentTransactionService : CmServiceBase, IPaymentTransactionServi
                 message.ParticipantId = (int)disputeFee.PayorId;
             }
 
-            Publish(message);
+            message.Publish(Bus);
         }
 
         if (result.CheckSuccess())
@@ -397,7 +397,7 @@ public class PaymentTransactionService : CmServiceBase, IPaymentTransactionServi
                 message.ParticipantId = (int)disputeFee.PayorId;
             }
 
-            Publish(message);
+            message.Publish(Bus);
         }
     }
 
@@ -417,23 +417,5 @@ public class PaymentTransactionService : CmServiceBase, IPaymentTransactionServi
     {
         var lastTransactionId = await UnitOfWork.PaymentTransactionRepository.GetLastTransactionId(disputeFeeId);
         return lastTransactionId;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {DisputeGuid} {MessageType}", message.DisputeGuid, message.MessageType);
-                }
-
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

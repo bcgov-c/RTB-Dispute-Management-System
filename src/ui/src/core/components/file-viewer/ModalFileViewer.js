@@ -1,24 +1,19 @@
-
+/**
+ *  @fileoverview - Displays a stripped down version of the FilePreviewContent.js. Contains a file display window and file download button
+ */
 import React from 'react';
 import ModalBaseView from '../modals/ModalBase';
 import { FilePreviewContent } from './FilePreviewContent';
 import { ViewJSXMixin } from '../../utilities/JsxViewMixin';
 
-/**
- * Displays a stripped down version of the FilePreviewContent.js. Contains a file display window and file download button
- * @param {file_model} fileModel - file model of the file that is used to populate the file viewer
- */
 const ModalFileViewer = ModalBaseView.extend({
-
+  /**
+   * @param {FileModel} fileModel - file model of the file that is used to populate the file viewer
+   * @param {Boolean} [hideSplitView] - hides split view button which opens up a second window with the currently loaded page
+   */
   initialize(options) {
     this.template = this.template.bind(this);
     this.mergeOptions(options, ['fileModel', 'hidePdfControls', 'hideSplitView']);
-
-    // If FileContent is opened in a modal, have to make sure to init draggable functionality after modal opens
-    this.listenTo(this, 'shown:modal', () => {
-      const view = this.getChildView('contentRegion');
-      if (view && view.isRendered()) view.initDraggableImage();
-    });
   },
 
   onRender() {

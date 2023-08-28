@@ -35,13 +35,13 @@ const UploadView = Marionette.View.extend({
     const blockModel = this.model.get('blockModel');
     const timeFormat = Input_model.getTimeFormat();
     const SCHEDULE_BLOCK_TYPE_DISPLAY = configChannel.request('get', 'SCHEDULE_BLOCK_TYPE_DISPLAY');
-    return <div className="bulkAddBlocks-modal__upload__list-item">
-      <div className="bulkAddBlocks-modal__upload__list-item__id">{this.childIndex}</div>
-      <div className="bulkAddBlocks-modal__upload__list-item__name">{Formatter.toUserDisplay(blockModel.get('system_user_id'))}</div>
-      <div className="bulkAddBlocks-modal__upload__list-item__date">{Formatter.toShortWeekdayShortDateYearDisplay(blockModel.get('block_start'))}</div>
-      <div className="bulkAddBlocks-modal__upload__list-item__duration">{`${Moment(blockModel.get('block_start')).format(timeFormat)} - ${Moment(blockModel.get('block_end')).format(timeFormat)}`}</div>
-      <div className="bulkAddBlocks-modal__upload__list-item__type">{SCHEDULE_BLOCK_TYPE_DISPLAY[blockModel.get('block_type')]}</div>
-      <div className={`bulkAddBlocks-modal__upload__list-item__result ${
+    return <div className="upload-table__list-item">
+      <div className="upload-table__list-item__id">{this.childIndex}</div>
+      <div className="upload-table__list-item__name">{Formatter.toUserDisplay(blockModel.get('system_user_id'))}</div>
+      <div className="upload-table__list-item__date">{Formatter.toShortWeekdayShortDateYearDisplay(blockModel.get('block_start'))}</div>
+      <div className="upload-table__list-item__duration">{`${Moment(blockModel.get('block_start')).format(timeFormat)} - ${Moment(blockModel.get('block_end')).format(timeFormat)}`}</div>
+      <div className="upload-table__list-item__type">{SCHEDULE_BLOCK_TYPE_DISPLAY[blockModel.get('block_type')]}</div>
+      <div className={`upload-table__list-item__result ${
         this.model.get('isUploadWarning') ? resultColorClasses.warn : this.model.get('isUploadError') ? resultColorClasses.error : resultColorClasses.success
       }`}>{this.model.get('resultText')}</div>
     </div>
@@ -306,7 +306,7 @@ const BulkAddBlocksUploads = Marionette.View.extend({
     });
 
     // Enclose all csv items and start download
-    filesChannel.request('download:csv', csvFilename, csvFileLines.map(line => line.map(item => `"${item}"`)));
+    filesChannel.request('download:csv', csvFileLines, csvFilename);
   },
 
   onRender() {
@@ -314,7 +314,7 @@ const BulkAddBlocksUploads = Marionette.View.extend({
   },
 
   regions: {
-    uploadsRegion: '.bulkAddBlocks-modal__upload__list'
+    uploadsRegion: '.upload-table__list'
   },
 
   template() {
@@ -331,20 +331,20 @@ const BulkAddBlocksUploads = Marionette.View.extend({
       } block(s) not added due to overlap</span><span className="error-red">, ${numErrorBlocks} system error(s).</span>`;
 
     return <>
-      <div className="bulkAddBlocks-modal__upload__progress"><b>{uploadCountDisplay}</b> {uploadDisplay}<span dangerouslySetInnerHTML={{__html:uploadDetailsDisplay }}/></div>
-      <div className="bulkAddBlocks-modal__upload__list-header">
-        <div className="bulkAddBlocks-modal__upload__list-item__id">ID</div>
-        <div className="bulkAddBlocks-modal__upload__list-item__name">Name</div>
-        <div className="bulkAddBlocks-modal__upload__list-item__date">Block Date</div>
-        <div className="bulkAddBlocks-modal__upload__list-item__duration">Block Duration</div>
-        <div className="bulkAddBlocks-modal__upload__list-item__type">Block Type</div>
-        <div className="bulkAddBlocks-modal__upload__list-item__result">Result</div>
+      <div className="upload-table__progress"><b>{uploadCountDisplay}</b> {uploadDisplay}<span dangerouslySetInnerHTML={{__html:uploadDetailsDisplay }}/></div>
+      <div className="upload-table__list-header">
+        <div className="upload-table__list-item__id">ID</div>
+        <div className="upload-table__list-item__name">Name</div>
+        <div className="upload-table__list-item__date">Block Date</div>
+        <div className="upload-table__list-item__duration">Block Duration</div>
+        <div className="upload-table__list-item__type">Block Type</div>
+        <div className="upload-table__list-item__result">Result</div>
       </div>
-      <div className="bulkAddBlocks-modal__upload__list"></div>
+      <div className="upload-table__list"></div>
 
 
       {this.blockConversionComplete && numErrorBlocks ? (
-        <div className="bulkAddBlocks-modal__upload__error error-red">
+        <div className="upload-table__error error-red">
           There were system errors adding blocks, this may have been caused by network or internet issues.  The errors listed above with the result of "{SYSTEM_ERROR_TEXT}". You can retry adding the error blocks by clicking the "Retry Error Blocks" button below. You can also download a .csv report of the above and add the error blocks manually in the schedule manager.
         </div>
       ) : null}
@@ -355,7 +355,7 @@ const BulkAddBlocksUploads = Marionette.View.extend({
 
   renderJsxButtons(numErrorBlocks) {
     return <>
-      <div className="bulkAddBlocks-modal__upload__buttons">
+      <div className="upload-table__buttons">
         {this.blockConversionComplete ?
         <>
           <span className="general-link" onClick={() => this.clickDownloadCsv()}>Download .csv of process results</span>

@@ -41,21 +41,6 @@ public class NoticeServiceResponse : CommonResponse
     [JsonProperty("other_participant_title")]
     public string OtherParticipantTitle { get; set; }
 
-    [JsonProperty("notice_service_file_1id")]
-    public int? NoticeServiceFile1Id { get; set; }
-
-    [JsonProperty("notice_service_file_2id")]
-    public int? NoticeServiceFile2Id { get; set; }
-
-    [JsonProperty("notice_service_file_3id")]
-    public int? NoticeServiceFile3Id { get; set; }
-
-    [JsonProperty("notice_service_file_4id")]
-    public int? NoticeServiceFile4Id { get; set; }
-
-    [JsonProperty("notice_service_file_5id")]
-    public int? NoticeServiceFile5Id { get; set; }
-
     [JsonProperty("proof_file_description_id")]
     public int? ProofFileDescriptionId { get; set; }
 
@@ -79,4 +64,16 @@ public class NoticeServiceResponse : CommonResponse
 
     [JsonProperty("archive_served_by")]
     public int? ArchiveServedBy { get; set; }
+
+    [JsonProperty("archive_service_comment")]
+    public string ArchiveServiceComment { get; set; }
+
+    [JsonProperty("other_proof_file_description_id")]
+    public int? OtherProofFileDescriptionId { get; set; }
+
+    [JsonProperty("service_description")]
+    public string ServiceDescription { get; set; }
+
+    [JsonProperty("archive_service_description")]
+    public string ArchiveServiceDescription { get; set; }
 }

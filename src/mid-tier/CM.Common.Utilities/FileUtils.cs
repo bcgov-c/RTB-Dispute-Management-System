@@ -55,4 +55,9 @@ public static class FileUtils
     {
         return !string.IsNullOrEmpty(fileName) && fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
     }
+
+    public static int ConvertBytesToMegabytes(long bytes)
+    {
+        return (int)Math.Round((bytes / Constants.UnitMultiplier) / Constants.UnitMultiplier);
+    }
 }

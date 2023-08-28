@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Overrides ModalBlank to add a checkbox for additional validation
+ */
 import ModalBlank from './ModalBlank';
 import CheckboxView from '../../../components/checkbox/Checkbox';
 import CheckboxModel from '../../../components/checkbox/Checkbox_model';

@@ -1,6 +1,7 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ContextContainer from '../../components/context-container/ContextContainer';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 import DisputeFilePackageClaimView from './dispute-file-package/DisputeFilePackageClaim';
 
 const disputeChannel = Radio.channel('dispute');
@@ -100,6 +101,7 @@ const EvidencePartyView = Marionette.View.extend({
   },
 
   onRender() {
+     const disputeModel = disputeChannel.request('get');
     this.showChildView('partyWithMenu', ContextContainer.withContextMenu({
       wrappedView: new WrappedEvidencePartyView({
         model: this.model,
@@ -115,7 +117,8 @@ const EvidencePartyView = Marionette.View.extend({
         default: this._hasUploadedFiles ? [{ name: `Download All (${this._fileCountDisplay}, ${this._totalFileSizeDisplay})`, event: 'download:all' }] : []
       },
       menu_events: [],
-      disputeModel: disputeChannel.request('get')
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Evidence', 'parties', this.model?.get('participantModel')?.id),
     }));
   },
 

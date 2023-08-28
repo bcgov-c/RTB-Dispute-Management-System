@@ -6,6 +6,12 @@
 
 import Backbone from 'backbone';
 
+/**
+ * @param {String} html - Checkbox label, supports passing in string or string wrapped in html
+ * @param {Boolean} checked - Initial state of checkbox //TODO: refactor to value in order to align with other inputs
+ * @param {String} ignoredLinkClass - If passing clickable html label, a class can be passed here that will be ignored on checkbox click
+ */
+
 export default Backbone.Model.extend({
   defaults: {
     html: null,
@@ -19,7 +25,7 @@ export default Backbone.Model.extend({
     hidden: false,
     cssClass: null,
     stepComplete: false,
-    value: null
+    name: null
   },
 
   validate() {

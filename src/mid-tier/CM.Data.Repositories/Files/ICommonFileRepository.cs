@@ -14,4 +14,6 @@ public interface ICommonFileRepository : IRepository<CommonFile>
     Task<CommonFile> GetCommonFileWithType(int commonFileId, CommonFileType? fileType);
 
     Task<List<CommonFile>> GetCommonFilesByType(CommonFileType? fileType, int count, int index);
+
+    Task<(List<CommonFile> commonFiles, int totalCount)> GetExternalFiles(int count, int index);
 }

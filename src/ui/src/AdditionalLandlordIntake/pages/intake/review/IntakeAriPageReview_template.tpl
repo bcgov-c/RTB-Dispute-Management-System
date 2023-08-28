@@ -59,6 +59,11 @@
             <div class="review-applicant-type col-xs-12 row">
               <span class="review-label">Type:</span> <span><%= typeDisplay %></span>
             </div>
+            <% if (isBusiness) { %>
+              <div class="review-applicant-contact-name">
+                <span class="review-label">Business Contact:</span>&nbsp;<b><%= applicant.getContactName() %></b>
+              </div>
+            <% }%>
             <% if (isPrimary) { %>
             <div class="review-applicant-hearing-by col-xs-12 row">
               <span class="review-label">Receive Notice of Dispute Resolution Proceeding package by:</span> <span><%= Formatter.toHearingOptionsByDisplay(applicant.get('package_delivery_method')) %></span>
@@ -80,21 +85,9 @@
           </div>
 
           <div class="review-applicant-contact-section row col-sm-12 <%= isBusiness ? 'review-business-contact col-md-6' : '' %>">
-            <% if (isBusiness) { %>
-              <div class="review-applicant-contact-name">
-                <span class="review-label">Business Contact:</span>&nbsp;<b><%= applicant.getContactName() %></b>
-              </div>
-            <% }%>
-
             <% if (applicant.get('email')) { %>
               <div class="review-applicant-email col-xs-12 row">
                 Email: <%= applicant.get('email') %>
-              </div>
-            <% }%>
-
-            <% if (applicant.get('fax')) { %>
-              <div class="review-applicant-fax col-xs-12 row">
-                Fax: <%= applicant.get('fax') %>
               </div>
             <% }%>
 
@@ -107,6 +100,12 @@
             <% if (applicant.get('secondary_phone')) { %>
               <div class="review-applicant-otherPhone col-xs-12 row">
                 Other Phone: <%= applicant.get('secondary_phone') %>
+              </div>
+            <% }%>
+
+            <% if (applicant.get('fax')) { %>
+              <div class="review-applicant-fax col-xs-12 row">
+                Fax: <%= applicant.get('fax') %>
               </div>
             <% }%>
           </div>

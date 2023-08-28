@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that contains functionality for loading and displaying audit logs
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';
@@ -7,6 +10,7 @@ import HearingAuditCollection from './HearingAudit_collection';
 const api_load_name = 'audit/logitems';
 const api_audit_item_load_name = 'audit/itemdata';
 const api_schedulinghistory_load_name = 'audit/hearing';
+const api_audit_service = 'audit/service';
 
 const REQUEST_TO_READABLE_FORM = {
   "post": "Addition",
@@ -61,12 +65,13 @@ const AuditManager = Marionette.Object.extend({
   radioRequests: {
     load: 'loadAuditsPromise',
     'load:schedulinghistory': 'loadSchedulingHistory',
+    'load:audit:service': 'loadAuditService',
 
     'get:audit': 'loadAuditPromise',
     'get:api:display': 'getApiTypeDisplay',
     'get:http:display': 'getHTTPRequestTypeDisplay',
     'get:displayable:audits': 'getDisplayableAudits',
-    'get:user:role:display': 'getUserRoleDisplay'
+    'get:user:role:display': 'getUserRoleDisplay',
   },
 
   getApiTypeDisplay(endpointUrl) {
@@ -92,29 +97,22 @@ const AuditManager = Marionette.Object.extend({
     return lower_case && _.has(REQUEST_TO_READABLE_FORM, lower_case) ? REQUEST_TO_READABLE_FORM[lower_case] : http_request;
   },
 
-  loadAuditsPromise(dispute_guid, options) {
+  loadAuditsPromise(dispute_guid, options={}) {
     if (!dispute_guid) {
       console.log(`[Error] Need a dispute_guid for load audits`);
       return;
     }
-
-    const default_index = 0,
-      default_count = 999990;
-
-    const dfd = $.Deferred();
+    const default_index = 0;
+    const default_count = 999990;
     const params = $.param(_.extend({
       index: default_index,
       count: default_count
     }, options));
 
-    apiChannel.request('call', {
+    return apiChannel.request('call', {
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_name}/${dispute_guid}?${params}`
-    }).done(response => {
-      self.audit_collection = new AuditCollection(response);
-      dfd.resolve(self.audit_collection);
-    }).fail(dfd.reject);
-    return dfd.promise();
+    });
   },
 
   loadAuditPromise(audit_id) {
@@ -124,7 +122,6 @@ const AuditManager = Marionette.Object.extend({
     }
 
     const dfd = $.Deferred();
-
     apiChannel.request('call', {
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_audit_item_load_name}/${audit_id}`
@@ -176,7 +173,27 @@ loadSchedulingHistory(searchParams) {
     } else if (role === 99) {
       return 'System';
     }
-  }
+  },
+
+  loadAuditService(searchParams) {
+    if (!searchParams.disputeGuid) {
+      console.log(`[Error] Need a dispute_guid for audit service load`);
+      return $.Deferred().reject().promise();
+    }
+
+    const default_index = 0;
+    const default_count = 999990;
+  
+    searchParams = $.param(_.extend({
+      index: default_index,
+      count: default_count
+    }, searchParams));
+
+    return apiChannel.request('call', {
+      type: 'GET',
+      url: `${configChannel.request('get', 'API_ROOT_URL')}${api_audit_service}?${searchParams}`
+    });
+  },
 
 });
 

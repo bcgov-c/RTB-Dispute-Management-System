@@ -305,8 +305,9 @@ const MyActivitiesPage = PageView.extend({
 
   getActivityFilterOptions() {
     const EMAIL_TEMPLATES_CONFIG = configChannel.request('get', 'EMAIL_TEMPLATES_CONFIG');
-    const nodrpTemplateIds = emailsChannel.request('get:email:templates:for:group', this.EMAIL_TEMPLATE_GROUP_NODRP, { all: true });
-    const needsUpdateTemplateIds = emailsChannel.request('get:email:templates:for:group', this.EMAIL_TEMPLATE_GROUP_NEEDS_UPDATE, { all: true });
+    const loadedTemplates = emailsChannel.request('get:templates');
+    const nodrpTemplateIds = loadedTemplates.filter(t => t.get('template_group') === this.EMAIL_TEMPLATE_GROUP_NODRP);
+    const needsUpdateTemplateIds = loadedTemplates.filter(t => t.get('template_group') === this.EMAIL_TEMPLATE_GROUP_NEEDS_UPDATE);
     const allTemplateIds = Object.keys(EMAIL_TEMPLATES_CONFIG);
 
     const NOTE_LINK_DISPUTE = configChannel.request('get', 'NOTE_LINK_DISPUTE');
@@ -352,7 +353,7 @@ const MyActivitiesPage = PageView.extend({
       { text: 'Corrections Clarifications', value: '5', FileType: configChannel.request('get', 'file_types_corrections_clarifications') },
       { text: 'Review Consideration Requests', value: '6', FileType: configChannel.request('get', 'file_types_review') },
       { text: 'Interim Decisions', value: '7', FileType: configChannel.request('get', 'file_types_interim_decisions') },
-      { text: 'Other Documents', value: '8', FileType: configChannel.request('get', 'file_types_other_documents') },
+      { text: 'Other Documents', value: '8', FileType: configChannel.request('get', 'file_types_other_search_documents') },
     ]
 
     if (this.activityTypeModel.getData() === ACTIVITY_TYPE_DISPUTES) return disputeStatusOptions;

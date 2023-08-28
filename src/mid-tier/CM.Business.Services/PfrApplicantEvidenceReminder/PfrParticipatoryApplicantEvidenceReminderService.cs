@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CM.Business.Services.Base;
 using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.PfrApplicantEvidenceReminder;
 
@@ -49,26 +49,9 @@ public class PfrParticipatoryApplicantEvidenceReminderService : CmServiceBase, I
                 AssignedTemplateId = AssignedTemplate.PfrParticipatoryApplicantEvidenceReminder
             };
 
-            Publish(message);
+            message.Publish(_bus);
         }
 
         return true;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        _bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {DisputeGuid} {MessageType}", message.DisputeGuid, message.MessageType);
-                }
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"CorrelationGuid = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

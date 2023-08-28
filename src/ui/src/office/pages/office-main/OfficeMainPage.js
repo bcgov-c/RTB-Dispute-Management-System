@@ -4,6 +4,7 @@ import PageView from '../../../core/components/page/Page';
 import OfficeDisputeOverview from '../../components/office-dispute/OfficeDisputeOverview';
 import OfficeTopSearchView from './OfficeTopSearch';
 import ModalAccessCodeLookup from './modal-access-code-lookup/ModalAccessCodeLookup';
+import ApplicantRequiredService from '../../../core/components/service/ApplicantRequiredService';
 import template from './OfficeMainPage_template.tpl';
 
 const INSTRUCTIONS_TEXT = 'To see menu options, select a file type and provide any required information';
@@ -19,6 +20,7 @@ const hearingChannel = Radio.channel('hearings');
 const flagsChannel = Radio.channel('flags');
 const Formatter = Radio.channel('formatter').request('get');
 const sessionChannel = Radio.channel('session');
+const noticeChannel = Radio.channel('notice');
 
 export default PageView.extend({
   template,
@@ -39,6 +41,7 @@ export default PageView.extend({
     menuViewAccessCode: '.office-view-access-code',
 
     menuDaUpdateContact: '.da-access-menu--da-contact',
+    menuDaReinstatement: '.da-access-menu--da--reinstatement',
     menuDaUploadEvidence: '.da-access-menu--da-evidence',
     menuDaProofNoticeService: '.da-access-menu--da-notice-pos',
   },
@@ -64,13 +67,14 @@ export default PageView.extend({
     'click @ui.menuViewAccessCode': 'clickViewAccessCode',
     
     'click @ui.menuDaUpdateContact': function() { this.clickDaLink('EXTERNAL_DA_ACTION_CONTACT'); },
+    'click @ui.menuDaReinstatement': function() { this.clickDaLink('EXTERNAL_DA_ACTION_REINSTATEMENT'); },
     'click @ui.menuDaUploadEvidence': function() { this.clickDaLink('EXTERNAL_DA_ACTION_EVIDENCE'); },
     'click @ui.menuDaProofNoticeService': function() { this.clickDaLink('EXTERNAL_DA_ACTION_NOTICE'); }
   },
 
   clickDaLink(daActionConfig) {
     const dispute = disputeChannel.request('get');
-    const accessCode = dispute.get('accessCode');
+    const accessCode = dispute?.get('_routingAccessCode');
     if (!accessCode) {
       this.showModalNoAccessCodeExternal();
       return;
@@ -177,11 +181,14 @@ export default PageView.extend({
     
     this.listenTo(modalAccessCodeLookup, 'login:participant', (participant, participantType) => {
       const dispute = disputeChannel.request('get');
-      dispute.set({ accessCode: participant.get('access_code_hint'), tokenParticipantId: participant.get('participant_id') });
-      disputeChannel.request('set:active', dispute);
+      dispute.set({
+        accessCode: participant.get('access_code'),
+        tokenParticipantId: participant.get('participant_id'),
+        _routingAccessCode: participant.get('_access_code'),
+      });
       const topSearchModel = this.model.getOfficeTopSearchModel();
       const ACCESS_CODE_FILE_IDENTIFIER_CODE = '2';
-      topSearchModel.setToAccessCodeLookupState(ACCESS_CODE_FILE_IDENTIFIER_CODE, participantType, participant.get('access_code_hint'));
+      topSearchModel.setToAccessCodeLookupState(ACCESS_CODE_FILE_IDENTIFIER_CODE, participantType, participant.get('access_code'));
       this.render();
     })
   },
@@ -189,13 +196,11 @@ export default PageView.extend({
   initialize() {
     this.dispute_loaded = false;
     this.listenTo(this.model.getOfficeTopSearchModel(), 'refresh:main', this.render, this);
-
     this._refreshLoadedDispute();
   },
 
   _refreshLoadedDispute() {
     this.dispute_loaded = false;
-
     const dispute = disputeChannel.request('get');
     const onLoadFinishFn = _.bind(function() {
       this.dispute_loaded = true;
@@ -211,7 +216,7 @@ export default PageView.extend({
     loaderChannel.trigger('page:load');
 
     setTimeout(() => {
-      const loadPromise = dispute.get('accessCode') ? this.model.performAccessCodeSearch(dispute.get('accessCode')) : this.model.performFileNumberSearch(dispute.get('file_number'));
+      const loadPromise = dispute.get('_routingAccessCode') ? this.model.performAccessCodeSearch(dispute.get('_routingAccessCode')) : this.model.performFileNumberSearch(dispute.get('file_number'));
       loadPromise.always(() => {
         onLoadFinishFn();
       });
@@ -285,9 +290,12 @@ export default PageView.extend({
     const disputeAccessUrl = `${configChannel.request('get', 'DISPUTE_ACCESS_URL')}#recovery`;
     const reviewFees = disputeFees.filter(f => f.isReviewFee() && f.get('payor_id') === participantId && participantId);
     const isReviewFeePaid = reviewFees.length ? reviewFees[0].isPaid() : false;
+    const notice = noticeChannel.request('get:active');
 
     const templateData = {
+      Formatter,
       dispute,
+      notice,
       canCreateDispute: dispute && dispute.isNew(),
       canCompleteDispute: dispute && dispute.checkStageStatus(0, 5),
       canUpdateCreatedDispute: dispute && dispute.checkStageStatus(0, 6),
@@ -302,11 +310,14 @@ export default PageView.extend({
       canDaUploadEvidence: accessChannel.request('external:evidence'),
       canDaRecordServiceOfNotice: accessChannel.request('external:notice'),
       canRequestPickup: accessChannel.request('office:pickup'),
+      canDaRequestReinstatement: accessChannel.request('external:reinstatement'),
       feeAmountDisplay: firstUnpaidDisputeFee ? Formatter.toAmountDisplay(firstUnpaidDisputeFee.get('amount_due'), true) : null,
       feeTypeDisplay: firstUnpaidDisputeFee ? Formatter.toFeeTypeDisplay(firstUnpaidDisputeFee.get('fee_type')) : null,
       canRequestAccessCodeRecovery: accessChannel.request('office:recovery'),
       INTAKE_FEE_AMOUNT_DISPLAY: Formatter.toAmountDisplay(configChannel.request('get', 'PAYMENT_FEE_AMOUNT_INTAKE'), true),
       REVIEW_FEE_AMOUNT_DISPLAY: Formatter.toAmountDisplay(configChannel.request('get', 'PAYMENT_FEE_AMOUNT_REVIEW'), true),
+      showArsDeadlineWarning: ApplicantRequiredService.externalLogin_hasUpcomingArsDeadline(dispute, notice),
+      showArsReinstatementDeadlineWarning: ApplicantRequiredService.externalLogin_hasUpcomingArsReinstatementDeadline(dispute, notice),
       isReviewFeePaid,
     };
 

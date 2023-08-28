@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Handles all trial related functionality. Used to add opt in trials for testing new functionality on intake. *Not curently in use*
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import Trial_collection from './Trial_collection';

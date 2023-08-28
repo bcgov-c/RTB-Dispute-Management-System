@@ -52,6 +52,9 @@
     <div class="outcome-doc-file-source">Source</div>
   </div>
   <div class="dispute-outcome-doc-files-public"></div>
+  <% if (hasPublicDocError) { %>
+    <div class="dispute-outcome-doc-section-public__error warning error-block">This file encountered an error during system processing and was not added to the Posted Decisions site</div>
+  <% } %>
 </div>
 
 <div class="<%= hideDeliveries ? 'hidden' : '' %>">

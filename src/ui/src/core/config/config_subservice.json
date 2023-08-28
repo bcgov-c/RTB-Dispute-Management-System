@@ -22,8 +22,7 @@
       "applicantAccess": true,
       "respondentAccess": false,
       "displayedDocumentList": [
-        "Notice of dispute resolution proceeding (Proceeding package) with supporting documents and evidence",
-        "Amendment to an application with supporting documents and evidence"
+        "Notice of Dispute Resolution Proceeding (the Notice) with supporting documents and evidence"
       ],
       "acceptedDocTypes": [1,2,3,6,10,11],
       "futureHearingMustExist": true 
@@ -39,7 +38,7 @@
       "applicantAccess": false,
       "respondentAccess": true,
       "displayedDocumentList": [
-        "Supporting documents and evidence"
+        "supporting documents and evidence"
       ],
       "acceptedDocTypes": [1,2,3,6,10,11],
       "futureHearingMustExist": true
@@ -87,7 +86,7 @@
       "applicantAccess": false,
       "respondentAccess": true,
       "displayedDocumentList": [
-        "Supporting documents and evidence"
+        "supporting documents and evidence"
       ],
       "acceptedDocTypes": [3,5,13,14],
       "futureHearingMustExist": true

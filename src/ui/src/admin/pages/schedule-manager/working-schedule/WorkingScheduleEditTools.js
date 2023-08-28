@@ -12,6 +12,7 @@ const EDIT_TOOL_CONFIGS = {
   OTH: 102,
   EDIT: -99,
   REMOVE: -98,
+  POWER_EDIT: -97,
 };
 
 const EDIT_TOOL_COLOUR_CLASSES = {
@@ -23,6 +24,7 @@ const EDIT_TOOL_COLOUR_CLASSES = {
   [EDIT_TOOL_CONFIGS.OTH]: '--oth',
   [EDIT_TOOL_CONFIGS.EDIT]: '--edit',
   [EDIT_TOOL_CONFIGS.REMOVE]: '--remove',
+  [EDIT_TOOL_CONFIGS.POWER_EDIT]: '--power-edit',
 }
 
 const LANGUAGE = {
@@ -56,13 +58,17 @@ const WorkingScheduleEditToolsView = Marionette.View.extend({
   
   initialize(options) {
     this.template = this.template.bind(this);
-    this.mergeOptions(options, ['selectedItemId', 'undoHandler', 'disabled']);
+    this.mergeOptions(options, ['selectedItemId', 'undoHandler', 'disabled', 'enablePowerEdit']);
 
     this.listenTo(this.undoHandler, 'update', this.render, this);
   },
 
   getLanguageDataForSelectedTool() {
     return LANGUAGE[this.selectedItemId] || null;
+  },
+
+  getButtonClass(buttonTypeId) {
+    return `working-sched__edit-tools__button ${this.selectedItemId === buttonTypeId ? 'selected' : ''}`
   },
 
   onButtonClick(newSelection) {
@@ -81,34 +87,44 @@ const WorkingScheduleEditToolsView = Marionette.View.extend({
     this.model.set('_selectedEditToolId', this.selectedItemId);
   },
   
-  className() { return `working-sched__edit-tools${this.getOption('disabled')?'--disabled':''}`; },
+  className: 'working-sched__edit-tools-container',
 
   template() {
     if (this.disabled) return <>The current period does not allow schedule editing.</>;
 
-    const getButtonClassFn = (buttonTypeId) => (
-      `working-sched__edit-tools__button ${this.selectedItemId === buttonTypeId ? 'selected' : ''}`
-    );
     const numUndos = this.undoHandler.getNumUndos();
     return <>
-      {
-        // Hide Undo functionality for the first SM release
-        /*<div className={`working-sched__edit-tools--undo working-sched__edit-tools__button ${this.undoHandler.hasUndo() ? 'selected':''}`} onClick={() => this.onUndoClick()}>
-          <div className="working-sched__edit-tools__button__title">Undo Last</div>
+        {this.renderJsxPowerEdit()}
+        <div className={`working-sched__edit-tools${this.getOption('disabled')?'--disabled':''}`}>
+        {
+          // Hide Undo functionality for the first SM release
+          /*<div className={`working-sched__edit-tools--undo working-sched__edit-tools__button ${this.undoHandler.hasUndo() ? 'selected':''}`} onClick={() => this.onUndoClick()}>
+            <div className="working-sched__edit-tools__button__title">Undo Last</div>
+            <div className="working-sched__edit-tools__button__icon"></div>
+            {numUndos ? <span className="working-sched__edit-tools__button__icon__badge">{numUndos}</span> : null}
+          </div>*/
+        }
+        <div className={`working-sched__edit-tools--edit ${this.getButtonClass(EDIT_TOOL_CONFIGS.EDIT)}`} onClick={() => this.onButtonClick(EDIT_TOOL_CONFIGS.EDIT)}>
+          <div className="working-sched__edit-tools__button__title">Edit</div>
           <div className="working-sched__edit-tools__button__icon"></div>
-          {numUndos ? <span className="working-sched__edit-tools__button__icon__badge">{numUndos}</span> : null}
-        </div>*/
-      }
-      <div className={`working-sched__edit-tools--edit ${getButtonClassFn(EDIT_TOOL_CONFIGS.EDIT)}`} onClick={() => this.onButtonClick(EDIT_TOOL_CONFIGS.EDIT)}>
-        <div className="working-sched__edit-tools__button__title">Edit</div>
-        <div className="working-sched__edit-tools__button__icon"></div>
+        </div>
+        <div className={`working-sched__edit-tools--remove ${this.getButtonClass(EDIT_TOOL_CONFIGS.REMOVE)}`} onClick={() => this.onButtonClick(EDIT_TOOL_CONFIGS.REMOVE)}>
+          <div className="working-sched__edit-tools__button__title">Remove</div>
+          <div className="working-sched__edit-tools__button__icon"></div>
+        </div>
+        {this.renderJsxButtonGroups()}
       </div>
-      <div className={`working-sched__edit-tools--remove ${getButtonClassFn(EDIT_TOOL_CONFIGS.REMOVE)}`} onClick={() => this.onButtonClick(EDIT_TOOL_CONFIGS.REMOVE)}>
-        <div className="working-sched__edit-tools__button__title">Remove</div>
-        <div className="working-sched__edit-tools__button__icon"></div>
-      </div>
-      {this.renderJsxButtonGroups()}
     </>
+  },
+
+  renderJsxPowerEdit() {
+    if (!this.enablePowerEdit) return;
+    return <div className={`working-sched__edit-tools--power-edit-container ${this.getOption('disabled')?'--disabled':''}`}>
+      <div className={`working-sched__edit-tools--power-edit ${this.getButtonClass(EDIT_TOOL_CONFIGS.POWER_EDIT)}`} onClick={() => this.onButtonClick(EDIT_TOOL_CONFIGS.POWER_EDIT)}>
+        <div className="working-sched__edit-tools__button__title">Power Edit</div>
+        <div className="working-sched__edit-tools__button__icon"></div>
+      </div>
+    </div>
   },
 
   renderJsxButtonGroups() {

@@ -32,5 +32,8 @@ public class UserMapping : Profile
         CreateMap<Data.Model.InternalUserRole, InternalUserRoleResponse>()
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
             .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+
+        CreateMap<UserToken, RecentLoginsResponse>()
+            .ForMember(x => x.IssuedOn, opt => opt.MapFrom(src => src.IssuedOn.ToCmDateTimeString()));
     }
 }

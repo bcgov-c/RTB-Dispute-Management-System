@@ -20,7 +20,7 @@ public class DisputeAccessService : CmServiceBase, IDisputeAccessService
         _disputeFlagService = disputeFlagService;
     }
 
-    public async Task<DisputeAccessResponse> GatherDisputeData(Dispute dispute, bool includeNonDeliveredOutcomeDocs = true)
+    public async Task<DisputeAccessResponse> GatherDisputeData(Dispute dispute, bool includeNonDeliveredOutcomeDocs = true, bool includeAccessCode = false)
     {
         var disputeAccessResponse = MapperService.Map<Dispute, DisputeAccessResponse>(dispute);
         var externalUpdateClaimGroup = new DisputeAccessClaimGroup();
@@ -52,7 +52,7 @@ public class DisputeAccessService : CmServiceBase, IDisputeAccessService
             disputeAccessResponse.DisputeHearingRole = lastDisputeHearing.DisputeHearingRole;
             disputeAccessResponse.SharedHearingLinkType = lastDisputeHearing.SharedHearingLinkType;
 
-            var hearingParticipations = await UnitOfWork.HearingParticipationRepository.GetHearingParticipationListAsync(lastHearing.HearingId);
+            var hearingParticipations = await UnitOfWork.HearingParticipationRepository.GetHearingParticipationsAsync(lastHearing.HearingId);
             if (hearingParticipations != null)
             {
                 var externalUpdateHearingParticipations = MapperService.Map<List<HearingParticipation>, List<DisputeAccessHearingParticipation>>(hearingParticipations);
@@ -70,24 +70,33 @@ public class DisputeAccessService : CmServiceBase, IDisputeAccessService
                     await UnitOfWork.ClaimGroupParticipantRepository
                         .GetByClaimGroupIdAsync(claimGroup.ClaimGroupId);
 
-                if (claimGroupParticipants != null)
+                if (claimGroupParticipants == null)
                 {
-                    foreach (var claimGroupParticipant in claimGroupParticipants)
-                    {
-                        var participant =
-                            await UnitOfWork.ParticipantRepository
-                                .GetByIdAsync(claimGroupParticipant.ParticipantId);
+                    continue;
+                }
 
-                        var externalUpdateParticipant =
-                            MapperService.Map<Participant, DisputeAccessParticipant>(participant);
-                        externalUpdateParticipant.Email = externalUpdateParticipant.Email.ToEmailHint();
-                        externalUpdateParticipant.PrimaryPhone = externalUpdateParticipant.PrimaryPhone.ToPhoneHint();
-                        externalUpdateParticipant.Fax = externalUpdateParticipant.Fax.ToPhoneHint();
-                        externalUpdateParticipant.SecondaryPhone = externalUpdateParticipant.SecondaryPhone.ToPhoneHint();
-                        externalUpdateParticipant.GroupParticipantRole = claimGroupParticipant.GroupParticipantRole;
-                        externalUpdateParticipant.GroupPrimaryContactId = claimGroupParticipant.GroupPrimaryContactId;
-                        externalUpdateClaimGroup.Participants.Add(externalUpdateParticipant);
+                foreach (var claimGroupParticipant in claimGroupParticipants)
+                {
+                    var participant =
+                        await UnitOfWork.ParticipantRepository
+                            .GetByIdAsync(claimGroupParticipant.ParticipantId);
+
+                    var externalUpdateParticipant =
+                        MapperService.Map<Participant, DisputeAccessParticipant>(participant);
+                    externalUpdateParticipant.Email = externalUpdateParticipant.Email.ToEmailHint();
+                    externalUpdateParticipant.PrimaryPhone = externalUpdateParticipant.PrimaryPhone.ToPhoneHint();
+                    externalUpdateParticipant.Fax = externalUpdateParticipant.Fax.ToPhoneHint();
+                    externalUpdateParticipant.SecondaryPhone = externalUpdateParticipant.SecondaryPhone.ToPhoneHint();
+                    externalUpdateParticipant.GroupParticipantRole = claimGroupParticipant.GroupParticipantRole;
+                    externalUpdateParticipant.GroupPrimaryContactId = claimGroupParticipant.GroupPrimaryContactId;
+                    externalUpdateParticipant.AccessCodeHint = externalUpdateParticipant.AccessCode.ToAccessCodeHint();
+
+                    if (includeAccessCode == false)
+                    {
+                        externalUpdateParticipant.AccessCode = string.Empty;
                     }
+
+                    externalUpdateClaimGroup.Participants.Add(externalUpdateParticipant);
                 }
             }
 

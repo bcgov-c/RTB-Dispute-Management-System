@@ -238,10 +238,10 @@ body {
 
 
 /* Menu and sub-menu styles */
-.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon { position: relative; bottom: 1px; }
-.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-approved { position: relative; bottom: 1px; }
-.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-denied { position: relative; bottom: 1px; }
-.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-not-set { position: relative; bottom: 1px; }
+.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon { position: relative; bottom: 2px; }
+.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-approved { position: relative; bottom: 2px; }
+.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-denied { position: relative; bottom: 2px; }
+.context-menu-title-container .amendment-icon, .context-menu-title-container .sub-service-icon-not-set { position: relative; bottom: 2px; }
 .context-menu-title-container { position: relative; width: 80%; flex-grow: 1; }
 .context-menu-title {
   float: left;
@@ -262,7 +262,7 @@ body {
   background-repeat: no-repeat;
   cursor: pointer;
   float: right;
-  margin: 3px 10px 0px 0px;
+  margin: 2px 10px 0px 0px;
 }
 
 .complexity-and-urgency-display {
@@ -367,7 +367,7 @@ body {
 
 .notes-empty-div {
   cursor: pointer;
-  width: 355px;
+  width: 345px;
   background-color: #f6f6f6;
   margin-left: 10px;
   flex: 1;
@@ -377,7 +377,7 @@ body {
   position: absolute;
   width: 355px;
   height: calc(100% - 35px);
-  overflow-y: visible;
+  overflow-y: scroll;
   display: inline-block;
   right: -350px;
   top: 0;
@@ -504,9 +504,11 @@ body {
 
 .note-click-context { position: absolute; font-size: 15px; right: 75px; color: #cc9716; }
 
-.context-container-with-notes { overflow-x: hidden; position: relative; width: 100%; }
+.context-container-with-notes { overflow-x: hidden; overflow-y: hidden; position: relative; width: 100%; }
 
-.context-container { font-size: 17px; padding-bottom: 30px; }
+.context-container { font-size: 17px; padding-bottom: 5px; }
+
+.context-container .collapse-icon { margin-left:0; margin-right:16px; margin-top:-2px; }
 
 .menu-help-warning-modal ul { padding-left: 20px; }
 
@@ -565,6 +567,22 @@ body {
   padding: 2px 0px 0px 5px;
 }
 
+.collapse-icon {
+  background-image: url('../static/Icon_Menu_vHide.png');
+  background-repeat: no-repeat;
+  cursor: pointer;
+  height: 26px;
+  width: 26px;
+  margin-top: 0;
+  margin-left: 10px;
+}
+.collapse-icon.collapsed { background-image: url('../static/Icon_Menu_vShow.png'); }
+.collapse-icon.collapsed:hover { background-image: url('../static/Icon_Menu_vShow_OVR.png'); }
+.collapse-icon:hover { background-image: url('../static/Icon_Menu_vHide_OVR.png'); }
+
+.collapsed .notes-icon,
+.collapsed .edit-icon { visibility: hidden; }
+/*.collapsed .notes-column { overflow-y: hidden; }*/
 /* Dispute header upper bar */
 
 #dispute-overview-upper-bar {
@@ -610,12 +628,6 @@ body {
   margin-top: 5px;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-.dispute-overview-header-notice, .dispute-overview-header-tasks, .dispute-overview-header-payment,
-.dispute-overview-header-comms, .dispute-overview-header-hearing, .dispute-overview-header-history,
-.dispute-overview-header-documents {
-
 }
 
 .dispute-overview-header-icon {
@@ -684,6 +696,10 @@ body {
   background-image: url('../static/Icon_AdminBar_Hearing.png');
 }
 
+.header-hearing-notice-icon {
+  background-image: url('../static/Icon_AdminBar_HearingNoticeGen.png');
+}
+
 .header-history-icon {
   background-image: url('../static/Icon_AdminBar_History.png');
 }
@@ -707,6 +723,12 @@ body {
 .header-refresh-icon {
   height: 33px;
   background-image: url('../static/Icon_AdminBar_Refresh.png');
+  margin-right: 10px;
+}
+.header-search-icon {
+  height: 33px;
+  background-image: url('../static/Icon_AdminBar_Search.png');
+  background-size: contain;
   margin-right: 10px;
 }
 .header-print-icon {
@@ -751,18 +773,27 @@ body {
 
 .modal-dms-party-names__party-container { display: flex; }
 .modal-dms-party-names__party-container > div { width: 48%; padding: 2px 15px 5px 15px; }
-.modal-dms-party-names__party-container > div > div { text-align: center; }
 
 .review-dispute-party-names { display: inline-block; }
 .review-dispute-address .rtb-editable-component-label { min-width: 126px; }
 .review-dispute-address .streetContainer input { width: 350px; }
 .review-dispute-address .cityContainer { width: 200px; }
 .review-dispute-address .postalCodeContainer input { width: 100px; }
-.review-dispute-address .provinceContainer { display: none; }
 
 .participant-add-icon { background: url('../static/Icon_AdminPage_AddParticipant.png') no-repeat; }
 
 .claim-add-icon { background: url('../static/Icon_AdminPage_AddIssue.png') no-repeat; }
+
+.claim-title-container { display:flex; justify-content: space-between; }
+.claim-title-controls {
+  display: flex;
+  margin-left: auto;
+  flex-direction: row;
+  min-width: 100px;
+  justify-content: flex-end;
+}
+.claim-title-controls .collapse-icon { margin-left:0; }
+
 
 .claim-ari-dashboard-btn { background: url('../static/Icon_AdminPage_RIDashboard.png') no-repeat; margin-top: 4px; margin-left: 20px; }
 .claim-permits-dashboard-btn { background: url('../static/Icon_AdminPage_PermitList.png') no-repeat; margin-top: 4px; margin-left: 20px; }
@@ -857,7 +888,7 @@ label { font-size: 17px; }
 .view .review-information-body .review-participant-address > .rtb-editable-component,
 .view .review-information-body .review-participant-access-code { margin-bottom: 10px; }
 
-.review-participant-mail-address .rtb-editable-component-editstate { margin: 20px 0; }
+.review-participant-mail-address .rtb-editable-component-editstate { margin: 40px 0; }
 .review-participant-mail-address .rtb-editable-component-viewstate { margin-bottom: 10px; }
 
 .review-information-body .review-claim-description { margin-top: 10px; }
@@ -885,12 +916,22 @@ label { font-size: 17px; }
 .audit-log-container .standard-list-empty { margin-top: -10px; }
 
 #comm-notes-list .standard-list-empty,
-#comm-email-list .standard-list-empty { margin-top: -25px; }
+.comm-email-list .standard-list-empty { margin-top: -25px; }
 
 /* Repeatable admin components */
-.claim-add-reverse-applicant-container { position: absolute; top: 10px; right: 10px; line-height: 21px; }
-.claim-add-reverse-applicant-text { font-size: 17px; font-weight: bold; color: #3d608c; cursor: pointer; margin-right: 10px; }
-.claim-add-reverse-applicant-text::last-child { margin-right: 0; }
+.claim-add-singleton-issue-container { display: flex; flex-wrap: wrap; max-width: 235px; line-height: 21px; }
+.claim-add-singleton-issue-text { font-size: 17px; font-weight: bold; color: #3d608c; cursor: pointer; margin-right: 10px; }
+.claim-add-singleton-issue-text::last-child { margin-right: 0; }
+
+.info-banner-with-icon-container {
+  display: flex; 
+  align-items: center; 
+  font-size: 17px;
+  background-color: #f6f6f6;
+  border: 1px solid #e5e5e5;
+  margin-bottom: 7px;
+  padding: 7px;
+}
 
 .hearing-tools-container { border: 3px solid #1a6dc0; padding-bottom: 10px; }
 
@@ -901,14 +942,16 @@ label { font-size: 17px; }
   float: right;
   color: #fff;
   background-color: #1a6dc0;
-  width: 220px;
+  width: 210px;
   height: 29px;
   margin-right: -3px;
   margin-top: 10px;
   font-size: 17px;
 }
 
+.hearing-tools-header.service-view, .hearing-tools-header.service-edit { display: flex; justify-content: space-between; }
 .hearing-tools-separator { border-left: 1px solid #fff; height: 20px; top:6px; position:relative; margin: 0 10px; }
+.hold-hearings-separator { border-left: 1px solid grey; height: 20px; top:0; position:relative; margin: 0 10px; }
 .hearing-tools-save-controls > span { padding-top:2px; }
 .hearing-tools-save-controls .hearing-tools-separator { height: 16px; align-self: center; top: 0; }
 .hearing-tools-save-controls-save,
@@ -957,6 +1000,16 @@ label { font-size: 17px; }
   cursor: pointer;
 }
 
+.file-card-image-metadata {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  color: #0e3468;
+  font-size: 15px;
+  text-shadow: 2px 2px 2px white, -2px -2px 2px white, 2px -2px 2px white, -2px 2px 2px white;
+  font-weight: bold;
+}
+
 .show-thumbnails .file-card-image img { max-height: 100%; max-width: 100%; object-fit: contain; }
 
 .show-thumbnails .dispute-issue-evidence-files { display: flex; flex-flow: row wrap; }
@@ -970,6 +1023,12 @@ label { font-size: 17px; }
   overflow: hidden;
   vertical-align: text-top;
 }
+
+.previewableContainer { margin: 20px 0px 0px 0px; border: 1px #396bc3 solid; display: block; overflow-y: scroll; height: calc(100vh - 540px) !important; min-height: 525px; }
+
+#selectionModal .modal-dialog { width: 800px; }
+.selectionModal__type label { display:block; margin-left: 0; margin-bottom: 10px; }
+.selectionModal__type label:last-child { margin-bottom: 0px; }
 
 /* Generic updates for sub-pages */
 .subpage.dispute-overview-header-right-container { position: relative; top: 10px; }
@@ -1046,6 +1105,7 @@ label { font-size: 17px; }
 /* quickaccess */
 #quickAccess_modal .modal-dialog { min-width: 1400px;}
 #quickAccess_modal .modal-content { min-height: 500px; }
+.quickaccess-dismiss__hearing-cross { width: 180px; }
 .quickaccess-options { }
 .quickaccess-option { }
 .quickaccess-option__title {
@@ -1059,6 +1119,7 @@ label { font-size: 17px; }
   line-height: 28px;
   height: 38px;
 }
+
 .quickaccess-option__title > b {
   background-image: url('../static/Icon_QuickStatus.png');
   background-repeat: no-repeat;
@@ -1066,9 +1127,11 @@ label { font-size: 17px; }
   height: 30px;
   margin-right: 5px;
 }
+
 .quickaccess-option__contents { padding: 15px; }
+.quickaccess-option__file-options-wrapper { display: flex; padding: 0 15px 20px 15px; }
 .quickaccess-option__row { display: flex; }
-.quickaccess-option__row__button {
+.quickaccess-option__row__button, .quickaccess-option__hearing-cross__row__button, .quickaccess-option__hearing-reschedule__row__button {
   background-image: url('../static/Icon_QuickActionArrow.png');
   background-repeat: no-repeat;
   width: 34px;
@@ -1076,13 +1139,19 @@ label { font-size: 17px; }
   cursor: pointer;
   margin-top: -1px;
 }
+.quickaccess-option__hearing-reschedule__row__button { margin-left: 15px; }
+.quickaccess-option__linked-files { 
+  position: relative;
+  top: 26px;
+  margin-right: 20px;
+}
 #quickAccess_modal .info-help-container ul { padding-left: 20px; }
 
 #quickDismissConfirm_modal .modal-dialog { width: 800px; }
 #quickDismissConfirm_modal .warning { margin: 15px 0; line-height: 22px; }
 .quickaccess-modal__title { font-weight: bold; margin: 2px 0 10px 0; }
 .quickaccess-modal__instructions { margin-bottom: 10px; }
-.quickaccess-dismiss__type { margin-left: 25px; margin-right: 15px; }
+.quickaccess-dismiss__type, .quickaccess-dismiss__hearing-cross { margin-left: 25px; margin-right: 15px; }
 
 .btn-quickstatus {
   background-image: url('../static/Icon_QuickStatus_ButnWht.png')!important;

@@ -39,6 +39,7 @@ export default CMModel.extend({
     file_referenced: null,
     submitter_name: null,
     file_date: null,
+    file_meta_summary: null,
 
     created_date: null,
     created_by: null,
@@ -101,6 +102,7 @@ export default CMModel.extend({
       maxLength: configChannel.request('get', 'DESCRIPTIVE_FILE_LENGTH_MAX'),
       minLength: configChannel.request('get', 'DESCRIPTIVE_FILE_LENGTH_MIN'),
       labelText: 'Descriptive file name',
+      allowedCharacters: InputModel.getRegex('filename__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('filename__restricted_chars'),
       replacementCharacters: {
           '\\s': '_',
@@ -368,6 +370,11 @@ export default CMModel.extend({
     return _.contains(['empty_size_upload_error', 'upload_error'], this.get('error_state'));
   },
 
+  isStatusArchived() {
+    // Only CommonFiles can be archived in current version - file_status for FileModel is not yet defined
+    return false;
+  },
+
   isDisputeAccess() {
     return this.get('disputeAccessSessionId');
   },
@@ -434,8 +441,23 @@ export default CMModel.extend({
     if (options.force_refresh || !this.decisionNotes) {
       this.decisionNotes = this._getNotes('get:file:decision');
     }
-
     return this.decisionNotes;
+  },
+
+  getMetadataDisplay() {
+    let metadata = this.get('file_meta_summary') || '';
+    // Detect the type of metadata being used, parse if needed
+    if (/\w{2}\.\w{2}\.\w{2}/.test(metadata)) {
+      // Audio and video files with length need the hr/min/sec separator char updated
+      metadata = metadata.replace(/\./g, ':');
+    } else if (/pages/i.test(metadata)) {
+      // PDF files need the "pages" corrected for singular/plural and case
+      const useSingular = Number(metadata.replace(/ pages/i, '')) === 1;
+      metadata = metadata.replace(/pages/i, useSingular ? 'Page' : 'Pages');
+    } else if (/\w+?x\w+/.test(metadata)) {
+      // No change needed for images
+    }
+    return metadata;
   },
 
 });

@@ -25,7 +25,7 @@ export default ViewMixin.extend({
   },
 
   ui: {
-    'login_button': 'button'
+    'login_button': 'button.btn'
   },
 
   events: {
@@ -103,6 +103,6 @@ export default ViewMixin.extend({
 
     this.setInitialFocus();
     loaderChannel.trigger('page:load:complete');
-  }
+  },
 
 });

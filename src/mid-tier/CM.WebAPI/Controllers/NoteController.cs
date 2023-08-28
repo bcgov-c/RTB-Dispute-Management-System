@@ -4,7 +4,6 @@ using CM.Business.Entities.Models.Note;
 using CM.Business.Services.Notes;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 

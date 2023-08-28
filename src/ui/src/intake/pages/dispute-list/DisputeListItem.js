@@ -20,77 +20,7 @@ const claimsChannel = Radio.channel('claims');
 const configChannel = Radio.channel('config');
 const Formatter = Radio.channel('formatter').request('get');
 const flagsChannel = Radio.channel('flags');
-
-const detailsModalHtml = `
-<div class="row">
-  <div class="col-xs-12 col-sm-6">
-    <div class="">
-      <label class="general-modal-label">File Number:</label>&nbsp;<span class="general-modal-value"><%= file_number %></span>
-    </div>
-
-    <div class="">
-      <label class="general-modal-label">Stage:</label>&nbsp;<span class="general-modal-value"><%= Formatter.toStageDisplay(status.dispute_stage) %></span>
-    </div>
-    <div class="">
-      <label class="general-modal-label">Status:</label>&nbsp;<span class="general-modal-value"><%= Formatter.toStatusDisplay(status.dispute_status) %></span>
-    </div>
-
-    <div class="">
-      <label class="general-modal-label">Parties:</label>&nbsp;<span class="class="general-modal-value"><%= partiesDisplay %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Rental Address:</label>&nbsp;<span class="general-modal-value"><%= tenancy_address %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Cross Application: Address:</label>&nbsp;<span class="general-modal-value"><%= cross_app_file_number ? cross_app_file_number : '-'  %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Submitted date:</label>&nbsp;<span class="general-modal-value"><%= submitted_date ? Formatter.toDateDisplay(submitted_date) : '-'  %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Payment date:</label>&nbsp;<span class="general-modal-value"><%= initial_payment_date ? Formatter.toDateDisplay(initial_payment_date) : '-'  %></span>
-    </div>
-  </div>
-
-  <div class="col-xs-12 col-sm-6">
-    <div class="">
-      <label class="general-modal-label">Primary applicant:</label>&nbsp;<span class="class="general-modal-value"><%= primaryApplicant %></span>
-    </div>
-    <div>
-      <label class="general-modal-label">Applicant type:</label>&nbsp;<span class="general-modal-value"><%= dispute_sub_type === 1 ? 'Tenant' : dispute_sub_type === 0 ? 'Landlord' : 'None selected' %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Act:</label>&nbsp;<span class="general-modal-value"><%= dispute_type === null ? 'None selected' : ( dispute_sub_type === 1 ? 'Landlord' : 'Tenant' ) %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Tenancy started:</label>&nbsp;<span class="general-modal-value"><%= tenancy_start_date ? Formatter.toDateDisplay(tenancy_start_date) : '-' %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Tenancy ended:</label>&nbsp;<span class="general-modal-value"><%= tenancy_ended ? Formatter.toDateDisplay(tenancy_end_date) : 'Current Tenant' %></span>
-    </div>
-    <div>
-      <label class="general-modal-label">Security deposit:</label>&nbsp;<span class="general-modal-value"><%= security_deposit_amount ? Formatter.toAmountDisplay(security_deposit_amount) : '-' %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Pet deposit:</label>&nbsp;<span class="general-modal-value"><%= pet_damage_deposit_amount ? Formatter.toAmountDisplay(pet_damage_deposit_amount) : '-' %></span>
-    </div>
-
-    <div>
-      <label class="general-modal-label">Dispute Notice Provided:</label>&nbsp;<span class="general-modal-value"><%= original_notice_delivered ? Formatter.toDateDisplay(original_notice_date) : '-'%></span>
-    </div>
-  </div>
-  
-</div>
-`;
-
+const sessionChannel = Radio.channel('session');
 
 const hearingModalCopiedStyles = `
 <style type="text/css" id="hearingStyles">
@@ -163,7 +93,10 @@ export default Marionette.View.extend({
     'pay': 'button.dispute-list-pay-app',
     'review': '.dispute-list-review-notification',
     'details': '.dispute-list-details-btn',
-    'hearingDetails': '.dispute-list-hearing-details-btn'
+    'hearingDetails': '.dispute-list-hearing-details-btn',
+    'daEvidenceLink': '.dispute-list-add-evidence-btn',
+    'daReinstatementLink': '.dispute-list-request-reinstatement-btn',
+    'daServiceLink': '.dispute-list-submit-service-btn'
   },
 
   events: {
@@ -174,47 +107,26 @@ export default Marionette.View.extend({
     'click @ui.review': 'clickReviewNotification',
 
     'click @ui.details': 'clickDetails',
-    'click @ui.hearingDetails': 'clickHearingDetails'
+    'click @ui.hearingDetails': 'clickHearingDetails',
+
+    'click @ui.daEvidenceLink': function() { this.clickDaLink('EXTERNAL_DA_ACTION_EVIDENCE'); },
+    'click @ui.daReinstatementLink': function() { this.clickDaLink('EXTERNAL_DA_ACTION_REINSTATEMENT'); },
+    'click @ui.daServiceLink': function() { this.clickDaLink('EXTERNAL_DA_ACTION_NOTICE'); }
   },
 
-  showModalDetails(disputeModel) {
-    const applicants = participantsChannel.request('get:applicants'),
-      respondents = participantsChannel.request('get:respondents'),
-      primaryApplicant = participantsChannel.request('get:primaryApplicant');
-    
-    const templateData = _.extend({}, disputeModel.toJSON(), {
-      Formatter,
-      partiesDisplay: Formatter.toPartiesDisplay(applicants, respondents),
-      primaryApplicant: primaryApplicant ? primaryApplicant.getContactName() : null
-    });
-    modalChannel.request('show:standard', {
-      modalCssClasses: 'dispute-list-details-modal',
-      title: 'Dispute Details',
-      bodyHtml: _.template(detailsModalHtml)(templateData),
-      primaryButtonText: 'Close',
-      hideCancelButton: true,
-      onContinueFn(modalView) {
-        modalView.close();
-      },
-    });
-  },
-
-  clickDetails() {
-    console.log(`[Info] Show Details feature not yet released`);
-    return;
-    
-    const self = this;
+  async clickDetails() {
     loaderChannel.trigger('page:load');
-    applicationChannel.request('load:dispute:full:promise', this.model.get('dispute_guid')).done(function(dispute) {
-      loaderChannel.trigger('page:load:complete');
-      self.showModalDetails(dispute);
-    }).fail(function() {
-      console.debug("Error loading dispute");
-    });
+    try {
+      const disputeGuid = this.model.dispute.id;
+      await applicationChannel.request('load:ivd:data', disputeGuid);
+      Backbone.history.navigate('view', { trigger: true });
+    } catch {
+      const errorHandler = generalErrorFactory.createHandler('INTAKE.DVIEW.LOAD.DISPUTE', () => loaderChannel.trigger('page:load:complete'));
+      errorHandler();
+    }
   },
 
   showModalHearingDetails() {
-    
     const hearingData = this.model.get('hearing') || {};
     // Create a UI-only backbone models to immitate the displays
     const hearingModel = new HearingModel(hearingData);
@@ -281,6 +193,14 @@ export default Marionette.View.extend({
 
   clickHearingDetails() {
     this.showModalHearingDetails();
+  },
+
+  clickDaLink(daActionConfig) {
+    const accessCode = this.model.get('primary_applicant_access_code');
+    const daActionId = configChannel.request('get', daActionConfig);
+    const extSiteId = configChannel.request('get', 'MAINTENANCE_SYSTEM_ID_INTAKE');
+    const submitterName = sessionChannel.request('name');
+    sessionChannel.trigger('redirect:disputeAccess', accessCode, daActionId, extSiteId, submitterName);
   },
 
   clickResumeDispute() {

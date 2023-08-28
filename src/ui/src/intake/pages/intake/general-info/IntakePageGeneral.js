@@ -73,7 +73,8 @@ export default PageView.extend({
   ui() {
     return _.extend({}, PageView.prototype.ui, {
       'out-of-bc-warning': '#out-of-bc-warning',
-      touContents: '.info-help-container'
+      touContents: '.info-help-container',
+      pageWarning: '#p1-DisputeInfoWarning',
     });
   },
 
@@ -189,15 +190,17 @@ export default PageView.extend({
       postalCode: 'tenancy_zip_postal',
       geozoneId: 'tenancy_geozone_id',
       unitType: 'tenancy_unit_type',
-      unitText: 'tenancy_unit_text'
+      unitText: 'tenancy_unit_text',
+      addressIsValidated: 'tenancy_address_validated'
     };
     const rentalAddressModel = new AddressModel({
         json: _.mapObject(rentalAddressApiMappings, function(val, key) { return dispute.get(val); }),
         apiMapping: rentalAddressApiMappings,
         required: true,
-        useDefaultProvince: true,
-        showValidate: true,
-        useSubLabel: false
+        showUpdateControls: true,
+        useSubLabel: false,
+        useAddressValidation: true,
+        useCPToolBackup: false
       }),
       is_rental_address_valid = rentalAddressModel.isValid();
 
@@ -323,7 +326,7 @@ export default PageView.extend({
       secondDropdownData = [
         { value: String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_FIRST')), text: 'First day of the month'},
         { value: String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_LAST')), text: 'Last day of the month'},
-        { value: String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_MIDDLE')), text: 'Middle day of the month'}
+        { value: String(configChannel.request('get', 'RENT_INTERVAL_MONTHLY_MIDDLE')), text: '15th day of the month'}
       ];
 
       // Create rent interval component
@@ -446,6 +449,7 @@ export default PageView.extend({
     const touRegion = this.getPageItem('touRegion');
     this.listenTo(touRegion, 'itemComplete', function(options) {
       if (!touRegion.stepComplete) return;
+      setTimeout(() => this.getUI('pageWarning').show(), 0);
       this.showPageItem(this.showOptInQuestion ? 'trialOptInRegion' : 'applicantType', options);
     }, this);
 
@@ -504,27 +508,13 @@ export default PageView.extend({
 
     const rentalAddress = this.getPageItem('rentalAddress');
     this.listenTo(rentalAddress, 'itemComplete', function(options) {
-      if (rentalAddress.stepComplete) {
+      if (rentalAddress.stepComplete && !rentalAddress?.subView?.model?.get('addressIsValidated')) {
+        setTimeout(() => this.showOutOfBCWarning(), 100);
+      } else {
         this.hideOutOfBCWarning();
-        if (options && options.triggered_on_show) {
-          this.showPageItem('rentalAddressQuestion', options);
-        } else {
-          // Perform a geozone lookup on the address, and only continue when that has returned
-          loaderChannel.trigger('page:load');
-          geozoneChannel.request('lookup:address', rentalAddress.getModel().getGeozoneAddressString({
-            no_province: true,
-            no_country: true
-          }));
-          this.listenToOnce(geozoneChannel, 'lookup:address:complete', function(geozone_val) {
-            rentalAddress.getModel().set('geozone_id', geozone_val);
-            if (geozone_val === configChannel.request('get', 'INVALID_GEOZONE_CODE')) {
-              this.showOutOfBCWarning();
-            }
-            loaderChannel.trigger('page:load:complete');
-            this.showPageItem('rentalAddressQuestion', options);
-          }, this);
-        }
       }
+
+      this.showPageItem('rentalAddressQuestion', options);
     }, this);
 
     const rentalAddressQuestion = this.getPageItem('rentalAddressQuestion');

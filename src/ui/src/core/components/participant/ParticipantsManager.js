@@ -149,7 +149,7 @@ const ParticipantsManager = Marionette.Object.extend({
     };
   },
 
-  loadClaimGroupParticipants(dispute_guid) {
+  loadClaimGroupParticipants(dispute_guid, options={}) {
     if (!dispute_guid) {
       console.log("[Error] No dispute guid provided, can't get claim dispute participants");
       return Promise.reject();
@@ -162,8 +162,10 @@ const ParticipantsManager = Marionette.Object.extend({
         if (!response || !response.length) return res([]);
         // Parse disputeParticipants response
         const claimGroup = response[0];
-        // Prime the claim group info retrieved from the system
-        claimGroupsChannel.request('load', claimGroup.claimGroupId);
+        if (!options.no_cache) {
+          // Prime the claim group info retrieved from the system
+          claimGroupsChannel.request('load', claimGroup.claimGroupId);
+        }
         res(claimGroup.participants);
       }, rej);
     });
@@ -182,20 +184,29 @@ const ParticipantsManager = Marionette.Object.extend({
     ));
   },
 
-  loadFullParticipants(dispute_guid) {
+  loadFullParticipants(dispute_guid, options={}) {
     if (!dispute_guid) {
       console.log("[Error] No dispute guid provided, can't get claim dispute participants");
       return Promise.reject();
     }
 
+
+    const removed = new ParticipantCollection();
+    const applicants = new ParticipantCollection();
+    const respondents = new ParticipantCollection();
+    if (!options.no_cache) {
+      this.removed = removed;
+      this.applicants = applicants;
+      this.respondents = respondents;
+    }
+
     const parseLoadedParticipantsFn = (loadedCgParticipants=[], loadedParticipants=[]) => {
-      this.claimGroupParticipants.add(loadedCgParticipants);
+      if (!options.no_cache) {
+        this.claimGroupParticipants.add(loadedCgParticipants);
+      }
       const loadedParticipantsLookup = {};
       loadedParticipants.forEach(p => loadedParticipantsLookup[p.participant_id] = p);
 
-      this.removed = new ParticipantCollection();
-      this.applicants = new ParticipantCollection();
-      this.respondents = new ParticipantCollection();
       const participants = new ParticipantCollection(
         (loadedCgParticipants || []).map(p => {
           const matchingParticipant = loadedParticipantsLookup[p.participant_id];
@@ -209,9 +220,9 @@ const ParticipantsManager = Marionette.Object.extend({
         }).filter(p => p)
       );
 
-      this.util_moveModelsTo(participants.filter(p => p.isRemoved()), this.removed);
-      this.util_moveModelsTo(participants.where({ group_participant_role: configChannel.request('get', 'CLAIM_GROUP_ROLE_APPLICANT') }), this.applicants);
-      this.util_moveModelsTo(participants.where({ group_participant_role: configChannel.request('get', 'CLAIM_GROUP_ROLE_RESPONDENT') }), this.respondents);
+      this.util_moveModelsTo(participants.filter(p => p.isRemoved()), removed);
+      this.util_moveModelsTo(participants.where({ group_participant_role: configChannel.request('get', 'CLAIM_GROUP_ROLE_APPLICANT') }), applicants);
+      this.util_moveModelsTo(participants.where({ group_participant_role: configChannel.request('get', 'CLAIM_GROUP_ROLE_RESPONDENT') }), respondents);
     };
 
     return new Promise((res, rej) => {
@@ -221,7 +232,7 @@ const ParticipantsManager = Marionette.Object.extend({
           const loadedCgParticipants = promiseValues && promiseValues.length ? promiseValues[0] : {};
           console.log(loadedParticipants, loadedCgParticipants);
           parseLoadedParticipantsFn(loadedCgParticipants, loadedParticipants);
-          res(loadedCgParticipants);
+          res([loadedCgParticipants, applicants, respondents, removed]);
         }, rej);
     });
   },
@@ -633,7 +644,7 @@ const ParticipantsManager = Marionette.Object.extend({
         if (tenant.get('address')) {
           const tenantDisputeMatchingAddress = StringSimilarity.compareTwoStrings(String(tenant.get('address')).toUpperCase(), dispute.get('tenancy_address').toUpperCase()) > MATCH_PERCENTAGE;
           //If past tenancy and the tenant address matches the dispute address
-          if (dispute.isPastTenancy() && tenantDisputeMatchingAddress && dispute.getFullAddressString({ withoutAddress: true }) === tenant.getCityCountryPostalString()) {
+          if (dispute.isPastTenancy() && tenantDisputeMatchingAddress && dispute.getCityCountryPostalString() === tenant.getCityCountryPostalString()) {
             addToDuplicates(PAST_TENANT_DISPUTE_ADDRESS_MATCH_TYPE, `The tenancy has ended but the dispute address and the tenant(s) address are the same: ${tenant.getAddressString()}`)
           }
         }
@@ -641,12 +652,12 @@ const ParticipantsManager = Marionette.Object.extend({
         if (applicant.get('address') && respondent.get('address')) {
           //If past tenancy and the tenant address matches the landlord address
           const tenantLandlordMatchingAddress = StringSimilarity.compareTwoStrings(String(applicant.get('address')).toUpperCase(), String(respondent.get('address')).toUpperCase()) > MATCH_PERCENTAGE;
-          if (dispute.isPastTenancy() && tenantLandlordMatchingAddress && applicant.getAddressString({ withoutAddress: true }) === respondent.getAddressString({ withoutAddress: true }) ) {
+          if (dispute.isPastTenancy() && tenantLandlordMatchingAddress && applicant.getAddressString() === respondent.getAddressString() ) {
             addToDuplicates(PAST_TENANT_LANDLORD_ADDRESS_MATCH_TYPE, `The tenancy has ended but the tenant and landlord addresses are the same: ${tenant.getAddressString()}`);
           }
 
           //If current tenancy, the tenant and landlord addresses match and "shared address" was set to No on both
-          if (!dispute.isPastTenancy() && tenantLandlordMatchingAddress && !applicant.get('unit_type') && !respondent.get('unit_type') && applicant.getAddressString({ withoutAddress: true }) === respondent.getAddressString({ withoutAddress: true })) {
+          if (!dispute.isPastTenancy() && tenantLandlordMatchingAddress && !applicant.get('unit_type') && !respondent.get('unit_type') && applicant.getAddressString() === respondent.getAddressString()) {
             addToDuplicates(CURRENT_TENANT_LANDLORD_ADDRESS_MATCH_TYPE, `A landlord and tenant address is the same but there is no shared address identifier (for example: basement suite, upper, coach house): ${tenant.getAddressString()}`)
           }
         }

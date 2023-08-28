@@ -65,4 +65,17 @@ public class FilePackageServiceRequest
 
     [JsonProperty("archive_served_by")]
     public int? ArchiveServedBy { get; set; }
+
+    [JsonProperty("archive_service_comment")]
+    [StringLength(255)]
+    public string ArchiveServiceComment { get; set; }
+
+    [JsonProperty("other_proof_file_description_id")]
+    public int? OtherProofFileDescriptionId { get; set; }
+
+    [JsonProperty("service_description")]
+    public string ServiceDescription { get; set; }
+
+    [JsonProperty("archive_service_description")]
+    public string ArchiveServiceDescription { get; set; }
 }

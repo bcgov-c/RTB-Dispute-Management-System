@@ -21,6 +21,7 @@ import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
 const TASK_YES_CODE = '1';
 const TASK_NO_CODE = '2';
 const EMAIL_EDITOR_PICKUP_CLASS = `modalEmail-email-content--pickups`;
+const EMAIL_CONTENT_ERROR = `This message contains the asterisk characters **. These characters indicate areas where custom message should be inserted, and then these characters should be removed.  Please locate the ** characters in the email and complete any associated text or delete the placeholders from this message before sending.`;
 
 const modalChannel = Radio.channel('modals');
 const configChannel = Radio.channel('config');
@@ -45,7 +46,6 @@ export default ModalBaseView.extend({
   },
   regions: {
     emailInputsRegion: '.modalEmail-top-container',
-
     emailContentRegion: '@ui.emailContent',
     responseDueRegion: '.modalEmail-due-filter',
     responseDueDateRegion: '.modalEmail-response-due-date',
@@ -140,6 +140,7 @@ export default ModalBaseView.extend({
       this.scrollToFirstVisibleError();
       return;
     }
+
     this.createEmailsAndPickupsForSend();
     this.saveEmailsAndPickups(true);
   },
@@ -662,6 +663,11 @@ export default ModalBaseView.extend({
         if (this.emailInputsView && this.emailInputsView.isRendered()) this.emailInputsView.showErrorMessage('Emails from NODRP templates need at least one Dispute File attached');
         isValid = false;
       }
+    }
+
+    if (isValid && childViewNames.includes('emailContentRegion') && String(this.emailContentModel.getData() || '').match(/\*\*/g)) {
+      this.getChildView('emailContentRegion')?.showErrorMessage(EMAIL_CONTENT_ERROR);
+      isValid = false;
     }
 
     return isValid;

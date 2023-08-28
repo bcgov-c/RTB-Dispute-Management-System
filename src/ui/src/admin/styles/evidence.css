@@ -20,7 +20,7 @@
 .evidence-page-note-icon { height: 27px; width: 27px; display: inline-block; }
 
 .evidence-page-filters-container .general-filters-row { justify-content: space-between; }
-.evidence-page-mark-all-evidence { display:flex; align-items: center; background-color: #1a6dc0; color: #fff; font-size: 17px; margin-right: -10px; }
+.evidence-page-mark-all-evidence { display:flex; align-items: center; background-color: #1a6dc0; color: #fff; font-size: 17px; margin-right: -10px; max-width: 49%; }
 .evidence-page-mark-all-evidence > div { display:flex; align-items: center; height: 100%; }
 .evidence-page-quick-action { margin: 0 10px 0 13px; width: 24px; height: 24px; }
 .mark-all-not-served::after { display: inline-block; content: ' '; margin-left:10px; width: 1px; height: 40%; background-color: #fff; }
@@ -51,10 +51,11 @@
 
 .evidence-page-party-names { display: inline-block; }
 
+.evidence-page-top-filters label:last-child { margin-left: 50px; }
+
 /* File package display */
 .file-package-title-arrow { display: inline-block; position: relative; top:3px; }
 .file-packages-list .file-package-title { padding-left: 30px; display: inline; }
-.file-packages-list .context-container { padding-bottom: 15px; }
 
 .dispute-file-package-claim-title {
   font-size: 19px;
@@ -67,11 +68,6 @@
 
 /* End File package display */
 
-.evidence-page-party,
-.evidence-page-claim { margin-top: 20px; }
-
-.evidence-page-party-with-menu .context-container,
-.evidence-page-claim-with-menu .context-container { padding-bottom: 0; }
 .evidence-page-claim-with-menu .review-applicant-title.section-header { background-color: #f6f6f6; border-bottom-color: #e6e6e6; }
 
 /* General evidence display */
@@ -85,6 +81,7 @@
 .evidence-page-claims .review-claim-evidence { margin-top: 0; }
 .evidence-page-claims .review-claim-evidence .dispute-issue-evidence-item-inner { margin-top: 22px; margin-bottom:0; }
 .evidence-page-claims .review-information-body { margin-top: 0; padding-bottom: 20px; }
+
 
 /* End general evidence display */
 
@@ -108,7 +105,6 @@
 
 .service-view.hearing-tools-save-controls { display: none; }
 .service-edit .hearing-tools-edit { display: none; }
-.service-edit .hearing-tools-edit-mode-buttons { display: inline; }
 /* End hearing tools */
 
 /* evidence preview styles */

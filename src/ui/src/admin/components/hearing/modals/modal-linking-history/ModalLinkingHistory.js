@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View only modal that displays all disputes that have been associated to the hearing
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import template from './ModalLinkingHistory_template.tpl';
@@ -24,7 +27,9 @@ export default ModalBaseView.extend({
       ownerDisplay: '.modalBaseDeleteHearing-owner-info',
     });
   },
-
+  /**
+   * @param {HearingModel} model
+   */
   initialize() {
     this.loading = false;
     this.linkingResults = null;

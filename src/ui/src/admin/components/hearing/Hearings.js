@@ -1,7 +1,18 @@
+/**
+ * @fileoverview - Main dispute hearings page view. Displays all past, future, and on hold hearings for a dispute.
+ */
+import Backbone from 'backbone';
+import React from 'react';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ContextContainer from '../context-container/ContextContainer';
+import SessionCollapse from '../session-settings/SessionCollapseHandler';
 import HearingView from './Hearing';
+import { routeParse } from '../../routers/mainview_router';
+import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
+import HearingHoldIcon from '../../static/Icon_HearingHold_LRG.png';
+import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
+import HearingCollection from '../../../core/components/hearing/Hearing_collection';
 
 const disputeChannel = Radio.channel('dispute');
 const modalChannel = Radio.channel('modals');
@@ -9,6 +20,7 @@ const configChannel = Radio.channel('config');
 const hearingChannel = Radio.channel('hearings');
 const notesChannel = Radio.channel('notes');
 const sessionChannel = Radio.channel('session');
+const loaderChannel = Radio.channel('loader');
 const Formatter = Radio.channel('formatter').request('get');
 
 const EmptyHearingsView = Marionette.View.extend({
@@ -40,16 +52,19 @@ const HearingsView = Marionette.CollectionView.extend({
       { name: 'Reschedule', event: 'reschedule' },
       { name: 'Cancel (unassign)', event: 'unassign' },
       { name: 'Edit Linking', event: 'edit:linked' },
-      { name: 'Edit Active Hearing', event: 'edit:current' },
-      { name: 'View on Daily Schedule', event: 'view:schedule' },
-      { name: 'View Hearing History', event: 'view:history' },
+      { name: 'Edit Hearing', event: 'edit:current' },
+      { name: 'Daily Schedule', event: 'view:schedule' },
+      { name: 'Hearing History', event: 'view:history' },
+      // Hearing Notice can only be removed from the file where it was provided
+      ...(child.getHearingNoticeFileDescription() ? [{ name: 'Remove Hearing Notice', event: 'remove:hearing:notice' }] : []),
     ];
     const inactiveMenuState = [
-      { name: 'Edit Past Hearing', event: 'edit:non:current' },
+      { name: 'Edit Hearing', event: 'edit:non:current' },
       { name: 'View on Daily Schedule', event: 'view:schedule' },
       { name: 'View Hearing History', event: 'view:history' },
     ];
     const isCurrentUserScheduler = sessionChannel.request('is:scheduler');
+    const disputeModel = disputeChannel.request('get');
     // Create the child view instance
     const view = ContextContainer.withContextMenuNotes({
       wrappedContextContainerView: ContextContainer.withContextMenu({
@@ -91,7 +106,8 @@ const HearingsView = Marionette.CollectionView.extend({
             cancelButtonText: 'Close'
           });
         },
-        disputeModel: disputeChannel.request('get')
+        disputeModel,
+        collapseHandler: SessionCollapse.createHandler(disputeModel, 'Hearings', 'hearings', child.id),
       }),
       notes: notesChannel.request('get:hearing', child.id),
       noteCreationData: {
@@ -104,8 +120,13 @@ const HearingsView = Marionette.CollectionView.extend({
     return view;
   },
 
+  /**
+   * @param {UnitCollection} unitCollection
+   * @param {FileCollection} hearingRecordings - .wav file containing recording of past hearing
+   * @param {HearingCollection} onHoldHearings - hearings that have been put on hold and associated to the loaded Dispute
+   */
   initialize(options) {
-    this.mergeOptions(options, ['unitCollection', 'hearingRecordings']);
+    this.mergeOptions(options, ['unitCollection', 'hearingRecordings', 'onHoldHearings']);
     this.listenTo(this.collection, 'update', this.render);
   },
 
@@ -119,14 +140,14 @@ const HearingsView = Marionette.CollectionView.extend({
     return {
       childIndex: index+1,
       unitCollection: this.unitCollection,
-      hearingRecording: hearingRecordings?.[0]
+      hearingRecordings: hearingRecordings,
+      onHoldHearings: this.onHoldHearings
     };
   }
 });
 
 
-export default Marionette.View.extend({
-  template: _.template(`<div class="hearing-list"></div>`),
+const Hearings = Marionette.View.extend({
 
   regions: {
     hearingsListRegion: '.hearing-list'
@@ -134,6 +155,45 @@ export default Marionette.View.extend({
 
   initialize(options) {
     this.options = options;
+    this.template = this.template.bind(this);
+    this.mergeOptions(options, ['onHoldHearings']);
+    this.onHoldHearingsCollection = new HearingCollection(this.onHoldHearings.available_hearings);
+    this.totalOnHoldHearings = this.onHoldHearings?.total_available_records;
+  },
+
+  async cancelHoldHearing(hearingModel) {
+    return new Promise((res, rej) => hearingChannel.request('cancel:reserved', hearingModel?.id).then(() => {
+      this.onHoldHearingsCollection.remove(hearingModel);
+      res();
+    }, generalErrorFactory.createHandler('HEARING.CANCEL.RESERVATION', rej)));
+  },
+
+  async clickCancelHold(hearingModel) {
+    loaderChannel.trigger('page:load');
+    this.cancelHoldHearing(hearingModel)
+      .finally(() => {
+        this.render();
+        loaderChannel.trigger('page:load:complete');
+      });
+  },
+
+  async clickBookHold(hearingModel) {
+    loaderChannel.trigger('page:load');
+    const disputeGuid = hearingModel.get('hearing_reserved_dispute_guid');
+    await this.cancelHoldHearing(hearingModel)
+    await hearingModel.createDisputeHearing({ dispute_guid: disputeGuid });
+    await hearingModel.checkAndUpdateLinkType()
+      .catch(err => {
+        generalErrorFactory.createHandler('ADMIN.DISPUTEHEARING.SAVE', () => {
+          hearingModel.resetDisputeHearings();
+        })(err);
+      });
+    this.collection.trigger('hearings:refresh');
+  },
+
+  clickViewHearing(hearingModel) {
+    const hearingStartDate = Moment(hearingModel.get('hearing_start_datetime')).format('YYYY-MM-DD');
+    Backbone.history.navigate(routeParse('scheduled_hearings_daily_param_item', null, hearingStartDate), { trigger: true });    
   },
 
   onRender() {
@@ -170,6 +230,44 @@ export default Marionette.View.extend({
         view.renderHearingToolsRegions();
       });
     }
+  },
+
+  template() {
+    return (
+      <>
+        { this.renderJsxOnHoldHearings() }
+        <div className="hearing-list"></div>
+      </>
+    );
+  },
+
+  renderJsxOnHoldHearings() {
+    const isSchedulerUser = sessionChannel.request('is:scheduler');
+    if (!this.totalOnHoldHearings >= 1) return;
+
+    const latestHearing = hearingChannel.request('get:latest');
+    const isFutureHearing = latestHearing?.isActive();    
+    return (
+      this.onHoldHearingsCollection.map((hearing) => <div className="info-banner-with-icon-container">
+        <img src={HearingHoldIcon} />&nbsp;
+        <span>
+          <b>On hold hearing:&nbsp;</b> 
+          {Moment(hearing.get('hearing_start_datetime')).format('LLLL')},&nbsp;{Formatter.toUserDisplay(hearing.get('hearing_owner'))}
+          {isSchedulerUser ?
+            <>
+              &nbsp;-
+              &nbsp;<span className="general-link general-link" onClick={() => this.clickViewHearing(hearing)}>View on daily schedule</span>
+              <span className="hold-hearings-separator"></span>
+              <span className="general-link" onClick={() => this.clickCancelHold(hearing)}>Cancel hold</span>
+              {isFutureHearing ? null : <span className="hold-hearings-separator"></span>}
+              {isFutureHearing ? null : <span className="general-link" onClick={() => this.clickBookHold(hearing)}>Book hold hearing</span>}
+            </>
+          : null}
+        </span>
+      </div>)
+    );
   }
 
 });
+_.extend(Hearings.prototype, ViewJSXMixin);
+export default Hearings;

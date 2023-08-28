@@ -42,10 +42,10 @@ public class EmailMessageRequest
     public byte BodyType { get; set; }
 
     [JsonProperty("preferred_send_date")]
-    public DateTime PreferredSendDate { get; set; }
+    public DateTime? PreferredSendDate { get; set; }
 
     [JsonProperty("response_due_date")]
-    public DateTime ResponseDueDate { get; set; }
+    public DateTime? ResponseDueDate { get; set; }
 
     [JsonProperty("is_active", DefaultValueHandling = DefaultValueHandling.Populate)]
     [Required]

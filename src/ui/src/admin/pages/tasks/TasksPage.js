@@ -82,6 +82,12 @@ export default TasksDisplayBaseView.extend({
 
   addNewTask() {
     this.tasks.add(this.newTaskModel);
+    if (
+      (this.newTaskModel.isComplete() && this.mixin_isFilterSetToClosed())
+      || !this.mixin_isFilterSetToClosed()
+    ) {
+        this.tasks.totalAvailable += 1;
+    }
     this.initializeNewTaskModel();
     this.render();
   },
@@ -104,8 +110,6 @@ export default TasksDisplayBaseView.extend({
     this.mixin_setupListeners();
 
     this.initializeNewTaskModel();
-    
-    this.mixin_performInitialTasksLoad();
 
     this.loadTasksWithLoader({
       index: 0,
@@ -128,6 +132,7 @@ export default TasksDisplayBaseView.extend({
       .done(disputeTasksCollection => {
         loaderChannel.trigger('page:load:complete');
         this.tasks = disputeTasksCollection;
+        this.mixin_setupTasksListeners();
         this.tasks_loaded = true;
 
         if (_.isFunction(onCompleteFn)) {
@@ -151,6 +156,8 @@ export default TasksDisplayBaseView.extend({
     // Don't perform an API reload here, just toggle UI elements
     this.stopListening(this.tasks, 'change:task_status');
     this.listenTo(this.tasks, 'change:task_status', this.render, this);
+
+    this.taskTypeFiltersModel.set('optionData', this.mixin_getTaskTypeFiltersWithCount(), { silent: true });
   },
 
   onRender() {

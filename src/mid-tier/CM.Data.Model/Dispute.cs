@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using CM.Common.Utilities;
 
 namespace CM.Data.Model;
@@ -48,7 +49,7 @@ public class Dispute : BaseEntity
 
     public byte? TenancyGeozoneId { get; set; }
 
-    public byte? TenancyAddressValidated { get; set; }
+    public bool? TenancyAddressValidated { get; set; }
 
     public int? CrossAppFileNumber { get; set; }
 
@@ -64,6 +65,8 @@ public class Dispute : BaseEntity
 
     public byte? CreationMethod { get; set; }
 
+    public Notice OriginalNotice { get; set; }
+
     public DateTime? TenancyAgreementDate { get; set; }
 
     public byte? TenancyAgreementSignedBy { get; set; }
@@ -74,11 +77,15 @@ public class Dispute : BaseEntity
 
     public int? SubmittedBy { get; set; }
 
+    public Participant SubmittedParticipant { get; set; }
+
     public bool? IsAmended { get; set; }
 
     public DateTime? InitialPaymentDate { get; set; }
 
     public int? InitialPaymentBy { get; set; }
+
+    public Participant InitialPaymentParticipant { get; set; }
 
     public byte? InitialPaymentMethod { get; set; }
 
@@ -161,4 +168,26 @@ public class Dispute : BaseEntity
     public virtual ICollection<SubmissionReceipt> SubmissionReceipts { get; set; }
 
     public virtual ICollection<TrialDispute> TrialDisputes { get; set; }
+
+    public virtual ICollection<ServiceAuditLog> ServiceAuditLogs { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices { get; set; }
+
+    public virtual ICollection<AuditLog> AuditLogs { get; set; }
+
+    public virtual ICollection<Hearing> Hearings { get; set; }
+
+    public virtual ICollection<TrialParticipant> TrialParticipants { get; set; }
+
+    public virtual ICollection<ExternalErrorLog> ExternalErrorLogs { get; set; }
+
+    public virtual ICollection<PollResponse> PollResponses { get; set; }
+
+    public virtual ICollection<ParticipantIdentity> ParticipantIdentities { get; set; }
+
+    public virtual ICollection<ParticipantIdentity> IdentityParticipants { get; set; }
+
+    public virtual ICollection<DisputeLink> DisputeLinks { get; set; }
+
+    public virtual ICollection<DisputeVerification> DisputeVerifications { get; set; }
 }

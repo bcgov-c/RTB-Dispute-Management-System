@@ -36,4 +36,6 @@ public class OutcomeDocGroup : BaseEntity
     public string DocNote { get; set; }
 
     public virtual ICollection<OutcomeDocFile> OutcomeDocFiles { get; set; }
+
+    public virtual ICollection<OutcomeDocRequest> OutcomeDocRequests { get; set; }
 }

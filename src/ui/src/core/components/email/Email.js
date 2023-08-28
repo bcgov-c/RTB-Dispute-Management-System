@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Wraps an Input and adds functionality relating to emails, such as: send status, sending animation, email opt out.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import InputView from '../input/Input'
@@ -189,6 +192,13 @@ export default Marionette.View.extend({
     const inputView = this._getInputView()
     inputView.saveInput();
   },
+
+  /**
+   * @param {EmailModel} model - EmailModel
+   * @param {Boolean} [widgetMode] - If true then email input will be rendered with extra send, cancel buttons and status displays
+   * @param {Boolean} [showOptOut] - Shows link that opens opt out of email modal
+   * @param {String} [floatDir] - left|right which side the email buttons and status should show on
+   */
 
   initialize(options) {
     this.mergeOptions(options, ['widgetMode', 'showOptOut', 'labelText', 'iconClass', 'floatDir', 'eraseTextAfterClose']);

@@ -21,4 +21,14 @@ public static class HearingReportingManager
     {
         return client.GetAsync<MonthlyReport>(RouteHelper.GetDailyHearings + dateTime.ToLongTimeString(), request);
     }
+
+    public static EntityWithStatus<OwnerHearingsResponse> GetOwnerHearingsDetail(HttpClient client, int hearingOwnerId, OwnerHearingsDetailRequest request)
+    {
+        return client.GetAsync<OwnerHearingsResponse>(RouteHelper.GetOwnerHearingsDetail + hearingOwnerId, request);
+    }
+
+    public static EntityWithStatus<AvailableHearingsResponse> GetAvailableHearings(HttpClient client, AvailableHearingsRequest request)
+    {
+        return client.GetAsync<AvailableHearingsResponse>(RouteHelper.GetAvailableHearings, request);
+    }
 }

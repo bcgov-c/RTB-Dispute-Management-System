@@ -6,6 +6,8 @@ using CM.Services.DataWarehouse.DataWarehouseRepository.DimTime;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactDisputeSummary;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactHearingSummary;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactIntakeProcessing;
+using CM.Services.DataWarehouse.DataWarehouseRepository.FactIssueOutcome;
+using CM.Services.DataWarehouse.DataWarehouseRepository.FactResolutionService;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactTimeStatistic;
 using CM.Services.DataWarehouse.DataWarehouseRepository.LoadingHistory;
 
@@ -25,7 +27,11 @@ public class UnitOfWorkDataWarehouse : IUnitOfWorkDataWarehouse
 
     private readonly IFactIntakeProcessingRepository _factIntakeProcessingRepository = null;
 
+    private readonly IFactResolutionServiceRepository _factResolutionServiceRepository = null;
+
     private readonly IFactTimeStatisticRepository _factTimeStatisticRepository = null;
+
+    private readonly IFactIssueOutcomeRepository _factIssueOutcomeRepository = null;
 
     private readonly ILoadingHistoryRepository _loadingHistoryRepository = null;
 
@@ -41,6 +47,10 @@ public class UnitOfWorkDataWarehouse : IUnitOfWorkDataWarehouse
     public IFactHearingSummaryRepository FactHearingSummaryRepository => _factHearingSummaryRepository ?? new FactHearingSummaryRepository(_context);
 
     public IFactIntakeProcessingRepository FactIntakeProcessingRepository => _factIntakeProcessingRepository ?? new FactIntakeProcessingRepository(_context);
+
+    public IFactResolutionServiceRepository FactResolutionServiceRepository => _factResolutionServiceRepository ?? new FactResolutionServiceRepository(_context);
+
+    public IFactIssueOutcomeRepository FactIssueOutcomeRepository => _factIssueOutcomeRepository ?? new FactIssueOutcomeRepository(_context);
 
     public IDimTimeRepository DimTimeRepository => _dimTimeRepository ?? new DimTimeRepository(_context);
 

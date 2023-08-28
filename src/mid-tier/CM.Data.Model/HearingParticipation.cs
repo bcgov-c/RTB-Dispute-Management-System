@@ -42,4 +42,14 @@ public class HearingParticipation : BaseEntity
 
     [StringLength(1000)]
     public string PreParticipationComment { get; set; }
+
+    public int? ParticipationStatusBy { get; set; }
+
+    public SystemUser ParticipationStatusUser { get; set; }
+
+    public int? PreParticipationStatusBy { get; set; }
+
+    public SystemUser PreParticipationStatusUser { get; set; }
+
+    public DateTime? PreParticipationStatusDate { get; set; }
 }

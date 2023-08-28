@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Displays editable View for recording participant hearing participation on a Dispute
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import React from 'react';
@@ -13,7 +16,10 @@ const disputeChannel = Radio.channel('dispute');
 const configChannel = Radio.channel('config');
 
 const HearingParticipation = Marionette.View.extend({
-
+  /**
+   * @param {String} viewMode - Changes UI between editable and view mode
+   * @param {UnitCollection} unitCollection 
+   */
   initialize(options) {
     this.template = this.template.bind(this);
     this.mergeOptions(options, ['viewMode', 'unitCollection']);
@@ -140,7 +146,7 @@ const HearingParticipation = Marionette.View.extend({
     this.showChildView('hearingParticipantsRegion', new HearingParticipantCollectionView({
       viewMode: this.viewMode,
       unitCollection: this.unitCollection,
-      collection: this.model.getParticipations()
+      collection: this.model.getParticipations(),
     }));
 
     if (!this.viewMode) {

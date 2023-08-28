@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CM.Business.Entities.Models.BulkEmailRecipient;
 using CM.Business.Entities.Models.EmailMessage;
 using CM.Common.Utilities;
 using CM.Integration.Tests.Helpers;
@@ -31,6 +32,12 @@ public partial class SecurityTests
         var disputeEmailMessagesResponse = EmailMessageManager.GetDisputeEmailMessages(Client, Data.Dispute.DisputeGuid);
         disputeEmailMessagesResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
 
+        var bulkEmailMessageResponse = EmailMessageManager.CreateBulkEmailMessage(Client, new BulkEmailRecipientRequest { BulkEmailBatchId = 1, EmailTemplateId = 1 });
+        bulkEmailMessageResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        var externalEmailMessagesResponse = EmailMessageManager.GetExternalEmailMessages(Client, Data.Dispute.DisputeGuid, new ExternalEmailMessagesRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalEmailMessagesResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -48,6 +55,12 @@ public partial class SecurityTests
 
         disputeEmailMessagesResponse = EmailMessageManager.GetDisputeEmailMessages(Client, Data.Dispute.DisputeGuid);
         disputeEmailMessagesResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        bulkEmailMessageResponse = EmailMessageManager.CreateBulkEmailMessage(Client, new BulkEmailRecipientRequest { BulkEmailBatchId = 1, EmailTemplateId = 1 });
+        bulkEmailMessageResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalEmailMessagesResponse = EmailMessageManager.GetExternalEmailMessages(Client, Data.Dispute.DisputeGuid, new ExternalEmailMessagesRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalEmailMessagesResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
 
         // LOGIN AS UNAUTHORIZED EXTERNAL USER //
         Client.Authenticate(Users.User2, Users.User2);
@@ -67,6 +80,12 @@ public partial class SecurityTests
         disputeEmailMessagesResponse = EmailMessageManager.GetDisputeEmailMessages(Client, Data.Dispute.DisputeGuid);
         disputeEmailMessagesResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        bulkEmailMessageResponse = EmailMessageManager.CreateBulkEmailMessage(Client, new BulkEmailRecipientRequest { BulkEmailBatchId = 1, EmailTemplateId = 1 });
+        bulkEmailMessageResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalEmailMessagesResponse = EmailMessageManager.GetExternalEmailMessages(Client, Data.Dispute.DisputeGuid, new ExternalEmailMessagesRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalEmailMessagesResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
         Assert.True(auth.ResponseObject is string);
@@ -85,6 +104,12 @@ public partial class SecurityTests
 
         disputeEmailMessagesResponse = EmailMessageManager.GetDisputeEmailMessages(Client, Data.Dispute.DisputeGuid);
         disputeEmailMessagesResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        bulkEmailMessageResponse = EmailMessageManager.CreateBulkEmailMessage(Client, new BulkEmailRecipientRequest { BulkEmailBatchId = 1, EmailTemplateId = 1 });
+        bulkEmailMessageResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalEmailMessagesResponse = EmailMessageManager.GetExternalEmailMessages(Client, Data.Dispute.DisputeGuid, new ExternalEmailMessagesRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalEmailMessagesResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS UNAUTHORIZED ACCESSCODE //
         auth = Client.Authenticate(Data.Participants[4].AccessCode);
@@ -110,5 +135,11 @@ public partial class SecurityTests
 
         disputeEmailMessagesResponse = EmailMessageManager.GetDisputeEmailMessages(Client, Data.Dispute.DisputeGuid);
         disputeEmailMessagesResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        bulkEmailMessageResponse = EmailMessageManager.CreateBulkEmailMessage(Client, new BulkEmailRecipientRequest { BulkEmailBatchId = 1, EmailTemplateId = 1 });
+        bulkEmailMessageResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalEmailMessagesResponse = EmailMessageManager.GetExternalEmailMessages(Client, Data.Dispute.DisputeGuid, new ExternalEmailMessagesRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalEmailMessagesResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
     }
 }

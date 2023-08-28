@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     dotnet = 'dotnet.exe'
-    ROOT_FOLDER = 'D:/inetpub/wwwroot/ext/dms-test2/ui'
+    ROOT_FOLDER = 'D:/inetpub/wwwroot/ext/dms-test2'
     TEMP_FOLDER = 'D:/Temp'
     BACKUP_FOLDER = 'D:/dms-build-backup'
   }
@@ -25,6 +25,7 @@ pipeline {
       }
     }
 
+    // NOTE: siteconfig/ folder must exist in env.ROOT_FOLDER for the file to be properly moved
     stage('Configuration') {
       steps {
         dir("${env.ROOT_FOLDER}"){
@@ -48,7 +49,15 @@ pipeline {
     stage('Backup') {
       steps {
         fileOperations([
-          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui")
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Admin", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/Admin"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/DisputeAccess", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/DisputeAccess"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Intake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/Intake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/OfficeSubmissio", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/OfficeSubmissio"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/AdditionalLandlordIntake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/AdditionalLandlordIntake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/PostedDecisions", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/PostedDecisions"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/Common", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/Common"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/CeuIntake", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/CeuIntake"),
+          folderCopyOperation(sourceFolderPath: "${env.ROOT_FOLDER}/siteconfig", destinationFolderPath: "${env.BACKUP_FOLDER}/dms-staging-ui/siteconfig")
         ])
       }
     }
@@ -97,4 +106,3 @@ pipeline {
     }
   }
 }
-

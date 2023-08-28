@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.Base;
 
@@ -14,7 +15,7 @@ public interface IHearingParticipationRepository : IRepository<HearingParticipat
 
     Task<bool> CheckHearingParticipationExistenceAsync(int hearingId);
 
-    Task<List<HearingParticipation>> GetHearingParticipationListAsync(int hearingId);
+    Task<List<HearingParticipation>> GetHearingParticipationsAsync(int hearingId, ParticipationStatus? status = null);
 
     Task<HearingParticipation> GetHearingParticipation(int hearingId, int participantId, Guid disputeGuid);
 }

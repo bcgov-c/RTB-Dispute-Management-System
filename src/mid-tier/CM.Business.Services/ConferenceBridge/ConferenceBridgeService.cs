@@ -6,6 +6,8 @@ using AutoMapper;
 using CM.Business.Entities.Models.ConferenceBridge;
 using CM.Common.Utilities;
 using CM.Data.Repositories.UnitOfWork;
+using FluentFTP.Helpers;
+using Polly;
 
 namespace CM.Business.Services.ConferenceBridge;
 
@@ -81,7 +83,7 @@ public class ConferenceBridgeService : CmServiceBase, IConferenceBridgeService
         var conferenceBridges = await UnitOfWork.ConferenceBridgeRepository.GetAllByOwnerAsync(ownerId);
 
         return conferenceBridges.Any(
-            conferenceBridge => endTime <= conferenceBridge.PreferredStartTime || startTime >= conferenceBridge.PreferredEndTime);
+            conferenceBridge => startTime < conferenceBridge.PreferredEndTime && conferenceBridge.PreferredStartTime < endTime);
     }
 
     public async Task<bool> ConferenceBridgeExists(int conferenceBridgeId)
@@ -95,24 +97,9 @@ public class ConferenceBridgeService : CmServiceBase, IConferenceBridgeService
         return false;
     }
 
-    public async Task<bool> ConferenceBridgeIsBooked(int conferenceBridgeId, DateTime startTime, DateTime endTime)
+    public async Task<bool> ConferenceBridgeIsBooked(int conferenceBridgeId, DateTime startTime)
     {
-        var conferenceBridge = await UnitOfWork.ConferenceBridgeRepository.GetByIdAsync(conferenceBridgeId);
-
-        if (conferenceBridge != null)
-        {
-            if (conferenceBridge.PreferredStartTime == null && conferenceBridge.PreferredEndTime == null)
-            {
-                return false;
-            }
-
-            if (endTime <= conferenceBridge.PreferredStartTime || startTime >= conferenceBridge.PreferredEndTime)
-            {
-                return false;
-            }
-        }
-
-        return false;
+        return await UnitOfWork.ConferenceBridgeRepository.IsBridgeBooked(conferenceBridgeId, startTime);
     }
 
     public async Task<DateTime?> GetLastModifiedDateAsync(object id)

@@ -45,6 +45,9 @@ export default CalendarGridModel.extend({
         disabled: false,
         scheduleBlocksCollection: null,
         arbPositionLookup: null,
+        
+        selectedBlockId: null,
+        disableHeaderRouting: false,
         // End Block mode data
     });
   },
@@ -70,11 +73,12 @@ export default CalendarGridModel.extend({
       const events = [];
       _.each(arbBlocks, function(blockModel) {
         const hearingsCount = blockModel.get('associated_hearings');
+        const hearingCountDisplay = hearingsCount && `${blockModel.get('assocaited_booked_hearings')||0}/${hearingsCount}`;
         events.push({
           ownerOffset: rowIndex,
           blockId: blockModel.id,
           cssClass: `${blockModel.getTypeDisplayClass()} ${hearingsCount ? 'has-hearings' : ''}`,
-          description: Formatter.toTrimmedString(`${hearingsCount || ''}${blockModel.get('block_description') ? `${hearingsCount?' (':''}${blockModel.get('block_description')}${hearingsCount?')':''}` : ''}`, BLOCK_DESCRIPTION_DISPLAY_MAX)
+          description: Formatter.toTrimmedString(`${hearingCountDisplay || ''}${blockModel.get('block_description') ? `${hearingsCount?' (':''}${blockModel.get('block_description')}${hearingsCount?')':''}` : ''}`, BLOCK_DESCRIPTION_DISPLAY_MAX)
         });
       }, this);
 

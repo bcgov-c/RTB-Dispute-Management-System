@@ -4,7 +4,6 @@ import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
 import Radio_model from '../../../../core/components/radio/Radio_model';
 import RadioView from '../../../../core/components/radio/Radio';
 
-const MODAL_TITLE = `Select ARI-C Notice Option`;
 const PRELIM_NOTICE_TITLE = `Notice of Prehearing Conference`;
 const NOTICE_TITLE = `Notice of Dispute Resolution Proceeding`;
 const PRELIM_NOTICE_CODE = 1;
@@ -14,7 +13,7 @@ const ModalSelectRentIncreaseNotice = ModalBaseView.extend({
 
   initialize(options) {
     this.template = this.template.bind(this);
-    this.mergeOptions(options, ['parentModel']);
+    this.mergeOptions(options, ['parentModel', 'noticeTypeDisplay']);
     this.createSubModels();
   },
 
@@ -41,10 +40,10 @@ const ModalSelectRentIncreaseNotice = ModalBaseView.extend({
     this.close();
   },
 
-  id: 'ri-notice-select-modal',
+  id: 'selectionModal',
   
   regions : {
-    typeRegion: '.ri-notice-select-modal__type'
+    typeRegion: '.selectionModal__type'
   },
 
   template() {
@@ -52,13 +51,13 @@ const ModalSelectRentIncreaseNotice = ModalBaseView.extend({
       <div className="modal-dialog">
         <div className="modal-content clearfix">
           <div className="modal-header">
-            <h4 className="modal-title">{MODAL_TITLE}</h4>
+            <h4 className="modal-title">Select {this.noticeTypeDisplay || 'Generate'} Notice Option</h4>
             <div className="modal-close-icon-lg close-x"></div>
           </div>
           <div className="modal-body clearfix">
-            <p>ARI-C files have the following notice generation options, please select one of the following:</p>
+            <p>{this.noticeTypeDisplay ? `${this.noticeTypeDisplay} files have` : `This dispute file has`} the following notice generation options, please select one of the following:</p>
 
-            <div className="ri-notice-select-modal__type"></div>
+            <div className="selectionModal__type"></div>
             
             <div className="modal-blank-buttons pull-right">
               <button type="button" className="btn btn-lg btn-default btn-cancel cancel-button">

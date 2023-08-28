@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Contains UI and functionality for a quick status. 
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
@@ -23,6 +26,7 @@ export default Marionette.View.extend({
     stageRegion: '.quickstatus-stage',
     statusRegion: '.quickstatus-status',
     ownerRegion: '.quickstatus-owner',
+    processRegion: '.quickstatus-process',
     overrideRegion: '.quickstatus-override',
   },
 
@@ -46,7 +50,8 @@ export default Marionette.View.extend({
         // Set owner to none (unassign) when no owner specified
         owner: this._requiresOwner() ? ownerId : 0,
       },
-        this._requiresOverride() ? { evidence_override: this.model.get('dest_override')?1:0 } : {}
+      this._requiresOverride() ? { evidence_override: this.model.get('dest_override')?1:0 } : {},
+      this._requiresProcess() ? { process: this.model.get('dest_process') } : {}
     );
     loaderChannel.trigger('page:load');
 
@@ -55,7 +60,7 @@ export default Marionette.View.extend({
     .then(() => {
       this.dispute.saveStatus(statusChanges)
       .done(() => {
-        statusChannel.request('apply:sspo:flags', statusChanges, this.dispute).finally(() => this.model.trigger('save:complete'));
+        statusChannel.request('apply:sspo:after:actions', statusChanges, this.dispute).finally(() => this.model.trigger('save:complete'));
       })
       .fail(err => {
         loaderChannel.trigger('page:load:complete');
@@ -77,9 +82,12 @@ export default Marionette.View.extend({
 
   applyStatusCheck() {
     const status = this.model.get('dest_status');
-    const evidenceOverride = this._requiresOverride() && this.model.get('dest_override');
+    const stage = this.model.get('dest_stage') || this.dispute.getStage();
+    const process = this.model.get('dest_process') || this.dispute.getProcess();
+    const evidence_override = this._requiresOverride() && (this.model.get('dest_override') || this.dispute.getOverride())
+
     return new Promise((res, rej) => (
-      statusChannel.request('check:sspo:status', this.dispute, status, evidenceOverride).then(() => {
+      statusChannel.request('check:sspo:status', this.dispute, { stage, status, process, evidence_override }).then(() => {
         loaderChannel.trigger('page:load');
         res();
       }, () => {
@@ -98,12 +106,18 @@ export default Marionette.View.extend({
     return this.model.get('dest_override') !== null;
   },
 
+  _requiresProcess() {
+    return !!this.model.get('dest_process')
+  },
+
   _useExistingOwner() {
     return this.model.get('dest_owner') === 'same';
   },
 
-  initialize() {
-    this.dispute = disputeChannel.request('get');
+  initialize(options) {
+    this.mergeOptions(options, ['disputeModel']);
+
+    this.dispute = this.disputeModel || disputeChannel.request('get');
     this.stageModel = new DropdownModel({
       labelText: 'Stage',
       disabled: true,
@@ -114,6 +128,13 @@ export default Marionette.View.extend({
       labelText: 'Status',
       disabled: true,
       optionData: [{ value: -1, text: Formatter.toStatusDisplay(this.model.get('dest_status')) }],
+      value: -1
+    });
+
+    this.processModel = new DropdownModel({
+      labelText: 'Process',
+      disabled: true,
+      optionData: [{ value: -1, text: Formatter.toProcessDisplay(this.model.get('dest_process')) }],
       value: -1
     });
 
@@ -156,12 +177,17 @@ export default Marionette.View.extend({
     if (this._requiresOverride()) {
       this.showChildView('overrideRegion', new CheckboxView({ model: this.overrideModel }));
     }
+
+    if (this._requiresProcess()) {
+      this.showChildView('processRegion', new DropdownView({ model: this.processModel }));
+    }
   },
 
   templateContext() {
     return {
       requiresOwner: this._requiresOwner(),
-      requiresOverride: this._requiresOverride()
+      requiresOverride: this._requiresOverride(),
+      requiresProcess: this._requiresProcess(),
     };
   },
 });

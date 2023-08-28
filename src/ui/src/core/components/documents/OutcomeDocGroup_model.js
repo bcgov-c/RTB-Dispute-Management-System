@@ -92,7 +92,7 @@ export default CMModel.extend({
     return outcomeDocFileModel;
   },
 
-  createOutcomeFileFromConfig(outcome_doc_file_config, options) {
+  createOutcomeFileFromConfig(outcome_doc_file_config, options={}) {
     return this.createOutcomeFile({
       file_type: outcome_doc_file_config.id,
       file_acronym: outcome_doc_file_config.code,
@@ -101,17 +101,16 @@ export default CMModel.extend({
     }, options);
   },
 
-  createAssociatedOutcomeFiles() {
-    const outcome_doc_group_config = documentsChannel.request('config:group', this.get('doc_group_type'));
-
-    _.each(outcome_doc_group_config.associated_outcome_docs, function(outcome_doc_code) {
-      const outcome_doc_file_config = documentsChannel.request('config:file', outcome_doc_code);
-      if (outcome_doc_file_config) {
-        this.createOutcomeFileFromConfig(outcome_doc_file_config, { add: true });
-      } else {
-        console.log(`[Error] Couldn't find a config for outcome doc file ${outcome_doc_code}`);
-      }
-    }, this);
+  createOutcomeFilePublicFinal(outcomeFileData={}, options={}) {
+    const docConfigId = configChannel.request('get', 'OUTCOME_DOC_FILE_TYPE_PDF_ANONYMIZED_DECISION');
+    const fileConfig = documentsChannel.request('config:file', docConfigId) || {};
+    return this.createOutcomeFile(Object.assign({}, {
+      file_type: docConfigId,
+      file_acronym: fileConfig.code,
+      file_title: fileConfig.title,
+      file_source: configChannel.request('get', 'OUTCOME_DOC_FILE_SOURCE_EXTERNAL'),
+      visible_to_public: false
+    }, outcomeFileData), options);
   },
 
   // Fills each OutcomeDocFile with the OutcomeDocDelivery objects it needs, based on participants and public-ness
@@ -123,7 +122,6 @@ export default CMModel.extend({
 
   getDeliverableOutcomeFiles() {
     return this.getOutcomeFiles().filter(outcome_file_model => (
-      outcome_file_model.isActive() &&
       !outcome_file_model.isPublic() &&
       !outcome_file_model.isExternal()
     ));
@@ -208,7 +206,8 @@ export default CMModel.extend({
           dfd.resolve();
         } else {
           this.saveOutcomeFiles(options)
-            .done(dfd.resolve)
+            // Ensure there is enough time between the outcome doc group record save and the outcome doc file save (race condition in PostedDecision mid-tier?)
+            .done(response => setTimeout(() => dfd.resolve(response), 25))
             .fail(dfd.reject);
         }
       })
@@ -242,15 +241,25 @@ export default CMModel.extend({
     return this.getOutcomeFiles().find(outcomeFile => outcomeFile.get('file_acronym') === OUTCOME_DOC_DECISION_CODE && OUTCOME_DOC_DECISION_CODE);
   },
 
-  getGroupRequestTitleDisplay() {
+  getOutcomeFilePublicFinal() {
+    return this.getOutcomeFiles().find(outcomeFile => outcomeFile.isPublic());
+  },
+
+  getAnonymousDocId() {
+    return this.getOutcomeFilePublicFinal()?.toAnonymousDocId();
+  },
+
+  getGroupRequestTitleDisplay(options={}) {
     const outcomeFiles = this.getOutcomeFiles();
     const hasDecision = outcomeFiles.any(outcomeFile => outcomeFile.isDecision());
     const hasMonetaryOrder = outcomeFiles.any(outcomeFile => outcomeFile.isMonetaryOrder());
     const hasOrderOfPossession = outcomeFiles.any(outcomeFile => outcomeFile.isOrderOfPossession());
-    const dateDisplay = this.get('doc_completed_date') ? (Formatter.toDateDisplay(this.get('doc_completed_date')) || 'date not available') : 'date not available';
-    return hasDecision && (hasMonetaryOrder || hasOrderOfPossession) ? `Decision and Order(s): ${dateDisplay}`
-      : hasDecision ? `Decision: ${dateDisplay}`
-      : `Other Documents: ${dateDisplay}`;
+    const title = hasDecision && (hasMonetaryOrder || hasOrderOfPossession) ? `Decision and Order(s)`
+      : hasDecision ? `Decision`
+      : `Other Documents`;
+    const dateDisplay = this.get('doc_completed_date') ? Formatter.toFullDateDisplay(this.get('doc_completed_date')) : 'date not available';
+    
+    return `${title}${options.date !== false ? `: ${dateDisplay}` : ''}`
   },
 
   getDocFilesWithConfigFilter(configFieldToCheck) {
@@ -279,14 +288,21 @@ export default CMModel.extend({
     });
   },
 
+  isSubType(subType) {
+    const outcomeFiles = this.getOutcomeFiles();
+    return outcomeFiles.length && outcomeFiles.all(f => f.get('file_sub_type') === subType);
+  },
+
   isSubTypeCorrection() {
-    const OUTCOME_DOC_FILE_SUB_TYPE_CORR = configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_CORR');
-    return this.getOutcomeFiles().all(f => f.get('file_sub_type') === OUTCOME_DOC_FILE_SUB_TYPE_CORR);
+    return this.isSubType(configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_CORR'));
   },
 
   isSubTypeReview() {
-    const OUTCOME_DOC_FILE_SUB_TYPE_REVIEW = configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_REVIEW');
-    return this.getOutcomeFiles().all(f => f.get('file_sub_type') === OUTCOME_DOC_FILE_SUB_TYPE_REVIEW);
+    return this.isSubType(configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_REVIEW'));
+  },
+
+  isSubTypeNewDoc() {
+    return this.isSubType(configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_NEW'));
   },
 
   getGroupTitle() {

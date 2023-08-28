@@ -16,8 +16,11 @@ import { AddIssueModal } from '../../../components/modals/AddIssueModal';
 import { IconAdd, IconPostedDecisionsDelete, IconInfo } from '../../../assets/images';
 import './DecisionSearch.scss';
 import { polyglot } from '../../../assets/locales';
+import { RADIO_FILTER_CODES } from '../Main';
 
-//no codes found in internal_config
+const HEARING_ATTENDANCE_ALL = '1';
+const HEARING_ATTENDANCE_APPLICANTS = '2';
+const HEARING_ATTENDANCE_RESPONDENTS = '3';
 const TENANT_IN_UNIT_CODE = '0';
 const TENANT_MOVED_OUT_CODE = '1';
 const OWNED_BY_RENTER_CODE = '1';
@@ -25,39 +28,33 @@ const NOT_OWNED_BY_RENTER_CODE = '0';
 const BETWEEN_DATES_SEARCH_CODE = '0';
 const BEFORE_DATE_SEARCH_CODE = '1';
 const AFTER_DATE_SEARCH_CODE = '2';
-const RADIO_CODE_PROPERTIES = 0;
-const RADIO_CODE_TEXT = 1;
 const BUSINESS_NAME_MAX_LENGTH = 50;
 const BUSINESS_NAME_MIN_LENGTH = 3;
 const INCOMPLETE_FIELDS_ERROR = 'Necessary fields not complete';
 const NO_ISSUE_SELECTED_ERROR = 'Please select an issue'
+const DECISION_SEARCH_ERROR = `Invalid DecisionID, please check your decision or order for the ID and try again`;
 const POSTED_DECISIONS_RELEASE_DATE = Moment("2020-09-31");
+
+const configChannel = Radio.channel('config');
+const animationChannel = Radio.channel('animations');
+const modalChannel = Radio.channel('modals');
 
 const DecisionSearch = Marionette.View.extend({
   initialize(options) {
-    this.configChannel = Radio.channel('config');
-    this.animationChannel = Radio.channel('animations');
-    this.modalChannel = Radio.channel('modals');
-    this.LANDLORD_CODE = String(this.configChannel.request('get', 'DISPUTE_SUBTYPE_LANDLORD'));
-    this.TENANT_CODE = String(this.configChannel.request('get', 'DISPUTE_SUBTYPE_TENANT'));
-    this.DROPDOWN_CODE_HOME = String(this.configChannel.request('get', 'DISPUTE_TYPE_RTA'));
-    this.DROPDOWN_CODE_MH_PARK = String(this.configChannel.request('get', 'DISPUTE_TYPE_MHPTA'));
-
-    this.LANDLORD_AND_TENANT_HEARING_CODE = String(this.configChannel.request('get', 'COMPLEXITY_SIMPLE'));
-    this.APPLICANT_HEARING_CODE = String(this.configChannel.request('get', 'COMPLEXITY_STANDARD'));
-    this.RESPONDENTS_HEARING_CODE = String(this.configChannel.request('get', 'COMPLEXITY_COMPLEX'));
-
-    this.PARTICIPATORY_HEARING_CODE = String(this.configChannel.request('get', 'PROCESS_ORAL_HEARING'));
-    this.DIRECT_REQUEST_CODE = String(this.configChannel.request('get', 'PROCESS_WRITTEN_OR_DR'));
-    this.REVIEW_HEARING_CODE = String(this.configChannel.request('get', 'PROCESS_REVIEW_HEARING'));
-    this.JOINED_APPLICATION_CODE = String(this.configChannel.request('get', 'PROCESS_JOINER_HEARING'));
-    this.RENT_INCREASE_CODE = String(this.configChannel.request('get', 'PROCESS_RENT_INCREASE'));
-
+    // Bind this to template so we can call functions inside of template. E.G "this.functionName()"
+    this.template = this.template.bind(this);
     this.mergeOptions(options, ['searchOption']);
-    this.createSubModels();
-    this.setupListeners();
-    this.template = this.template.bind(this);//bind this to template so we can call functions inside of template. E.G "this.functionName()"
-
+    
+    this.DISPUTE_SUBTYPE_LANDLORD = String(configChannel.request('get', 'DISPUTE_SUBTYPE_LANDLORD'));
+    this.DISPUTE_SUBTYPE_TENANT = String(configChannel.request('get', 'DISPUTE_SUBTYPE_TENANT'));
+    this.DROPDOWN_CODE_HOME = String(configChannel.request('get', 'DISPUTE_TYPE_RTA'));
+    this.DISPUTE_TYPE_MHPTA = String(configChannel.request('get', 'DISPUTE_TYPE_MHPTA'));
+    this.PROCESS_ORAL_HEARING = String(configChannel.request('get', 'PROCESS_ORAL_HEARING'));
+    this.PROCESS_WRITTEN_OR_DR = String(configChannel.request('get', 'PROCESS_WRITTEN_OR_DR'));
+    this.PROCESS_REVIEW_HEARING = String(configChannel.request('get', 'PROCESS_REVIEW_HEARING'));
+    this.PROCESS_JOINER_HEARING = String(configChannel.request('get', 'PROCESS_JOINER_HEARING'));
+    this.PROCESS_RENT_INCREASE = String(configChannel.request('get', 'PROCESS_RENT_INCREASE'));
+    
     this.searchOption ? this.searchOption : null;
     this.addIssueCollection = new DropdownCollection();
     this.showIssueError = false;
@@ -67,185 +64,32 @@ const DecisionSearch = Marionette.View.extend({
     this.showBeforeDate = false;
     this.showAndText = false;
     
-    this.requiredDisputeRegions = ['applicantDropdownRegion', 'rentalTypeDropdownRegion', 'tenancyStatusDropdownRegion', 'resolutionProcessDropdownRegion',
-    'businessCheckboxRegion', 'attendancCheckboxRegion', 'specificIssueCheckboxRegion', 'dateCheckboxRegion', 'ownedByDropdownRegion', 'dateDecisionAfterInputRegion', 'dateDecisionBeforeInputRegion'];
-    this.requiredInputsRegions = ['applicantDropdownRegion', 'rentalTypeDropdownRegion', 'tenancyStatusDropdownRegion', 'ownedByDropdownRegion', 'resolutionProcessDropdownRegion'];
-    this.disputeRegions = ['applicantDropdownRegion', 'rentalTypeDropdownRegion', 'ownedByDropdownRegion', 
-    'tenancyStatusDropdownRegion', 'resolutionProcessDropdownRegion', 'businessNameInputRegion', 'attendanceDropdownRegion',
-    'decisionDateDropdownRegion', 'dateDecisionAfterInputRegion', 'dateDecisionBeforeInputRegion', 'businessCheckboxRegion', 'attendancCheckboxRegion', 'specificIssueCheckboxRegion', 'dateCheckboxRegion'];
+    this.requiredDisputeRegions = [
+      'applicantDropdownRegion', 'rentalTypeDropdownRegion', 'businessCheckboxRegion', 'specificIssueCheckboxRegion', 'dateCheckboxRegion', 'ownedByDropdownRegion', 'dateDecisionAfterInputRegion', 'dateDecisionBeforeInputRegion',
+      'resolutionProcessDropdownRegion', 'tenancyStatusDropdownRegion',
+      //'attendanceCheckboxRegion',
+    ];
+    this.requiredInputsRegions = ['applicantDropdownRegion', 'rentalTypeDropdownRegion', 'ownedByDropdownRegion',
+      'resolutionProcessDropdownRegion', 'tenancyStatusDropdownRegion',
+    ];
+    this.disputeRegions = ['applicantDropdownRegion', 'rentalTypeDropdownRegion', 'ownedByDropdownRegion', 'businessNameInputRegion', 'attendanceDropdownRegion', 'decisionDateDropdownRegion', 'dateDecisionAfterInputRegion', 'dateDecisionBeforeInputRegion', 'businessCheckboxRegion', 'specificIssueCheckboxRegion', 'dateCheckboxRegion',
+      'resolutionProcessDropdownRegion', 'tenancyStatusDropdownRegion',
+      //'attendanceCheckboxRegion',
+    ];
     this.dateRegions = ['decisionDateDropdownRegion','dateDecisionAfterInputRegion', 'dateDecisionBeforeInputRegion'];
     this.disputeTextFreeRegions = ['decisionFreeTextRegion'];
-    this.decisionSearchRegions = [...this.disputeRegions, ...this.disputeTextFreeRegions];
-  },
+    this.disputeIdSearchRegions = ['decisionIdSearchRegion'];
+    this.decisionSearchRegions = [...this.disputeRegions, ...this.disputeTextFreeRegions, ...this.disputeIdSearchRegions];
 
-  setupListeners() {
-    /* Model trigger listeners */
-    this.listenTo(this.model, 'filter:update', (filterVal) => {
-      this.resetDecisionSearch();
-      this.searchOption = filterVal;
-      this.render();
-    });
-    this.listenTo(this.model, 'search:clicked', () => {
-      const valid = this.validateAndShowErrors(this.decisionSearchRegions);
-      if (valid) {
-        this.disableForm();
-        this.loadDecisions();
-      }
-    });
-    this.listenTo(this.model, 'search:reset', this.resetDecisionSearch);
-
-    /* Input Listeners */
-    this.listenTo(this.applicantModel, 'change:value', () => {
-      if (this.requiredRegionsValid()) {
-        this.setProcessModel();
-      } else {
-        this.resolutionProcessModel.set({ disabled: true, errorMessage: INCOMPLETE_FIELDS_ERROR });
-      }
-      this.resetAndRenderDependentModels();
-    });
-
-    this.listenTo(this.rentalTypeModel, 'change:value', () => {
-      if (this.requiredRegionsValid()) {
-        this.setProcessModel();
-      } else {
-        this.resolutionProcessModel.set({ disabled: true, errorMessage: INCOMPLETE_FIELDS_ERROR });
-      }
-      this.resetAndRenderDependentModels();
-    });
-
-    this.listenTo(this.ownedByModel, 'change:value', () => {
-      if (this.requiredRegionsValid()) {
-        this.setProcessModel();
-      } else {
-        this.resolutionProcessModel.set({ disabled: true, errorMessage: INCOMPLETE_FIELDS_ERROR });
-      }
-      this.resetAndRenderDependentModels();
-    });
-
-    this.listenTo(this.tenancyStatusModel, 'change:value', () => {
-      if (this.requiredRegionsValid()) {
-        this.setProcessModel();
-      } else {
-        this.resolutionProcessModel.set({ disabled: true, errorMessage: INCOMPLETE_FIELDS_ERROR });
-      }
-      this.resetAndRenderDependentModels();
-    });
-
-    this.listenTo(this.resolutionProcessModel, 'change:value', () => {                                   
-      this.showIssueError = false;
-      const resetResolutionProcess = false;
-      this.resetAndRenderDependentModels(resetResolutionProcess);
-    });
-
-
-    /* Checkbox listeners*/
-    this.listenTo(this.businessCheckboxModel, 'change:checked', () => {
-      if (this.businessCheckboxModel.getData() === true) {
-        this.businessNameModel.set({ disabled: false, value: null, required: true });
-        this.getChildView('businessNameInputRegion').render();
-      } else {
-        this.businessNameModel.set({ disabled: true, value: null, required: false });
-        this.getChildView('businessNameInputRegion').render();
-      }
-    });
-
-    this.listenTo(this.attendanceCheckboxModel, 'change:checked', () => {
-      if (this.attendanceCheckboxModel.getData() === true) {
-        this.attendanceModel.set({ disabled: false, value: null, required: true });
-        this.getChildView('attendanceDropdownRegion').render();
-      } else {
-        this.attendanceModel.set({ disabled: true, value: null, required: false });
-        this.getChildView('attendanceDropdownRegion').render();
-      }
-    });
-
-    this.listenTo(this.decisionDateCheckboxModel, 'change:checked', () => {
-      if (this.decisionDateCheckboxModel.getData() === true) {
-        this.dateSearchDropdownModel.set({ disabled: false, required: true });
-        this.dateDecisionAfterModel.set({ disabled: false, required: true });
-        this.dateDecisionBeforeModel.set({ disabled: false, required: true });
-        this.getChildView('decisionDateDropdownRegion').render();
-      } else {
-        this.dateSearchDropdownModel.set({ disabled: true, value: null, required: false });
-        this.dateDecisionAfterModel.set({ disabled: false, value: null, required: false });
-        this.dateDecisionBeforeModel.set({ disabled: false, value: null, required: false });
-        this.render();
-      }
-    });
-
-    this.listenTo(this.specificIssueCheckboxModel, 'change:checked', () => {
-      if (this.specificIssueCheckboxModel.getData() === true) {
-        this.showAddIssue = true;
-      } else {
-        this.addIssueCollection.reset([], { silent: true });
-        this.showIssueError = false;
-        this.showAddIssue = false;
-      }
-      this.render();
-    });
-
-    /* Dropdown Listeners */
-    this.listenTo(this.rentalTypeModel, 'change:value', () => {
-      if (this.rentalTypeModel.getData() === this.DROPDOWN_CODE_MH_PARK) {
-        this.showOwnedBy = true;
-        this.ownedByModel.set({ required: true });
-      } else {
-        this.showOwnedBy = false;
-        this.ownedByModel.set({ required: false });
-      }
-
-      this.render();
-    });
-
-    /* Date Input Listeners */
-    this.listenTo(this.dateDecisionAfterModel, 'change:value', (model, val) => {
-      if (Moment(val).isAfter(Moment().subtract(1, 'd')) && this.dateSearchDropdownModel.getData() === BETWEEN_DATES_SEARCH_CODE) this.dateDecisionBeforeModel.set({ customLink: '' });
-      else this.dateDecisionBeforeModel.set({ customLink: 'Today' });
-      this.dateDecisionBeforeModel.set({ minDate: Moment(val).add(1, 'd') });
-      this.render();
-    });
-
-    this.listenTo(this.dateDecisionBeforeModel, 'change:value', (model, val) => {
-      if (val) this.dateDecisionAfterModel.set({ maxDate: Moment(val).subtract(1, 'd') });
-      this.render();
-    });
-
-    this.listenTo(this.dateSearchDropdownModel, 'change:value', () => {
-      if (this.dateSearchDropdownModel.getData() === BETWEEN_DATES_SEARCH_CODE) {
-        this.dateDecisionAfterModel.set({ value: null, required: true, maxDate: Moment().subtract(1, 'd') });
-        this.dateDecisionBeforeModel.set({ value: null, required: true });
-        this.showAfterDate = true; 
-        this.showAndText = true;
-        this.showBeforeDate = true;
-      } else if (this.dateSearchDropdownModel.getData() === BEFORE_DATE_SEARCH_CODE) {
-        this.dateDecisionAfterModel.set({ value: null, required: null });
-        this.dateDecisionBeforeModel.set({ value: null, required: true });
-        this.showAfterDate = false;
-        this.showAndText = false;
-        this.showBeforeDate = true;
-      } else if (this.dateSearchDropdownModel.getData() === AFTER_DATE_SEARCH_CODE) {
-        this.dateDecisionBeforeModel.set({ value: null, required: null });
-        this.dateDecisionAfterModel.set({ value: null, required: true, maxDate: Moment() });
-        this.showAfterDate = true;
-        this.showAndText = false;
-        this.showBeforeDate = false;
-      } else {
-        this.dateDecisionAfterModel.set({ value: null });
-        this.dateDecisionBeforeModel.set({ value: null});
-        this.showAfterDate = false;
-        this.showAndText = false;
-        this.showBeforeDate = false;
-      }
-
-      this.render();
-    });
+    this.createSubModels();
+    this.setupListeners();
   },
 
   createSubModels() {
     /* Dropdown Models */
     this.applicantModel = new DropdownModel({
-      optionData: [{ value: this.LANDLORD_CODE, text: 'Landlord' },
-      { value: this.TENANT_CODE, text: 'Tenant' }],
+      optionData: [{ value: this.DISPUTE_SUBTYPE_LANDLORD, text: 'Landlord' },
+      { value: this.DISPUTE_SUBTYPE_TENANT, text: 'Tenant' }],
       labelText: "Applicant",
       required: true,
       defaultBlank: true,
@@ -254,7 +98,7 @@ const DecisionSearch = Marionette.View.extend({
 
     this.rentalTypeModel = new DropdownModel({
       optionData: [{ value: this.DROPDOWN_CODE_HOME, text: 'Home, suite or apartment' }, 
-      { value: this.DROPDOWN_CODE_MH_PARK, text: 'Site in a manufactured home park' }],
+      { value: this.DISPUTE_TYPE_MHPTA, text: 'Site in a manufactured home park' }],
       labelText: "Rental Type",
       required: true,
       defaultBlank: true,
@@ -262,7 +106,7 @@ const DecisionSearch = Marionette.View.extend({
     });
 
     this.ownedByModel = new DropdownModel({
-      optionData: [{ value: OWNED_BY_RENTER_CODE, text: 'Owned By the Renter'}, { value: NOT_OWNED_BY_RENTER_CODE, text: 'Not owned by the renter'}],
+      optionData: [{ value: OWNED_BY_RENTER_CODE, text: 'Owned by the tenant'}, { value: NOT_OWNED_BY_RENTER_CODE, text: 'Not owned by the tenant'}],
       labelText: "Ownership",
       required: false,
       defaultBlank: true,
@@ -270,18 +114,20 @@ const DecisionSearch = Marionette.View.extend({
     })
 
     this.tenancyStatusModel = new DropdownModel({
-      optionData: [{ value: TENANT_IN_UNIT_CODE, text: 'Tenant was living in unit' }, { value: TENANT_MOVED_OUT_CODE, text: 'Tenant already moved out' }],
+      optionData: [{ value: TENANT_IN_UNIT_CODE, text: 'Tenant was living in unit' },
+        { value: TENANT_MOVED_OUT_CODE, text: 'Tenant already moved out' }],
       labelText: "Tenancy Status",
       required: true,
       defaultBlank: true,
       value: null,
+      disabled: true,
     });
 
     this.resolutionProcessModel = new DropdownModel({
-      optionData: this.getResolutionProcessOptions(),
+      optionData: [], // Will be set in process model
       labelText: "Resolution Process",
       errorMessage: INCOMPLETE_FIELDS_ERROR,
-      disabled: true,
+      disabled: false,
       required: true,
       defaultBlank: true,
       value: null,
@@ -290,7 +136,7 @@ const DecisionSearch = Marionette.View.extend({
     /* Checkbox + Input/Dropdown Models */
 
     this.businessCheckboxModel = new CheckboxModel({
-      html: 'With a business like:',
+      html: 'With a business name like:',
       checked: false
     });
 
@@ -372,10 +218,200 @@ const DecisionSearch = Marionette.View.extend({
       countdown: true,
       max: 500
     });
+
+    this.decisionIdSearchModel = new InputModel({
+      labelText: 'Decision ID (i.e. AnonDec-1000)',
+      errorMessage: 'Enter decision ID',
+      maxLength: 16,
+      required: true,
+      value: null
+    });
+
+    // Ensure process model is initialized correctly once all models are created
+    this.setProcessModel();
+  },
+
+  setupListeners() {
+    /* Model trigger listeners */
+    this.listenTo(this.model, 'filter:update', (filterVal) => {
+      this.resetDecisionSearch();
+      this.searchOption = filterVal;
+      this.render();
+    });
+    this.listenTo(this.model, 'search:clicked', () => {
+      const valid = this.validateAndShowErrors(this.decisionSearchRegions);
+      if (valid) {
+        this.disableForm();
+        this.loadDecisions();
+      }
+    });
+    this.listenTo(this.model, 'search:reset', this.resetDecisionSearch);
+
+    /* Input Listeners */
+    this.listenTo(this.applicantModel, 'change:value', () => {
+      if (this.requiredRegionsValid()) {
+        this.setProcessModel();
+      } else {
+        // Do not disable process for R1.03.09
+        this.resolutionProcessModel.set({
+          //disabled: true,
+          errorMessage: INCOMPLETE_FIELDS_ERROR
+        });
+      }
+
+      this.resetAndRenderDependentModels();
+    });
+
+    this.listenTo(this.rentalTypeModel, 'change:value', () => {
+      if (this.requiredRegionsValid()) {
+        this.setProcessModel();
+      } else {
+        // Do not disable process for R1.03.09
+        this.resolutionProcessModel.set({
+          //disabled: true,
+          errorMessage: INCOMPLETE_FIELDS_ERROR
+        });
+      }
+      this.resetAndRenderDependentModels();
+    });
+
+    this.listenTo(this.ownedByModel, 'change:value', () => {
+      if (this.requiredRegionsValid()) {
+        this.setProcessModel();
+      } else {
+        // Do not disable process for R1.03.09
+        this.resolutionProcessModel.set({
+          //disabled: true,
+          errorMessage: INCOMPLETE_FIELDS_ERROR
+        });
+      }
+      this.resetAndRenderDependentModels();
+    });
+
+    this.listenTo(this.tenancyStatusModel, 'change:value', () => {
+      if (this.requiredRegionsValid()) {
+        this.setProcessModel();
+      } else {
+        // Do not disable process for R1.03.09
+        this.resolutionProcessModel.set({
+          //disabled: true,
+          errorMessage: INCOMPLETE_FIELDS_ERROR
+        });
+      }
+      this.resetAndRenderDependentModels();
+    });
+
+    this.listenTo(this.resolutionProcessModel, 'change:value', () => {                                   
+      this.showIssueError = false;
+      const resetResolutionProcess = false;
+      this.resetAndRenderDependentModels(resetResolutionProcess);
+    });
+
+
+    /* Checkbox listeners*/
+    this.listenTo(this.businessCheckboxModel, 'change:checked', () => {
+      if (this.businessCheckboxModel.getData() === true) {
+        this.businessNameModel.set({ disabled: false, value: null, required: true });
+        this.getChildView('businessNameInputRegion').render();
+      } else {
+        this.businessNameModel.set({ disabled: true, value: null, required: false });
+        this.getChildView('businessNameInputRegion').render();
+      }
+    });
+
+    this.listenTo(this.attendanceCheckboxModel, 'change:checked', () => {
+      if (this.attendanceCheckboxModel.getData() === true) {
+        this.attendanceModel.set({ disabled: false, value: null, required: true });
+        this.getChildView('attendanceDropdownRegion').render();
+      } else {
+        this.attendanceModel.set({ disabled: true, value: null, required: false });
+        this.getChildView('attendanceDropdownRegion').render();
+      }
+    });
+
+    this.listenTo(this.decisionDateCheckboxModel, 'change:checked', () => {
+      if (this.decisionDateCheckboxModel.getData() === true) {
+        this.dateSearchDropdownModel.set({ disabled: false, required: true });
+        this.dateDecisionAfterModel.set({ disabled: false, required: true });
+        this.dateDecisionBeforeModel.set({ disabled: false, required: true });
+        this.getChildView('decisionDateDropdownRegion').render();
+      } else {
+        this.dateSearchDropdownModel.set({ disabled: true, value: null, required: false });
+        this.dateDecisionAfterModel.set({ disabled: false, value: null, required: false });
+        this.dateDecisionBeforeModel.set({ disabled: false, value: null, required: false });
+        this.render();
+      }
+    });
+
+    this.listenTo(this.specificIssueCheckboxModel, 'change:checked', () => {
+      if (this.specificIssueCheckboxModel.getData() === true) {
+        this.showAddIssue = true;
+      } else {
+        this.addIssueCollection.reset([], { silent: true });
+        this.showIssueError = false;
+        this.showAddIssue = false;
+      }
+      this.render();
+    });
+
+    /* Dropdown Listeners */
+    this.listenTo(this.rentalTypeModel, 'change:value', () => {
+      if (this.rentalTypeModel.getData() === this.DISPUTE_TYPE_MHPTA) {
+        this.showOwnedBy = true;
+        this.ownedByModel.set({ required: true });
+      } else {
+        this.showOwnedBy = false;
+        this.ownedByModel.set({ required: false });
+      }
+
+      this.render();
+    });
+
+    /* Date Input Listeners */
+    this.listenTo(this.dateDecisionAfterModel, 'change:value', (model, val) => {
+      if (Moment(val).isAfter(Moment().subtract(1, 'd')) && this.dateSearchDropdownModel.getData() === BETWEEN_DATES_SEARCH_CODE) this.dateDecisionBeforeModel.set({ customLink: '' });
+      else this.dateDecisionBeforeModel.set({ customLink: 'Today' });
+      this.dateDecisionBeforeModel.set({ minDate: Moment(val).add(1, 'd') });
+      this.render();
+    });
+
+    this.listenTo(this.dateDecisionBeforeModel, 'change:value', (model, val) => {
+      if (val) this.dateDecisionAfterModel.set({ maxDate: Moment(val).subtract(1, 'd') });
+      this.render();
+    });
+
+    this.listenTo(this.dateSearchDropdownModel, 'change:value', () => {
+      if (this.dateSearchDropdownModel.getData() === BETWEEN_DATES_SEARCH_CODE) {
+        this.dateDecisionAfterModel.set({ value: null, required: true, maxDate: Moment().subtract(1, 'd') });
+        this.dateDecisionBeforeModel.set({ value: null, required: true });
+        this.showAfterDate = true; 
+        this.showAndText = true;
+        this.showBeforeDate = true;
+      } else if (this.dateSearchDropdownModel.getData() === BEFORE_DATE_SEARCH_CODE) {
+        this.dateDecisionAfterModel.set({ value: null, required: null });
+        this.dateDecisionBeforeModel.set({ value: null, required: true });
+        this.showAfterDate = false;
+        this.showAndText = false;
+        this.showBeforeDate = true;
+      } else if (this.dateSearchDropdownModel.getData() === AFTER_DATE_SEARCH_CODE) {
+        this.dateDecisionBeforeModel.set({ value: null, required: null });
+        this.dateDecisionAfterModel.set({ value: null, required: true, maxDate: Moment() });
+        this.showAfterDate = true;
+        this.showAndText = false;
+        this.showBeforeDate = false;
+      } else {
+        this.dateDecisionAfterModel.set({ value: null });
+        this.dateDecisionBeforeModel.set({ value: null});
+        this.showAfterDate = false;
+        this.showAndText = false;
+        this.showBeforeDate = false;
+      }
+
+      this.render();
+    });
   },
 
   validateAndShowErrors(regionsToValidate) {
-    
     let isValid = true;
 
     if (this.specificIssueCheckboxModel.getData() && (!this.applicantModel.getData() || !this.rentalTypeModel.getData() 
@@ -395,55 +431,64 @@ const DecisionSearch = Marionette.View.extend({
       const view = this.getChildView(regionName);
       if (view) {
         isValid = view.validateAndShowErrors() && isValid;
+        if (regionName === 'decisionIdSearchRegion') {
+          if (!/^AnonDec-\d+$/.test(view.model.getData())) {
+            isValid = false;
+            view.showErrorMessage(DECISION_SEARCH_ERROR);
+          }
+        }
       }
     });
 
-      const visible_error_eles = this.$('.error-block:visible').filter(function() { return $.trim($(this).html()) !== ""; });
-      if (visible_error_eles.length === 0) {
-        console.log(`[Warning] Page not valid, but no visible error message found`);
-      } else {
-        this.animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {is_page_item: true});
-      }
+    const visible_error_eles = this.$('.error-block:visible').filter(function() { return $.trim($(this).html()) !== ""; });
+    if (visible_error_eles.length === 0) {
+      console.log(`[Warning] Page not valid, but no visible error message found`);
+    } else {
+      animationChannel.request('queue', $(visible_error_eles[0]) , 'scrollPageTo', {is_page_item: true});
+    }
 
     return isValid;
   },
 
   requiredRegionsValid() {
     if (this.applicantModel.getData() && (this.rentalTypeModel.getData() === this.DROPDOWN_CODE_HOME ||  
-      (this.rentalTypeModel.getData() === this.DROPDOWN_CODE_MH_PARK && this.ownedByModel.getData())) 
+      (this.rentalTypeModel.getData() === this.DISPUTE_TYPE_MHPTA && this.ownedByModel.getData())) 
       && this.tenancyStatusModel.getData()) return true;
     else return false;
   },
 
   loadDecisions() {
     const decisionSearchData = {
-      disputeType: this.rentalTypeModel,
-      tenancyEnded: this.tenancyStatusModel,
-      disputeProcess:  this.resolutionProcessModel,
-      disputeSubType: this.applicantModel,
-      businessNames: this.businessNameModel,
-      hearingAttendance: this.attendanceModel,
-      decisionDateGreaterThan: this.dateDecisionAfterModel,
-      decisionDateLessThan: this.dateDecisionBeforeModel,
+      disputeType: this.getAct()?.value,
+      tenancyEnded: this.tenancyStatusModel?.getData(),
+      disputeProcess:  this.resolutionProcessModel?.getData(),
+      disputeSubType: this.applicantModel?.getData(),
+      businessNames: this.businessNameModel?.getData(),
+      hearingAttendance: this.attendanceModel?.getData(),
+      decisionDateGreaterThan: this.dateDecisionAfterModel?.getData(),
+      decisionDateLessThan: this.dateDecisionBeforeModel?.getData(),
       includedClaimCodes: this.getClaimCodes()
-    }
-
-    const decisionFreeTextData = {
-      query: this.decisionFreeTextModel
-    }
-
-    this.model.trigger('form:disabled', this.searchOption === RADIO_CODE_PROPERTIES ? decisionSearchData : decisionFreeTextData);
+    };
+    const decisionFreeTextData = { query: this.decisionFreeTextModel?.getData() };
+    const decisionIdData = { decisionId: this.decisionIdSearchModel?.getData() };
+    this.model.trigger('form:disabled', (
+      this.searchOption === RADIO_FILTER_CODES.PROPERTIES ? decisionSearchData
+      : this.searchOption === RADIO_FILTER_CODES.FREE_TEXT ? decisionFreeTextData
+      : decisionIdData
+    ));
   },
 
   disableForm() {
     let regionsToDisable = '';
     
-    if (this.searchOption === RADIO_CODE_PROPERTIES) {
+    if (this.searchOption === RADIO_FILTER_CODES.PROPERTIES) {
       regionsToDisable = this.disputeRegions;
       this.showAddIssue = false;
       this.dateDecisionBeforeModel.set({ customLink: '' })
-    } else if (this.searchOption === RADIO_CODE_TEXT) {
+    } else if (this.searchOption === RADIO_FILTER_CODES.FREE_TEXT) {
       regionsToDisable = this.disputeTextFreeRegions;
+    } else if (this.searchOption === RADIO_FILTER_CODES.DECISION_ID) {
+      regionsToDisable = this.disputeIdSearchRegions;
     }
 
     _.each(regionsToDisable, function(viewName) {
@@ -458,13 +503,16 @@ const DecisionSearch = Marionette.View.extend({
   resetDecisionSearch() {
     let regionsToReset = '';
     let requiredRegions = '';
-    if (this.searchOption === RADIO_CODE_PROPERTIES) {
+    if (this.searchOption === RADIO_FILTER_CODES.PROPERTIES) {
       regionsToReset = this.disputeRegions;//enable required inputs
       requiredRegions = this.requiredDisputeRegions;
       this.dateDecisionBeforeModel.set({ customLink: 'Today' });
-    } else if (this.searchOption === RADIO_CODE_TEXT) {
+    } else if (this.searchOption === RADIO_FILTER_CODES.FREE_TEXT) {
       regionsToReset = this.disputeTextFreeRegions
       requiredRegions = this.disputeTextFreeRegions;
+    } else if (this.searchOption === RADIO_FILTER_CODES.DECISION_ID) {
+      regionsToReset = this.disputeIdSearchRegions
+      requiredRegions = this.disputeIdSearchRegions;
     }
 
     _.each(requiredRegions, function(viewName) {
@@ -485,10 +533,20 @@ const DecisionSearch = Marionette.View.extend({
     this.render();
   },
 
-  resetAndRenderDependentModels(resetResolutionProcess = true) {
+  resetAndRenderDependentModels(resetResolutionProcess=false) {
     resetResolutionProcess ? this.resolutionProcessModel.set({ value: null }) : null;
     this.addIssueCollection.reset([], { silent: true });
     this.showIssueError = false;
+    
+    const isDirectRequestSelected = this.resolutionProcessModel.getData() === this.PROCESS_WRITTEN_OR_DR;
+    this.tenancyStatusModel.set({
+      disabled: isDirectRequestSelected,
+      value: isDirectRequestSelected ? (
+        this.applicantModel.getData() === this.DISPUTE_SUBTYPE_LANDLORD ? TENANT_IN_UNIT_CODE
+        : this.applicantModel.getData() === this.DISPUTE_SUBTYPE_TENANT ? TENANT_MOVED_OUT_CODE
+        : null
+      ) : this.tenancyStatusModel.get('value'),
+    }, { silent: true });
     this.render();
   },
 
@@ -496,10 +554,10 @@ const DecisionSearch = Marionette.View.extend({
     if (!this.validateAndShowErrors(this.requiredInputsRegions)) return;
     this.showIssueError = false;
     const issueData = {
-      disputeProcess: { text: this.renderJsxDisputeProcessText(), value: this.resolutionProcessModel.getData() },
+      disputeProcess: { text: this.getDisputeProcessText(), value: this.resolutionProcessModel.getData() },
       act: this.getAct(),
       applicantType: { text: this.applicantModel.getSelectedText(), value: this.applicantModel.getData() },
-      tenancyStatus: { text: this.renderJsxTenancyStatusText(), value: this.tenancyStatusModel.getData() }
+      tenancyStatus: { text: this.getTenancyStatusText(), value: this.tenancyStatusModel.getData() }
     };
 
     const modalAddIssue = new AddIssueModal({
@@ -507,7 +565,7 @@ const DecisionSearch = Marionette.View.extend({
       addIssueCollection: this.addIssueCollection,
     });
 
-    this.modalChannel.request('add', modalAddIssue);
+    modalChannel.request('add', modalAddIssue);
 
     /* Add issue modal listener */
     this.listenTo(modalAddIssue, 'issue:added', (addIssueCollection) => {
@@ -525,14 +583,20 @@ const DecisionSearch = Marionette.View.extend({
   },
 
   setProcessModel() {
-    this.resolutionProcessModel.set({ disabled: false, errorMessage: null });
-    if (this.applicantModel.getData() === this.LANDLORD_CODE && this.tenancyStatusModel.getData() === TENANT_IN_UNIT_CODE) {
-      this.resolutionProcessModel.set({ optionData: [...this.getResolutionProcessOptions(), ...this.getDirectRequestProcess(), ...this.getRentIncreaseProcess()] });
-    } else if (this.applicantModel.getData() === this.TENANT_CODE && this.tenancyStatusModel.getData() === TENANT_MOVED_OUT_CODE) {
-      this.resolutionProcessModel.set({ optionData: [...this.getResolutionProcessOptions(), ...this.getDirectRequestProcess()] });
-    } else {
-      this.resolutionProcessModel.set({ optionData: [...this.getResolutionProcessOptions()] });
-    }
+    const isCurrentLandlord = this.applicantModel.getData() === this.DISPUTE_SUBTYPE_LANDLORD && this.tenancyStatusModel.getData() === TENANT_IN_UNIT_CODE;
+    const isPastTenant = this.applicantModel.getData() === this.DISPUTE_SUBTYPE_TENANT && this.tenancyStatusModel.getData() === TENANT_MOVED_OUT_CODE;
+    const showDirectRequest = true; // isCurrentLandlord || isPastTenant;
+    const showRentIncrease = false; // isCurrentLandlord;
+    const processDropdownOptions = [
+      { value: this.PROCESS_ORAL_HEARING, text: 'Participatory Hearing (oral)' },
+      ...(showDirectRequest || showRentIncrease ? [{ value: this.PROCESS_WRITTEN_OR_DR, text: 'Direct Request (written)' }] : []),
+    ];
+
+    this.resolutionProcessModel.set({
+      optionData: processDropdownOptions,
+      disabled: false,
+      errorMessage: null,
+    });
   },
 
   getClaimCodes() {
@@ -554,30 +618,14 @@ const DecisionSearch = Marionette.View.extend({
 
   getHearingOptions() {
     return [
-      { value: this.LANDLORD_AND_TENANT_HEARING_CODE, text: 'Applicants and Respondents' },
-      { value: this.APPLICANT_HEARING_CODE, text: 'Applicants only' },
-      { value: this.RESPONDENTS_HEARING_CODE, text: 'Respondents only' },
+      { value: HEARING_ATTENDANCE_ALL, text: 'Applicants and Respondents' },
+      { value: HEARING_ATTENDANCE_APPLICANTS, text: 'Applicants only' },
+      { value: HEARING_ATTENDANCE_RESPONDENTS, text: 'Respondents only' },
     ]
   },
 
-  getResolutionProcessOptions() {
-    return [
-      { value: this.PARTICIPATORY_HEARING_CODE, text: 'Participatory hearing (oral)' },
-      { value: this.REVIEW_HEARING_CODE, text: 'Review hearing (oral)' },
-      { value: this.JOINED_APPLICATION_CODE, text: 'Joined application hearing (oral)' },
-    ];
-  },
-
-  getDirectRequestProcess() {
-    return [{ value: this.DIRECT_REQUEST_CODE, text: 'Direct request (written)' }];
-  },
-
-  getRentIncreaseProcess() {
-    return [{ value: this.RENT_INCREASE_CODE, text: 'Rent increase hearing (oral)' }];
-  },
-
   getAct() {
-    if (this.rentalTypeModel.getData() === this.DROPDOWN_CODE_MH_PARK && this.ownedByModel.getData() === OWNED_BY_RENTER_CODE) return {text: 'MHPTA', value: this.DROPDOWN_CODE_MH_PARK};
+    if (this.rentalTypeModel.getData() === this.DISPUTE_TYPE_MHPTA && this.ownedByModel.getData() === OWNED_BY_RENTER_CODE) return {text: 'MHPTA', value: this.DISPUTE_TYPE_MHPTA};
     else return {text: 'RTA', value: this.DROPDOWN_CODE_HOME};
   },
 
@@ -587,7 +635,7 @@ const DecisionSearch = Marionette.View.extend({
   onRender() {
     ViewMixin.prototype.initializeHelp(this, polyglot.t('postedDecisions.helpText'));
 
-    if (this.searchOption === RADIO_CODE_PROPERTIES) {
+    if (this.searchOption === RADIO_FILTER_CODES.PROPERTIES) {
       this.showChildView('applicantDropdownRegion', new DropdownView({ model: this.applicantModel }));
       this.showChildView('rentalTypeDropdownRegion', new DropdownView({ model: this.rentalTypeModel }));
       this.showChildView('ownedByDropdownRegion', new DropdownView({ model: this.ownedByModel }));
@@ -597,7 +645,7 @@ const DecisionSearch = Marionette.View.extend({
       this.showChildView('businessCheckboxRegion', new CheckboxView({ model: this.businessCheckboxModel }));
       this.showChildView('businessNameInputRegion', new InputView({ model: this.businessNameModel }));
   
-      this.showChildView('attendancCheckboxRegion', new CheckboxView({ model: this.attendanceCheckboxModel }));
+      this.showChildView('attendanceCheckboxRegion', new CheckboxView({ model: this.attendanceCheckboxModel }));
       this.showChildView('attendanceDropdownRegion', new DropdownView({ model: this.attendanceModel }));
   
       this.showChildView('specificIssueCheckboxRegion', new CheckboxView({ model: this.specificIssueCheckboxModel }));
@@ -607,8 +655,10 @@ const DecisionSearch = Marionette.View.extend({
       this.showChildView('dateDecisionAfterInputRegion', new InputView({ model: this.dateDecisionAfterModel }));
       this.showChildView('dateDecisionBeforeInputRegion', new InputView({ model: this.dateDecisionBeforeModel }));
 
-    } else if (this.searchOption === RADIO_CODE_TEXT) {
+    } else if (this.searchOption === RADIO_FILTER_CODES.FREE_TEXT) {
       this.showChildView('decisionFreeTextRegion', new TextareaView({ model: this.decisionFreeTextModel }));
+    } else if (this.searchOption === RADIO_FILTER_CODES.DECISION_ID) {
+      this.showChildView('decisionIdSearchRegion', new InputView({ model: this.decisionIdSearchModel }));
     }
   },
 
@@ -618,30 +668,40 @@ const DecisionSearch = Marionette.View.extend({
     ownedByDropdownRegion: '.decision-search__input__owned-by',
     tenancyStatusDropdownRegion: '.decision-search__input__tenancy-status',
     resolutionProcessDropdownRegion: '.decision-search__input__resolution-process',
-    
     businessCheckboxRegion: '.decision-search__input__business-checkbox',
     businessNameInputRegion: '.decision-search__input__business-name',
-   
-    attendancCheckboxRegion: '.decision-search__input__attendance-checkbox',
+    attendanceCheckboxRegion: '.decision-search__input__attendance-checkbox',
     attendanceDropdownRegion: '.decision-search__input__attendance',
-    
     specificIssueCheckboxRegion: '.decision-search__issue__specific-issue',
-
     dateCheckboxRegion: '.decision-search__decision-date__date-checkbox',
     decisionDateDropdownRegion: '.decision-search__decision-date__date-dropdown',
     dateDecisionAfterInputRegion: '.decision-search__decision-date__date-after',
     dateDecisionBeforeInputRegion: '.decision-search__decision-date__date-before',
-    decisionFreeTextRegion: '.decision-search__free-text'
+    decisionFreeTextRegion: '.decision-search__free-text',
+    decisionIdSearchRegion: '.decision-search__decision-id-search',
   },
 
   ui: {
     issueError: '.decision-search__issue__add_error'
   },
 
+
+  getDisputeProcessText() {
+    const disputeText = this.resolutionProcessModel.getSelectedText();
+    return disputeText.substring(0, disputeText.indexOf("("));
+  },
+
+  getTenancyStatusText() {
+    if (this.tenancyStatusModel.getData() === TENANT_IN_UNIT_CODE) return 'Current Tenant';
+    else return 'Past Tenant';
+  },
+
   template() {
     return (
       <div className="decision-search">
-        {this.renderJsxDecisionSearch()}
+        {this.searchOption === RADIO_FILTER_CODES.PROPERTIES ? this.renderJsxDisputeProperties() : null}
+        {this.searchOption === RADIO_FILTER_CODES.FREE_TEXT ? this.renderJsxFreeSearch() : null}
+        {this.searchOption === RADIO_FILTER_CODES.DECISION_ID ? this.renderJsxDecisionIdSearch() : null}
       </div>
     );
   },
@@ -651,7 +711,7 @@ const DecisionSearch = Marionette.View.extend({
       <>
         {/* Dropdown Inputs */}
         <div className="decision-search__input">
-          <span className="decision-search__input__label">Where the dispute was filled by a:</span>
+          <span className="decision-search__input__label">Where the dispute was filed by a:</span>
           <div className="decision-search__input__applicant"></div>
         </div>
         <div className="decision-search__input">
@@ -663,12 +723,12 @@ const DecisionSearch = Marionette.View.extend({
           </div>
         </div>
         <div className="decision-search__input">
-          <span className="decision-search__input__label">Where the tenancy status was:</span>
-          <div className="decision-search__input__tenancy-status"></div>
-        </div>
-        <div className="decision-search__input">
           <span className="decision-search__input__label">That was resolved by:</span>
           <div className="decision-search__input__resolution-process"></div>
+        </div>
+        <div className="decision-search__input">
+          <span className="decision-search__input__label">Where the tenancy status was:</span>
+          <div className="decision-search__input__tenancy-status"></div>
         </div>
         {/* Checkbox + Dropdown/Inputs */}
         <div className="decision-search__input">
@@ -683,7 +743,7 @@ const DecisionSearch = Marionette.View.extend({
             </span>
           </div>
         </div>
-        <div className="decision-search__input">
+        <div className="decision-search__input hidden">
           <span className="decision-search__input__checkbox-label">
             <div className="decision-search__input__attendance-checkbox"></div>
           </span>
@@ -719,25 +779,6 @@ const DecisionSearch = Marionette.View.extend({
     )
   },
 
-  renderJsxDisputeProcessText() {
-    const disputeText = this.resolutionProcessModel.getSelectedText();
-    return disputeText.substring(0, disputeText.indexOf("("));
-  },
-
-  renderJsxTenancyStatusText() {
-    if (this.tenancyStatusModel.getData() === TENANT_IN_UNIT_CODE) return 'Current Tenant';
-    else return 'Past Tenant';
-  },
-
-  renderJsxFreeSearch() {
-    return <div className="decision-search__free-text"></div>;
-  },
-
-  renderJsxDecisionSearch() {
-    if (this.searchOption === RADIO_CODE_PROPERTIES) return this.renderJsxDisputeProperties();
-    else return this.renderJsxFreeSearch();
-  },
-
   renderJsxIssue() {
     return this.addIssueCollection.map((issue, index) => {
       return (
@@ -751,6 +792,15 @@ const DecisionSearch = Marionette.View.extend({
       );
     });
   },
+
+  renderJsxFreeSearch() {
+    return <div className="decision-search__free-text"></div>;
+  },
+
+  renderJsxDecisionIdSearch() {
+    return <div className="decision-search__decision-id-search"></div>;
+  },
+
 });
 
 _.extend(DecisionSearch.prototype, ViewJSXMixin);

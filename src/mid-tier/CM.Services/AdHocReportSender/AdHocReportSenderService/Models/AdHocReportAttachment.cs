@@ -1,12 +1,16 @@
-using System;
+using CM.Common.Utilities;
 
 namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Models;
 
-public class AdHocReportAttachment
+public class AdHocReportAttachment : CommonModel
 {
     public long AdHocReportAttachmentId { get; set; }
 
     public long AdHocReportId { get; set; }
+
+    public AdHocReport AdHocReport { get; set; }
+
+    public TargetDatabase TargetDatabase { get; set; }
 
     public string Description { get; set; }
 
@@ -16,5 +20,9 @@ public class AdHocReportAttachment
 
     public bool IsActive { get; set; }
 
-    public DateTime CreatedDate { get; set; }
+    public bool? IsDeleted { get; set; }
+
+    public bool? ExcelTemplateExists { get; set; }
+
+    public int? ExcelTemplateId { get; set; }
 }

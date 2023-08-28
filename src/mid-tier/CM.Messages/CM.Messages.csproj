@@ -37,7 +37,6 @@
     <ProjectReference Include="..\CM.Common.Utilities\CM.Common.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AdHocReport\Event" />
     <Folder Include="PollyHandler\" />
     <Folder Include="Validation\" />
   </ItemGroup>

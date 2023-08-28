@@ -9,6 +9,8 @@ $COLOR-BLK: #333;
 $COLOR-OTH: #4e96bb;
 $COLOR-EDIT: #2872bd;
 $COLOR-EDIT-TITLE: #1e1566;
+$COLOR-POWER-EDIT: #e46a3f;
+$COLOR-POWER-EDIT-TITLE: #e46a3f;
 $COLOR-REMOVE: #b92429;
 $COLOR-REMOVE-TITLE: #86252b;
 $COLOR-MULTI-BUTTON-TITLE: #1b6934;
@@ -94,6 +96,7 @@ $HEIGHT-EDIT-TOOLS: 73px;
 
 
   // EditTools component
+  &__edit-tools-container { display: flex; }
   &__edit-tools {
     padding: 3px;
     border: 1px solid $COLOR-BOX-BORDER;
@@ -255,6 +258,27 @@ $HEIGHT-EDIT-TOOLS: 73px;
       .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_Undo_CLR.png'); cursor: pointer; }
       .working-sched__edit-tools__button__title { cursor: pointer; }
     }
+    
+    &--power-edit-container {
+      border: 3px solid #aaa;
+      margin-right: 10px;
+      padding: 1px;
+      .working-sched__edit-tools__button { margin-right: 0; }
+    }
+    &--power-edit {
+      .working-sched__edit-tools__button__icon {
+        background-image: url('../../../static/Icon_WS_PowerEdit_GRY.png');
+        margin-left: 14px;
+      }
+    }
+    &--power-edit.selected {
+
+      > .working-sched__edit-tools__button__title {
+        background-color: $COLOR-POWER-EDIT-TITLE;
+      }
+
+      .working-sched__edit-tools__button__icon { background-image: url('../../../static/Icon_WS_PowerEdit_ORG.png'); }
+    }
 
 
     &--disabled {
@@ -330,10 +354,6 @@ $HEIGHT-EDIT-TOOLS: 73px;
   .schedule-calendar-next {
     margin-left: 10px;
     margin-right: 35px;
-  }
-
-  .block-calendar .calendar-grid-time-item {
-    background-color: #fff;
   }
 
   /* Edit/remove modal */

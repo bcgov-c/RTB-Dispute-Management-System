@@ -41,4 +41,6 @@ public class OutcomeDocDelivery : BaseEntity
     public bool? IsDeleted { get; set; }
 
     public int? AssociatedEmailId { get; set; }
+
+    public EmailMessage AssociatedEmail { get; set; }
 }

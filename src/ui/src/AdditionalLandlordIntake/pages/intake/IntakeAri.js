@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import MenuCollection from '../../components/menu/Menu_collection';
 import IntakeAriPageGeneral from './general-info/IntakeAriPageGeneral';
-import IntakePageApplicants from './applicants/IntakePageApplicants';
+import IntakePageApplicants from './applicants/IntakeAriPageApplicants';
 import IntakeAriPageApplicantOptions from './applicant-options/IntakeAriPageApplicantOptions';
 import IntakeAriPageImprovementUnits from './units/IntakeAriPageImprovementUnits';
 import IntakeAriPageInformation from './information/IntakeAriPageInformation';
@@ -33,7 +33,7 @@ export default IntakeBase.extend({
       { step: 8, text: 'Rent Increase Tenants' },
       { step: 9, text: 'Review and Submit' },
       { step: 10, text: 'Payment', unreachable: hasCompletedPayment },
-      { step: 11, text: 'Payment Receipt', unreachable: hasCompletedPayment }
+      { step: 11, text: 'Submission Receipt', unreachable: hasCompletedPayment }
     ], {
       paymentStep: ARI_PAYMENT_STEP_NUMBER,
       paymentReceiptStep: ARI_PAYMENT_RECEIPT_STEP_NUMBER

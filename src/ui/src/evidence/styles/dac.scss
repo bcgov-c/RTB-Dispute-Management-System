@@ -135,6 +135,10 @@ $_SITE-MAX-WIDTH: 1280px;
     }
   }
 
+  &__warning {
+    padding: 10px 10px 10px 50px !important;
+  }
+
   // DisputeOverview component
   &__dispute-overview-container { padding: 40px 0 0 0; }
   &__dispute-overview {

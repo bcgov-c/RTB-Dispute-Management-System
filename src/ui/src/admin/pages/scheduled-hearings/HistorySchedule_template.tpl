@@ -22,7 +22,7 @@
           </span>
         </div>
       </div>
-      <div class="history-schedule-sub-hearing-info-text">Use the specific hearing menu to view a hearing's history</div>
+      <div class="history-schedule-sub-hearing-info-text">Use the regular schedule views to locate a hearing and view its history</div>
     </div>
 
     <div class="history-schedule-sub-arbs <%= showArbInput ? '' : 'hidden' %>"></div>

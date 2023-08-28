@@ -18,6 +18,10 @@ public static class DataWarehouseContextExtension
         modelBuilder.Entity<FactTimeStatistic>().Property(r => r.AvgNext10StandardEmptyHearingDays).HasColumnType("decimal(6,2)");
         modelBuilder.Entity<FactTimeStatistic>().Property(r => r.AvgNext10EmergEmptyHearingDays).HasColumnType("decimal(6,2)");
         modelBuilder.Entity<FactTimeStatistic>().Property(r => r.AvgNext10DeferredEmptyHearingDays).HasColumnType("decimal(6,2)");
+
+        modelBuilder.Entity<FactIssueOutcome>().Property(r => r.RequestedAmount).HasColumnType("decimal(10,2)");
+        modelBuilder.Entity<FactIssueOutcome>().Property(r => r.AwardedAmount).HasColumnType("decimal(10,2)");
+        modelBuilder.Entity<FactIssueOutcome>().Property(r => r.PrevAwardedAmount).HasColumnType("decimal(10,2)");
     }
 
     public static void ApplyUniqueIndexes(this ModelBuilder modelBuilder)

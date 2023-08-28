@@ -21,8 +21,13 @@ public class CmRepository<T> : IRepository<T>
 
     protected CaseManagementContext Context { get; }
 
-    public async Task<T> GetByIdAsync(int id)
+    public async Task<T> GetByIdAsync(int id, bool ignoreFilter = false)
     {
+        if (ignoreFilter)
+        {
+            return await DbSet.FindAsync(id);
+        }
+
         return await DbSet.FindAsync(id);
     }
 
@@ -71,7 +76,7 @@ public class CmRepository<T> : IRepository<T>
     public async Task<bool> Delete(int id)
     {
         var obj = await DbSet.FindAsync(id);
-        var prop = obj.GetType().GetProperty("IsDeleted");
+        var prop = obj?.GetType().GetProperty("IsDeleted");
 
         if (prop != null)
         {
@@ -88,7 +93,7 @@ public class CmRepository<T> : IRepository<T>
     public async Task<bool> Delete(Guid guid)
     {
         var obj = await DbSet.FindAsync(guid);
-        var prop = obj.GetType().GetProperty("IsDeleted");
+        var prop = obj?.GetType().GetProperty("IsDeleted");
 
         if (prop != null)
         {
@@ -102,8 +107,13 @@ public class CmRepository<T> : IRepository<T>
         return false;
     }
 
-    public async Task<T> GetNoTrackingByIdAsync(Expression<Func<T, bool>> where)
+    public async Task<T> GetNoTrackingByIdAsync(Expression<Func<T, bool>> where, bool ignoreFilter = false)
     {
+        if (ignoreFilter)
+        {
+            return await DbSet.AsNoTracking().IgnoreQueryFilters().SingleOrDefaultAsync(where);
+        }
+
         return await DbSet.AsNoTracking().SingleOrDefaultAsync(where);
     }
 }

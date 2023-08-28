@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Main hearing view. Displays hearing information and hearing participation
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
@@ -13,12 +16,13 @@ import ModalEditHearingLinkView from './modals/modal-edit-hearing-link/ModalEdit
 import ModalHearingReassignView from './modals/modal-reassign-hearing/ModalHearingReassign';
 import ModalHearingRescheduleView from './modals/modal-reschedule-hearing/ModalHearingReschedule';
 import ModalUnassignHearingView from './modals/modal-hearing-deletes/ModalUnassignHearing';
-import FileDisplay from '../../pages/common-files/FileDisplay';
+import FileBlockDisplay from '../../pages/common-files/FileBlockDisplay';
 import template from './Hearing_template.tpl';
 import hearingDisplayLinkTemplate from '../../../core/components/hearing/hearing-display/HearingDisplayLink_template.tpl';
 import hearingDisplayOwnerTemplate from '../../../core/components/hearing/hearing-display/HearingDisplayOwner_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import { toUserLevelAndNameDisplay } from '../user-level/UserLevel';
+import FileCollection from '../../../core/components/files/File_collection';
 
 const noticeChannel = Radio.channel('notice')
 const disputeChannel = Radio.channel('dispute');
@@ -40,13 +44,21 @@ export default Marionette.View.extend({
     hearingPriorityRegion: '.hearing-priority-edit',
     hearingParticipationsDisplayRegion: '.hearing-participation-view',
     hearingParticipationsRegion: '.hearing-participations-hearing-tools',
-    hearingRecordingRegion: '.hearing-recording-file'
+    hearingRecordingRegion: '.hearing-recording-file',
+    hearingGenFilesRegion: '.hearing-notice-generated-files',
   },
 
   ui: {
     linkDisplay: '.hearing-link-display',
     ownerDisplay: '.hearing-owner-display',
     priorityWarning: '.hearing-priority-edit-warning',
+    hearingNoticeLink: '.hearing-notice-generated-files-link',
+  },
+
+  events: {
+    'click @ui.hearingNoticeLink': () => {
+      Backbone.history.navigate(routeParse('hearing_item', this.model.getHearingNoticeFileDescription()?.get('dispute_guid')), { trigger: true });
+    },
   },
 
   _getPriorityOptions() {
@@ -57,8 +69,12 @@ export default Marionette.View.extend({
       });
   },
 
+  /**
+   * @param {UnitCollection} unitCollection
+   * @param {FileCollection} hearingRecordings - files containing .wav files with recorded hearings 
+   */
   initialize(options) {
-    this.mergeOptions(options, ['unitCollection', 'hearingRecording']);
+    this.mergeOptions(options, ['unitCollection', 'hearingRecordings']);
     const hearingId = this.model.get('hearing_id');
     this.hasMatchingNotice = noticeChannel.request('get:all').any( (noticeModel) => hearingId && hearingId === noticeModel.get('hearing_id') );
 
@@ -136,7 +152,7 @@ export default Marionette.View.extend({
         primaryButtonText: 'Continue',
         onContinueFn(modalView) { modalView.close(); }
       });
-      this.listenTo(modalView, 'removed:modal', () => this.model.trigger('hearings:refresh'));      
+      this.listenTo(modalView, 'removed:modal', () => this.model.trigger('hearings:refresh'));
       return;
     }
 
@@ -159,6 +175,33 @@ export default Marionette.View.extend({
       showHearingModalFn();
     }
     
+  },
+
+  onMenuRemoveHearingNotice() {
+    const fileDescription = this.model.getHearingNoticeFileDescription();
+    if (!fileDescription) {
+      return this.model.trigger('hearings:refresh');
+    }
+
+    modalChannel.request('show:standard', {
+      title: 'Remove Hearing Notice?',
+      bodyHtml: `<p>Are you sure you would like to permanently remove this hearing notice? This action will store the current hearing notice in deficient documents and clear it from this view.
+        This action cannot be undone
+      </p>`,
+      primaryButtonText: 'Remove',
+      onContinue: (modalView) => {
+        loaderChannel.trigger('page:load');
+        const fileDescription = this.model.getHearingNoticeFileDescription();
+        fileDescription.markAsDeficient(`This hearing notice was removed from the hearing by a staff user`);
+        Promise.all([
+          fileDescription.save(),
+          this.model.save({ notification_file_description_id: null })
+        ]).finally(() => {
+          this.model.trigger('hearings:refresh');
+          modalView.close();
+        });
+      }
+    });
   },
 
   onMenuUnassign() {
@@ -360,8 +403,13 @@ export default Marionette.View.extend({
     }));
 
     this.showChildView('hearingEndTimeRegion', new InputView({ model: this.hearingEndTimeModel }));
-    this.showChildView('hearingPriorityRegion', new DropdownView({ model: this.hearingPriorityModel }));    
-    if (!!this.hearingRecording) this.showChildView('hearingRecordingRegion', new FileDisplay({ model: this.hearingRecording }))
+    this.showChildView('hearingPriorityRegion', new DropdownView({ model: this.hearingPriorityModel }));
+    
+    if (this.hearingRecordings.length) this.showChildView('hearingRecordingRegion', new FileBlockDisplay({ collection: new FileCollection(this.hearingRecordings) }));
+
+    const uploadedFiles = this.model.getHearingNoticeFileDescription()?.getUploadedFiles() || [];
+    if (uploadedFiles.length) this.showChildView('hearingGenFilesRegion', new FileBlockDisplay({ collection: new FileCollection(uploadedFiles) }));
+    
     this.renderHearingToolsRegions();
   },
 
@@ -374,6 +422,7 @@ export default Marionette.View.extend({
     const dispute = disputeChannel.request('get');
     const isConference = this.model.isConference();
     const conferenceBridge = this.model.getConferenceBridge();
+    const hearingNoticeDisputeGuid = this.model.getHearingNoticeFileDescription()?.get('dispute_guid');
 
     return {
       Formatter,
@@ -384,7 +433,10 @@ export default Marionette.View.extend({
       isActive: this.model.isActive(),
       instructionsDisplay: this.model.getInstructions(),
       noticeGeneratedDisplay: this.hasMatchingNotice ? `<span class="success-green">Yes</span>` : `<span class="error-red">No</span>`,
-      hasRecordedHearing: !!this.hearingRecording
+      hearingNoticeDisplay: this.model.get('notification_file_description_id') ?
+        (hearingNoticeDisputeGuid ? `<span class="hearing-notice-generated-files-link">Yes</a>` : 'Yes')
+        : '-',
+      hasRecordedHearing: this.hearingRecordings.length
     };
   }
 });

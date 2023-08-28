@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CM.Business.Entities.Models.PollResponse;
 using CM.Business.Entities.Models.TrialDispute;
 using CM.Business.Entities.Models.TrialParticipant;
 using CM.Business.Services.Amendment;
@@ -17,6 +18,7 @@ using CM.Business.Services.NoticeService;
 using CM.Business.Services.OutcomeDocRequest;
 using CM.Business.Services.Parties;
 using CM.Business.Services.Payment;
+using CM.Business.Services.Poll;
 using CM.Business.Services.RemedyDetails;
 using CM.Business.Services.RemedyServices;
 using CM.Business.Services.SubstitutedService;
@@ -35,6 +37,7 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
     {
         var action = context.ActionDescriptor.RouteValues["action"];
         var userService = context.GetService<IUserService>();
+        var partyService = context.GetService<IParticipantService>();
         var user = await userService.GetUserWithFullInfo(userId);
         var disputeGuid = Guid.Empty;
         var bypassAuth = false;
@@ -92,6 +95,7 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
                 disputeGuid = action switch
                 {
                     "Post" => context.GetContextId<Guid>("disputeGuid"),
+                    "GetExternalOutcomeDocRequests" => context.GetContextId<Guid>("disputeGuid"),
                     _ => disputeGuid
                 };
 
@@ -104,10 +108,19 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
                 };
 
                 break;
+            case OutcomeDocGroupController:
+                disputeGuid = action switch
+                {
+                    "GetExternalOutcomeDocGroups" => context.GetContextId<Guid>("disputeGuid"),
+                    _ => disputeGuid
+                };
+
+                break;
             case SubstitutedServiceController:
                 disputeGuid = action switch
                 {
                     "Post" => context.GetContextId<Guid>("disputeGuid"),
+                    "GetExternalDisputeSubstitutedServices" => context.GetContextId<Guid>("disputeGuid"),
                     "Patch" => await context.ResolveDispute<ISubstitutedService>("substitutedServiceId"),
                     "Delete" => await context.ResolveDispute<ISubstitutedService>("substitutedServiceId"),
                     _ => disputeGuid
@@ -131,6 +144,7 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
                     "Delete" => await context.ResolveDispute<INoticeService>("noticeId"),
                     "GetById" => await context.ResolveDispute<INoticeService>("noticeId"),
                     "GetByDisputeGuid" => context.GetContextId<Guid>("disputeGuid"),
+                    "GetExternalDisputeNotices" => context.GetContextId<Guid>("disputeGuid"),
                     _ => disputeGuid
                 };
 
@@ -223,8 +237,15 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
                     "GetById" => await context.ResolveDispute<IEmailMessageService>("emailId"),
                     "GetByDisputeGuid" => context.GetContextId<Guid>("disputeGuid"),
                     "Post" => context.GetContextId<Guid>("disputeGuid"),
+                    "GetExternalDisputeEmailMessages" => context.GetContextId<Guid>("disputeGuid"),
                     _ => disputeGuid
                 };
+
+                if (action.Equals("PostVerificationMessage") || action.Equals("PostEmailVerification"))
+                {
+                    var headerGuid = context.HttpContext.Request.Headers["disputeGuid"].ToString();
+                    var isValid = Guid.TryParse(headerGuid, out disputeGuid);
+                }
 
                 break;
             case EmailAttachmentController:
@@ -413,8 +434,38 @@ public class ExtendedUserResourceAuthorizationHandler : IResourceAuthorizationHa
                 disputeGuid = action switch
                 {
                     "Post" => context.GetContextId<Guid>("disputeGuid"),
+                    "GetExternalSubmissionReceipts" => context.GetContextId<Guid>("disputeGuid"),
                     _ => disputeGuid
                 };
+
+                break;
+
+            case DisputeHearingController:
+                disputeGuid = action switch
+                {
+                    "GetExternalDisputeHearings" => context.GetContextId<Guid>("disputeGuid"),
+                    _ => disputeGuid
+                };
+
+                break;
+
+            case PollResponseController:
+                disputeGuid = action switch
+                {
+                    "Post" => context.GetContextId<PollRespRequest>("request").DisputeGuid,
+                    "Patch" => await context.ResolveDispute<IPollResponseService>("pollResponseId"),
+                    "Delete" => await context.ResolveDispute<IPollResponseService>("pollResponseId"),
+                    "Get" => await context.ResolveDispute<IPollResponseService>("pollResponseId"),
+                    "GetDisputePollResponses" => context.GetContextId<Guid>("disputeGuid"),
+                    _ => disputeGuid
+                };
+
+                if (action.Equals("GetParticipantPollResponses"))
+                {
+                    var participantId = context.GetContextId<int>("participantId");
+                    var participant = await partyService.GetByIdAsync(participantId);
+                    disputeGuid = participant.DisputeGuid;
+                }
 
                 break;
         }

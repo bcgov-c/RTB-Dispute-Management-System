@@ -23,7 +23,7 @@ public interface IConferenceBridgeService : IServiceBase
 
     Task<bool> ConferenceBridgeExists(int conferenceBridgeId);
 
-    Task<bool> ConferenceBridgeIsBooked(int conferenceBridgeId, DateTime startTime, DateTime endTime);
+    Task<bool> ConferenceBridgeIsBooked(int conferenceBridgeId, DateTime startTime);
 
     Task<List<ConferenceBridgeResponse>> GetAllBridges();
 }

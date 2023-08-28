@@ -25,6 +25,8 @@ public class OutcomeDocReqItem : BaseEntity
 
     public int? FileDescriptionId { get; set; }
 
+    public FileDescription FileDescription { get; set; }
+
     [StringLength(500)]
     public string ItemNote { get; set; }
 

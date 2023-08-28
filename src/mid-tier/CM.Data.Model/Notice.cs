@@ -8,33 +8,13 @@ public class Notice : BaseEntity
 {
     public int NoticeId { get; set; }
 
-    public int? NoticeFile1Id { get; set; }
-
     public Dispute Dispute { get; set; }
 
     public Guid DisputeGuid { get; set; }
 
-    public File File1 { get; set; }
-
     public int? ParentNoticeId { get; set; }
 
     public Notice ParentNotice { get; set; }
-
-    public File File2 { get; set; }
-
-    public int? NoticeFile2Id { get; set; }
-
-    public File File3 { get; set; }
-
-    public int? NoticeFile3Id { get; set; }
-
-    public File File4 { get; set; }
-
-    public int? NoticeFile4Id { get; set; }
-
-    public File File5 { get; set; }
-
-    public int? NoticeFile5Id { get; set; }
 
     [StringLength(100)]
     [Required]
@@ -81,7 +61,19 @@ public class Notice : BaseEntity
     [StringLength(100)]
     public string NoticeDeliveredToOther { get; set; }
 
+    public bool HasServiceDeadline { get; set; }
+
+    public int? ServiceDeadlineDays { get; set; }
+
+    public DateTime? ServiceDeadlineDate { get; set; }
+
+    public DateTime? SecondServiceDeadlineDate { get; set; }
+
     public ICollection<NoticeService> NoticeServices { get; set; }
 
     public ICollection<Amendment> Amendments { get; set; }
+
+    public ICollection<Dispute> Disputes { get; set; }
+
+    public ICollection<Notice> ChildNotices { get; set; }
 }

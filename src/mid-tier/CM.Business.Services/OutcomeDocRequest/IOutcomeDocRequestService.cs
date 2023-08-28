@@ -27,4 +27,6 @@ public interface IOutcomeDocRequestService : IServiceBase, IDisputeResolver
     Task<OutcomeDocRequestGetResponse> GetByIdAsync(int outcomeDocRequestId);
 
     Task<List<OutcomeDocRequestGetResponse>> GetByDispute(Guid disputeGuid);
+
+    Task<List<ExternalOutcomeDocRequestGetResponse>> GetExternalOutcomeDocRequests(Guid disputeGuid);
 }

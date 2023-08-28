@@ -171,6 +171,10 @@
   &__free-text {
     max-width: 1000px;
   }
+
+  &__decision-id-search input {
+    width: 200px;
+  }
 }
 
 @media only screen and (max-width: 880px) {

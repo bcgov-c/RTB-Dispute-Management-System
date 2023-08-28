@@ -1,5 +1,9 @@
+/**
+ * @fileoverview - Modal that warns user that clicked link leads to external site. Opens external site when continue button is pressed.
+ */
 import ModalBaseView from '../ModalBase';
 import template from './ModalExternalLink_template.tpl';
+import AnalyticsUtil from '../../../utilities/AnalyticsUtil';
 
 export default ModalBaseView.extend({
   template,
@@ -20,6 +24,8 @@ export default ModalBaseView.extend({
   },
 
   goToLink() {
+    AnalyticsUtil.trackUrlClickEvent(this.url);
+
     const winTab = window.open(this.url, '_blank');
       winTab.opener = null;
     this.close();

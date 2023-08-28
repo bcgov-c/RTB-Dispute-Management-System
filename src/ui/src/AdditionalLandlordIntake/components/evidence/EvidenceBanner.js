@@ -54,8 +54,9 @@ export default Marionette.View.extend({
       }
     }
     return {
+      COMMON_IMAGE_ROOT: configChannel.request('get', 'COMMON_IMAGE_ROOT'),
       evidence_status,
-      useShortMessages: this.getOption('useShortMessages')
+      useShortMessages: this.getOption('useShortMessages'),
     };
   }
 });

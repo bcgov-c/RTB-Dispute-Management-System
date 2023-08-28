@@ -5,6 +5,7 @@ import template from './DisputeOverviewHeader_template.tpl';
 import Formatter from '../../../core/components/formatter/Formatter';
 
 const taskChannel = Radio.channel('tasks');
+const notesChannel = Radio.channel('notes');
 const disputeChannel = Radio.channel('dispute');
 
 export default Marionette.View.extend({
@@ -57,13 +58,12 @@ export default Marionette.View.extend({
   },
 
   templateContext() {
-    const disputeTasks = taskChannel.request('get:by:dispute');
-
     return {
       Formatter,
       lastRefreshTime: this.model.get('refreshTime') || Moment(),
       enableQuickAccess: isQuickAccessEnabled(this.model),
-      numOpenDisputeTasks: disputeTasks.filter(t => !t.isComplete()).length,
+      numOpenDisputeTasks: taskChannel.request('get:by:dispute')?.filter(t => !t.isComplete())?.length,
+      numGeneralNotes: notesChannel.request('get:dispute')?.length,
     };
   }
 });

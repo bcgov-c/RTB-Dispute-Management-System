@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays note information. Can render existing notes, or a textarea for creating new notes
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import TextareaView from '../../../core/components/textarea/Textarea';

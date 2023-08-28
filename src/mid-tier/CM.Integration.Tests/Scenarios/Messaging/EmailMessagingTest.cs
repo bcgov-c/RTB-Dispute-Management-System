@@ -125,9 +125,13 @@ public partial class EmailMessagingTest
             DisputeType = (byte)DisputeType.Rta,
             TenancyAddress = FakerInstance.Address.FullAddress()
                 .Truncate(79),
+            TenancyCity = FakerInstance.Address.City().Truncate(49),
+            TenancyCountry = FakerInstance.Address.Country(),
+            TenancyZipPostal = FakerInstance.Address.ZipCode().Truncate(6),
             SubmittedDate = FakerInstance.Date.Past(),
-            DisputeUrgency = (byte)disputeUrgency,
-            TenancyGeozoneId = 6
+            DisputeUrgency = (byte?)disputeUrgency,
+            TenancyGeozoneId = 6,
+            CreationMethod = (byte?)DisputeCreationMethod.Online
         };
 
         var disputeResponse = DisputeManager.CreateDisputeWithData(Client, dispute);
@@ -205,7 +209,7 @@ public partial class EmailMessagingTest
         }
     }
 
-    private void SetupNotice(Guid disputeGuid, int participantId, int hearingId)
+    private void SetupNotice(Guid disputeGuid, int participantId, int hearingId, DateTime? serviceDeadlineDate = null, DateTime? secondServiceDeadlineDate = null)
     {
         Client.Authenticate(Users.Admin, Users.Admin);
 
@@ -215,8 +219,20 @@ public partial class EmailMessagingTest
             NoticeType = (byte)NoticeTypes.GeneratedDisputeNotice,
             NoticeTitle = "Notice Title",
             NoticeDeliveredTo = participantId,
-            HearingId = hearingId
+            HearingId = hearingId,
+            NoticeDeliveredDate = DateTime.UtcNow.AddDays(-1),
+            HasServiceDeadline = serviceDeadlineDate.HasValue
         };
+
+        if (serviceDeadlineDate.HasValue)
+        {
+            noticeRequest.ServiceDeadlineDate = serviceDeadlineDate.Value;
+        }
+
+        if (secondServiceDeadlineDate.HasValue)
+        {
+            noticeRequest.SecondServiceDeadlineDate = secondServiceDeadlineDate.Value;
+        }
 
         var noticeResponse = NoticeManager.CreateNotice(Client, disputeGuid, noticeRequest);
         noticeResponse.CheckStatusCode();
@@ -238,7 +254,7 @@ public partial class EmailMessagingTest
             HearingEndDateTime = new DateTime(tomorrowDate.Year, tomorrowDate.Month, tomorrowDate.Day, 6, 30, 0, DateTimeKind.Utc),
             LocalStartDateTime = new DateTime(tomorrowDate.Year, tomorrowDate.Month, tomorrowDate.Day, 9, 30, 0),
             LocalEndDateTime = new DateTime(tomorrowDate.Year, tomorrowDate.Month, tomorrowDate.Day, 10, 30, 0),
-            HearingNote = FakerInstance.Lorem.Sentence(5)
+            HearingNote = FakerInstance.Lorem.Sentence(5),
         };
 
         var hearingResponse = HearingManager.CreateHearing(Client, hearingRequest);
@@ -247,7 +263,7 @@ public partial class EmailMessagingTest
         return hearingResponse;
     }
 
-    private void SetupDisputeHearing(Guid disputeGuid, int hearingId, int conferenceBridgeId)
+    private void SetupDisputeHearing(Guid disputeGuid, int hearingId, int conferenceBridgeId, SharedHearingLinkType sharedHearingLinkType = SharedHearingLinkType.Single)
     {
         Client.Authenticate(StaffUser.Username, StaffUser.Username);
 
@@ -258,7 +274,7 @@ public partial class EmailMessagingTest
             DisputeHearingRole = (byte)DisputeHearingRole.Active,
             NoticeConferenceBridgeId = conferenceBridgeId,
             DisputeHearingStatus = (byte)DisputeHearingStatus.Active,
-            SharedHearingLinkType = 1
+            SharedHearingLinkType = (byte)sharedHearingLinkType
         };
 
         var disputeHearingResponse = DisputeHearingManager.CreateDisputeHearing(Client, disputeHearingRequest);
@@ -271,6 +287,14 @@ public partial class EmailMessagingTest
         claimGroupResponse.CheckStatusCode();
 
         return claimGroupResponse;
+    }
+
+    private EntityWithStatus<ClaimResponse> SetupClaim(int claimGroupId)
+    {
+        var claimResponse = ClaimManager.CreateClaim(Client, claimGroupId, new ClaimRequest { ClaimTitle = "Test", ClaimCode = 208 });
+        claimResponse.CheckStatusCode();
+
+        return claimResponse;
     }
 
     private void SetupClaimGroupParticipant(int claimGroupId, int participantId, ParticipantRole participantRole)

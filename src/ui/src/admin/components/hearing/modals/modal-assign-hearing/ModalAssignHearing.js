@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal for adding a dispute to a hearing via filenumber
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import InputView from '../../../../../core/components/input/Input';
@@ -71,7 +74,10 @@ export default ModalBaseView.extend({
       { external_file_id: this.selectedDispute }
     );
 
-    this.model.saveDisputeHearings()
+    const cancelHoldPromise = () => !this.model.isReserved() ? Promise.resolve() : new Promise((res, rej) => hearingChannel.request('cancel:reserved', this.model.id).then(
+      res, generalErrorFactory.createHandler('HEARING.CANCEL.RESERVATION', rej)));
+
+    const saveDisputeHearings = () => this.model.saveDisputeHearings()
       .done(() => {
         this.model.checkAndUpdateLinkType().always(() => {
           this.trigger('save:complete');
@@ -94,6 +100,10 @@ export default ModalBaseView.extend({
             this.model.resetDisputeHearings();
           })(err);
         }
+      });
+
+      cancelHoldPromise().then(() => saveDisputeHearings()).finally(() => {
+        loaderChannel.trigger('page:load:complete');
       });
   },
 
@@ -175,7 +185,8 @@ export default ModalBaseView.extend({
       labelText: 'DMS File Number',
       errorMessage: 'Enter a DMS File Number',
       maxLength: 9,
-      required: true
+      required: true,
+      value: this.model.get('hearing_reserved_file_number') || null
     });
 
     this.externalInputModel = new InputModel({

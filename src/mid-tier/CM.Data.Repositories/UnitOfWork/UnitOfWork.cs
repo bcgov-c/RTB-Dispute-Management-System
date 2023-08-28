@@ -15,13 +15,16 @@ using CM.Data.Repositories.CustomDataObject;
 using CM.Data.Repositories.Dispute;
 using CM.Data.Repositories.DisputeFlag;
 using CM.Data.Repositories.DisputeHearing;
+using CM.Data.Repositories.DisputeLink;
 using CM.Data.Repositories.DisputeProcessDetail;
 using CM.Data.Repositories.DisputeStatus;
+using CM.Data.Repositories.DisputeVerification;
 using CM.Data.Repositories.EmailAttachment;
 using CM.Data.Repositories.EmailMessage;
 using CM.Data.Repositories.EmailTemplate;
 using CM.Data.Repositories.ExcludeWord;
 using CM.Data.Repositories.ExternalCustomDataObject;
+using CM.Data.Repositories.ExternalErrorLog;
 using CM.Data.Repositories.ExternalFile;
 using CM.Data.Repositories.FilePackageService;
 using CM.Data.Repositories.Files;
@@ -32,16 +35,20 @@ using CM.Data.Repositories.InternalUserRole;
 using CM.Data.Repositories.Maintenance;
 using CM.Data.Repositories.Notes;
 using CM.Data.Repositories.Notice;
+using CM.Data.Repositories.OnlineMeeting;
 using CM.Data.Repositories.OutcomeDocRequest;
 using CM.Data.Repositories.OutcomeDocument;
+using CM.Data.Repositories.ParticipantIdentity;
 using CM.Data.Repositories.Parties;
 using CM.Data.Repositories.Payment;
+using CM.Data.Repositories.Poll;
 using CM.Data.Repositories.Remedy;
 using CM.Data.Repositories.Role;
 using CM.Data.Repositories.ScheduleBlock;
 using CM.Data.Repositories.SchedulePeriod;
 using CM.Data.Repositories.ScheduleRequest;
 using CM.Data.Repositories.Search;
+using CM.Data.Repositories.ServiceAuditLog;
 using CM.Data.Repositories.SiteVersion;
 using CM.Data.Repositories.SubmissionReceipt;
 using CM.Data.Repositories.SubstitutedService;
@@ -54,6 +61,7 @@ using CM.Data.Repositories.TrialIntervention;
 using CM.Data.Repositories.TrialOutcome;
 using CM.Data.Repositories.TrialParticipant;
 using CM.Data.Repositories.User;
+using CM.Data.Repositories.VerificationAttempt;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -90,7 +98,6 @@ public class UnitOfWork : IUnitOfWork
     private readonly ICommonFileRepository _commonFileRepository = null;
 
     private readonly IConferenceBridgeRepository _conferenceBridgeRepository = null;
-    private readonly CaseManagementContext _context;
 
     private readonly ICustomConfigObjectRepository _customConfigObjectRepository = null;
 
@@ -207,6 +214,26 @@ public class UnitOfWork : IUnitOfWork
     private readonly ITrialParticipantRepository _trialParticipantRepository = null;
 
     private readonly ITrialRepository _trialRepository = null;
+
+    private readonly IServiceAuditLogRepository _serviceAuditLogRepository = null;
+
+    private readonly IExternalErrorLogRepository _externalErrorLogRepository = null;
+
+    private readonly IPollRepository _pollRepository = null;
+
+    private readonly IPollResponseRepository _pollResponseRepository = null;
+
+    private readonly IParticipantIdentityRepository _participantIdentityRepository = null;
+
+    private readonly IOnlineMeetingRepository _onlineMeetingRepository = null;
+
+    private readonly IDisputeLinkRepository _disputeLinkRepository = null;
+
+    private readonly IDisputeVerificationRepository _disputeVerificationRepository = null;
+
+    private readonly IVerificationAttemptRepository _verificationAttemptRepository = null;
+
+    private readonly CaseManagementContext _context;
 
     public UnitOfWork(CaseManagementContext context)
     {
@@ -415,6 +442,33 @@ public class UnitOfWork : IUnitOfWork
 
     public IExternalFileRepository ExternalFileRepository =>
         _externalFileRepository ?? new ExternalFileRepository(_context);
+
+    public IServiceAuditLogRepository ServiceAuditLogRepository =>
+        _serviceAuditLogRepository ?? new ServiceAuditLogRepository(_context);
+
+    public IExternalErrorLogRepository ExternalErrorLogRepository =>
+        _externalErrorLogRepository ?? new ExternalErrorLogRepository(_context);
+
+    public IPollRepository PollRepository =>
+        _pollRepository ?? new PollRepository(_context);
+
+    public IPollResponseRepository PollResponseRepository =>
+        _pollResponseRepository ?? new PollResponseRepository(_context);
+
+    public IParticipantIdentityRepository ParticipantIdentityRepository =>
+        _participantIdentityRepository ?? new ParticipantIdentityRepository(_context);
+
+    public IOnlineMeetingRepository OnlineMeetingRepository =>
+        _onlineMeetingRepository ?? new OnlineMeetingRepository(_context);
+
+    public IDisputeLinkRepository DisputeLinkRepository =>
+        _disputeLinkRepository ?? new DisputeLinkRepository(_context);
+
+    public IDisputeVerificationRepository DisputeVerificationRepository =>
+        _disputeVerificationRepository ?? new DisputeVerificationRepository(_context);
+
+    public IVerificationAttemptRepository VerificationAttemptRepository =>
+        _verificationAttemptRepository ?? new VerificationAttemptRepository(_context);
 
     public async Task<int> Complete(bool withNoTracking = false)
     {

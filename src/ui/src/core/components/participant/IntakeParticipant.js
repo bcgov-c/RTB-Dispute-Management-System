@@ -2,6 +2,7 @@
  * @class core.components.participant.IntakeParticipantView
  * @memberof core.components.participant
  * @augments Marionette.View
+ * @fileoverview - View form for creating and validating different types of Dispute Participants.
  */
 
 import Marionette from 'backbone.marionette';
@@ -69,6 +70,7 @@ export default Marionette.View.extend({
       city: dispute.get('tenancy_city'),
       postalCode: dispute.get('tenancy_zip_postal'),
       country: dispute.get('tenancy_country'),
+      addressIsValidated: dispute.get('tenancy_address_validated'),
       province: null,
     };
     const updateAddressFn = (modalView) => {
@@ -92,9 +94,17 @@ export default Marionette.View.extend({
     }
   },
 
-  initialize(options) {
-    this.mergeOptions(options, ['baseName', 'noHeader', 'enableUnitType', 'enableKnownContact', 'enablePackageMethod', 'packageMethodOptional', 'disableEmailOptOut']);
+  /**
+   * @param {IntakeParticipant} model - Participant model to save data to
+   * @param {Boolean} [noHeader] - Hides the participant title header
+   * @param {Boolean} [enableUnitType] - Enables the 'Unit Type' dropdown display
+   * @param {Boolean} [enablePackageMethod] - Enables the 'Notice Package Delivery Method' dropdown display
+   * @param {Boolean} [enableKnownContact] - Enables the 'What contact information do you have for them' dropdown display
+   * @param {Boolean} [hideAddressLink] - Hides the auto populate address link 
+   */
 
+  initialize(options) {
+    this.mergeOptions(options, ['baseName', 'noHeader', 'enableUnitType', 'enableKnownContact', 'enablePackageMethod', 'packageMethodOptional', 'disableEmailOptOut', 'hideAddressLink']);
     this.baseName = this.baseName || 'Applicant';
 
     this.SEND_METHOD_EMAIL = String(configChannel.request('get', 'SEND_METHOD_EMAIL') || '');
@@ -218,7 +228,7 @@ export default Marionette.View.extend({
     this.model.get('daytimePhoneModel').set({labelText: 'Business Daytime Phone'});
   },
 
-  hideAddressLink() {
+  shouldHideAddressLink() {
     const dispute = disputeChannel.request('get');
     return !dispute || (dispute.isPastTenancy() && this.model.get('participantModel').isTenant()) || this.model.isAssistant();
   },
@@ -313,12 +323,12 @@ export default Marionette.View.extend({
     if (!this.enableKnownContact || !this.model.get('knownContactModel').getData()) return;
 
     const landlordTenantText = disputeChannel.request('get').isLandlord() ? 'tenant' : 'landlord';
-    return this.showAddressEntry ? `
-      <p>You must be able to serve a Notice of Dispute Resolution Proceeding Package to all the ${landlordTenantText}s listed on the application. Each ${landlordTenantText} must receive their own package. <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution">Click here</a> to learn about <b>allowable</b> methods of service.</p>
-    ` : `
-    <p>You must be able to serve a Notice of Dispute Resolution Proceeding Package to all the ${landlordTenantText}s listed on the application. Each ${landlordTenantText} must receive their own package. <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution">Click here</a> to learn about <b>allowable</b> methods of service. If you cannot serve using an allowable method, you can apply for substituted service online after submitting this application or complete a paper application (form RTB-13) and submit it in person.</p>
-    <p>Substituted service requires you to indicate the alternate way you want to serve the documents with proof the respondent(s) would receive them. There is no additional fee for an application for substituted service.</p>
-    `;
+    const introText = `You must be able to serve a Notice of Dispute Resolution Proceeding Package individually to each ${landlordTenantText} listed on the application. <a class="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution">Click here</a> to learn about <b>allowable</b> methods of service.`;
+    return this.showAddressEntry ? `<p>${introText}</p>`
+      : `<p>${introText}</p>
+      <p>To serve documents in a different way you need to apply for substituted service. It allows you to indicate the alternate way you want to serve the documents with proof the respondent(s) would receive them. There is no additional fee for an application for substituted service.</p>
+      <p>You must apply for substituted service immediately after submitting this application. </p>
+    </p>`;
   },
 
   templateContext() {
@@ -342,7 +352,7 @@ export default Marionette.View.extend({
       hasMailAddress: this.model.hasMailAddress() || this.model.get('useMailModel').getData({ parse: true }) === 0,
       isBusiness: this.model.isBusiness(),
       partyName: `${this.model.isAssistant() ? SUPPORT_TYPE_DISPLAY : this.baseName} ${displayIndex}`,
-      hideAddressLink: this.hideAddressLink(),
+      hideAddressLink: this.hideAddressLink || this.shouldHideAddressLink(),
 
       showAddressEntry: this.showAddressEntry,
       showEmailEntry: this.showEmailEntry,

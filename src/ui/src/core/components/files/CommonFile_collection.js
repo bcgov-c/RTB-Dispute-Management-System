@@ -8,5 +8,6 @@ import FileCollection from './File_collection';
 import CommonFileModel from './CommonFile_model';
 
 export default FileCollection.extend({
-  model: CommonFileModel
+  model: CommonFileModel,
+  comparator: 'modified_date'
 });

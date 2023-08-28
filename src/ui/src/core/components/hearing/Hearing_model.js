@@ -5,6 +5,7 @@ import DisputeHearingModel from './DisputeHearing_model';
 import HearingParticipationCollection from './HearingParticipation_collection';
 import HearingParticipationModel from './HearingParticipation_model';
 import { generalErrorFactory } from '../api/ApiLayer';
+import FileDescription_model from '../files/file-description/FileDescription_model';
 
 const hearing_api_url = 'hearing';
 
@@ -12,7 +13,16 @@ const loaderChannel = Radio.channel('loader');
 const configChannel = Radio.channel('config');
 const userChannel = Radio.channel('users');
 const hearingChannel = Radio.channel('hearings');
+const filesChannel = Radio.channel('files');
+const participantsChannel = Radio.channel('participants');
+const disputeChannel = Radio.channel('dispute');
 const Formatter = Radio.channel('formatter').request('get');
+
+export const HEARING_NOTICE_GENERATE_TYPES = {
+  ADJOURNED: 1,
+  RESCHEDULED: 2,
+  FOLLOWUP: 3
+};
 
 export default CMModel.extend({
   idAttribute: 'hearing_id',
@@ -37,6 +47,9 @@ export default CMModel.extend({
     hearing_priority: null,
     hearing_type: null,
     hearing_sub_type: null,
+    notification_delivery_date: null,
+    notification_delivery_description: null,
+    notification_file_description_id: null,
     other_staff_participants: null,
     special_instructions: null,
     staff_participant1: null,
@@ -47,6 +60,8 @@ export default CMModel.extend({
     use_custom_schedule: false,
     use_special_instructions: false,
     hearing_reserved_until: null,
+    hearing_reserved_file_number: null,
+    hearing_reserved_dispute_guid: null,
 
     created_date: null,
     created_by: null,
@@ -71,6 +86,9 @@ export default CMModel.extend({
     'hearing_priority',
     'hearing_type',
     'hearing_sub_type',
+    'notification_delivery_date',
+    'notification_delivery_description',
+    'notification_file_description_id',
     'other_staff_participants',
     'special_instructions',
     'staff_participant1',
@@ -100,6 +118,10 @@ export default CMModel.extend({
 
   getDisputeHearings() {
     return this.get('associated_disputes');
+  },
+
+  getHearingNoticeFileDescription() {
+    return filesChannel.request('get:filedescription', this.get('notification_file_description_id'));
   },
 
   resetHearingParticipations() {
@@ -150,6 +172,20 @@ export default CMModel.extend({
       this.getDisputeHearings().add(disputeHearingModel, options);
     }
     return disputeHearingModel;
+  },
+
+  async createHearingNotice(attrs={}) {
+    const hearingNotice = new FileDescription_model(Object.assign({
+      title: `Hearing Notice`,
+      description: `Hearing Notice`,
+      description_by: participantsChannel.request('get:primaryApplicant:id'),
+      description_category: configChannel.request('get', 'EVIDENCE_CATEGORY_NOTICE')
+    }, attrs));
+    
+    return hearingNotice.save().then(() => {
+      filesChannel.request('add:filedescription', hearingNotice);
+      return this.save({ notification_file_description_id: hearingNotice.id });
+    }).catch(err => { throw new Error(err) });
   },
 
   deleteAllDisputeHearings() {
@@ -393,7 +429,6 @@ export default CMModel.extend({
     return this.get('hearing_type') && this.get('hearing_type') === configChannel.request('get', 'HEARING_TYPE_FACE_TO_FACE');
   },
 
-
   isConference() {
     return !!this.get('conference_bridge_id') && !this.get('use_custom_schedule');
   },
@@ -404,6 +439,18 @@ export default CMModel.extend({
 
   isPriorityDuty() {
     return this.get('hearing_priority') && this.get('hearing_priority') === configChannel.request('get', 'HEARING_PRIORITY_DUTY');
+  },
+
+  isPriorityStandard() {
+    return this.get('hearing_priority') && this.get('hearing_priority') === configChannel.request('get', 'HEARING_PRIORITY_STANDARD');
+  },
+
+  isPriorityEmergency() {
+    return this.get('hearing_priority') && this.get('hearing_priority') === configChannel.request('get', 'HEARING_PRIORITY_EMERGENCY');
+  },
+
+  isPriorityDeferred() {
+    return this.get('hearing_priority') && this.get('hearing_priority') === configChannel.request('get', 'HEARING_PRIORITY_DEFERRED');
   },
 
   isReserved() {
@@ -430,20 +477,26 @@ export default CMModel.extend({
   },
 
   _getDateXDaysBeforeStart(dayOffset) {
-    if (!this.get('local_start_datetime')) {
+    if (!this.get('hearing_start_datetime')) {
       console.log(`[Warning] No local start datetime for the hearing`, this);
       return;
     }
     // For deadlines, always include today, so add one to the offset calculation to pick an earlier deadline
-    return Moment(this.get('local_start_datetime')).subtract(Number(dayOffset)+1, 'days');
+    return Moment(this.get('hearing_start_datetime')).subtract(Number(dayOffset)+1, 'days');
   },
 
   getApplicantEvidenceDeadline() {
-    return this._getDateXDaysBeforeStart(configChannel.request('get', 'APPLICANT_EVIDENCE_WARNING_DAY_OFFSET'));
+    if (disputeChannel.request('get')?.isUrgent()) {
+      const submittedDate = Moment(disputeChannel.request('get')?.get('submitted_date'));
+      return submittedDate.isValid() ? submittedDate : null;
+    } else {
+      return this._getDateXDaysBeforeStart(configChannel.request('get', 'APPLICANT_EVIDENCE_WARNING_DAY_OFFSET'));
+    }
   },
 
   getRespondentEvidenceDeadline() {
-    return this._getDateXDaysBeforeStart(configChannel.request('get', 'RESPONDENT_EVIDENCE_WARNING_DAY_OFFSET'));
+    const evidenceOffset = configChannel.request('get', disputeChannel.request('get')?.isUrgent() ? 'RESPONDENT_EVIDENCE_URGENT_WARNING_DAY_OFFSET' : 'RESPONDENT_EVIDENCE_WARNING_DAY_OFFSET');
+    return this._getDateXDaysBeforeStart(evidenceOffset);
   }
 
 });

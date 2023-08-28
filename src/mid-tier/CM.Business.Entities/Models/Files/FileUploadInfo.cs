@@ -43,4 +43,6 @@ public class FileUploadInfo
     public string FileDescription { get; set; }
 
     public byte? FileStatus { get; set; }
+
+    public string FileMetaSummary { get; set; }
 }

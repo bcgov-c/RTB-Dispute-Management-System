@@ -16,6 +16,7 @@ import MonthlyScheduleView from './MonthlySchedule';
 import YearlyScheduleView from './YearlySchedule';
 import HistoryScheduleView from './HistorySchedule';
 import ModalBulkMoveHearings from '../../components/modals/modal-bulk-move-hearing/ModalBulkMoveHearing';
+import ScheduleHoldHearings from './ScheduleHoldHearings';
 import { routeParse } from '../../routers/mainview_router';
 import template from './ScheduledHearingsPage_template.tpl';
 
@@ -32,6 +33,7 @@ const PERSONAL_SCHEDULE_CODE = '2';
 const MONTHLY_SCHEDULE_CODE = '3';
 const YEARLY_SCHEDULE_CODE = '4';
 const SCHEDULING_HISTORY_CODE = '5';
+const ON_HOLD_HEARINGS_CODE = '6';
 
 const sessionChannel = Radio.channel('session');
 const userChannel = Radio.channel('users');
@@ -124,7 +126,7 @@ export default PageView.extend({
   initialize(options) {
     // Detect which item should be selected based on the route
     // NOTE: initialHearingId and initialFileNumber are only used on the Scheduling History sub-page
-    this.mergeOptions(options, ['initialDate', 'initialOwner', 'initialHearingId', 'initialFileNumber', 'daily', 'personal', 'monthly', 'yearly', 'history']);
+    this.mergeOptions(options, ['initialDate', 'initialOwner', 'initialHearingId', 'initialFileNumber', 'daily', 'personal', 'monthly', 'yearly', 'history', 'onHold']);
 
     this.createSubModels();
     this.setupListeners();
@@ -143,6 +145,7 @@ export default PageView.extend({
       this.monthly ? MONTHLY_SCHEDULE_CODE :
       this.yearly ? YEARLY_SCHEDULE_CODE :
       this.history ? SCHEDULING_HISTORY_CODE :
+      this.onHold ? ON_HOLD_HEARINGS_CODE :
       null
 
     this.scheduleTypeModel = new DropdownModel({
@@ -150,7 +153,8 @@ export default PageView.extend({
       { value: PERSONAL_SCHEDULE_CODE, text: 'Personal' },
       { value: MONTHLY_SCHEDULE_CODE, text: 'Monthly' },
       { value: YEARLY_SCHEDULE_CODE, text: 'Yearly' },
-      { value: SCHEDULING_HISTORY_CODE, text: 'Scheduling History' }],
+      { value: SCHEDULING_HISTORY_CODE, text: 'Scheduling History' },
+      { value: ON_HOLD_HEARINGS_CODE, text: 'On Hold Hearings' }],
       value: hasRoutingValue ? hasRoutingValue : DAILY_SCHEDULE_CODE
     });
 
@@ -235,6 +239,10 @@ export default PageView.extend({
     return this.scheduleTypeModel.getData() === SCHEDULING_HISTORY_CODE;
   },
 
+  _onHoldHearings() {
+    return this.scheduleTypeModel.getData() === ON_HOLD_HEARINGS_CODE;
+  },
+
   onRender() {
     this.getUI('printHeader').html(PrintHeaderTemplate({
       printTitle: `Schedule Page`
@@ -262,6 +270,8 @@ export default PageView.extend({
       this.renderYearlySchedule();
     } else if (this._isHistorySelected()) {
       this.renderHistorySchedule();
+    } else if (this._onHoldHearings()) {
+      this.renderOnHoldHearings();
     }
   },
 
@@ -310,6 +320,11 @@ export default PageView.extend({
     }
     this.showChildView('scheduleSubViewRegion', new HistoryScheduleView({ model: this.model, hearingId: this.initialHearingId, fileNumber: this.initialFileNumber }));
     menuChannel.trigger('update:menu:item', { item_id: ROUTE_NAME, title: HISTORY_MENU_NAME });
+  },
+
+  renderOnHoldHearings() {
+    this._updateRouting('scheduled_hearings_on_hold_item');
+    this.showChildView('scheduleSubViewRegion', new ScheduleHoldHearings());
   },
 
   templateContext() {

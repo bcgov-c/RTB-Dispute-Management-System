@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using CM.Business.Services.Base;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
@@ -28,6 +29,6 @@ public class DirectRequestUpdateSubmitted : DisputeTransition
             AssignedTemplateId = AssignedTemplate.DirectRequestUpdateSubmitted
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }

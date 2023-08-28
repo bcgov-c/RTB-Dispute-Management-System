@@ -81,4 +81,15 @@
   <ItemGroup>
     <EmbeddedResource Remove="Resources.resx" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="CustomExtensionsMethods.Repositories.cs">
+      <DependentUpon>CustomExtensionsMethods.cs</DependentUpon>
+    </Compile>
+    <Compile Update="CustomExtensionsMethods.Scheduler.cs">
+      <DependentUpon>CustomExtensionsMethods.cs</DependentUpon>
+    </Compile>
+    <Compile Update="CustomExtensionsMethods.Services.cs">
+      <DependentUpon>CustomExtensionsMethods.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

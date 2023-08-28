@@ -1,25 +1,28 @@
-﻿FROM microsoft/dotnet:2.2-sdk
-WORKDIR /src
-COPY CM.Common.Utilities/CM.Common.Utilities.csproj CM.Common.Utilities/
-COPY CM.Messages/CM.Messages.csproj CM.Messages/
-COPY CM.Services/EmailGenerator/EmailGeneratorService/EmailGeneratorService.csproj CM.Services/EmailGenerator/EmailGeneratorService/
-COPY CM.Data.Repositories/CM.Data.Repositories.csproj CM.Data.Repositories/
-COPY CM.Data.Model.Postgres/CM.Data.Model.Postgres.csproj CM.Data.Model.Postgres/
-COPY CM.UserResolverService/CM.UserResolverService.csproj CM.UserResolverService/
-COPY CM.Business.Entities/CM.Business.Entities.csproj CM.Business.Entities/
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 
-WORKDIR /src/CM.Services/EmailGenerator/EmailGeneratorService/
-RUN dotnet restore -nowarn:msb3202,nu1503
-
-WORKDIR /src
-COPY . .
-
-WORKDIR /src/CM.Services/EmailGenerator/EmailGeneratorService/
-RUN dotnet publish -c Release -o /app
-
-FROM microsoft/dotnet:2.2-sdk
-ENV ASPNETCORE_URLS=http://+:8080
 WORKDIR /app
-COPY --from=0 /app .
-EXPOSE 8080
+EXPOSE 80
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+COPY ["CM.Services/EmailGenerator/EmailGeneratorService/EmailGeneratorService.csproj", "CM.Services/EmailGenerator/EmailGeneratorService/"]
+COPY ["CM.Common.Utilities/CM.Common.Utilities.csproj", "CM.Common.Utilities/"]
+COPY ["CM.Messages/CM.Messages.csproj", "CM.Messages/"]
+
+RUN dotnet restore "CM.Services/EmailGenerator/EmailGeneratorService/EmailGeneratorService.csproj"
+COPY . .
+RUN dotnet build "CM.Services/EmailGenerator/EmailGeneratorService/EmailGeneratorService.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "CM.Services/EmailGenerator/EmailGeneratorService/EmailGeneratorService.csproj" -c Release -o /app/publish
+
+FROM base AS final
+
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+RUN apt-get update && apt-get install -y curl
+
 ENTRYPOINT ["dotnet", "EmailGeneratorService.dll"]
+

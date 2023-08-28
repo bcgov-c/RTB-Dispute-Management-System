@@ -1,0 +1,265 @@
+.dispute-service {
+  display: flex; 
+  align-items: center;
+
+  &__service-name {
+    min-width: 430px; 
+    width: 430px; 
+    display: flex; 
+    color: black; 
+    font-weight: bold; 
+    padding-right: 3px;
+
+    > span { width: 100%; display: flex; align-self: center; justify-content: space-between; margin-left: 10px; margin-top: 5px; overflow: hidden; }
+    .dispute-notice-service-name > span > div {
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .sub-service-icon-wrapper { min-width: 26px; width: 26px; height: 24px; position: relative; top: 0; margin-right: 10px; }
+  }
+
+  &__service-comment {
+    .rtb-editable-component-label { min-width: 85px; }
+  }
+
+  &__add-files {
+    background-image: url('../../static/AddIcon_NoticeService.png');
+    background-repeat: no-repeat;
+    background-size: 29px 28px;
+    color: #337ab7;
+    cursor: pointer;
+    padding-left: 36px;
+    line-height: 28px;
+    display: inline-block;
+    user-select: none;
+
+    &::before { content: "Add Files"; }
+  }
+
+  &__delivery-icons {
+    width: 120px;
+    margin-top: 1px;
+
+    .radio-icon { 
+      height: 35px;
+      width: 52px;
+      min-width: 52px;
+    }
+  }
+
+  &__delivery-method {
+    margin-right: 10px;
+
+    &__text { margin-right: 10px; }
+  }
+
+  &__delivery-date {
+    margin-right: 10px;
+
+    &__text { margin-right: 10px; }
+  }
+
+  &__received-date {
+    margin-right: 10px;
+    &__text { margin-right: 10px; }
+
+    .input-model-custom-link-container { float: right; }
+  }
+
+  &__details {
+    display: flex; 
+    min-width: fit-content;
+  }
+
+  &__type {
+    margin-right: 10px;
+
+    &__text { margin-right: 10px; }
+  }
+
+  &__history {
+    font-weight: normal;
+    font-size: 17px;
+  }
+
+  &__meta-data-wrapper {
+    display: flex; 
+    flex-direction: column;
+    min-width: 180px;
+    width: 180px;
+  }
+
+  &__name-wrapper {
+    display: flex;
+  }
+
+  &__meta-data {
+    color: #8e8e8e;
+    font-weight: normal;
+    font-style: italic;
+    line-height: 18px;
+    font-size: 15px;
+  }
+
+  &__delivery-icon-display {
+    height: 35px;
+    width: 52px;
+    min-width: 52px;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+
+    .service-view &__wrapper { display: flex; align-items: center; }
+  }
+
+  .service-view &__delivery-icon-display { position: relative; bottom: 2px;}
+
+  &__label {
+    color: #8e8e8e;
+  }
+
+  &__reset {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    left: 10px;
+    
+    &__text {
+      font-weight: normal;
+      color: #d80000;
+    }
+  }
+
+  &__validation-tools { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    background-color: #2772be;
+    color: white;
+    font-weight: normal;
+    padding: 5px;
+    min-width: fit-content;
+    margin: 0 10px;
+    min-height: 80px;
+
+    &__tool { 
+      cursor: pointer;
+
+      &--disabled { 
+        color: white; 
+        opacity: 0.5; }
+    }
+  }
+
+  &__validation {
+    display: flex;
+    margin: 0 10px;
+    
+    &__selection {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .service-view &__selection { position: relative; top: 5px; }
+
+    &__edit {
+      min-width: 37px;
+      position: relative;
+      top: 10px;
+      font-weight: normal;
+    }
+  }
+
+  .service-view &__validation { align-items: center; }
+
+  &__proof-text { color: #8e8e8e; }
+}
+
+.service-view {
+  .dispute-service__service-name { min-width: 380px; width: 380px; }
+  .dispute-service > div { margin-top: 7px; }
+  .dispute-service > .dispute-service__service-name { margin-top: 0; position:relative; }
+  .dispute-service__delivery-icons { display: none; }
+  .dispute-service__add-files-container  { display: none; }
+}
+
+.service-edit {
+  .dispute-service { flex-wrap: wrap; }
+  .dispute-service__add-files { margin-top: 26px; }
+  .dispute-service__delivery-method { width: 200px; }
+  .dispute-service__delivery-method:not(:empty) { width: 180px; }
+  .dispute-service__delivery-date, .dispute-service__received-date { width: 170px; }
+  .dispute-service__delivery-date:not(:empty) { width: 160px; }
+  .dispute-service__received-date:not(:empty) { width: 160px; }
+  .dispute-service__type { width: 280px; }
+  .dispute-service__type:not(:empty) { width: 190px; }
+  .dispute-service__delivery-icon-display { display: none; }
+  .dispute-service__service-description, .dispute-service__service-comment { width: 840px; }
+  .hearing-tools-separator { top: 0!important; }
+  .hearing-tools-left-container { display: flex; }
+  .show-archived-checkbox span { color: white; }
+  .show-archived-checkbox { margin-left: 30px; position: relative; bottom: 2px; }
+}
+
+.dispute-notice-service-item {
+  width: 99%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #e5e5e5; 
+  min-height: 65px; 
+  padding: 0 0 5px 0; 
+  margin-right: 10px; 
+  margin-left: 5px;
+}
+
+.archived-service {
+  max-width: 2233px;
+  display: flex;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f0d4d5;
+
+  &__replaced-participant {
+    display: flex;
+    margin-right: 60px;
+  }
+
+  &__participant {
+    &__wrapper {
+      display: flex;
+      flex-direction: column;
+      margin-left: 10px;
+    }
+
+    &__header {
+      color: #d80000;
+    }
+
+    &__text {
+      color: #8e8e8e;
+      font-style: italic;
+    }
+
+    &__archived-icon {
+      width: 33px;
+      height: 38px;
+    }
+  }
+
+  &__archive-data {
+    margin-right: 10px;
+    color: #8e8e8e;
+    font-style: italic;
+  }
+}
+
+@media (min-width: 1646px) {
+  .dispute-service__add-files { &::before { content: "Add Service Files";} }
+  .service-edit .dispute-service__service-description { width: auto; min-width: 873px; }
+  .service-edit .dispute-service__service-comment { width: auto; min-width: 873px; }
+}

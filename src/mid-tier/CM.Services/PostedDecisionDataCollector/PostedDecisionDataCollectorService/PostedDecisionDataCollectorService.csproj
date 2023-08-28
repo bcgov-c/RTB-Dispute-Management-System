@@ -44,6 +44,6 @@
     <ProjectReference Include="..\..\..\CM.Services\CM.ServiceBase\CM.ServiceBase.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="PdfPig" Version="0.1.5" />
+    <PackageReference Include="PdfPig" Version="0.1.8" />
   </ItemGroup>
 </Project>

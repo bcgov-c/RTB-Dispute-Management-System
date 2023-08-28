@@ -41,7 +41,7 @@ public class DisputeRequest
     public byte? TenancyGeozoneId { get; set; }
 
     [JsonProperty("tenancy_address_validated")]
-    public byte? TenancyAddressValidated { get; set; }
+    public bool? TenancyAddressValidated { get; set; }
 
     [JsonProperty("tenancy_agreement_date")]
     public DateTime? TenancyAgreementDate { get; set; }

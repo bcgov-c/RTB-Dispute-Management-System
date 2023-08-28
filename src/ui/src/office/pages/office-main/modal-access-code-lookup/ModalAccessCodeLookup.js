@@ -38,8 +38,8 @@ const ModalAccessCodeLookup = ModalBaseView.extend({
   },
 
   closeModalAndLogin(model, participantType) {
-    this.close();
     this.trigger('login:participant', model, participantType);
+    this.close();
   },
 
   onRender() {

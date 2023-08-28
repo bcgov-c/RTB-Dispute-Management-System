@@ -485,7 +485,7 @@ const CreateUserView = Marionette.View.extend({
     No
   <% } %>
 </div>
-<div class="rolegrop-column"><%= roleGroup %></div>
+<div class="rolegroup-column"><%= roleGroup %></div>
 <div class="roletype-column"><%= roletype %></div>
 `),
 

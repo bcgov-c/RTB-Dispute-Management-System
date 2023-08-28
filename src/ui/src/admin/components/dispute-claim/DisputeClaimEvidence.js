@@ -2,6 +2,7 @@ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import template from './DisputeClaimEvidence_template.tpl';
+import LoaderImg from '../../../core/static/loader.svg';
 
 const FILE_PARENT_SELECTOR = '.dispute-issue-evidence-file';
 
@@ -14,6 +15,7 @@ const configChannel = Radio.channel('config');
 const loaderChannel = Radio.channel('loader');
 const Formatter = Radio.channel('formatter').request('get');
 const filesChannel = Radio.channel('files');
+const userChannel = Radio.channel('users');
 
 const FILE_EXTENSION_WHITE_LIST = ['png', 'jpg', 'jpeg', 'pdf'];
 const modalChannel = Radio.channel('modals');
@@ -29,7 +31,9 @@ export default Marionette.View.extend({
     filePreview: '.file-card-viewable-icon',
     notesIcon: '.file-card-note-icon',
     image: '.file-card-image',
-    evidenceFileNotes: '.dispute-issue-evidence-file-notes'
+    evidenceFileNotes: '.dispute-issue-evidence-file-notes',
+    loaderImg: '.file-card-image > img:not(.hidden)',
+    mainImg: '.file-card-image > img.hidden',
   },
 
   events: {
@@ -77,7 +81,7 @@ export default Marionette.View.extend({
   },
 
   clickEvidenceFileViewerAsNotes(ev) {
-    return this.clickEvidenceFileViewer(ev,{ openToNotes: true });
+    return this.clickEvidenceFileViewer(ev, { openToNotes: true });
   },
 
   clickFile(ev) {
@@ -176,6 +180,19 @@ export default Marionette.View.extend({
     this._hasArbPermissions = (sessionChannel.request('get:user') || {isArbitrator() {}}).isArbitrator();
   },
 
+  onRender() {
+    // Manually apply the event listener for img.onLoad
+    // Must be done manually vs in `events` because `events` only handles events that bubble up
+    this.listenToOnce(this.getUI('mainImg'), 'load', () => {
+      try {
+        this.getUI('loaderImg').addClass('hidden');
+        this.getUI('mainImg').removeClass('hidden');
+      } catch (err) {
+        // Pass
+      }
+    });
+  },
+
   templateContext() {
     const files = this.model.get('files');
     const participant_model = this.model.get('participant_model');
@@ -213,9 +230,11 @@ export default Marionette.View.extend({
     const matchingUnit = fileSubmitterId && this.unitCollection && this.unitCollection.find(unit => unit.hasParticipantId(fileSubmitterId));
     const singleSubmitterDisplay = !submitterModel ? null :
       (`${matchingUnit ? `${matchingUnit.getUnitNumDisplay()}: ` : ''}${submitterModel.getContactName()}`);
+    const fileDescription = this.model.get('file_description')
 
     return _.extend({
       Formatter,
+      LoaderImg,
       enableEvidenceFileViewer: this.enableEvidenceFileViewer && _.isFunction(this.evidenceFilePreviewFn),
       showThumbnails: this.showThumbnails,
       showArrows: this.showArrows,
@@ -225,21 +244,24 @@ export default Marionette.View.extend({
       showDetailedNames: this.showDetailedNames,
 
       participantDisplayName: hasFilesUploadedByMultipleParticipants ? '<i>Multiple Submitters</i>' :
-        ((!isDocument && singleSubmitterDisplay) || (!isDocument && participant_model.getContactName()) || 'Added as Document' ),
+        ((!isDocument && singleSubmitterDisplay) || (!isDocument && participant_model.getContactName()) ||
+        userChannel.request('get:user:name', this.model.get('file_description')?.get('created_by')) || 'Added as Document' ),
       isEvidenceRemoved: this.model.isParticipantRemoved() || claimIsRemoved,
       beforeAfterText: offset_days !== null && offset_days >= 0 ? 'before' : 'after',
       offsetToHearing: offset_days !== null ? Math.abs(offset_days) : null,
-      showOffsetWarning: offset_days !== null && date_offset_warning_threshold ? offset_days <= date_offset_warning_threshold : false,
+      showOffsetWarning: offset_days !== null && date_offset_warning_threshold ? offset_days < date_offset_warning_threshold : false,
       fileIsPastThresholdFn(fileModel) {
         const fileDate = fileModel.get('file_date');
-        return date_offset_warning_threshold && latestHearingDate && fileDate ? latestHearingDate.diff(Moment(fileDate), 'days') <= date_offset_warning_threshold : false;
+        return date_offset_warning_threshold && latestHearingDate && fileDate ? latestHearingDate.diff(Moment(fileDate), 'days') < date_offset_warning_threshold : false;
       },
       noFilesReferenced: !files.any(function(file) { return file.isReferenced(); }),
       noFilesConsidered: !files.any(function(file) { return file.isConsidered(); }),
 
       file_description_id: null,
       fileDupTranslations: this.fileDupTranslations,
-      hideDups: this.hideDups
+      hideDups: this.hideDups,
+      isDeficient: fileDescription && fileDescription.get('is_deficient')
+      
     },
     // Expose the file description attributes directly on the template
     this.model.get('file_description').toJSON());

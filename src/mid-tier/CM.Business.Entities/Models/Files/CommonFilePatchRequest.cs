@@ -16,4 +16,7 @@ public class CommonFilePatchRequest
 
     [JsonProperty("file_description")]
     public string FileDescription { get; set; }
+
+    [JsonProperty("file_status")]
+    public byte? FileStatus { get; set; }
 }

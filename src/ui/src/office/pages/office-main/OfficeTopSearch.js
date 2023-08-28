@@ -120,7 +120,7 @@ export default Marionette.View.extend({
 
     loaderChannel.trigger('page:load');
     this.model.runCurrentActionPromise().done(response => {
-      this.model.set({ reviewNotificationDisplayed: false });
+      this.model.set({ reviewNotificationDisplayed: false, });
       if (response instanceof Backbone.Model && response.get('tokenParticipantId') && !this.validateParticipantAccessCodeType(response)) {
         this.showInvalidCodeTypeMessage();
         

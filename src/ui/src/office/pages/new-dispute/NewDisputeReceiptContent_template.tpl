@@ -1,6 +1,9 @@
 <h4 class="er-title visible-email" style="font-weight: bold; padding: 0px; margin: 25px 0px 10px 0px;">Receipt: <%= receiptTitle %></h4>
 
 <p className="er-text" style="text-align: 'left';padding: '0px 0px 0px 0px'; margin: '0px 0px 10px 0px';">
+  You will need to confirm your email address if provided. Login with your Access Code on the Dispute Access site: <a class="static-external-link" href="javascript:;" url="<%= daRootUrl %>"><%= daRootUrl %></a>. You will be receiving emails directly from the Residential Tenancy Branch with important information and documents.
+</p>
+<p className="er-text" style="text-align: 'left';padding: '0px 0px 0px 0px'; margin: '0px 0px 10px 0px';">
   The following was submitted to the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
 </p>
 

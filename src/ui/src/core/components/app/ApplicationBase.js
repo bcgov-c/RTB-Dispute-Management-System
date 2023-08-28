@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Contains core helper functions used in application.js files accross sites. 
+ */
+
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../utilities/UtilityMixin';

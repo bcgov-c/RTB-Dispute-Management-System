@@ -20,6 +20,7 @@ const documentsChannel = Radio.channel('documents');
 const participantChannel = Radio.channel('participants');
 const loaderChannel = Radio.channel('loader');
 const filesChannel = Radio.channel('files');
+const hearingChannel = Radio.channel('hearings');
 const configChannel = Radio.channel('config');
 const Formatter = Radio.channel('formatter').request('get');
 
@@ -29,9 +30,12 @@ const ModalAddEmailAttachments = ModalBaseView.extend({
     this.mergeOptions(options, ['files', 'maxFileSizeBytes', 'linkedNoticeFileModels']);
     this.fileListScroll = 0;
 
+    const getFiles = (fileDescription) => [...(fileDescription ? filesChannel.request('get:filedescription:files', fileDescription).models : [])];
+
     this.noticeFileModels = [
       ..._.flatten(noticeChannel.request('get:all').map(notice => notice.getNoticeFileModels())),
-      ...(this.linkedNoticeFileModels && this.linkedNoticeFileModels.length ? this.linkedNoticeFileModels : [])
+      ...(this.linkedNoticeFileModels && this.linkedNoticeFileModels.length ? this.linkedNoticeFileModels : []),
+      ..._.flatten(hearingChannel.request('get').map(hearing => getFiles(hearing.getHearingNoticeFileDescription()))),
     ];
 
     this.createSubModels();
@@ -120,7 +124,7 @@ const ModalAddEmailAttachments = ModalBaseView.extend({
   },
 
   createAttachmentsFromFiles(fileModels) {
-    fileModels = _.sortBy(fileModels, fileModel => fileModel.get('file_name'));
+    fileModels = _.sortBy(fileModels, fileModel => -1*Number(Moment(fileModel.get('modified_date'))));
     const fileAttachmentCollection = [];
     const isPartyNonEvidenceMode = this.isPartyNonEvidenceMode();
     
@@ -150,7 +154,7 @@ const ModalAddEmailAttachments = ModalBaseView.extend({
       
       const parseFilesForParticipantFn = (p) => {
         const arrowIconHtml = `<div class="file-package-title-arrow ${p.isApplicant() ? 'applicant-upload' : (p.isRespondent() ? 'respondent-upload' : '')}"></div>`;
-        const matchingModels = _.filter(fileModels, fileModel => fileModel.get('added_by') === p.id);
+        const matchingModels = fileModels?.filter(fileModel => fileModel.get('added_by') === p.id);
         
         if (matchingModels.length && !isPartyNonEvidenceMode) {
           fileAttachmentCollection.push({ isTitle: true, isSubTitle: false, titleHtml: `${arrowIconHtml}${p.getDisplayName()}` });
@@ -200,7 +204,7 @@ const ModalAddEmailAttachments = ModalBaseView.extend({
       outcomeDocGroups.forEach(outcomeDocGroup => {
         const index = outcomeDocGroup && outcomeDocGroup.collection && outcomeDocGroup.collection.indexOf(outcomeDocGroup);
         const indexDisplay = index !== -1 ? Formatter.toLeftPad(outcomeDocGroup.collection.length - index) : null;
-        fileAttachmentCollection.push({ isTitle: true, isSubTitle: false, titleHtml: `Outcome Doc Set ${indexDisplay?Formatter.toLeftPad(indexDisplay):''} (${outcomeDocGroup.isActive() ? 'Active' : 'Inactive'})` });
+        fileAttachmentCollection.push({ isTitle: true, isSubTitle: false, titleHtml: `${outcomeDocGroup.getGroupTitle()} ${indexDisplay?Formatter.toLeftPad(indexDisplay):''} (${outcomeDocGroup.isActive() ? 'In Progress / Not Completed' : 'Completed / Ready to Deliver'})` });
         (outcomeDocFileLookups[outcomeDocGroup.id] || []).forEach(outcomeDocFileObj => {
           const fileModel = outcomeDocFileObj.fileModel;
           const outcomeDocFile = outcomeDocFileObj.docFile;
@@ -248,16 +252,14 @@ const ModalAddEmailAttachments = ModalBaseView.extend({
     const fileType  = Number(this.fileTypeModel.getData());
     const isCommonFilesSelected = this.isCommonFilesSelected();
     const collection = this.isNoticeSelected() ? this.noticeFileModels
-      : isCommonFilesSelected ? filesChannel.request('get:commonfiles').models
+      : isCommonFilesSelected ? filesChannel.request('get:commonfiles').filter(f => !f?.isStatusArchived())
       : filesChannel.request('get:files').models;
-    
-    return collection.filter(f => f.get('file_type') === fileType).sort((f1, f2) => (f1.get('file_name') || '').localeCompare(f2.get('file_name') || ''));
+    return collection.filter(f => f.get('file_type') === fileType);
   },
 
   getFilesMatchingFiltersWithRemovedToggle() {
     const allFiles = this.getFilesMatchingMainFilters();
     const removed = this.getRemovedAndDeficientFiles(allFiles);
-    
     return !this.isRemovedFilterEnabled() ? allFiles.filter(file => !removed.find(_file => file.id === _file.id)) : allFiles;
   },
 

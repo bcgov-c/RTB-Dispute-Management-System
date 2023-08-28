@@ -40,4 +40,9 @@ public static class NoticeManager
     {
         return client.GetAsync<List<NoticeResponse>>(RouteHelper.GetDisputeNotices + disputeGuid);
     }
+
+    public static EntityWithStatus<List<ExternalNoticeResponse>> GetExternalNotices(HttpClient client, Guid disputeGuid)
+    {
+        return client.GetAsync<List<ExternalNoticeResponse>>(RouteHelper.GetExternalNotices + disputeGuid);
+    }
 }

@@ -21,6 +21,7 @@ export default CMModel.extend({
 
   defaults: {
     associated_hearings: null,
+    assocaited_booked_hearings: null,
     
     schedule_block_id: null,
     schedule_period_id: null,
@@ -67,24 +68,53 @@ export default CMModel.extend({
     return (blockTypesDaily||[])?.includes(this.get('block_type'));
   },
 
+  isTypeHearing() {
+    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_HEARING');
+  },
+
   isTypeDuty() {
     return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_DUTY');
   },
 
-  isTypeHearing() {
-    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_HEARING');
+  isTypeWriting() {
+    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_WRITING');
   },
 
   isTypeWorking() {
     return this.isTypeHearing() || this.isTypeDuty();
   },
 
+  isTypeOtherWorking() {
+    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_OTHER_WORKING');
+  },
+
+  isTypeOtherTimeOff() {
+    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_OTHER_NON_WORKING');
+  },
+
+  isTypeVacation() {
+    return this.get('block_type') && this.get('block_type') === configChannel.request('get', 'SCHED_BLOCK_TYPE_VACATION');
+  },
+
+  isTypeNonWorking() {
+    return this.isTypeVacation() || this.isTypeOtherTimeOff();
+  },
+  
+  canAutoSetDefaultTimes(startDate=null, endDate=null) {
+    return (this.isTypeWorking() || this.isTypeWriting() || this.isTypeOtherWorking())
+      || (this.isTypeOtherTimeOff() && (!startDate || !endDate || Moment(startDate).isSame(Moment(endDate), 'day')));
+  },
+
   getBlockDuration() {
     if (this.get('_blockDuration')) return this.get('_blockDuration');
-
     const blockDuration = Moment(this.get('block_end')).diff(Moment(this.get('block_start')));
     if (blockDuration) this.set('_blockDuration', blockDuration);
     return blockDuration || 0;
+  },
+
+  hasStarted() {
+    const momentStart = this.get('block_start') && Moment(this.get('block_start'));
+    return momentStart?.isValid() && Moment().isAfter(momentStart, 'minutes');
   },
   
 }, {

@@ -5,6 +5,9 @@ import PageView from '../../../../core/components/page/Page';
 import ModalBlankCheckbox from '../../../../core/components/modals/modal-blank/ModalBlankCheckbox'
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
 import IntakeReviewReceipt from './IntakeReviewReceipt';
+import CheckboxView from '../../../../core/components/checkbox/Checkbox';
+import CheckboxModel from '../../../../core/components/checkbox/Checkbox_model';
+import ApplicantRequiredService from '../../../../core/components/service/ApplicantRequiredService';
 
 const modalChannel = Radio.channel('modals');
 const configChannel = Radio.channel('config');
@@ -18,7 +21,8 @@ const Formatter = Radio.channel('formatter').request('get');
 
 const IntakePageReview = PageView.extend({
   regions: {
-    intakeReviewReceiptRegion: '.intake-review-receipt'
+    intakeReviewReceiptRegion: '.intake-review-receipt',
+    intakeReviewARSCheckboxRegion: '.intake-review-ars-tos'
   },
 
   ui() {
@@ -49,16 +53,30 @@ const IntakePageReview = PageView.extend({
     this.template = this.template.bind(this);
     PageView.prototype.initialize.call(this, ...arguments);
     this.respondents = participantsChannel.request('get:respondents');
+    const dispute = disputeChannel.request('get');
+    this.isARSDispute = ApplicantRequiredService.onlineIntake_isAvailableForARS(dispute, claimsChannel.request('get'));
+
+    this.arsCheckboxModel = new CheckboxModel({
+      html: `<p>
+        <b>Proof of Service:</b> You will be required to declare service to the Residential Tenancy Branch that you served the Notice of Dispute Resolution Proceeding Package.
+        Visit the Residential Tenancy Branch <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution'>website</a> to learn more about service.
+      </p>
+      <p>If you do not declare service, your hearing and application will be deemed withdrawn.</p>
+      <p>Mark this checkbox to confirm that you understand and agree to the rules for serving respondents.</p>
+      `,
+      required: this.isARSDispute,
+      checked: false
+    });
   },
 
   onRender() {
     this.showChildView('intakeReviewReceiptRegion', new IntakeReviewReceipt({ showEdit: true }));
+    if (this.isARSDispute) this.showChildView('intakeReviewARSCheckboxRegion', new CheckboxView({ model: this.arsCheckboxModel }))
   },
 
   previousPage() {
     Backbone.history.navigate('page/6', {trigger: true});
   },
-
 
   getPageApiUpdates() {
     // Review page has no items in progress
@@ -72,7 +90,6 @@ const IntakePageReview = PageView.extend({
     
     return new Promise(res => {
       if (!respondentsWithoutAddr.length) return res();
-
       modalChannel.request('show:custom', ModalBlankCheckbox, {
         modalCssClasses: 'modalIntakeContactWarning',
         title: 'Service Reminder',
@@ -100,7 +117,16 @@ const IntakePageReview = PageView.extend({
     });
   },
 
+  validateAndShowErrors() {
+    if (this.isARSDispute) {
+      return this.getChildView('intakeReviewARSCheckboxRegion')?.validateAndShowErrors();
+    }
+
+    return true;
+  },
+
   nextPage() {
+    if (!this.validateAndShowErrors()) return
     this.showRespondentContactWarningModal().then(() => this.submitReceipt());
   },
 
@@ -149,16 +175,20 @@ const IntakePageReview = PageView.extend({
 
   template() {
     const dispute = disputeChannel.request('get');
-    const isLandlordApplication = dispute.isLandlord();
     const disputeIsReview = dispute.isReviewOnlyState();
 
     const renderJsxPageHeader = () => {
       return (
         <div className="step evidence-info-heading">
           <p>Please review your information carefully to ensure it is accurate and complete.  If you need to, go back and make changes.</p>
-          <p>This information will be submitted to the Residential Tenancy Branch for validation and will be included in a package that you must deliver to the {isLandlordApplication ? 'tenant' : 'landlord'} to notify them of this dispute.</p>
+          <p>This information will be submitted to the Residential Tenancy Branch and will be included in the Notice of Dispute Resolution Proceeding package.</p>
         </div>
       )
+    }
+
+    const renderJsxARSCheckbox = () => {
+      if (!this.isARSDispute) return;
+      return <div className="intake-review-ars-tos"></div>
     }
     
     const renderJsxPageNav = () => {
@@ -182,6 +212,7 @@ const IntakePageReview = PageView.extend({
       <>
         { renderJsxPageHeader() }
         <div className="intake-review-receipt"></div>
+        { renderJsxARSCheckbox() }
         { renderJsxPageNav() }
       </>
     )

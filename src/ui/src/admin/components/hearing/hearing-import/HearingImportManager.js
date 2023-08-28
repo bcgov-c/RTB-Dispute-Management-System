@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all functionality around hearing imports
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import HearingImportCollection from './HearingImport_collection';

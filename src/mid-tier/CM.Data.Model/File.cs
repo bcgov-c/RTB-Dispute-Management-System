@@ -71,29 +71,16 @@ public class File : BaseEntity
 
     public bool? IsDeleted { get; set; }
 
+    public bool IsSourceFileDeleted { get; set; }
+
+    [StringLength(50)]
+    public string FileMetaSummary { get; set; }
+
     public virtual ICollection<LinkedFile> LinkedFiles { get; set; }
-
-    public virtual ICollection<Notice> Notices1 { get; set; }
-
-    public virtual ICollection<Notice> Notices2 { get; set; }
-
-    public virtual ICollection<Notice> Notices3 { get; set; }
-
-    public virtual ICollection<Notice> Notices4 { get; set; }
-
-    public virtual ICollection<Notice> Notices5 { get; set; }
-
-    public virtual ICollection<NoticeService> NoticeServices1 { get; set; }
-
-    public virtual ICollection<NoticeService> NoticeServices2 { get; set; }
-
-    public virtual ICollection<NoticeService> NoticeServices3 { get; set; }
-
-    public virtual ICollection<NoticeService> NoticeServices4 { get; set; }
-
-    public virtual ICollection<NoticeService> NoticeServices5 { get; set; }
 
     public virtual ICollection<EmailAttachment> EmailAttachments { get; set; }
 
     public virtual ICollection<OutcomeDocFile> OutcomeDocFiles { get; set; }
+
+    public virtual ICollection<PollResponse> PollResponses { get; set; }
 }

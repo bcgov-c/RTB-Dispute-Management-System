@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View wrapper for HTML content to be printed. Using an Iframe with print styles in order to eliminate all print related bugs. 
+ */
 import Marionette from 'backbone.marionette';
 import React from 'react';
 import { ViewJSXMixin } from '../../utilities/JsxViewMixin';

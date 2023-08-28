@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CM.Common.Utilities;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.ExternalContexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Entities;

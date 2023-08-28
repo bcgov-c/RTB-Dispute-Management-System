@@ -4,7 +4,6 @@ using CM.Business.Entities.Models.EmailTemplate;
 using CM.Business.Services.EmailTemplate;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 

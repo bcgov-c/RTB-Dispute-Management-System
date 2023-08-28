@@ -43,7 +43,7 @@ const modalChannel = Radio.channel('modals');
  * @param {String} evidenceHelp - help html for the evidence
  * @param {Boolean} evidenceRequired - whether or not the evidence upload is required.  Note: Evidence will never be required when enableQuestion=true and question answer = No
  
- * @param {Boolean} isUpload - Controls whether the the UI should render in upload mode
+ * @param {Boolean} isUpload - Controls whether the UI should render in upload mode
  * 
  **/
 

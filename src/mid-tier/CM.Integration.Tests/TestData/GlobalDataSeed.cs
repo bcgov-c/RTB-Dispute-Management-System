@@ -50,6 +50,16 @@ public class GlobalDataSeed
             AssignedTemplate.PfrParticipatoryUpdateSubmitted => "File Number <file-number>: Update Received",
             AssignedTemplate.AricParticipatoryApplicantEvidenceReminder => "File Number <file-number>: Evidence Deadline Reminder",
             AssignedTemplate.PfrParticipatoryApplicantEvidenceReminder => "File Number <file-number>: Evidence Deadline Reminder",
+            AssignedTemplate.ArsDeclarationDeadlineReminder => "File Number <file-number>: Declaration Deadline Reminder",
+            AssignedTemplate.ArsDeclarationDeadlineMissed => "File Number <file-number>: Reinstatement Deadline Reminder",
+            AssignedTemplate.ArsReinstatementDeadlineReminder => "File Number <file-number>: Reinstatement Deadline Reminder",
+            AssignedTemplate.ArsReinstatementDeadlineMissed => "File Number <file-number>: Reinstatement Deadline Reminder",
+            AssignedTemplate.MhvApplicantAnyLinkedCnReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
+            AssignedTemplate.MhvApplicantNotLinkedNotCnReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
+            AssignedTemplate.MhvApplicantLinkedNotCnReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
+            AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
+            AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
+            AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder => "File number <file_number>: Hearing Proceeding Confirmation - Response Required",
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
@@ -84,6 +94,16 @@ public class GlobalDataSeed
             AssignedTemplate.PfrParticipatoryUpdateSubmitted => "PFR-Participatory-UpdateSubmitted",
             AssignedTemplate.AricParticipatoryApplicantEvidenceReminder => "ARIC-Applicant-EvidenceReminder",
             AssignedTemplate.PfrParticipatoryApplicantEvidenceReminder => "PFR-Applicant-EvidenceReminder",
+            AssignedTemplate.ArsDeclarationDeadlineReminder => "Ars-Declaration-Deadline-Reminder",
+            AssignedTemplate.ArsDeclarationDeadlineMissed => "Ars-Declaration-Deadline-Missed",
+            AssignedTemplate.ArsReinstatementDeadlineReminder => "Ars-Reinstatement-Deadline-Reminder",
+            AssignedTemplate.ArsReinstatementDeadlineMissed => "Ars-Reinstatement-Deadline-Missed",
+            AssignedTemplate.MhvApplicantAnyLinkedCnReminder => "MHV Applicant ANY Linked CN Reminder",
+            AssignedTemplate.MhvApplicantNotLinkedNotCnReminder => "MHV Applicant NOT Linked NOT CN Reminder",
+            AssignedTemplate.MhvApplicantLinkedNotCnReminder => "MHV Applicant Linked NOT CN Reminder",
+            AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder => "MHV FINAL Applicant CN ANY Linked Reminder",
+            AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder => "MHV FINAL Applicant NOT CN NOT Linked Reminder",
+            AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder => "MHV FINAL Applicant Linked NOT CN Reminder",
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
@@ -135,6 +155,16 @@ public class GlobalDataSeed
             AssignedTemplate.PfrParticipatoryUpdateSubmitted => "PfrParticipatoryUpdateSubmitted",
             AssignedTemplate.AricParticipatoryApplicantEvidenceReminder => "AricParticipatoryApplicantEvidenceReminder",
             AssignedTemplate.PfrParticipatoryApplicantEvidenceReminder => "PfrParticipatoryApplicantEvidenceReminder",
+            AssignedTemplate.ArsDeclarationDeadlineReminder => "ArsDeclarationDeadlineReminder",
+            AssignedTemplate.ArsDeclarationDeadlineMissed => "ArsDeclarationDeadlineMissed",
+            AssignedTemplate.ArsReinstatementDeadlineReminder => "ArsReinstatementDeadlineReminder",
+            AssignedTemplate.ArsReinstatementDeadlineMissed => "ArsReinstatementDeadlineMissed",
+            AssignedTemplate.MhvApplicantAnyLinkedCnReminder => "MHV reminder for Tenant CN Files",
+            AssignedTemplate.MhvApplicantNotLinkedNotCnReminder => "MHV reminder for Non-CN not linked Files",
+            AssignedTemplate.MhvApplicantLinkedNotCnReminder => "MHV reminder for Non-CN linked Files",
+            AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder => "Final MHV reminder for Tenant CN Files",
+            AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder => "Final MHV reminder for Non-CN not linked Files",
+            AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder => "Final MHV reminder for Non-CN linked Files",
             _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
         };
     }
@@ -181,6 +211,16 @@ public class GlobalDataSeed
         BuildEmailTemplate("29_PfrParticipatoryUpdateSubmitted.html", AssignedTemplate.PfrParticipatoryUpdateSubmitted);
         BuildEmailTemplate("30_AricParticipatoryApplicantEvidenceReminder.html", AssignedTemplate.AricParticipatoryApplicantEvidenceReminder);
         BuildEmailTemplate("31_PfrParticipatoryApplicantEvidenceReminder.html", AssignedTemplate.PfrParticipatoryApplicantEvidenceReminder);
+        BuildEmailTemplate("33_ARS_DecDeadlineReminder.html", AssignedTemplate.ArsDeclarationDeadlineReminder);
+        BuildEmailTemplate("34_ARS_RecDeadlineReminder.html", AssignedTemplate.ArsDeclarationDeadlineMissed);
+        BuildEmailTemplate("35_ARS_RecDeadlineReminder.html", AssignedTemplate.ArsReinstatementDeadlineReminder);
+        BuildEmailTemplate("36_ARS_RecDeadlineReminder.html", AssignedTemplate.ArsReinstatementDeadlineMissed);
+        BuildEmailTemplate("37_MhvAppCnFirstReminder.html", AssignedTemplate.MhvApplicantAnyLinkedCnReminder);
+        BuildEmailTemplate("38_MhvAppCnFinalReminder.html", AssignedTemplate.MhvApplicantNotLinkedNotCnReminder);
+        BuildEmailTemplate("39_MhvAppLinkedFirstReminder.html", AssignedTemplate.MhvApplicantLinkedNotCnReminder);
+        BuildEmailTemplate("40_MhvAppLinkedFinalReminder.html", AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder);
+        BuildEmailTemplate("41_MhvAppNotLinkedFirstReminder.html", AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder);
+        BuildEmailTemplate("42_MhvAppNotLinkedFinalReminder.html", AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder);
     }
 
     private void BuildEmailTemplate(string name, AssignedTemplate assignedTemplateId)

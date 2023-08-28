@@ -11,4 +11,6 @@ public interface IClaimGroupRepository : IRepository<ClaimGroup>
     Task<List<ClaimGroup>> GetDisputeClaimGroups(Guid disputeGuid);
 
     Task<List<ClaimGroup>> GetDisputeClaimGroupsWithParties(Guid disputeGuid);
+
+    Task<List<ClaimGroup>> GetDisputeClaimGroupsWithAllChilds(Guid disputeGuid);
 }

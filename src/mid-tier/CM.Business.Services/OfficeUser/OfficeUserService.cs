@@ -8,6 +8,8 @@ using AutoMapper;
 using CM.Business.Entities.Models.AccessCode;
 using CM.Business.Entities.Models.EmailMessage;
 using CM.Business.Entities.Models.OfficeUser;
+using CM.Business.Entities.Models.Parties;
+using CM.Business.Services.Base;
 using CM.Business.Services.DisputeAccess;
 using CM.Business.Services.Files;
 using CM.Business.Services.SystemSettingsService;
@@ -16,7 +18,6 @@ using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.OfficeUser;
 
@@ -67,6 +68,7 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
 
     public async Task<OfficeUserPostDisputeResponse> CreateDispute(OfficeUserPostDisputeRequest request)
     {
+        var nameAbbreviationLength = 10;
         var dispute = MapperService.Map<OfficeUserPostDisputeRequest, Dispute>(request);
         dispute.DisputeGuid = Guid.NewGuid();
         dispute.CreationMethod = request.CreationMethod ?? (byte?)DisputeCreationMethod.Manual;
@@ -113,11 +115,21 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
         var participant = MapperService.Map<OfficeUserPostDisputeRequest, Participant>(request);
         participant.DisputeGuid = disputeResult.DisputeGuid;
         participant.AccessCode = await GenerateAccessCode();
-        participant.NameAbbreviation = await GetNameAbbreviation(participant);
+        var nameAbbr = await GetNameAbbreviationAsync(participant, disputeResult.DisputeGuid);
+        participant.NameAbbreviation = nameAbbr.Truncate(nameAbbreviationLength);
         participant.CreatedBy = Constants.UndefinedUserId;
         participant.ModifiedBy = Constants.UndefinedUserId;
         participant.AcceptedTouDate = DateTime.UtcNow;
         participant.IsDeleted = false;
+
+        participant.EmailVerified = false;
+        participant.EmailVerifyCode = StringHelper.GetRandomCode();
+
+        if (!string.IsNullOrEmpty(request.PrimaryPhone))
+        {
+            participant.PrimaryPhoneVerified = false;
+            participant.PrimaryPhoneVerifyCode = StringHelper.GetRandomCode();
+        }
 
         var participantResult = await UnitOfWork.ParticipantRepository.InsertAsync(participant);
         await UnitOfWork.Complete();
@@ -217,7 +229,7 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
                 message.ParticipantId = (int)disputeFee.PayorId;
             }
 
-            Publish(message);
+            message.Publish(Bus);
         }
 
         var disputeFeeResponse = await UnitOfWork.DisputeFeeRepository.GetWithTransactions(disputeFeeId);
@@ -312,9 +324,9 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
         return $"{rootPath}/{fileGuid}/{fileName}";
     }
 
-    private async Task<string> GetNameAbbreviation(Participant participantRequest)
+    private async Task<string> GetNameAbbreviationAsync(Participant participantRequest, Guid disputeGuid)
     {
-        string nameAbbreviation;
+        var nameAbbreviation = string.Empty;
 
         switch (participantRequest.ParticipantType)
         {
@@ -326,11 +338,9 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
             case (int)ParticipantType.AdvocateOrAssistant:
                 nameAbbreviation = StringExtensions.GetAbbreviation(participantRequest.FirstName, participantRequest.LastName);
                 break;
-            default:
-                return null;
         }
 
-        var partiesCount = await UnitOfWork.ParticipantRepository.GetSameAbbreviationsCount(participantRequest.DisputeGuid, nameAbbreviation);
+        var partiesCount = await UnitOfWork.ParticipantRepository.GetSameAbbreviationsCount(disputeGuid, nameAbbreviation);
 
         if (partiesCount > 0)
         {
@@ -367,7 +377,7 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
         var dispute = await UnitOfWork.DisputeRepository.GetDisputeByFileNumberWithStatus(request.FileNumber);
         if (dispute != null)
         {
-            var externalUpdateDispute = await _disputeAccessService.GatherDisputeData(dispute);
+            var externalUpdateDispute = await _disputeAccessService.GatherDisputeData(dispute, true, true);
             return externalUpdateDispute;
         }
 
@@ -380,7 +390,7 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
         if (participant != null)
         {
             var dispute = await UnitOfWork.DisputeRepository.GetDisputeWithStatusByGuidAsync(participant.DisputeGuid);
-            var externalUpdateDispute = await _disputeAccessService.GatherDisputeData(dispute);
+            var externalUpdateDispute = await _disputeAccessService.GatherDisputeData(dispute, true, true);
             externalUpdateDispute.TokenParticipantId = participant.ParticipantId;
             return externalUpdateDispute;
         }
@@ -426,23 +436,5 @@ public class OfficeUserService : CmServiceBase, IOfficeUserService
         }
 
         return evidenceCode;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
-
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

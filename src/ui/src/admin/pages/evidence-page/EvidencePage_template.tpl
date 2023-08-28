@@ -61,7 +61,7 @@
         <div class="">
           <div class="radio-display-title">Show:</div>
           <div class="evidence-page-filter-thumbnails"></div>
-          <div class="evidence-page-filter-names <%= showPackageView ? '' : 'hidden' %>"></div>
+          <div class="evidence-page-filter-names <%= showPackageView || showOtherDocsView ? '' : 'hidden' %>"></div>
         </div>
       </div>
     </div>
@@ -106,6 +106,7 @@
 
     <div class="evidence-page-parties <%= showPartiesView  ? '' : 'hidden' %>"></div>
 
+    <div class="evidence-page-other-docs <%= showOtherDocsView  ? '' : 'hidden' %>"></div>
   </div>
 
   <div class="spacer-block-45"></div>

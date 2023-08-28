@@ -55,4 +55,14 @@ public class FilePackageServiceRepository : CmRepository<Model.FilePackageServic
 
         return false;
     }
+
+    public async Task<Model.FilePackageService> GetWithChild(int filePackageServiceId)
+    {
+        var filePackageService = await Context
+            .FilePackageServices
+            .Include(x => x.FilePackage)
+            .FirstOrDefaultAsync(x => x.FilePackageServiceId == filePackageServiceId);
+
+        return filePackageService;
+    }
 }

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Basic root View that renders a header and main site content
+ */
 import Marionette from 'backbone.marionette';
 
 import template from './RootLayout_template.tpl';

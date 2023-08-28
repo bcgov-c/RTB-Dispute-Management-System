@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.AccessCode;
+using CM.Business.Entities.Models.ClaimDetail;
 using CM.Business.Entities.Models.Dispute;
 using CM.Business.Entities.Models.ExternalUpdate;
 using CM.Business.Entities.Models.Hearing;
@@ -171,6 +172,16 @@ public class DisputeService : CmServiceBase, IDisputeService
 
                 var disputeFlags = await _disputeFlagService.GetLinkedFlagsFromHearing(latestHearing, disputeGuid);
                 dispute.LinkedDisputeFlags = disputeFlags;
+
+                var latestNotice = await UnitOfWork.NoticeRepository.GetCurrentNotice(disputeGuid);
+                if (latestNotice != null)
+                {
+                    dispute.LatestNoticeId = latestNotice.NoticeId;
+                    dispute.LatestNoticeDeliveryDate = latestNotice.NoticeDeliveredDate.ToCmDateTimeString();
+                    dispute.LatestNoticeHasServiceDeadline = latestNotice.HasServiceDeadline;
+                    dispute.LatestNoticeServiceDeadlineDate = latestNotice.ServiceDeadlineDate.ToCmDateTimeString();
+                    dispute.LatestNoticeSecondServiceDeadlineDate = latestNotice.SecondServiceDeadlineDate.ToCmDateTimeString();
+                }
             }
 
             getApplicationResponse.TotalAvailableRecords = await UnitOfWork.DisputeRepository.GetDisputesCountAsync(userId, creationMethod);
@@ -212,7 +223,7 @@ public class DisputeService : CmServiceBase, IDisputeService
         return dispute;
     }
 
-    public async Task<DisputeStatusResponse> PostDisputeStatusAsync(DisputeStatusPostRequest request, Guid disputeGuid, int userId)
+    public async Task<DisputeStatusResponse> PostDisputeStatusAsync(DisputeStatusPostRequest request, Guid disputeGuid)
     {
         var dispute = await UnitOfWork.DisputeRepository.GetDisputeByGuidAsync(disputeGuid);
         if (dispute != null)
@@ -252,7 +263,7 @@ public class DisputeService : CmServiceBase, IDisputeService
             if (disputeStatus.Status.Equals((byte)DisputeStatusName.Submitted))
             {
                 dispute.SubmittedDate = now.GetCmDateTime();
-                dispute.SubmittedBy = userId;
+                ////dispute.SubmittedBy = userId;
 
                 UnitOfWork.DisputeRepository.Attach(dispute);
             }
@@ -443,8 +454,12 @@ public class DisputeService : CmServiceBase, IDisputeService
         {
             (byte)DisputeStatuses.WaitingForProofOfService when
                 lastDisputeStatus.Stage == (byte)DisputeStage.ServingDocuments &&
-                disputeStatus.Status == (byte)DisputeStatuses.ClosedForSubmissions &&
+                disputeStatus.Status == (byte)DisputeStatuses.OpenForSubmissions &&
                 disputeStatus.Stage == (byte)DisputeStage.HearingPending => true,
+            (byte)DisputeStatuses.WaitingForProofOfService when
+            lastDisputeStatus.Stage == (byte)DisputeStage.ServingDocuments &&
+            disputeStatus.Status == (byte)DisputeStatuses.ClosedForSubmissions &&
+            disputeStatus.Stage == (byte)DisputeStage.HearingPending => true,
             (byte)DisputeStatuses.PaymentRequired when
                 lastDisputeStatus.Stage == (byte)DisputeStage.ApplicationInProgress &&
                 disputeStatus.Status == (byte)DisputeStatuses.Received &&
@@ -481,10 +496,85 @@ public class DisputeService : CmServiceBase, IDisputeService
             lastDisputeStatus.Stage == (byte)DisputeStage.ApplicationInProgress &&
             disputeStatus.Status == (byte)DisputeStatuses.Received &&
             disputeStatus.Stage == (byte)DisputeStage.ApplicationScreening => true,
+            (byte)DisputeStatuses.Dismissed when
+                lastDisputeStatus.Stage == (byte)DisputeStage.ServingDocuments &&
+                disputeStatus.Status == (byte)DisputeStatuses.OpenForSubmissions &&
+                disputeStatus.Stage == (byte)DisputeStage.HearingPending => true,
+            (byte)DisputeStatuses.WaitingForProofOfService when
+                lastDisputeStatus.Stage == (byte)DisputeStage.ServingDocuments &&
+                disputeStatus.Status == (byte)DisputeStatuses.ProcessDecisionRequired &&
+                disputeStatus.Stage == (byte)DisputeStage.ApplicationScreening => true,
             _ => false
         };
 
         return isAllowed;
+    }
+
+    public async Task<bool> IsDisputeUser(Guid disputeGuid, int userId)
+    {
+        var disputeUser = await UnitOfWork.DisputeUserRepository.GetDisputeUser(disputeGuid, userId);
+        return disputeUser != null;
+    }
+
+    public async Task<List<DisputeUserGetResponse>> GetDisputeUsers(Guid disputeGuid)
+    {
+        var disputeUsers = await UnitOfWork
+            .DisputeUserRepository
+            .FindAllAsync(x => x.DisputeGuid == disputeGuid);
+        var usersId = disputeUsers.Select(x => x.SystemUserId);
+        var users = await UnitOfWork.SystemUserRepository.GetUsers(usersId);
+
+        var mappedUsers = MapperService.Map<ICollection<DisputeUser>, ICollection<DisputeUserGetResponse>>(disputeUsers);
+
+        foreach (var user in mappedUsers)
+        {
+            var u = users.FirstOrDefault(x => x.SystemUserId == user.SystemUserId);
+            user.SystemUserRoleId = u.SystemUserRoleId;
+            user.Username = u.Username;
+            user.FullName = u.FullName;
+        }
+
+        return mappedUsers.ToList();
+    }
+
+    public async Task<bool> IsDisputeUserModified(int disputeUserId, DateTime unmodifiedSince)
+    {
+        var lastModified = await GetLastModifiedDisputeUserAsync(disputeUserId);
+
+        if (lastModified?.Ticks > unmodifiedSince.Ticks)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<DisputeUser> GetDisputeUser(int disputeUserId)
+    {
+        var disputeUser = await UnitOfWork.DisputeUserRepository.GetNoTrackingByIdAsync(x => x.DisputeUserId == disputeUserId);
+        return disputeUser;
+    }
+
+    public async Task<DisputeUserGetResponse> PatchDisputeUserAsync(DisputeUser disputeUser)
+    {
+        UnitOfWork.DisputeUserRepository.Attach(disputeUser);
+        var result = await UnitOfWork.Complete();
+        if (result.CheckSuccess())
+        {
+            var mappedUser = MapperService.Map<DisputeUser, DisputeUserGetResponse>(disputeUser);
+            var user = await UnitOfWork.SystemUserRepository.GetUserWithFullInfo(disputeUser.SystemUserId);
+            mappedUser.Username = user.Username;
+            mappedUser.FullName = user.FullName;
+            return mappedUser;
+        }
+
+        return null;
+    }
+
+    private async Task<DateTime?> GetLastModifiedDisputeUserAsync(int disputeUserId)
+    {
+        var lastModifiedDate = await UnitOfWork.DisputeUserRepository.GetLastModifiedDate(disputeUserId);
+        return lastModifiedDate;
     }
 
     private async Task<string> GetPrimaryApplicantAccessCode(Guid disputeGuid)
@@ -512,6 +602,20 @@ public class DisputeService : CmServiceBase, IDisputeService
                         {
                             await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.DeleteDisputeHearing, null, disputeHearing);
                         }
+                    }
+
+                    if (hearing.NotificationFileDescriptionId.HasValue)
+                    {
+                        var fileDescription = await UnitOfWork.FileDescriptionRepository.GetByIdAsync(hearing.NotificationFileDescriptionId.Value);
+                        if (fileDescription != null)
+                        {
+                            fileDescription.IsDeficient = true;
+                            fileDescription.IsDeficientReason = ConstantStrings.DeficientReason;
+                            UnitOfWork.FileDescriptionRepository.Attach(fileDescription);
+                        }
+
+                        hearing.NotificationFileDescriptionId = null;
+                        UnitOfWork.HearingRepository.Attach(hearing);
                     }
                 }
             }

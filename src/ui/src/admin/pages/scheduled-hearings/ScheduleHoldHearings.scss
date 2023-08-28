@@ -1,0 +1,16 @@
+.schedule-hold-hearings {
+  margin-top: 30px;
+  
+  &__table-header {
+    display: flex;
+  }
+
+  .standard-list-item { display: flex; }
+
+  &__hearing-id { width: 120px; }
+  &__priority { width: 150px; }
+  &__assigned-to { width: 300px; }
+  &__hearing-start { width: 200px; }
+  &__file-number { width: 200px; }
+  &__hold-until { width: 260px; }
+}

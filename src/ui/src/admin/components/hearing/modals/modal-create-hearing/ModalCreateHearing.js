@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal for creating a new hearing and assigning it to an arb
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import DropdownView from '../../../../../core/components/dropdown/Dropdown';
@@ -167,7 +170,9 @@ export default ModalBaseView.extend({
     return is_valid;
   },
 
-
+  /**
+   * @param {ModalCreateHearingModel} model 
+   */
   initialize() {
     this.minBookingTime = configChannel.request('get', 'HEARING_MIN_BOOKING_TIME');
     this.setupListeners();
@@ -229,13 +234,14 @@ export default ModalBaseView.extend({
     const templateData = {
       Formatter,
       access_code: this.model.participantCodeModel.getData(),
-      conference_data_items: [{
+      primary_conf_data: {
         title: this.model.primaryDialInTitleModel.getData(),
         phone_number: this.model.primaryDialInNumberModel.getData()
-      }, {
+      },
+      secondary_conf_data: {
         title: this.model.secondaryDialInTitleModel.getData(),
         phone_number: this.model.secondaryDialInNumberModel.getData()
-      }]
+      }
     };
     this.getUI('hearingConferenceDetails').html(conference_template(templateData));
   },

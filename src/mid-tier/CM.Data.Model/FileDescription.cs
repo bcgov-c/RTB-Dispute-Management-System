@@ -28,9 +28,9 @@ public class FileDescription : BaseEntity
     [StringLength(750)]
     public string Description { get; set; }
 
-    [ForeignKey("DescriptionBy")]
     public Participant Participant { get; set; }
 
+    [ForeignKey("Participant")]
     public int? DescriptionBy { get; set; }
 
     public byte DescriptionCategory { get; set; }
@@ -56,7 +56,37 @@ public class FileDescription : BaseEntity
 
     public virtual ICollection<Notice> Notices { get; set; }
 
+    public virtual ICollection<Amendment> Amendments { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices1 { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices2 { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices3 { get; set; }
+
+    [InverseProperty("ProofFileDescription")]
     public virtual ICollection<NoticeService> NoticeServices { get; set; }
 
-    public virtual ICollection<Amendment> Amendments { get; set; }
+    [InverseProperty("OtherProofFileDescription")]
+    public virtual ICollection<NoticeService> OtherNoticeServices { get; set; }
+
+    public virtual ICollection<Hearing> Hearings { get; set; }
+
+    [InverseProperty("ProofFileDescription")]
+    public virtual ICollection<FilePackageService> FilePackageServices { get; set; }
+
+    [InverseProperty("OtherProofFileDescription")]
+    public virtual ICollection<FilePackageService> OtherFilePackageServices { get; set; }
+
+    [InverseProperty("ProofFileDescription")]
+    public virtual ICollection<ServiceAuditLog> ServiceAuditLogs { get; set; }
+
+    [InverseProperty("OtherProofFileDescription")]
+    public virtual ICollection<ServiceAuditLog> OtherServiceAuditLogs { get; set; }
+
+    public virtual ICollection<OutcomeDocRequest> OutcomeDocRequests { get; set; }
+
+    public virtual ICollection<OutcomeDocReqItem> OutcomeDocReqItems { get; set; }
 }

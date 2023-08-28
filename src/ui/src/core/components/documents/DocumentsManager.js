@@ -1,13 +1,18 @@
+/**
+ * @fileoverview - Manager that handles OutcomeDocs, OutcomeDocRequests, OutcomeDocFiles, and configs related to OutcomeDocs
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../utilities/UtilityMixin';
 
-//import ComposerInstanceCollection from '../../../admin/components/composer/ComposerInstance_collection';
+//import ComposerInstanceCollection from '../../../admin/components/composer/ComposerInstance_collection';//TODO: cleanup?
 import OutcomeDocGroupCollection from './OutcomeDocGroup_collection';
 import DocRequestCollection from './doc-requests/DocRequest_collection';
 
 const api_load_all_groups = 'disputeoutcomedocgroups';
+const api_external_load_all_groups = 'externaldisputeoutcomedocgroups';
 const api_load_all_requests = 'outcomedocrequests/outcomedocrequests';
+const api_external_load_all_requests = 'outcomedocrequests/externaloutcomedocrequests';
 
 const apiChannel = Radio.channel('api');
 const configChannel = Radio.channel('config');
@@ -21,12 +26,11 @@ const DocumentsManager = Marionette.Object.extend({
     'get:all': 'getAllOutcomeDocGroups',
     'get:group': 'getOutcomeDocGroup',
     'get:outcomedoc:from:file': 'getOutcomeDocFileFromFile',
+    'get:outcomedoc': 'getOutcomeDocFileById',
     'get:participant:deliveries': 'getOutcomeDocDeliveryModelsForParticipant',
     'get:requests': 'getAllOutcomeDocRequests',
+    'get:requests:by:id': 'getOutcomeDocRequestsById',
     'get:fileTypes:deliveredBy': 'getFileTypesFromDeliveredByCode',
-
-    'config:all:groups': 'getConfigAllOutcomeDocGroups',
-    'config:group': 'getConfigOutcomeDocGroup',
 
     'config:all:files': 'getConfigAllOutcomeDocFiles',
     'config:files': 'getConfigRulesOutcomeDocFiles',
@@ -40,7 +44,9 @@ const DocumentsManager = Marionette.Object.extend({
     refresh: 'loadAllOutcomeDocGroups',
 
     'load': 'loadAllOutcomeDocGroups',
+    'load:external': 'loadExternalOutcomeDocGroups',
     'load:requests': 'loadOutcomeDocRequests',
+    'load:requests:external': 'loadExternalOutcomeDocRequests',
     'load:disputeaccess': 'loadFromDisputeAccessResponse',
 
     clear: 'clearInternalData',
@@ -138,6 +144,31 @@ const DocumentsManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
+  loadExternalOutcomeDocGroups(disputeGuid, participantIds=[]) {
+    const params = $.param({ DeliveryParticipantIds: participantIds }, true);
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_load_all_groups}/${disputeGuid}?${params}`
+      }).done(response => {
+        this.allOutcomeDocGroups = new OutcomeDocGroupCollection(response);
+        res(this.allOutcomeDocGroups);
+      }).fail(rej);
+    });
+  },
+
+  loadExternalOutcomeDocRequests(disputeGuid) {
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_load_all_requests}/${disputeGuid}`
+      }).done(response => {
+        this.allDocRequests.reset(response);
+        res(this.allDocRequests);
+      }).fail(rej);
+    });
+  },
+
   loadOutcomeDocRequests(dispute_guid) {
     if (!dispute_guid) {
       console.log(`[Error] Need a dispute_guid for get:requests outcome doc groups`);
@@ -200,6 +231,10 @@ const DocumentsManager = Marionette.Object.extend({
     return this.allDocRequests;
   },
 
+  getOutcomeDocRequestsById(requestId) {
+    return this.allDocRequests.findWhere({ outcome_doc_request_id: requestId });
+  },
+
 
   getAllOutcomeDocGroups() {
     return this.allOutcomeDocGroups;
@@ -207,18 +242,6 @@ const DocumentsManager = Marionette.Object.extend({
 
   getOutcomeDocGroup(outcome_doc_group_id) {
     return this.allOutcomeDocGroups.findWhere({ outcome_doc_group_id });
-  },
-
-  getConfigAllOutcomeDocGroups() {
-    if (_.isEmpty(this._configOutcomeDocGroups)) {
-      this._configOutcomeDocGroups = configChannel.request('get', 'outcome_doc_groups') || {};
-    }
-    return this._configOutcomeDocGroups;
-  },
-
-  getConfigOutcomeDocGroup(outcome_doc_group_config_id) {
-    const config = this.getConfigAllOutcomeDocGroups();
-    return _.has(config, outcome_doc_group_config_id) ? config[outcome_doc_group_config_id] : {};
   },
 
   getConfigAllOutcomeDocFiles() {
@@ -231,7 +254,7 @@ const DocumentsManager = Marionette.Object.extend({
   getConfigRulesOutcomeDocFiles(dispute, hearing) {
     const filesConfig = this.getConfigAllOutcomeDocFiles();
     const process = dispute?.getProcess();
-    const linkType = hearing?.getHearingLinkType();
+    const linkType = hearing?.getHearingLinkType() || null;
     const subType = dispute?.get('dispute_sub_type');
     const creationMethod = dispute?.get('creation_method');
 
@@ -239,10 +262,10 @@ const DocumentsManager = Marionette.Object.extend({
       // Remove any non-matching files from return
       .filter(fileId => {
         const configData = filesConfig[fileId];
-        const matchingProcess = (configData.processes || []).includes(process);
-        const matchingLinkType = (configData.link_types || []).includes(linkType);
-        const matchingDisputeSubType = (configData.dispute_sub_types || []).includes(subType);
-        const matchingCreationMethod = (configData.creation_methods || []).includes(creationMethod);
+        const matchingProcess = configData.processes ? configData.processes?.includes(process) : true;
+        const matchingLinkType = configData.link_types ? configData.link_types?.includes(linkType) : true;
+        const matchingDisputeSubType = configData.dispute_sub_types ? configData.dispute_sub_types?.includes(subType) : true;
+        const matchingCreationMethod = configData.creation_methods ? configData.creation_methods?.includes(creationMethod) : true;
         return matchingProcess && matchingLinkType && matchingDisputeSubType && matchingCreationMethod;
       })
       // Turn back into an object and return
@@ -278,6 +301,18 @@ const DocumentsManager = Marionette.Object.extend({
     this.allOutcomeDocGroups.forEach(group => {
       if (matchingDocFileModel) return;
       matchingDocFileModel = group.getOutcomeFiles().find(outcomeFile => outcomeFile.get('file_id') === fileModel.id);
+    });
+    
+    return matchingDocFileModel || null;
+  },
+
+  getOutcomeDocFileById(outcomeDocFileId) {
+    if (!outcomeDocFileId) return;
+
+    let matchingDocFileModel;
+    this.allOutcomeDocGroups.forEach(group => {
+      if (matchingDocFileModel) return;
+      matchingDocFileModel = group.getOutcomeFiles().find(outcomeFile => outcomeFile.id === outcomeDocFileId);
     });
     
     return matchingDocFileModel || null;

@@ -511,14 +511,15 @@
   position: absolute;
   z-index: 11;
   background-color: orange;  
-  font-size: 16px;
+  font-size: 13px;
   text-align: center;
   color: #fff;
-  padding: 5px 5px 0 5px;
+  padding: 7px 2px 0 2px;
   overflow-x: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
+.block-calendar__saved-block.selected { border: 3px solid #e46a3f; line-height: 16px; padding-top: 4px; }
 
 .working-sched__calendar.disabled { opacity: 0.7; }
 
@@ -526,7 +527,9 @@
 .working-sched__calendar:not(.disabled) .block-calendar__saved-block:hover {
   border: 1px solid black;
   box-shadow: #2772BE;
+  line-height: initial;
 }
+.working-sched__calendar:not(.disabled) .block-calendar__saved-block.selected:hover { border: 3px solid #e46a3f; }
 
 .ds-selector { background: rgba(0, 255, 0, 0.1); border: 2px solid rgba(0, 255, 0, 0.45); } 
 
@@ -534,6 +537,7 @@
 .block-calendar .calendar-grid-time-item {
   min-width: 100px;
   width: calc(100% / 9);
+  background-color: #fff;
 }
 
 .calendar-grid-time-item--today { border-left: 3px solid #333; border-right: 3px solid #333; }
@@ -613,9 +617,9 @@
 .block-calendar__saved-block.hear { background-color: #97bfa6; }
 .block-calendar__saved-block.duty { background-color: #fae6aa; }
 .block-calendar__saved-block.writ { background-color: #666; }
-.block-calendar__saved-block.vac { background-color: #9d5786; }
-.block-calendar__saved-block.blk { background-color: #333; }
-.block-calendar__saved-block.other { background-color: #4e96bb; }
+.block-calendar__saved-block.vac { background-color: #9d5786; text-overflow: ellipsis; }
+.block-calendar__saved-block.blk { background-color: #333; text-overflow: ellipsis; }
+.block-calendar__saved-block.other { background-color: #4e96bb; text-overflow: ellipsis; }
 
 .block-calendar__saved-block.hear.has-hearings { background-color: #2a9240; }
 .block-calendar__saved-block.duty.has-hearings { background-color: #f5c626; }

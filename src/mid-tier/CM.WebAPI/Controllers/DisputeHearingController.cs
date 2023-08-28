@@ -9,7 +9,6 @@ using CM.Business.Services.Hearings;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -213,6 +212,25 @@ public class DisputeHearingController : BaseController
         if (disputeHearingHistory != null)
         {
             return Ok(disputeHearingHistory);
+        }
+
+        return NotFound();
+    }
+
+    [HttpGet("/api/externaldisputehearings/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalDisputeHearings(Guid disputeGuid)
+    {
+        var disputeExists = await _disputeService.DisputeExistsAsync(disputeGuid);
+        if (!disputeExists)
+        {
+            return BadRequest(ApiReturnMessages.InvalidDisputeGuid);
+        }
+
+        var disputeHearings = await _hearingService.GetExternalDisputeHearings(disputeGuid);
+        if (disputeHearings != null)
+        {
+            return Ok(disputeHearings);
         }
 
         return NotFound();

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Basic View that contains core modal logic from which other modal files can extend from 
+ */
+
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 

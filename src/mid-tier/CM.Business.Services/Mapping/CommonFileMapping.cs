@@ -17,5 +17,9 @@ public class CommonFileMapping : Profile
 
         CreateMap<CommonFilePatchRequest, CommonFile>();
         CreateMap<CommonFile, CommonFilePatchRequest>();
+
+        CreateMap<CommonFile, ExternalCommonFile>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
     }
 }

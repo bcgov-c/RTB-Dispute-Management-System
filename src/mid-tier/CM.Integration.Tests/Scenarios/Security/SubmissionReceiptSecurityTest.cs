@@ -30,6 +30,9 @@ public partial class SecurityTests
         var submissionReceiptsGetResponse = SubmissionReceiptManager.GetSubmissionReceipts(Client, Data.Dispute.DisputeGuid);
         submissionReceiptsGetResponse.CheckStatusCode();
 
+        var externalSubmissionReceiptsGetResponse = SubmissionReceiptManager.GetExternalSubmissionReceipts(Client, Data.Dispute.DisputeGuid, new ExternalSubmissionReceiptRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalSubmissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -47,6 +50,9 @@ public partial class SecurityTests
 
         submissionReceiptsGetResponse = SubmissionReceiptManager.GetSubmissionReceipts(Client, Data.Dispute.DisputeGuid);
         submissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubmissionReceiptsGetResponse = SubmissionReceiptManager.GetExternalSubmissionReceipts(Client, Data.Dispute.DisputeGuid, new ExternalSubmissionReceiptRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalSubmissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -67,6 +73,9 @@ public partial class SecurityTests
         submissionReceiptsGetResponse = SubmissionReceiptManager.GetSubmissionReceipts(Client, Data.Dispute.DisputeGuid);
         submissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        externalSubmissionReceiptsGetResponse = SubmissionReceiptManager.GetExternalSubmissionReceipts(Client, Data.Dispute.DisputeGuid, new ExternalSubmissionReceiptRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalSubmissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -84,5 +93,8 @@ public partial class SecurityTests
 
         submissionReceiptsGetResponse = SubmissionReceiptManager.GetSubmissionReceipts(Client, Data.Dispute.DisputeGuid);
         submissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubmissionReceiptsGetResponse = SubmissionReceiptManager.GetExternalSubmissionReceipts(Client, Data.Dispute.DisputeGuid, new ExternalSubmissionReceiptRequest() { Participants = new int[] { Data.Participants[0].ParticipantId } });
+        externalSubmissionReceiptsGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
@@ -36,5 +39,16 @@ public class SchedulePeriodRepository : CmRepository<Model.SchedulePeriod>, ISch
         }
 
         return null;
+    }
+
+    public async Task<(int totalCount, List<Model.SchedulePeriod> periods)> GetPeriods(Expression<Func<Model.SchedulePeriod, bool>> predicate, int count, int index)
+    {
+        var periods = await Context.SchedulePeriods
+            .Where(predicate)
+            .ToListAsync();
+
+        var pageBlocks = periods.ApplyPagingArrayStyleAsync(count, index);
+
+        return (periods.Count, periods);
     }
 }

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Basic modal that wraps the DisputeAmendmentsView. 
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import { routeParse } from '../../routers/mainview_router';

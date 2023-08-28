@@ -115,7 +115,7 @@ public class WorkflowReportsRepository : IWorkflowReportsRepository
     {
         var disputeHearings = await _context
             .DisputeHearings
-            .Where(x => x.DisputeGuid == disputeGuid)
+            .Where(x => x.DisputeGuid == disputeGuid && x.DisputeHearingRole == 1)
             .Select(x => x.HearingId)
             .Distinct()
             .ToListAsync();
@@ -295,5 +295,20 @@ public class WorkflowReportsRepository : IWorkflowReportsRepository
             .CountAsync(x => x.IsServed == null && filePackagesId.Contains(x.FilePackageId));
 
         return filePackageServicesCount;
+    }
+
+    public async Task<int> GetMissingNoticeServiceConfirmations(Guid disputeGuid)
+    {
+        var noticeIds = await _context
+            .Notices
+            .Where(x => x.DisputeGuid == disputeGuid)
+            .Select(x => x.NoticeId)
+            .ToListAsync();
+
+        var missingNoticeServiceConfirmationsCount = await _context
+            .NoticeServices
+            .CountAsync(x => x.IsServed != null && x.ValidationStatus == null && noticeIds.Contains(x.NoticeId));
+
+        return missingNoticeServiceConfirmationsCount;
     }
 }

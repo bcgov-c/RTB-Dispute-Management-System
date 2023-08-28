@@ -16,6 +16,7 @@ import EditorView from '../../../../core/components/editor/Editor';
 import EditorModel from '../../../../core/components/editor/Editor_model';
 import template from './ModalAddNotice_template.tpl';
 import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
+import ApplicantRequiredService from '../../../../core/components/service/ApplicantRequiredService';
 
 const filesErrorClassSelector = '.add-files-error-block';
 const NO_FILES_ERROR_MSG = `You must add at least one valid file to continue.`;
@@ -79,12 +80,28 @@ const ModalAddNotice = ModalBaseView.extend({
 
     this.cleanupExistingFileDescriptionAndSaveNewNoticeFileDescription()
       .done(noticeFileDescriptionModel => {
-        filesChannel.request('add:filedescription', noticeFileDescriptionModel);
         // NOTE: Must save NoticeModel first to get the notice_version number to be used on the generated PDF
         // This will also save any new FileDescription to be associated to the notice
-        this.model.save()
+        this.model.save(this.model.getApiChangesOnly())
           .done(() => {
-            this.performNoticeGeneration(this.disputeNoticeTitleModel.getData(), this.getChildView('noticePreview').$el.html(), noticeFileDescriptionModel, null, this.model.isNew());
+            this.performNoticeGeneration(this.disputeNoticeTitleModel.getData(), this.getChildView('noticePreview').$el.html(), noticeFileDescriptionModel, () => {}, this.model.isNew())
+              .done(() => {
+                // Always clear ARS information after notice save
+                this.model.set(Object.assign({
+                  has_service_deadline: !!this.isArsEnabled,
+                }, this.isArsEnabled ? ApplicantRequiredService.getServiceDeadlines() : {
+                  service_deadline_date: null,
+                  second_service_deadline_date: null,
+                }));
+
+                this.model.save(this.model.getApiChangesOnly())
+                  .done(() => this.onNoticeModelSaveSuccess())
+                  .fail(err => {
+                    loaderChannel.trigger('page:load:complete');
+                    const handler = generalErrorFactory.createHandler('ADMIN.NOTICE.SAVE', null, `Applicant Service Deadlines could not be updated on this notice.`);
+                    handler(err);
+                  });
+              });
           })
           .fail(err => {
             loaderChannel.trigger('page:load:complete');
@@ -143,7 +160,7 @@ const ModalAddNotice = ModalBaseView.extend({
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['isRegenerationMode']);
+    this.mergeOptions(options, ['isRegenerationMode', 'isArsEnabled']);
 
     this.NOTICE_FILES_MAX = configChannel.request('get', 'NOTICE_FILES_MAX');
     this.NOTICE_ASSOCIATED_TO_APPLICANT = configChannel.request('get', 'NOTICE_ASSOCIATED_TO_APPLICANT');
@@ -159,6 +176,7 @@ const ModalAddNotice = ModalBaseView.extend({
     const maxNumberOfFiles = 1;
     return filesChannel.request('create:uploader', {
       processing_options: {
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
         maxNumberOfFiles,
         checkForDisputeDuplicates: false,
         allowedFileTypes: configChannel.request('get', 'VALID_NOTICE_FILE_TYPES')
@@ -321,7 +339,10 @@ const ModalAddNotice = ModalBaseView.extend({
       this.showChildView('specialInstructionsText', new EditorView({ model: this.specialInstructionsModel })); 
 
       if (disputeChannel.request('get').getProcess()) {
-        this.showChildView('noticePreview', new NoticePreviewView({ model: this.model }));
+        this.showChildView('noticePreview', new NoticePreviewView({
+          model: this.model,
+          isArsEnabled: this.isArsEnabled,
+        }));
         // Trigger the special instructions toggle first
         this._onChangeUseSpecialInstructions(null, this.useSpecialInstructionsModel.getData());
         if (this.activeHearing && this.activeHearing.get('special_instructions')) {

@@ -1,10 +1,16 @@
+/**
+ * @fileoverview - View wrapper for DisputeService that displays clickable actions related to service. Becomes enabled when hearing tools is selected
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import DisputeServiceView from '../../components/service/DisputeService';
 import ModalMarkAsDeficientView from '../../../core/components/claim/ModalMarkAsDeficient';
+import CheckboxModel from '../../../core/components/checkbox/Checkbox_model';
+import CheckboxView from '../../../core/components/checkbox/Checkbox';
 import template from './HearingToolsService_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 
+const configChannel = Radio.channel('config');
 const disputeChannel = Radio.channel('dispute');
 const modalChannel = Radio.channel('modals');
 const sessionChannel = Radio.channel('session');
@@ -20,13 +26,17 @@ export default Marionette.View.extend({
     edit: '.hearing-tools-edit',
     cancel: '.hearing-tools-save-controls-cancel',
     save: '.hearing-tools-save-controls-save',
+    editModeBtns: '.hearing-tools-edit-mode-buttons',
 
+    showArchived: '.show-archived-checkbox',
     notServed: '.hearing-tools-mark-not-served',
     served: '.hearing-tools-mark-served'
+
   },
 
   regions: {
-    servicesRegion: '@ui.services'
+    servicesRegion: '@ui.services',
+    archivedRegion: '@ui.showArchived'
   },
 
   events: {
@@ -37,10 +47,12 @@ export default Marionette.View.extend({
 
     'click @ui.served': 'clickMarkAllServed',
     'click @ui.notServed': 'clickMarkAllNotServed',
+    'click @ui.archived': 'clickShowArchived'
   },
 
-  clickBody() {
-    if (this.mode === 'service-view') {
+  clickBody(ev) {
+    const subServiceClasses=['sub-service-icon-denied','sub-service-icon-not-set', 'sub-service-icon-approved'];
+    if (this.mode === 'service-view' && ev.target.className !== 'filename-download' && !subServiceClasses.includes(ev.target.className)) {
       this.clickEdit();
     }
   },
@@ -79,6 +91,7 @@ export default Marionette.View.extend({
     }
 
     this.renderInViewMode();
+    this.getUI('editModeBtns').addClass('hidden');
   },
 
   clickMarkAllServed() {
@@ -105,9 +118,9 @@ export default Marionette.View.extend({
     };
 
     if ( services.any(serviceModel => serviceModel.hasSavedApiData(['service_method', 'service_date', 'received_date'])) ) {
-      const hideReason = services.all(serviceModel => !serviceModel.getServiceFileModels().length);
+      const hideReason = services.all(serviceModel => !serviceModel.getProofFileModels().length);
       const modalView = new ModalMarkAsDeficientView({
-        title: 'Mark All Acknowledge Served',
+        title: 'Mark All Editable Acknowledge Served',
         topHtml: `
           <p><b>Warning:</b> This action will cause existing information to be cleared.<p>
           <p>This will delete service information associated to respondent(s) including any service methods or service dates.</p>
@@ -120,7 +133,7 @@ export default Marionette.View.extend({
         hideReason,
         getRemovalReasonFn: (enteredReason) => `Service record removed by ${sessionChannel.request('name')} on ${Formatter.toDateDisplay(Moment())} - ${enteredReason}`,
         clickMarkDeficientFn: (reason) => {
-          const allXhr = services.filter(m => m.getServiceFileModels().length).map(serviceModel => {
+          const allXhr = services.filter(m => m.getProofFileModels().length).map(serviceModel => {
             const serviceFileDescription = serviceModel.getServiceFileDescription();
             serviceFileDescription.markAsDeficient(reason);
             return _.bind(serviceFileDescription.save, serviceFileDescription, serviceFileDescription.getApiChangesOnly());
@@ -139,7 +152,7 @@ export default Marionette.View.extend({
   },
 
   clickMarkAllNotServed() {
-    this._markAllNotServed().done(() => {
+    this.markAllNotServed().done(() => {
       if (typeof this.onSaveAllNotServedFn !== 'function') {
         return;
       }
@@ -147,11 +160,16 @@ export default Marionette.View.extend({
     });
   },
 
-  _markAllNotServed() {
+  isArbEditable() {
+    const currentUser = sessionChannel.request('get:user');
+    return currentUser.isArbitrator();
+  },
+
+  markAllNotServed() {
     const dfd = $.Deferred();
     const services = this.model.getServices();
     const saveAsUnservedFn = () => {
-      services.each(serviceModel => serviceModel.setToUnserved());
+      services.each(serviceModel => serviceModel.setToUnserved({validation_status: configChannel.request('get', 'SERVICE_VALIDATION_INTERNAL_CONFIRMED')}));
       loaderChannel.trigger('page:load');
       Promise.all(services.map(serviceModel => serviceModel.save(serviceModel.getApiChangesOnly())))
         .then(response => {
@@ -169,9 +187,9 @@ export default Marionette.View.extend({
     };
 
     if ( services.any(serviceModel => serviceModel.hasSavedApiData(['service_method', 'service_date', 'received_date'])) ) {
-      const hideReason = services.all(serviceModel => !serviceModel.getServiceFileModels().length);
+      const hideReason = services.all(serviceModel => !serviceModel.getProofFileModels().length);
       const modalView = new ModalMarkAsDeficientView({
-        title: 'Mark All Not Served',
+        title: 'Mark All Editable Not Served',
         topHtml: `
           <p><b>Warning:</b> This action will cause existing information to be cleared.<p>
           <p>This will delete service information associated to respondent(s) including any service methods or service dates.</p>
@@ -183,7 +201,7 @@ export default Marionette.View.extend({
         hideReason,
         getRemovalReasonFn: (enteredReason) => `Service record removed by ${sessionChannel.request('name')} on ${Formatter.toDateDisplay(Moment())} - ${enteredReason}`,
         clickMarkDeficientFn: (reason) => {
-          const allXhr = services.filter(m => m.getServiceFileModels().length).map(serviceModel => {
+          const allXhr = services.filter(m => m.getProofFileModels().length).map(serviceModel => {
             const serviceFileDescription = serviceModel.getServiceFileDescription();
             serviceFileDescription.markAsDeficient(reason);
             return _.bind(serviceFileDescription.save, serviceFileDescription, serviceFileDescription.getApiChangesOnly());
@@ -210,8 +228,8 @@ export default Marionette.View.extend({
 
     let all_valid = true;
     if (noticeServices && noticeServices.children) {
-      noticeServices.children.each(function(noticeServiceView) {
-        all_valid = noticeServiceView.validateAndShowErrors() && all_valid;
+      noticeServices.children.each(function(disputeServiceView) {
+        all_valid = disputeServiceView.validateAndShowErrors() && all_valid;
       });
     }
 
@@ -220,24 +238,12 @@ export default Marionette.View.extend({
     }
     
     if (noticeServices && noticeServices.children) {
-      noticeServices.children.each(function(noticeServiceView) {
-        noticeServiceView.saveViewDataToModel();
+      noticeServices.children.each(function(disputeServiceView) {
+        disputeServiceView.saveViewDataToModel();
       });
     }
 
-    const servicesToClear = [];
-    this.model.getServices().each(function(noticeServiceModel) {
-      if (!noticeServiceModel.isServed()) {
-        noticeServiceModel.setToUnserved({ is_served: noticeServiceModel.get('is_served') });
-        servicesToClear.push(noticeServiceModel);
-      }
-    }, this);
-
     loaderChannel.trigger('page:load');
-
-    if (!_.isEmpty(servicesToClear)) {
-      console.log(`[Warning] Found services that should be cleared, but shouldn't be any at this point of HearingTools save!`);
-    }
 
     this.model.saveService()
       .done(() => {
@@ -268,6 +274,26 @@ export default Marionette.View.extend({
         'saveAllNotServedButtonText', 'onSaveAllNotServedFn',]);
     this.mode = 'service-view';
     this.disputeModel = disputeChannel.request('get');
+    this.createSubModels();
+    this.setupListeners();
+  },
+
+  createSubModels() {
+    this.archivedCheckboxModel = new CheckboxModel({
+      html: 'Show replaced last participant record',
+      required: false,
+      checked: true,
+    });
+  },
+
+  setupListeners() {
+    this.listenTo(this.archivedCheckboxModel, 'change:checked', () => this.render());
+    this.listenTo(this.model.getServices(), 'render:viewMode', () => this.renderInViewMode())
+    this.listenTo(this.model.getServices(), 'save:service', () => this.clickSave());
+  },
+
+  isEditMode() {
+    return this.mode === 'service-edit';
   },
 
   renderInViewMode() {
@@ -292,19 +318,27 @@ export default Marionette.View.extend({
         const matchingUnit = this.unitCollection && this.unitCollection.find(unit => unit.hasParticipantId(child.get('participant_id')));
         return {
           mode: this.mode,
-          matchingUnit
+          matchingUnit,
+          showArchived: this.archivedCheckboxModel.getData(),
+          isNoticeService: true,
+          collection: this.model.getServices()
         };
       },
       childView: this.childView || DisputeServiceView,
       collection: this.model.getServices()
     }));
+
+    if (this.isEditMode()) this.showChildView('archivedRegion', new CheckboxView({ model: this.archivedCheckboxModel }));
   },
 
   templateContext() {
     return {
       mode: this.mode,
+      isEditMode: this.isEditMode(),
       containerTitle: this.containerTitle || 'Respondent Service',
-      saveAllNotServedButtonText: this.saveAllNotServedButtonText || 'Mark All Not Served',
+      saveAllNotServedButtonText: this.saveAllNotServedButtonText || 'Mark All Editable Not Served',
+      saveAllAcknowledgedServedButtonText: this.saveAllAcknowledgedServedButtonText || 'Mark All Editable Acknowledged Served',
+      isArbEditable: this.isArbEditable()
     };
   }
 

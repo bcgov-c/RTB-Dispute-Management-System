@@ -28,6 +28,8 @@
 		padding:0px;
 		margin:0px;
   }
+
+  .pdf_container table { page-break-inside: avoid; }
 	
 	div.spacer_min {
 		line-height:10px;
@@ -63,10 +65,6 @@
 
 	p.listitem {
 		margin:5px 0px 0px 0px;
-  }
-  
-  .listitem-hearingdetails {
-    margin-left: 25px;
   }
 	
 	p.issue_listitem {
@@ -226,6 +224,10 @@
 		font-weight: normal !important;
 	}
 
+  .dms_page_break {
+    page-break-before: always;
+  }
+
 </style>
 </head>
 
@@ -261,26 +263,30 @@
 	
 	<table id="important-information" style="width:100%;">
 	<tr><td class="main_header">
-		Important Information 
+		Important Information
 	</td></tr>
 	<tr><td>
     <% if (isParticipatoryHearing) { %>
       <p class="text_content">The Residential Tenancy Branch has received an Application for Dispute Resolution and a hearing has been scheduled.</p>
+    <% } else if (checkClaimsContain('OPC-DR')) { %>
+      <p class="text_content">The Residential Tenancy Branch has received an application for an Order of Possession from your landlord. When a tenant receives a One Month Notice to End Tenancy for Cause, they have 10 days to dispute the notice. If the tenant does not dispute the notice within the 10 day period, landlords have the option to get an Order of Possession through a Direct Request. In this type of proceeding, an adjudicator or arbitrator considers a landlord's application based only on the landlord's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant an Order of Possession along with a monetary order for the application filing fees. The decision and order(s) (if applicable) are sent to the landlord. Only the decision is mailed to the tenant.</p>
+    <% } else if (checkClaimsContain('OPE-DR')) { %>
+      <p class="text_content">The Residential Tenancy Branch has received an application for an Order of Possession from your landlord. When a tenant receives a One Month Notice to End Tenancy for End of Employment, they have 10 days to dispute the notice. If the tenant does not dispute the notice within the 10 day period, landlords have the option to get an Order of Possession through a Direct Request. In this type of proceeding, an adjudicator or arbitrator considers a landlord's application based only on the landlord's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant an Order of Possession along with a monetary order for the application filing fees. The decision and order(s) (if applicable) are sent to the landlord. Only the decision is mailed to the tenant.</p>
+    <% } else if (checkClaimsContain('OPQ-DR')) { %>
+      <p class="text_content">The Residential Tenancy Branch has received an application for an Order of Possession from your landlord. When a tenant receives a Two Month Notice to End Tenancy Because Does the Tenant Does Not Qualify for Subsidized Housing, they have 15 days to dispute the notice. If the tenant does not dispute the notice within the 15 day period, landlords have the option to get an Order of Possession through a Direct Request. In this type of proceeding, an adjudicator or arbitrator considers a landlord's application based only on the landlord's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant an Order of Possession along with a monetary order for the application filing fees. The decision and order(s) (if applicable) are sent to the landlord. Only the decision is mailed to the tenant.</p>
+    <% } else if (checkClaimsContain('OPL-4M-DR')) { %>
+      <p class="text_content">The Residential Tenancy Branch has received an application for an Order of Possession from your landlord. When a tenant receives a Four Month Notice to End Tenancy For Demolition or Conversion of a Rental Unit, they have 30 days to dispute the notice. If the tenant does not dispute the notice within the 30 day period, landlords have the option to get an Order of Possession through a Direct Request. In this type of proceeding, an adjudicator or arbitrator considers a landlord's application based only on the landlord's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant an Order of Possession along with a monetary order for the application filing fees. The decision and order(s) (if applicable) are sent to the landlord. Only the decision is mailed to the tenant.</p>
+    <% } else if (isLandlord) { %>
+      <p class="text_content">The Residential Tenancy Branch has received an application for an Order of Possession / Monetary Order from your landlord. When a tenant receives a 10 Day Notice to End Tenancy for Unpaid Rent or Utilities, they have five days to either pay the rent in full or dispute the notice. If the tenant does neither of these within the five day period, landlords have the option to get an Order of Possession through a Direct Request. In this type of proceeding, an adjudicator or arbitrator considers a landlord's application based only on the landlord's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant an Order of Possession along with a monetary order for any unpaid rent or utilities and the application filing fees. The decision and order(s) (if applicable) are sent to the landlord. Only the decision is mailed to the tenant. The direct request procedure is specific to unpaid rent and/or utilities and the recovery of the application filing fee only.</p>
     <% } else { %>
-      <p class="text_content">The Residential Tenancy Branch has received an application for a<%= isLandlord ? 'n Order of Possession / ' : ' ' %>Monetary Order from your <%= isLandlord ? 'landlord' : 'tenant' %>.</p>
-      
-      <% if (isLandlord) { %>
-        <p class="text_content">When a tenant receives a 10 Day Notice to End Tenancy for Unpaid Rent or Utilities, they have five days to either pay the rent in full or dispute the notice. If the tenant does neither of these within the five day period, landlords have the option to get an Order of Possession through a Direct Request.</p>
-      <% } else if (isTenant) { %>
-        <p class="text_content">When a landlord receives a forwarding address and the tenancy has ended, they have 15 days to either return the deposit(s) or apply to the Residential Tenancy Branch to retain part or all of the deposit(s). If the landlord does neither of these within the 15 day period, tenants have the option to apply for a monetary order through a Direct Request for the return of their deposit(s).</p>
-      <% } %>
-
-      <p class="text_content">In this type of proceeding, an adjudicator or arbitrator considers a <%= isLandlord ? 'landlord' : 'tenant' %>'s application based only on the <%= isLandlord ? 'landlord' : 'tenant' %>'s written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant a<%=isLandlord ? 'n Order of Possession along with a ' : ' ' %>monetary order for <%= isLandlord ? 'any unpaid rent or utilities ' : 'the return of the deposit(s) ' %>and the application filing fees. The decision and order(s) (if applicable) are sent to the <%= isLandlord ? 'landlord' : 'tenant' %>. Only the decision is mailed to the <%= isLandlord ? 'tenant' : 'landlord' %>.</p>
-
-      <% if (isLandlord) { %>
-        <p class="text_content">The direct request procedure is specific to unpaid rent and/or utilities and the recovery of the application filing fee only.</p> 
-      <% } %>
+      <!-- Tenant version -->
+      <p class="text_content">The Residential Tenancy Branch has received an application for a Monetary Order from your tenant.</p>
+      <p class="text_content">When a landlord receives a forwarding address and the tenancy has ended, they have 15 days to either return the deposit(s) or apply to the Residential Tenancy Branch to retain part or all of the deposit(s). If the landlord does neither of these within the 15 day period, tenants have the option to apply for a monetary order through a Direct Request for the return of their deposit(s).</p>
+      <p class="text_content">In this type of proceeding, an adjudicator or arbitrator considers a tenant's application based only on the tenant's written evidence - verbal testimony from any party is not included. An adjudicator or arbitrator may grant a monetary order for the return of the deposit(s) and the application filing fees. The decision and order(s) (if applicable) are sent to the tenant. Only the decision is mailed to the landlord.</p>
     <% } %>
+	</td></tr>
+  <tr><td class="evidence_context">
+    <p class="text_content">Date the Residential Tenancy Branch received payment for the Application:&nbsp;<b><%= dispute.get('initial_payment_date') ? Formatter.toDateDisplay(dispute.get('initial_payment_date')) : '-' %></b></p>
 	</td></tr>
 	</table>
 	
@@ -351,15 +357,14 @@
     <p class="listitem">Time:&nbsp;<b><%= Formatter.toTimeDisplay(hearing.get('local_start_datetime'), RTB_OFFICE_TIMEZONE_STRING) %>&nbsp;Pacific Time</b></p>
     <% if (hearing.isConference()) { %>
       <% if (hearing.get('hearing_details')) { %>
-        <p class="listitem">
-          <div class="listitem-hearingdetails">
-            <%= hearing.get('hearing_details') %>
-          </div>
-        </p>
+        <br/>
+        <div class="listitem">
+          <%= hearing.get('hearing_details') %>
+        </div>
       <% } else if (hearing.get('conference_bridge_id') && conferenceBridgeData.dial_in_description1 && conferenceBridgeData.dial_in_number1 && conferenceBridgeData.dial_in_description2 && conferenceBridgeData.dial_in_number2 && conferenceBridgeData.participant_code) { %>
         <p class="listitem"><%= conferenceBridgeData.dial_in_description1 %>:&nbsp;<span><%= Formatter.toPhoneDisplay(conferenceBridgeData.dial_in_number1) %></span></p>
         <p class="listitem"><%= conferenceBridgeData.dial_in_description2 %>:&nbsp;<span><%= Formatter.toPhoneDisplay(conferenceBridgeData.dial_in_number2) %></span></p>
-        <p class="listitem">Participant Access Code:&nbsp;<span><%= conferenceBridgeData.participant_code %></span></p>
+        <p class="listitem">Access Code:&nbsp;<span><%= conferenceBridgeData.participant_code %></span></p>
       <% } %>
     <% } else if (hearing.get('hearing_location')) { %>
       <p class="listitem"><%= hearing.get('hearing_location') %></p>
@@ -414,7 +419,27 @@
 		<p class="text_content">The applicant is required to give the Residential Tenancy Branch proof that this notice and copies of all supporting documents were served to the respondent.</p>
 		<div class="list_wrapper">
 		<ul class="bullet_list">
-      <% if (isLandlord) { %>
+      <% if (checkClaimsContain('OPC-DR')) { %>
+        <li>A copy of all pages of the One Month Notice to End Tenancy for Cause (form RTB-33)</li>
+        <li>A copy of the Proof of Service - Notice to End Tenancy and Written Demand for Utility Payment (form RTB-34)</li>
+        <li>A copy of the tenancy agreement (including the addendum if there is one)</li>
+        <li>Any other supporting documents submitted with your application</li>
+      <% } else if (checkClaimsContain('OPE-DR')) { %>
+        <li>A copy of all pages of the One Month Notice to End Tenancy for End of Employment (form RTB-33)</li>
+        <li>A copy of the Proof of Service - Notice to End Tenancy and Written Demand for Utility Payment (form RTB-34)</li>
+        <li>A copy of the tenancy agreement (including the addendum if there is one)</li>
+        <li>Any other supporting documents submitted with your application</li>
+      <% } else if (checkClaimsContain('OPQ-DR')) { %>
+        <li>A copy of all pages of the Two Month Notice to End Tenancy Because Does the Tenant Does Not Qualify for Subsidized Housing (form RTB-32)</li>
+        <li>A copy of the Proof of Service - Notice to End Tenancy and Written Demand for Utility Payment (form RTB-34)</li>
+        <li>A copy of the tenancy agreement (including the addendum if there is one)</li>
+        <li>Any other supporting documents submitted with your application</li>
+      <% } else if (checkClaimsContain('OPL-4M-DR')) { %>
+        <li>A copy of all pages of the Four Month Notice to End Tenancy For Demolition or Conversion of a Rental Unit (form RTB-29)</li>
+        <li>A copy of the Proof of Service - Notice to End Tenancy and Written Demand for Utility Payment (form RTB-34)</li>
+        <li>A copy of the tenancy agreement (including the addendum if there is one)</li>
+        <li>Any other supporting documents submitted with your application</li>
+      <% } else if (isLandlord) { %>
         <li>A copy of all pages of the 10 Day Notice to End Tenancy for Unpaid Rent or Utilities (form RTB-30)</li>
         <li>A copy of the Proof of Service - Notice to End Tenancy and Written Demand for Utility Payment (form RTB-34)</li>
         <li>A copy of the Direct Request Worksheet (form RTB-46)</li>
@@ -423,6 +448,7 @@
         <li>A copy of all Notices of Rent Increase since the tenancy began, if rent has increased</li>
         <li>If any rent was received after the 10 Day Notice to End Tenancy was issued, a copy of any receipts issued to the tenant</li>
       <% } else { %>
+        <!-- Tenant -->
         <li>A copy of the signed tenancy agreement showing the initial amount of rent, the amount of security deposit required, and if applicable, the amount of pet damage deposit required;</li>
         <li>If a pet damage deposit was accepted after the tenancy began, a receipt for the deposit;</li>
         <li>A copy of the forwarding address given to the landlord (form RTB-47 is recommended, but not required) or a copy of the condition inspection report with the forwarding address provided;</li>
@@ -442,9 +468,6 @@
 	<table id="application-header" style="width:100%;">
 	<tr><td class="main_header">
 		Application for Dispute Resolution
-	</td></tr>
-	<tr><td class="sub_header">
-		Date Application Submitted to the Residential Tenancy Branch:&nbsp;<%= Formatter.toDateDisplay(dispute.get('submitted_date')) %>
 	</td></tr>
 	</table>
   
@@ -490,7 +513,7 @@
 	<tr><td colspan="2">
 		<p class="text_content">
       <% if (isParticipatoryHearing) { %>
-        Respondents must provide all applicants with copies of any evidence submitted to the Residential tenancy branch.
+        Respondents must provide all applicants with copies of any evidence submitted to the Residential Tenancy Branch.
       <% } else { %>
         The Direct Request process is based solely on written submissions from the applicant(s).  Respondent(s)&nbsp;<u>do not</u>&nbsp;serve documents or evidence to the applicant(s) or to the Residential Tenancy Branch.
       <% } %>
@@ -639,6 +662,11 @@
     <table class="issue_item" style="width:100%;">
       <tr><td class="issuetitle_onecol">
         <span class="issuetitle_num"><%= Formatter.toLeftPad(claim_index) %> -&nbsp;</span><%= disputeClaim.getClaimTitle() %>
+      </td></tr>
+      <tr><td class="evidence_context">
+        <% if (disputeClaim.getAmount()) { %>
+          <p class="issue_listitem"><%= Formatter.toAmountDisplay(disputeClaim.getAmount()) %></p>
+        <% } %>
       </td></tr>
       <tr><td class="evidence_context">
         <p class="issue_listitem_none">No additional information available</p>

@@ -30,6 +30,9 @@ public partial class SecurityTests
         var noticesGetResponse = NoticeManager.GetNotices(Client, Data.Dispute.DisputeGuid);
         noticesGetResponse.CheckStatusCode();
 
+        var externalNoticesGetResponse = NoticeManager.GetExternalNotices(Client, Data.Dispute.DisputeGuid);
+        externalNoticesGetResponse.CheckStatusCode();
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -48,6 +51,9 @@ public partial class SecurityTests
         noticesGetResponse = NoticeManager.GetNotices(Client, Data.Dispute.DisputeGuid);
         noticesGetResponse.CheckStatusCode();
 
+        externalNoticesGetResponse = NoticeManager.GetExternalNotices(Client, Data.Dispute.DisputeGuid);
+        externalNoticesGetResponse.CheckStatusCode();
+
         // LOGIN AS UNAUTHORIZED EXTERNAL USER //
         Client.Authenticate(Users.User2, Users.User2);
 
@@ -62,6 +68,9 @@ public partial class SecurityTests
 
         noticesGetResponse = NoticeManager.GetNotices(Client, Data.Dispute.DisputeGuid);
         noticesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalNoticesGetResponse = NoticeManager.GetExternalNotices(Client, Data.Dispute.DisputeGuid);
+        externalNoticesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -82,6 +91,9 @@ public partial class SecurityTests
         noticesGetResponse = NoticeManager.GetNotices(Client, Data.Dispute.DisputeGuid);
         noticesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        externalNoticesGetResponse = NoticeManager.GetExternalNotices(Client, Data.Dispute.DisputeGuid);
+        externalNoticesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -99,5 +111,8 @@ public partial class SecurityTests
 
         noticesGetResponse = NoticeManager.GetNotices(Client, Data.Dispute.DisputeGuid);
         noticesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalNoticesGetResponse = NoticeManager.GetExternalNotices(Client, Data.Dispute.DisputeGuid);
+        externalNoticesGetResponse.CheckStatusCode();
     }
 }

@@ -300,24 +300,24 @@ export default Marionette.View.extend({
   createSubModels() {
     const remedy_status = this.remedyModel ? this.remedyModel.get('remedy_status') : null;
     const remedy_status_reason_code = this.remedyModel ? this.remedyModel.get('remedy_status_reason_code') : null;
-    const isReverseApplicantIssue = this.disputeClaimModel.isReverseAward();
+    const isAlwaysAwarded = this.disputeClaimModel.isAlwaysAwarded();
     const absValAmount = this.remedyModel && this.remedyModel.get('awarded_amount') ? Math.abs(this.remedyModel.get('awarded_amount')) : null;
     const amountIsZero = this.remedyModel && this.remedyModel.get('awarded_amount') === 0;
 
     this.issueOptionsModel = new RadioModel({
       optionData: [
         { text: 'Include', value: INCLUDE_RADIO_CODE },
-        ...(!isReverseApplicantIssue ? [{ text: 'Sever/Amend', value: REMOVE_RADIO_CODE }] : [])
+        ...(!isAlwaysAwarded ? [{ text: 'Sever/Amend', value: REMOVE_RADIO_CODE }] : [])
       ],
       required: true,
-      value: this._isRemedyStatusIncluded(remedy_status) || isReverseApplicantIssue ? INCLUDE_RADIO_CODE : 
+      value: this._isRemedyStatusIncluded(remedy_status) || isAlwaysAwarded ? INCLUDE_RADIO_CODE : 
         this._isRemedyStatusRemoved(remedy_status) ? REMOVE_RADIO_CODE :
         INCLUDE_RADIO_CODE
     });
 
     this.detailsModel = new InputModel({
       inputType: 'text',
-      required: null, // Will be set at time of render
+      required: false,
       maxLength: this.AWARD_DETAILS_MAX_LENGTH || 255,
       errorMessage: 'Enter the details',
       value: this.remedyModel ? this.remedyModel.get('award_details') : null,
@@ -325,7 +325,10 @@ export default Marionette.View.extend({
     });
 
     this.includeOutcomeModel = new DropdownModel({
-      optionData: [
+      optionData: isAlwaysAwarded ? [
+        { text: 'Granted', value: AWARDED_DROPDOWN_CODE },
+        { text: 'Settled', value: SETTLED_DROPDOWN_CODE },
+      ] : [
         { text: 'Granted', value: AWARDED_DROPDOWN_CODE },
         { text: 'Dismissed', value: DISMISS_DROPDOWN_CODE },
         { text: 'Settled', value: SETTLED_DROPDOWN_CODE },
@@ -335,9 +338,9 @@ export default Marionette.View.extend({
       defaultBlank: true,
       labelText: null,
       required: this._isIssueIncludeSelected(),
-      disabled: isReverseApplicantIssue,
+      disabled: false,
 
-      value: (this.remedyModel.isOutcomeAwarded() || isReverseApplicantIssue) ? AWARDED_DROPDOWN_CODE : 
+      value: this.remedyModel.isOutcomeAwarded() ? AWARDED_DROPDOWN_CODE : 
         this.remedyModel.isOutcomeDismissed() ? DISMISS_DROPDOWN_CODE : 
         this.remedyModel.isOutcomeSettled() ? SETTLED_DROPDOWN_CODE : 
         this.remedyModel.isOutcomeNoJurisdiction() ? NO_JURISDICTION_DROPDOWN_CODE :
@@ -392,20 +395,22 @@ export default Marionette.View.extend({
       apiMapping: 'awarded_date'
     });
     
+    const amendOptions = [this.REMEDY_STATUS_REASON_AMEND_REMOVED_BY_APPLICANT, this.REMEDY_STATUS_REASON_AMEND_REMOVED_BY_RESPONDENT, this.REMEDY_STATUS_REASON_AMEND_REMOVED]
+      .map(value => ({ text: this.REMEDY_STATUS_REASONS_DISPLAY[value], value: value }));
     this.amendOptionsModel = new DropdownModel({
-      optionData: [this.REMEDY_STATUS_REASON_AMEND_REMOVED_BY_APPLICANT, this.REMEDY_STATUS_REASON_AMEND_REMOVED_BY_RESPONDENT, this.REMEDY_STATUS_REASON_AMEND_REMOVED].map(value => (
-        { text: this.REMEDY_STATUS_REASONS_DISPLAY[value], value: value })),
+      optionData: amendOptions,
       defaultBlank: true,
       required: true,
-      value: remedy_status_reason_code ? String(remedy_status_reason_code) : null,
+      value: remedy_status_reason_code && amendOptions.find(opt => opt.value === String(remedy_status_reason_code)) ? String(remedy_status_reason_code) : null,
       apiMapping: 'remedy_status_reason_code'
     });
 
+    const severOptions = [{ text: this.REMEDY_STATUS_REASONS_DISPLAY[this.REMEDY_STATUS_REASON_SEVER_NOT_RELATED], value: this.REMEDY_STATUS_REASON_SEVER_NOT_RELATED }];
     this.severOptionsModel = new DropdownModel({
-      optionData: [{ text: this.REMEDY_STATUS_REASONS_DISPLAY[this.REMEDY_STATUS_REASON_SEVER_NOT_RELATED], value: this.REMEDY_STATUS_REASON_SEVER_NOT_RELATED }],
+      optionData: severOptions,
       defaultBlank: true,
       required: true,
-      value: remedy_status_reason_code ? String(remedy_status_reason_code) : null,
+      value: remedy_status_reason_code && severOptions.find(opt => opt.value === String(remedy_status_reason_code)) ? String(remedy_status_reason_code) : null,
       apiMapping: 'remedy_status_reason_code'
     });
 
@@ -431,9 +436,10 @@ export default Marionette.View.extend({
   saveOutcome() {
     const api_attrs = _.extend({}, this.detailsModel.getPageApiDataAttrs());
     const isSettled = this.isSettled();
+    const isAwarded = this.isAwarded();
     let remedyStatusToUse = null;
     
-    if (isSettled || this.isAwarded()) {
+    if (isSettled || isAwarded) {
       if (this.disputeClaimModel.isMonetaryOutcomeIssue()) {
         remedyStatusToUse = isSettled ? this.remedyStatusConfigs.REMEDY_STATUS_SETTLED_MONETARY :
           this.remedyStatusConfigs.REMEDY_STATUS_MONETARY_GRANTED;
@@ -493,6 +499,14 @@ export default Marionette.View.extend({
     if (_.isEmpty(api_attrs)) {
       this.renderInViewMode();
       return;
+    }
+
+    if (!isSettled && !isAwarded) {
+      this.remedyModel.set({
+        awarded_amount: null,
+        awarded_date: null,
+        awarded_days_after_service: null,
+      });
     }
 
     this.remedyModel.set(api_attrs);
@@ -588,15 +602,18 @@ export default Marionette.View.extend({
 
   onBeforeRender() {
     // Toggle required / not required state of details based on current UI selected state
-
-    this.detailsModel.set('required',
-      (this.isAwarded() && !this.disputeClaimModel.isLandlordMoveOutIssue() && !this.disputeClaimModel.isMonetaryOutcomeIssue() && !this.disputeClaimModel.isTenantMoveOut()) ||
-      this._isOtherDateTypeSelected() ||
-      this._isNoJurisdictionSelected()
-    );
-
     this.includeOutcomeModel.set('required', this._isIssueIncludeSelected());
     this.removeOutcomeModel.set('required', this._isIssueRemoveSelected());
+
+    // If an options dropdown contains one item, auto select it if it's blank
+    const checkAndTriggerDropdownAutoSelect = (dropdownModel) => {
+      const optionData = dropdownModel.get('optionData');
+      if (optionData?.length === 1 && !dropdownModel.getData()) {
+        dropdownModel.set('value', optionData[0]?.value, { silent: true });
+      }
+    };
+    checkAndTriggerDropdownAutoSelect(this.severOptionsModel);
+    checkAndTriggerDropdownAutoSelect(this.amendOptionsModel);
   },
   
   onRender() {

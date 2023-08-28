@@ -123,27 +123,13 @@ export default IntakePageGeneralBase.extend({
 
     const rentalAddress = this.getPageItem('rentalAddress');
     this.listenTo(rentalAddress, 'itemComplete', function(options) {
-      if (rentalAddress.stepComplete) {
+      if (rentalAddress.stepComplete && !rentalAddress?.subView?.model?.get('addressIsValidated')) {
+        this.showOutOfBCWarning();
+      } else {
         this.hideOutOfBCWarning();
-        if (options && options.triggered_on_show) {
-          this.showPageItem('repairsInPastQuestion', options);
-        } else {
-          // Perform a geozone lookup on the address, and only continue when that has returned
-          loaderChannel.trigger('page:load');
-          geozoneChannel.request('lookup:address', rentalAddress.getModel().getGeozoneAddressString({
-            no_province: true,
-            no_country: true
-          }));
-          this.listenToOnce(geozoneChannel, 'lookup:address:complete', function(geozone_val) {
-            rentalAddress.getModel().set('geozone_id', geozone_val);
-            if (geozone_val === configChannel.request('get', 'INVALID_GEOZONE_CODE')) {
-              this.showOutOfBCWarning();
-            }
-            loaderChannel.trigger('page:load:complete');
-            this.showPageItem('repairsInPastQuestion', options);
-          }, this);
-        }
       }
+
+      this.showPageItem('repairsInPastQuestion', options);
     }, this);
 
     this.listenTo(repairsInPastQuestion, 'itemComplete', function(options) {

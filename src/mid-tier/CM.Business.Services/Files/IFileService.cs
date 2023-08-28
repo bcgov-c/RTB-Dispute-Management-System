@@ -15,7 +15,7 @@ public interface IFileService : IServiceBase, IDisputeResolver
 
     Task<bool> DeleteAsync(int fileId);
 
-    Task<FileResponse> GetAsync(Guid fileGuid);
+    Task<FileResponse> GetAsync(Guid fileGuid, bool ignoreFilter = false);
 
     Task<FileResponse> GetAsync(int fileId);
 
@@ -34,4 +34,8 @@ public interface IFileService : IServiceBase, IDisputeResolver
     Task<bool> FileExists(int fileId);
 
     Task<bool> FileExists(string originalFileName);
+
+    Task<bool> SoftDelete(int fileId);
+
+    Task<bool> IsFileAssociatedToDispute(int fileId, Guid disputeGuid);
 }

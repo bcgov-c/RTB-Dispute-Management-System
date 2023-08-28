@@ -107,6 +107,8 @@ public enum DisputeStatuses
 
     DocumentReadyToSend = 24,
 
+    CaseManaged = 25,
+
     WaitingForDocumentsPickUp = 40,
 
     WaitingForProofOfService = 41,
@@ -375,7 +377,29 @@ public enum AssignedTemplate
 
     AricParticipatoryApplicantEvidenceReminder = 30,
 
-    PfrParticipatoryApplicantEvidenceReminder = 31
+    PfrParticipatoryApplicantEvidenceReminder = 31,
+
+    ParticipantVerificationEmail = 32,
+
+    ArsDeclarationDeadlineReminder = 33,
+
+    ArsDeclarationDeadlineMissed = 34,
+
+    ArsReinstatementDeadlineReminder = 35,
+
+    ArsReinstatementDeadlineMissed = 36,
+
+    MhvApplicantAnyLinkedCnReminder = 37,
+
+    MhvApplicantNotLinkedNotCnReminder = 38,
+
+    MhvApplicantLinkedNotCnReminder = 39,
+
+    MhvFinalApplicantNotCnNotLinkedReminder = 41,
+
+    MhvFinalApplicantLinkedNotCnReminder = 42,
+
+    MhvFinalApplicantCnAnyLinkedReminder = 40
 }
 
 public enum EmailMessageType
@@ -904,7 +928,11 @@ public enum FactTable
 
     FHearingSummary = 3,
 
-    FIntakeProcessing = 4
+    FIntakeProcessing = 4,
+
+    FResolutionService = 5,
+
+    FIssueOutcome = 6
 }
 
 public enum GroupParticipantRole
@@ -952,7 +980,11 @@ public enum SharedHearingLinkType
 {
     Single = 1,
 
-    Cross = 2
+    Cross = 2,
+
+    Repeat = 4,
+
+    RepeatCross = 5
 }
 
 public enum ServedBy
@@ -1365,4 +1397,187 @@ public enum CustomObjectSortField
     ModifiedNewestFirst = 3,
 
     ModifiedOldestFirst = 4
+}
+
+public enum ReportType : byte
+{
+    Operational = 1,
+    Exception,
+    Other
+}
+
+public enum ReportSubType : byte
+{
+    NotDefined = 0
+}
+
+public enum ServiceType
+{
+    Notice = 1,
+
+    FilePackage = 2
+}
+
+public enum ServiceChangeType
+{
+    CreateRecord = 1,
+
+    DeleteRecord = 2,
+
+    MarkServed = 3,
+
+    MarkNotServed = 4,
+
+    EditServiceInformation = 5,
+
+    ConfirmRecord = 6,
+
+    InvalidateRecord = 7,
+
+    ArchiveRecord = 8,
+}
+
+public enum ServiceMethod : byte
+{
+    PostedOnTheDoor = 1,
+
+    SentByRegisteredMail = 3,
+
+    DeliveredInPerson = 5,
+
+    SentByPreAgreedEmail = 8,
+
+    Other = 7
+}
+
+public enum TargetDatabase : byte
+{
+    RtbDms = 1,
+    PostedDecision,
+    DataWarehouse
+}
+
+public enum VerificationType
+{
+    Email = 1,
+    PrimaryPhone = 2,
+    SecondaryPhone = 3
+}
+
+public enum PollStatus
+{
+    Active = 1,
+
+    Inactive = 2
+}
+
+public enum PollSite
+{
+    All = 1,
+
+    Intake = 2,
+
+    AdditionalLandlordIntake = 3,
+
+    DisputeAccess = 4,
+
+    OfficeSubmission = 5,
+
+    Admin = 6,
+
+    Ceu = 7
+}
+
+public enum PollAudience
+{
+    All = 1,
+
+    ApplicantsOnly = 2,
+
+    RespondentsOnly = 3
+}
+
+public enum ConferenceType
+{
+    MsTeams = 1,
+
+    Skype = 2,
+
+    Zoom = 3
+}
+
+public enum DisputeLinkRole
+{
+    Primary = 1,
+
+    Secondary = 2
+}
+
+public enum DisputeLinkType
+{
+    Single = 1,
+
+    Cross = 2,
+
+    Joiner = 3,
+
+    Repeat = 4,
+
+    CrossRepeat = 5
+}
+
+public enum DisputeLinkStatus
+{
+    Active = 1,
+
+    NotActive = 2
+}
+
+public enum VerificationStatus
+{
+    NotSet = 0,
+    InProgress = 1,
+    Verified = 2,
+    Completed = 3
+}
+
+public enum RefundStatus
+{
+    NotSet = 0,
+    OnHold = 1,
+    Approved = 2,
+    Pending = 3,
+    Completed = 4
+}
+
+public enum DisputeVerificationType
+{
+    ApplicantSingleNonCn = 1,
+    ApplicantCn = 2,
+    ApplicantLinkedNonCn = 3,
+    ApplicantLinked = 4,
+    RespondentCn = 5
+}
+
+public enum AttemptMethod
+{
+    Email = 1,
+    Phone = 2,
+    Other = 3
+}
+
+public enum VerificationOutcome
+{
+    NotSet = 0,
+    WaitingResponse = 1,
+    VerifiedNeeded = 2,
+    Cancelled = 3,
+    NotAnswered = 4,
+    Terminated = 5
+}
+
+public enum VerificationReason
+{
+    Resolved = 1,
+    MovedOut = 2
 }

@@ -15,6 +15,11 @@ public class ExtendedAdminResourceAuthorizationHandler : IResourceAuthorizationH
         var action = context.ActionDescriptor.RouteValues["action"];
         var isAuthorized = false;
 
+        if (action == null)
+        {
+            return false;
+        }
+
         switch (context.Controller)
         {
             case DisputeHearingController:
@@ -33,7 +38,7 @@ public class ExtendedAdminResourceAuthorizationHandler : IResourceAuthorizationH
             case HearingController:
             {
                 if (action.Equals("Delete") || action.Equals("GetAvailableStaff") ||
-                    action.Equals("GetAvailableConferenceBridges") || action.Equals("Reassign") || action.Equals("Reschedule"))
+                    action.Equals("GetAvailableConferenceBridges") || action.Equals("Reassign") || action.Equals("Reschedule") || action.Equals("GetOnHoldHearings"))
                 {
                     if (user.Scheduler)
                     {
@@ -111,6 +116,19 @@ public class ExtendedAdminResourceAuthorizationHandler : IResourceAuthorizationH
 
                 break;
             }
+
+            case PollController:
+                {
+                    if (action.Equals("Post") || action.Equals("Delete") || action.Equals("Patch"))
+                    {
+                        if (user.Scheduler)
+                        {
+                            isAuthorized = true;
+                        }
+                    }
+
+                    break;
+                }
         }
 
         return isAuthorized;

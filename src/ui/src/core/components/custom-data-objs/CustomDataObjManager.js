@@ -1,4 +1,8 @@
 
+/**
+ * @fileoverview - Manager for loading, and getting ARI and PFR dispute data
+ */
+
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';

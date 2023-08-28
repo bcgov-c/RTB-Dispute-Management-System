@@ -1,6 +1,13 @@
 ﻿using System;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.ExternalContexts;
 using CM.Services.AdHocReportSender.AdHocReportSenderService.Job;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Repositories.AdHocDlReport;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Repositories.AdHocReport;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Repositories.AdHocReportAttachment;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Repositories.UnitOfWork;
 using CM.Services.AdHocReportSender.AdHocReportSenderService.Services;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Services.AdHocDlReport;
+using CM.Services.AdHocReportSender.AdHocReportSenderService.Services.AdHocReport;
 using CM.UserResolverService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +26,10 @@ public static class CustomExtensionMethods
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAdHocDlReportRepository, AdHocDlReportRepository>();
+        services.AddScoped<IAdHocReportRepository, AdHocReportRepository>();
+        services.AddScoped<IAdHocReportAttachmentRepository, AdHocReportAttachmentRepository>();
         return services;
     }
 
@@ -46,6 +57,16 @@ public static class CustomExtensionMethods
             .AddEntityFrameworkNpgsql()
             .AddDbContext<RtbDmsContext>(c => c.UseNpgsql(rtbDmsConnectionString), ServiceLifetime.Transient);
 
+        var pdConnectionString = configuration.GetConnectionString("PdConnection");
+        services
+            .AddEntityFrameworkNpgsql()
+            .AddDbContext<PostedDecisionContext>(c => c.UseNpgsql(pdConnectionString), ServiceLifetime.Transient);
+
+        var dwConnectionString = configuration.GetConnectionString("DwConnection");
+        services
+            .AddEntityFrameworkNpgsql()
+            .AddDbContext<DataWarehouseContext>(c => c.UseNpgsql(dwConnectionString), ServiceLifetime.Transient);
+
         return services;
     }
 
@@ -54,6 +75,8 @@ public static class CustomExtensionMethods
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddSingleton<IUserResolver, UserResolver>();
         services.AddScoped<IScheduledAdHocReport, ScheduledAdHocReport>();
+        services.AddScoped<IAdHocDlReportService, AdHocDlReportService>();
+        services.AddScoped<IAdHocReportService, AdHocReportService>();
 
         return services;
     }

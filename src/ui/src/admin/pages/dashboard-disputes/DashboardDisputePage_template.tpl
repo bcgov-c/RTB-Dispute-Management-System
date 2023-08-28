@@ -21,6 +21,9 @@
     </div>
 
     <div class="dashboard-dispute-optional-filters">
+      <% if (displayProcessFilter) { %>
+        <div class="dashboard-process-filter"></div>
+      <% } %>
       <% if (displaySourceFilter) { %>
         <div class="dashboard-source-filter"></div>
       <% } %>

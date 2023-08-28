@@ -61,6 +61,13 @@ public static class MappingProfile
             cfg.AddProfile(new CustomConfigObjectMapping());
             cfg.AddProfile(new ExternalCustomDataObjectMapping());
             cfg.AddProfile(new ExternalFilesMapping());
+            cfg.AddProfile(new ServiceAuditLogMapping());
+            cfg.AddProfile(new ExternalErrorLogMapping());
+            cfg.AddProfile(new PollMapping());
+            cfg.AddProfile(new PollResponseMapping());
+            cfg.AddProfile(new ParticipantIdentityMapping());
+            cfg.AddProfile(new OnlineMeetingMapping());
+            cfg.AddProfile(new DisputeVerificationMapping());
         });
 
         return config.CreateMapper();

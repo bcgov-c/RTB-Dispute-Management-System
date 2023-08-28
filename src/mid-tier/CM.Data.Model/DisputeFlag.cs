@@ -27,7 +27,11 @@ public class DisputeFlag : BaseEntity
 
     public int? FlagParticipantId { get; set; }
 
+    public Participant FlagParticipant { get; set; }
+
     public int? FlagOwnerId { get; set; }
+
+    public SystemUser FlagOwner { get; set; }
 
     public DateTime? FlagStartDate { get; set; }
 

@@ -1,3 +1,5 @@
+import Backbone from "backbone";
+
 export default Backbone.Model.extend({
   defaults: {
     showInactiveUsers: false,
@@ -9,6 +11,14 @@ export default Backbone.Model.extend({
     userManagement: {
       filter_userType: null,
       sort_userAttr: null
+    },
+    commonFiles: {
+      thumbnailsEnabled_help: null,
+      thumbnailsEnabled_forms: null,
+      thumbnailsEnabled_signatures: null,
+      thumbnailsEnabled_excel: null,
+      showArchivedHelp: null,
+      showArchivedForms: null,
     },
     mySchedulePage: {
       filter_scheduleType: null,
@@ -53,6 +63,6 @@ export default Backbone.Model.extend({
       filter_dateFirst: null,
       filter_dateSecond: null,
       filter_resultsCount: null,
-    }
+    },
   }
 });

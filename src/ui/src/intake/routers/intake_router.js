@@ -156,6 +156,10 @@ export const IntakeRouter = Marionette.AppRouter.extend({
       }
     }
 
+    if (sessionChannel.request('get:active:api')?.length) {
+      // NOTE: Data change warning/error for the user could go here
+    }
+
     // Now check for unsaved page changes
     const pageApiUpdates = this.controller.getPageApiUpdates();
     console.log('^^^^^END^^^^^');

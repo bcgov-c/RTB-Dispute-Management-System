@@ -71,7 +71,7 @@ public partial class IntegrationTests : IntegrationTestBase
             {
                 ParticipantId = parties.ResponseObject[0].ParticipantId,
                 GroupParticipantRole = (byte)ParticipantRole.Applicant,
-                GroupPrimaryContactId = 1
+                GroupPrimaryContactId = parties.ResponseObject[0].ParticipantId
             }
         });
         claimGroupParticipant.CheckStatusCode();
@@ -82,7 +82,7 @@ public partial class IntegrationTests : IntegrationTestBase
             {
                 ParticipantId = parties.ResponseObject[1].ParticipantId,
                 GroupParticipantRole = (byte)ParticipantRole.Respondent,
-                GroupPrimaryContactId = 1
+                GroupPrimaryContactId = parties.ResponseObject[1].ParticipantId
             }
         });
         claimGroupParticipant.CheckStatusCode();

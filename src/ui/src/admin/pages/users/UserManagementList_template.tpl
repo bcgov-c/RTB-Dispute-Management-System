@@ -1,8 +1,8 @@
 <div class="standard-list-header <%= hasVisibleItems ? '' : 'hidden' %>">
-  <div class="user-active-column">Active</div>
+  <div class="user-active-column"></div>
   <div class="user-id-column">ID</div>
   <div class="name-column">Full Name</div>
-  <div class="rolegrop-column">Role Group</div>
+  <div class="rolegroup-column">Role Group</div>
   <div class="roletype-column">Role Type</div>
   <div class="managedby-column">Managed By</div>
   <div class="user-admin-column text-center">Admin</div>

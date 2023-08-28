@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CM.Data.Model;
@@ -14,7 +15,11 @@ public class TrialIntervention : BaseEntity
 
     public Guid? TrialDisputeGuid { get; set; }
 
+    public TrialDispute TrialDispute { get; set; }
+
     public Guid? TrialParticipantGuid { get; set; }
+
+    public TrialParticipant TrialParticipant { get; set; }
 
     public int? OtherAssociatedId { get; set; }
 
@@ -35,4 +40,6 @@ public class TrialIntervention : BaseEntity
     public DateTime? EndDate { get; set; }
 
     public bool? IsDeleted { get; set; }
+
+    public virtual ICollection<TrialOutcome> TrialOutcomes { get; set; }
 }

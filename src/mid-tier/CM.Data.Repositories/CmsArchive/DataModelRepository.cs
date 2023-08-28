@@ -63,11 +63,12 @@ public class DataModelRepository : CmRepository<DataModel>, IDataModelRepository
 
     public async Task<List<DataModel>> GetDataByFileNumbers(List<string> requestIds, CmsArchiveSearchBase commonFilters)
     {
-        var data = await Context.CMSData.Where(x => requestIds.Contains(x.Request_ID) && x.Searchable_Record == 1).DistinctBy(x => x.File_Number).ToListAsync();
+        var selectedData = await Context.CMSData.Where(x => requestIds.Contains(x.Request_ID) && x.Searchable_Record == 1).ToListAsync();
+        var result = selectedData.DistinctBy(x => x.File_Number).ToList();
 
-        data = await CmsSearchHelper.ApplyCommonFilters(data, commonFilters).ToListAsync();
+        result = await CmsSearchHelper.ApplyCommonFilters(result, commonFilters).ToListAsync();
 
-        return data;
+        return result;
     }
 
     public async Task<List<DataModel>> GetRecordsByFileNumber(string fileNumber)

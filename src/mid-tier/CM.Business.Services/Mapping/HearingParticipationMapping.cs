@@ -15,9 +15,16 @@ public class HearingParticipationMapping : Profile
 
         CreateMap<HearingParticipation, HearingParticipationResponse>()
             .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
-            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()));
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.PreParticipationStatusDate, opt => opt.MapFrom(src => src.PreParticipationStatusDate.ToCmDateTimeString()));
 
         CreateMap<HearingParticipation, OfficeUserPatchHearingParticipantRequest>();
         CreateMap<OfficeUserPatchHearingParticipantRequest, HearingParticipation>();
+
+        CreateMap<ExternalHearingParticipationRequest, HearingParticipation>();
+        CreateMap<HearingParticipation, ExternalHearingParticipationResponse>()
+            .ForMember(x => x.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate.ToCmDateTimeString()))
+            .ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
+            .ForMember(x => x.PreParticipationStatusDate, opt => opt.MapFrom(src => src.PreParticipationStatusDate.ToCmDateTimeString()));
     }
 }

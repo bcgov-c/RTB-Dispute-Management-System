@@ -26,4 +26,24 @@ export default FileModel.extend({
   urlRoot() {
     return `${configChannel.request('get', 'API_ROOT_URL')}${apiCommonFiles}`;
   },
+
+  isStatusArchived() {
+    return this.get('file_status') && this.get('file_status') === configChannel.request('get', 'COMMONFILE_STATUS_ARCHIVED');
+  },
+
+  isTypeHelp() {
+    return this.get('file_type') && this.get('file_type') === configChannel.request('get', 'COMMONFILE_TYPE_HELP_FILE');
+  },
+
+  isTypeForm() {
+    return this.get('file_type') && this.get('file_type') === configChannel.request('get', 'COMMONFILE_TYPE_RTB_FORM');
+  },
+
+  isTypeDocument() {
+    return this.get('file_type') && this.get('file_type') === configChannel.request('get', 'COMMONFILE_TYPE_DOCUMENT');
+  },
+
+  isTypeReport() {
+    return this.get('file_type') && this.get('file_type') === configChannel.request('get', 'COMMONFILE_TYPE_REPORT');
+  }
 });

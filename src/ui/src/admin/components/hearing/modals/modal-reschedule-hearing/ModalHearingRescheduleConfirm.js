@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal that displays before/after rescheduling view that processes rescheduling once confirm button is clicked
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import template from './ModalHearingRescheduleConfirm_template.tpl';
@@ -75,19 +78,33 @@ export default ModalBaseView.extend({
   _performReschedule() {
     const onCompleteFn = () => {
       this.model.trigger('hearings:refresh');
+      this.model.trigger('reschedule:complete');
+      loaderChannel.trigger('page:load:complete');
       this.close();
     }
+    
+    const saveRequestPromise = () => new Promise((res, rej) => {
+      this.model.fetch()
+      .then(() => this.model.save({ hearing_sub_type: 99 }))
+      .then(() => this.model.destroy().then(onCompleteFn()))
+      .fail(generalErrorFactory.createHandler('OUTCOME.DOC.REQUEST.CREATE', rej))
+    });
+    
 
     hearingChannel.request('reschedule', this.model.id, this.rescheduleHearingModel.id)
-      .then(
-        onCompleteFn.bind(this),
-        err => {
+      .then(() => {
+        if (this.deleteAfterReschedule) {
+          saveRequestPromise();
+        } else {
+          onCompleteFn();
+        }
+      }).fail((err) => {
+        loaderChannel.trigger('page:load:complete');
+        const handler = generalErrorFactory.createHandler('ADMIN.HEARING.RESCHEDULE', () => {
           loaderChannel.trigger('page:load:complete');
-          const handler = generalErrorFactory.createHandler('ADMIN.HEARING.RESCHEDULE', () => {
-            loaderChannel.trigger('page:load:complete');
-            onCompleteFn();
-          }, 'There was an error during hearing reschedule.');
-          handler(err);
+          onCompleteFn();
+        }, 'There was an error during hearing reschedule.');
+        handler(err);
       });
   },
 
@@ -101,9 +118,11 @@ export default ModalBaseView.extend({
       this.render();
     })
   },
-
+  /**
+   * @param {HearingModel} model 
+   */
   initialize(options) {
-    this.mergeOptions(options, ['rescheduleHearingModel']);
+    this.mergeOptions(options, ['rescheduleHearingModel', 'deleteAfterReschedule']);
     this.model.set({ _isAdjourned: null });
     this.rescheduleHearingModel.set({ _isAdjourned: null });
     this.checkAdjourned(this.model);
@@ -154,6 +173,14 @@ export default ModalBaseView.extend({
       isReserved: hearingModel.isReserved(),
       isAdjourned: hearingModel.get('_isAdjourned')
     }));
+  },
+
+  templateContext() {
+    return {
+      title: this.deleteAfterReschedule ? 'Confirm Delete and Reschedule' : 'Confirm Reschedule',
+      confirmButtonText: this.deleteAfterReschedule ? 'Confirm Hearing Delete and Reschedule' : 'Confirm Reschedule',
+      currentHearingTitle: this.deleteAfterReschedule ? 'Current hearing (being cancelled and deleted)' : 'Current hearing (being cancelled)'
+    }
   }
 
 });

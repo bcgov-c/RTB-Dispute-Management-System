@@ -38,6 +38,7 @@
 
     &__title {
       font-size: 18px;
+      line-height: 22px;
     }
   }
 
@@ -68,10 +69,30 @@
     &__title {
       font-size: 18px;
     }
+
+    &__question { margin-bottom: 30px; }
+    .warning { min-height: 38px; }
+  }
+
+  &__service-method {
+    &__type { 
+      margin-top: 30px;
+
+      select { width: fit-content; }
+    }
+
+    &__type-input-container { display: flex; margin-top: 15px; max-width: 800px; }
+    &__type-input-container {
+      input[type=tel] { width: 200px; }
+    }
+
+    &__type-input { width: 100%; min-width: 420px; margin-right: 10px; }
+    &__type-input2 { width: 100%; }
+    &__type-input3 { width: 100%; }
   }
 
   &__service-method-result__description {
-    margin-top: 10px;
+    margin-top: 15px;
   }
 
   &__evidence-upload {
@@ -90,4 +111,12 @@
   }
 
   .upload .step-description { display: none; }
+}
+
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .subserv {
+    &__service-method__type-input-container { display: block; }
+  }
 }

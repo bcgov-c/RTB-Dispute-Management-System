@@ -26,6 +26,7 @@ export default CMModel.extend({
     managed_by_id: null,
     schedule_sub_status: null,
     access_sub_types: null,
+    role_note: null,
 
     user_id: null // This needs to be passed in when creating the model
   },
@@ -36,7 +37,8 @@ export default CMModel.extend({
     'engagement_type',
     'managed_by_id',
     'schedule_sub_status',
-    'access_sub_types'
+    'access_sub_types',
+    'role_note'
   ],
 
   urlRoot() {

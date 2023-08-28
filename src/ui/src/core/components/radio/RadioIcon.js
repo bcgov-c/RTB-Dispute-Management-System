@@ -1,4 +1,5 @@
 /**
+ * @overview - View with same functionality as Radio, but supports usage of clickable icons that can be passed in rather than default radio buttons
  * @class core.components.radio.RadioModel
  * @memberof core.components.radio
  */
@@ -48,6 +49,11 @@ export default ViewMixin.extend({
     const ele = $(event.currentTarget);
     let value = ele.data('val');
 
+    if (this._isValueDisabled(value)) {
+      event.preventDefault();
+      return;
+    }
+
     if (this.isSingleViewMode) {
       value = this.getNextSingleViewValue(value);
     } else if (ele.hasClass(CLASS_SELECTED)) {
@@ -62,6 +68,11 @@ export default ViewMixin.extend({
     this.model.set('value', value);
     this.model.set('stepComplete', true);
     this.render();
+  },
+
+  _isValueDisabled(value) {
+    const valuesToDisable = this.model.get('valuesToDisable');
+    return this.model.get('disabled') || ( !_.isEmpty(valuesToDisable) && _.contains(valuesToDisable, Number(value)) );
   },
 
   validateAndShowErrors() {
@@ -80,7 +91,8 @@ export default ViewMixin.extend({
 
   templateContext() {
     return {
-      isSingleViewMode: this.isSingleViewMode
+      isSingleViewMode: this.isSingleViewMode,
+      isValueDisabledFn: _.bind(this._isValueDisabled, this)
     };
   }
 

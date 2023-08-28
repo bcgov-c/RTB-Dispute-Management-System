@@ -1,9 +1,14 @@
+/**
+ * @fileoverview - Manager that handles hearings related functionality. This includes hearings, hearing participations and hearing staff, hearing conference bridges, dispute linking history, and .ics file download.
+ */
+
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import HearingModel from './Hearing_model';
 import DisputeHearingCollection from './DisputeHearing_collection';
 import HearingCollection from './Hearing_collection';
 import ConferenceBridgeCollection from '../conference-bridge/ConferenceBridge_collection';
+import Formatter from '../formatter/Formatter';
 
 const configChannel = Radio.channel('config');
 const apiChannel = Radio.channel('api');
@@ -12,8 +17,10 @@ const modalChannel = Radio.channel('modals');
 const loaderChannel = Radio.channel('loader');
 const participantsChannel = Radio.channel('participants');
 const flagsChannel = Radio.channel('flags');
+const filesChannel = Radio.channel('files');
 
 const api_load_name = 'disputehearings';
+const api_external_load_name = 'externaldisputehearings';
 const api_available_hearings_name = 'availablehearings';
 const api_available_staff_name = 'availablestaff';
 const api_available_conferencebridges_name = 'availableconferencebridges';
@@ -27,7 +34,8 @@ const api_reassign_name = 'hearing/reassign';
 const api_reschedule_name = 'hearing/reschedule';
 const api_hold_hearing = 'hearings/holdhearing';
 const api_cancel_reserved_hearing = 'hearings/cancelreservedhearing';
-
+const api_on_hold_hearings_name = 'hearings/onholdhearings';
+const api_hearing_cross = 'hearings/linkpasthearings';
 
 const HearingsManager = Marionette.Object.extend({
   channelName: 'hearings',
@@ -48,7 +56,10 @@ const HearingsManager = Marionette.Object.extend({
     'load:conferencebridges': 'loadAllConferenceBridges',
     'load:linkinghistory:dispute': 'loadDisputeLinkingHistory',
     'load:linkinghistory:hearing': 'loadHearingLinkingHistory',
+    'load:onholdhearings': 'loadOnHoldHearings',
     'load:disputeaccess': 'loadFromDisputeAccessResponse',
+    'load:external': 'loadExternalDisputeHearings',
+    load: 'loadHearingsPromise',
 
     'show:invalid:modal': 'showInvalidHearingStateModal',
     'check:scheduling:error': 'checkForHearingSchedulingError',
@@ -59,13 +70,16 @@ const HearingsManager = Marionette.Object.extend({
     'cancel:reserved': 'cancelReservedHearing',
     'reserve:hearing': 'reserveHearing',
     'check:adjourned': 'checkAdjourned',
+    'cross:past:hearings': 'crossPastHearings',
 
     'get:active': 'getActiveHearing',
     'get:latest': 'getLatestHearing',
     'get:hearing': 'getHearingById',
     get: 'getHearings',
-    load: 'loadHearingsPromise',
+    
     'has:hearings' : 'hasHearings',
+    'generate:ics': 'generateAndDownloadHearingCalendarFile',
+    'cancel:ics': 'generateAndDownloadCancelHearingCalendarFile',
 
     'update:participations': 'fillHearingParticipationForHearing',
     'update:participations:save': 'fillHearingParticipationForHearingAndSave',
@@ -106,7 +120,7 @@ const HearingsManager = Marionette.Object.extend({
 
   _toCacheData() {
     return {
-      hearings: this.hearings
+      hearings: this.hearings,
     };
   },
 
@@ -205,6 +219,45 @@ const HearingsManager = Marionette.Object.extend({
     this.hearings = new HearingCollection(hearingModel);
   },
 
+  loadOnHoldHearings(searchParams={}) {
+
+    const defaultParams = {
+      count: 20,
+      index: 0,
+    };
+
+    const params = { ...defaultParams, ...searchParams };
+
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_on_hold_hearings_name}?${$.param(params, true)}`
+      }).done((response={}) => {
+        this.onHoldHearings = response;
+        res(response);
+      }).fail(rej);
+    });
+  },
+
+  crossPastHearings(disputeA, disputeB) {
+    if (!disputeA || !disputeB) {
+      return new Promise((res, rej) => rej());
+    }
+
+    const params = $.param(_.extend({
+      staticDisputeGuid: disputeA,
+      movedDisputeGuid: disputeB
+    }));
+
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'POST',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_hearing_cross}?${params}`
+      }).done(response => {
+        res(response);
+      }).fail(rej);
+    });
+  },
 
   loadAllConferenceBridges() {
     const dfd = $.Deferred();
@@ -223,7 +276,20 @@ const HearingsManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
-  loadHearingsPromise(dispute_guid) {
+  loadExternalDisputeHearings(disputeGuid) {
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_load_name}/${disputeGuid}`
+      }).done(response => {
+        const hearings = new HearingCollection(response);
+        this.hearings = hearings;
+        res(this.hearings);
+      }).fail(rej);
+    });
+  },
+
+  loadHearingsPromise(dispute_guid, options={}) {
     if (!dispute_guid) {
       const error_msg = `[Error] Invalid or no dispute to load hearings for ${dispute_guid}`;
       console.log(error_msg);
@@ -235,11 +301,16 @@ const HearingsManager = Marionette.Object.extend({
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_name}/${dispute_guid}`
     }).done(response => {
-      this.hearings = new HearingCollection(response);
-      // Do an update for all the hearing info
-      // NOTE: After filling in the hearing info, make sure to save any changes back to API
-      Promise.all(this.hearings.map(hearingModel => this.fillHearingParticipationForHearingAndSave(hearingModel)))
-        .finally(dfd.resolve(this.hearings));
+      const hearings = new HearingCollection(response);
+      if (options.no_cache) {
+        return dfd.resolve(hearings);
+      } else {
+        this.hearings = hearings;
+        // Do an update for all the hearing info
+        // NOTE: After filling in the hearing info, make sure to save any changes back to API
+        Promise.all(this.hearings.map(hearingModel => this.fillHearingParticipationForHearingAndSave(hearingModel)))
+         .finally(dfd.resolve(this.hearings));
+      }
     }).fail(err => {
       console.log(`[Error] Couldn't load dispute hearings for ${dispute_guid}`);
       dfd.reject(err);
@@ -395,14 +466,17 @@ const HearingsManager = Marionette.Object.extend({
     });
   },
 
-  reserveHearing(hearingId) {
+  reserveHearing(hearingId, request_params) {
     if (!hearingId) {
       return $.Deferred().reject().promise();
     }
 
+    request_params = request_params || {};
+    const params = $.param(request_params, true);
+
     return apiChannel.request('call', {
       type: 'POST',
-      url: `${configChannel.request('get', 'API_ROOT_URL')}${api_hold_hearing}/${hearingId}`,
+      url: `${configChannel.request('get', 'API_ROOT_URL')}${api_hold_hearing}/${hearingId}?${params}`,
       headers: {
         'Content-Type': 'application/json'
       }
@@ -547,7 +621,56 @@ const HearingsManager = Marionette.Object.extend({
     return hearingModel.createDisputeHearing(attrs).save();
   },
 
+  generateAndDownloadCalendarFile(method, eventDataLines=[]) {
+    const fileContents = [
+      `BEGIN:VCALENDAR`,
+      `VERSION:2.0`,
+      `PRODID:-//DMS//EN`,
+      `CALSCALE:GREGORIAN`,
+      `METHOD:${method}`,
+      ...eventDataLines,
+      `END:VCALENDAR`
+    ];
+    const blob = new Blob([fileContents.join("\r\n")], { type: 'text/calendar;charset=utf8' });
+    filesChannel.request('download:file', blob, 'event.ics');
+  },
 
+  getHearingEventLines(hearingModel, eventDataLines=[]) {
+    const nowDisplay = Formatter.toIcsDateDisplay(Moment());
+    // NOTE: If the VEVENT SUMMARY contains telephone-like numbers, the first one such number will be pulled
+    // by some mail clients and put as the telephone number for the event
+    return [
+      `BEGIN:VEVENT`,
+      `UID:RTB_Hearing_${hearingModel.id}`,
+      `LAST-MODIFIED:${nowDisplay}`,
+      `DTSTAMP:${nowDisplay}`,
+      `DTSTART:${Formatter.toIcsDateDisplay(hearingModel.get('hearing_start_datetime'))}`,
+      `DTEND:${Formatter.toIcsDateDisplay(hearingModel.get('hearing_end_datetime'))}`,
+      `LOCATION:${Formatter.toHearingTypeDisplay(hearingModel.get('hearing_type'))}`,
+      `ORGANIZER;CN=BC Residential Tenancy Branch:MAILTO:${configChannel.request('get', 'EMAIL_FROM_DEFAULT')}`,
+      ...eventDataLines,
+      `END:VEVENT`,
+    ];
+  },
+
+  generateAndDownloadHearingCalendarFile(hearingModel, calendarHearingTitle, calendarHearingDescription) {
+    const eventDataLines = [
+      `SEQUENCE:0`,
+      `SUMMARY:${calendarHearingTitle}`,
+      `DESCRIPTION:${calendarHearingDescription}`,
+      `TRANSP:OPAQUE`,
+    ];
+    return this.generateAndDownloadCalendarFile('PUBLISH', this.getHearingEventLines(hearingModel, eventDataLines));
+  },
+
+  generateAndDownloadCancelHearingCalendarFile(hearingModel) {
+    const eventDataLines = [
+      // NOTE: SEQUENCE must be higher than previous edits - assume creation was seq0, so this one can be seq1
+      `SEQUENCE:1`,
+      `STATUS:CANCELLED`,
+    ];
+    return this.generateAndDownloadCalendarFile('CANCEL', this.getHearingEventLines(hearingModel, eventDataLines));
+  },
 
   // Hearing reporting APIs
   getHearingReportYearly(year, search_params) {
@@ -615,6 +738,7 @@ const HearingsManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
+  // Returns hearings having LocalStartDateTime between StartDate/EndDate in request
   getHearingsByOwner(ownerId, search_params) {
     search_params = search_params || {};
     const params = $.param(search_params);

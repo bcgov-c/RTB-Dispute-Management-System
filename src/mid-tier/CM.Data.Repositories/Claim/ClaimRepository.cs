@@ -48,8 +48,16 @@ public class ClaimRepository : CmRepository<Model.Claim>, IClaimRepository
 
     public async Task<List<byte?>> GetDisputeClaimsCode(Guid disputeGuid)
     {
-        var claimGroups = await Context.ClaimGroups.Where(d => d.DisputeGuid == disputeGuid).Select(x => x.ClaimGroupId).ToListAsync();
-        var claimsCode = await Context.Claims.Where(c => claimGroups.Contains(c.ClaimGroupId) && c.ClaimStatus != (byte)ClaimStatus.Deleted && c.ClaimStatus != (byte)ClaimStatus.Removed).Select(x => x.ClaimCode).ToListAsync();
+        var claimGroups = await Context.ClaimGroups
+            .Where(d => d.DisputeGuid == disputeGuid)
+            .Select(x => x.ClaimGroupId)
+            .ToListAsync();
+
+        var claimsCode = await Context.Claims
+            .Where(c => claimGroups
+            .Contains(c.ClaimGroupId) && c.ClaimStatus != (byte)ClaimStatus.Deleted
+                                        && c.ClaimStatus != (byte)ClaimStatus.Removed)
+            .Select(x => x.ClaimCode).ToListAsync();
 
         return claimsCode;
     }

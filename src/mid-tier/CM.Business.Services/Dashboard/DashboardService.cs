@@ -173,7 +173,7 @@ public class DashboardService : CmServiceBase, IDashboardService
                 IntakePaymentDatePaid = disputeFee?.DatePaid.ToCmDateTimeString(),
                 IntakePaymentAmountPaid = disputeFee?.AmountPaid,
                 IntakePaymentAmountPaymentMethod = disputeFee?.MethodPaid,
-                HearingStart = hearing != null ? hearing.LocalStartDateTime.ToCmDateTimeString() : string.Empty,
+                HearingStart = hearing != null ? hearing.HearingStartDateTime.ToCmDateTimeString() : string.Empty,
                 HearingType = hearing?.HearingType,
                 HearingOwner = hearing?.HearingOwner,
                 NoticeGeneratedDate = noticeGenDate.ToCmDateTimeString(),

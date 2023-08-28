@@ -89,7 +89,7 @@ export default Marionette.View.extend({
   showAddConfirmModal() {
     modalChannel.request('show:standard', {
       title: `Add Issue?`,
-      bodyHtml: `<p>Warning - this will add the new issue: <b>${this.claimModel.getClaimTitleWithCode()}</b> and store the change as an amendment.  Amendments must be served to responding parties.`
+      bodyHtml: `<p>Warning - this will add the new issue: <b>${this.claimModel.getClaimTitleWithCode()}</b> and store the change as an amendment.  Amendments must be served to responding parties unless they are RTB Initiated.`
         + `<p>Are you sure you want to add this issue?`,
       primaryButtonText: 'Add Issue and Amendment',
       onContinueFn: _.bind(function(modal) {
@@ -128,25 +128,34 @@ export default Marionette.View.extend({
       console.log(`[Error] Need a collection to add claim to`);
       return;
     }
-    this.mergeOptions(options, ['is_post_notice', 'claimCollection']);
+    this.mergeOptions(options, ['is_post_notice', 'claimCollection', 'preLoadedClaim', 'instructionsText']);
     this.claimCollection = options.collection;
     this.isDisputeCreatedAriE = this.model.isCreatedAriE();
-
+    this.dispute = disputeChannel.request('get');
     this.createClaimModels();
     this.createAmendmentModels();
     this.setupListeners();
   },
 
   createClaimModels() {
+    const optionData = this.getAvailableClaimOptions();
+    if (this.preLoadedClaim && !optionData.find(opt => opt.value === this.preLoadedClaim.get('claim_code'))) {
+      optionData.push({
+        value: this.preLoadedClaim.get('claim_code'),
+        text: `${this.preLoadedClaim?.claimConfig?.code} - ${this.preLoadedClaim?.claimConfig?.issueTitle}`
+      });
+    }
     this.claimSelectorModel = new DropdownModel({
-      optionData: this.getAvailableClaimOptions(),
+      optionData,
       labelText: "Issue to add",
       errorMessage: "Select an issue to add",
       defaultBlank: true,
       required: true,
-      value: null
+      value: this.preLoadedClaim ? this.preLoadedClaim.get('claim_code') : null,
+      disabled: !!this.preLoadedClaim,
     });
-    this.claimModel = this.claimCollection.createClaimWithRemedy();
+    const claimOptions = this.preLoadedClaim ? { claim_code: this.preLoadedClaim.get('claim_code'), } : {};
+    this.claimModel = this.claimCollection.createClaimWithRemedy(claimOptions);
     this.claimCollection.add(this.claimModel, {silent: true});
   },
 
@@ -158,7 +167,6 @@ export default Marionette.View.extend({
     // - No ET
     const config_issues = configChannel.request('get:issues');
     const dr_issues = configChannel.request('get', 'direct_request_issue_codes');
-    const dispute = disputeChannel.request('get');
 
     const LEGACY_FILING_LATE_CODE = configChannel.request('get', 'LEGACY_FILING_LATE_CODE');
     const LANDLORD_OTHER_ISSUE_CODE = configChannel.request('get', 'LANDLORD_OTHER_ISSUE_CODE');
@@ -168,56 +176,62 @@ export default Marionette.View.extend({
     const PFR_ISSUE_CODE = configChannel.request('get', 'PFR_ISSUE_CODE');
     const landlord_fee_recovery = configChannel.request('get', 'landlord_fee_recovery');
     const tenant_fee_recovery = configChannel.request('get', 'tenant_fee_recovery');
+    const LL_RETAIN_SECURITY_DEPOSIT_CODE = configChannel.request('get', 'LL_RETAIN_SECURITY_DEPOSIT_CODE');
 
-    const isCreatedIntake = dispute.isCreatedIntake();
-    const isCreatedPfr = dispute.isCreatedPfr();
-    const isCreatedAriC = dispute.isCreatedAriC();
+    const isCreatedIntake = this.dispute.isCreatedIntake();
+    const isCreatedPfr = this.dispute.isCreatedPfr();
+    const isCreatedAriC = this.dispute.isCreatedAriC();
     const isCreatedAriE = this.isDisputeCreatedAriE;
 
     const filtered_issues = _.map(
       _.filter(config_issues, function(issue_config) {
 
+        // Hide any issues manually set to "not selectable" in Admin
+        if (issue_config?.canStaffCreate === false) return;
+
         // The default "filing late" (code MT) is not able to be added
-        if (issue_config.id === LEGACY_FILING_LATE_CODE) { return; }
+        if (issue_config.id === LEGACY_FILING_LATE_CODE) return;
+
+        // Landlord security deposit retain can only be added via +CODE singleton issue pattern
+        if (issue_config.id === LL_RETAIN_SECURITY_DEPOSIT_CODE) return;
         
         // Landlord/Tenant Other issues (OL/OT) are not available to Intake applications
-        if ((issue_config.id === LANDLORD_OTHER_ISSUE_CODE || issue_config.id === TENANT_OTHER_ISSUE_CODE) && isCreatedIntake) { return; }
+        if ((issue_config.id === LANDLORD_OTHER_ISSUE_CODE || issue_config.id === TENANT_OTHER_ISSUE_CODE) && isCreatedIntake) return;
 
         // Issues which award the opposite of applicant type (TT awards on LL dispute, and LL awards on TT dispute) cannot be added here
-        if (issue_config.reverseAward) { return; }
+        if (issue_config.reverseAward) return;
 
 
         // Filter issues based on creation method
-        if (isCreatedAriE && issue_config.id !== ARI_E_ISSUE_CODE) { return; }
-        if (issue_config.id === ARI_E_ISSUE_CODE && !isCreatedAriE) { return; }
+        if (isCreatedAriE && issue_config.id !== ARI_E_ISSUE_CODE) return;
+        if (issue_config.id === ARI_E_ISSUE_CODE && !isCreatedAriE) return;
 
-        if (isCreatedAriC && issue_config.id !== ARI_C_ISSUE_CODE) { return; }
-        if (issue_config.id === ARI_C_ISSUE_CODE && !isCreatedAriC) { return; }
+        if (isCreatedAriC && issue_config.id !== ARI_C_ISSUE_CODE) return;
+        if (issue_config.id === ARI_C_ISSUE_CODE && !isCreatedAriC) return;
 
-        if (isCreatedPfr && issue_config.id !== PFR_ISSUE_CODE) { return; }
-        if (issue_config.id === PFR_ISSUE_CODE && !isCreatedPfr) { return; }
+        if (isCreatedPfr && issue_config.id !== PFR_ISSUE_CODE) return;
+        if (issue_config.id === PFR_ISSUE_CODE && !isCreatedPfr) return;
 
         // Filter first that it passes visibility rules 
         const is_visible = (
-          (issue_config.associatedToApplicantType === 'both' || issue_config.associatedToApplicantType === (dispute.isLandlord() ? 'landlord' : 'tenant') )
-            && (issue_config.associatedToTenancyStatus === 'both' || issue_config.associatedToTenancyStatus === (dispute.isPastTenancy() ? 'past' : 'current') )
-            && (issue_config.associatedToAct === 'both' || issue_config.associatedToAct === (dispute.isMHPTA() ? 'mhpta' : 'rta') )
-            && (_.contains(['pet', 'both'], issue_config.associatedToDeposit) ? dispute.hasPetDeposit() : true)
-            && (_.contains(['security', 'both'], issue_config.associatedToDeposit) ? dispute.hasSecurityDeposit() : true)
-            && (issue_config.associatedToDeposit === 'any' ? dispute.hasDeposit() : true)
+          (issue_config.associatedToApplicantType === 'both' || issue_config.associatedToApplicantType === (this.dispute.isLandlord() ? 'landlord' : 'tenant') )
+            && (issue_config.associatedToTenancyStatus === 'both' || issue_config.associatedToTenancyStatus === (this.dispute.isPastTenancy() ? 'past' : 'current') )
+            && (issue_config.associatedToAct === 'both' || issue_config.associatedToAct === (this.dispute.isMHPTA() ? 'mhpta' : 'rta') )
+            && (_.contains(['pet', 'both'], issue_config.associatedToDeposit) ? this.dispute.hasPetDeposit() : true)
+            && (_.contains(['security', 'both'], issue_config.associatedToDeposit) ? this.dispute.hasSecurityDeposit() : true)
+            && (issue_config.associatedToDeposit === 'any' ? this.dispute.hasDeposit() : true)
         );
 
-        if (!is_visible) { return false }
+        if (!is_visible) return;
 
         // Then validate that the issues have not already been chosen
-
-        if (this.claimCollection.findWhere({ claim_code: issue_config.id })) { return false; }
+        if (this.claimCollection.findWhere({ claim_code: issue_config.id })) return;
         
         const isFilingFee = _.contains([landlord_fee_recovery, tenant_fee_recovery], issue_config.id);
         
         // Then validate DR / non-DR
         const issue_is_direct_request = _.contains(dr_issues, issue_config.id);
-        if (dispute.isNonParticipatory()) {
+        if (this.dispute.isNonParticipatory()) {
           // Direct request, but issue is not request
           if (!issue_is_direct_request && !isFilingFee) {
             return false;
@@ -301,6 +315,14 @@ export default Marionette.View.extend({
       });
       this.amendmentByModel.trigger('render');
     });
+
+    this.listenTo(this.amendmentRtbInitModel, 'change:checked', (model, checked) => {
+      this.amendmentByModel.set({
+        required: !checked,
+        cssClass: checked ? 'optional-input' : ''
+      });
+      this.amendmentByModel.trigger('render');
+    });
   },
 
 
@@ -334,6 +356,8 @@ export default Marionette.View.extend({
       }
       
       if (this.claimModel.isFeeRecovery()) claimView.amountEditModel.set({ value: configChannel.request('get', 'PAYMENT_FEE_AMOUNT_INTAKE') || null });
+      if (this.claimModel.isRetainSecurityDeposit()) claimView.amountEditModel.set({ value: this.dispute.getDepositAmount() || null });
+  
       claimView.switchToPreNoticeEditState();
       this.showChildView('claimRegion', claimView);
     }
@@ -347,11 +371,11 @@ export default Marionette.View.extend({
 
   templateContext() {
     const DISPUTE_CREATION_METHOD_DISPLAY = configChannel.request('get', 'DISPUTE_CREATION_METHOD_DISPLAY');
-    const dispute = disputeChannel.request('get');
     return _.extend({
-      dispute,
+      dispute: this.dispute,
       Formatter,
-      creationMethodDisplay: DISPUTE_CREATION_METHOD_DISPLAY[dispute.get('creation_method')],
+      creationMethodDisplay: DISPUTE_CREATION_METHOD_DISPLAY[this.dispute.get('creation_method')],
+      instructionsText: this.instructionsText,
     }, this.options);
   }
 });

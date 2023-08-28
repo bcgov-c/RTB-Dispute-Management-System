@@ -62,10 +62,6 @@
 	p.listitem {
 		margin:5px 0px 0px 0px;
   }
-  
-  .listitem-hearingdetails {
-    margin-left: 25px;
-  }
 	
 	p.issue_listitem {
 		margin:5px 0px 0px 0px;

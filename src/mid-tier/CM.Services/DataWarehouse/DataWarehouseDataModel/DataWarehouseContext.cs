@@ -20,6 +20,10 @@ public class DataWarehouseContext : DbContext
 
     public DbSet<FactIntakeProcessing> FactIntakeProcessings { get; set; }
 
+    public DbSet<FactResolutionService> FactResolutionServices { get; set; }
+
+    public DbSet<FactIssueOutcome> FactIssueOutcomes { get; set; }
+
     public DbSet<DimCity> DimCities { get; set; }
 
     public DbSet<DimTime> DimTimes { get; set; }

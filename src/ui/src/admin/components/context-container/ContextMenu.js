@@ -1,4 +1,6 @@
-
+/**
+ * @fileoverview - Hamburger menu associated to the ContextContainer
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import template from './ContextMenu_template.tpl';
@@ -123,10 +125,10 @@ export default Marionette.View.extend({
       menu_options: this.menu_options,
       help_fn: _.isFunction(this.help_fn) && this.help_fn,
 
-      createdDate: this.createdDate || this.model.get('created_date'),
-      createdBy: this.createdBy || this.model.get('created_by'),
-      modifiedDate: this.modifiedDate || this.model.get('modified_date'),
-      modifiedBy: this.modifiedBy || this.model.get('modified_by')
+      createdDate: this.createdDate || this.model?.get('created_date'),
+      createdBy: this.createdBy || this.model?.get('created_by'),
+      modifiedDate: this.modifiedDate || this?.model.get('modified_date'),
+      modifiedBy: this.modifiedBy || this?.model.get('modified_by')
     };
   }
 });

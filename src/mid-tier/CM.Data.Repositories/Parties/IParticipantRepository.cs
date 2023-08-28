@@ -40,5 +40,7 @@ public interface IParticipantRepository : IRepository<Participant>
 
     Task<Participant> GetDisputeActiveParticipant(Guid disputeGuid, int submitterId);
 
-    Task<bool> IsActiveParticipantExists(int descriptionBy);
+    Task<bool> IsActiveParticipantExists(int participantId);
+
+    Task<List<Participant>> GetPrimaryApplicants(List<Guid> disputes);
 }

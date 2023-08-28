@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using AutoMapper;
 using CM.Business.Entities.Models.Dispute;
 using CM.Business.Entities.Models.DisputeHearing;
@@ -24,7 +25,7 @@ public class HearingRecordingTransferService : CmServiceBase, IHearingRecordingT
     private const int RecordingCodeSplitPosition = 7;
     private const int DateLenght = 14;
     private const int DefaultAudioSamplingRate = 11025;
-    private const int DefaultBitRate = 64;
+    private const int DefaultBitRate = 65536;
     private const int DefaultChannels = 1;
     private const string OriginalFileExtension = "wav";
     private const string ConvertedFileExtension = "mp3";
@@ -94,7 +95,7 @@ public class HearingRecordingTransferService : CmServiceBase, IHearingRecordingT
         if (_appSettings.Bypass == false)
         {
             extensionTo = ConvertedFileExtension;
-            ConvertFiles(recordingUnprocessed);
+            await ConvertFilesAsync(recordingUnprocessed);
         }
 
         var items = GetRecordingsList(recordingUnprocessed, extensionTo);
@@ -162,7 +163,7 @@ public class HearingRecordingTransferService : CmServiceBase, IHearingRecordingT
         return di.GetFiles($"?????????????????????.{extension}");
     }
 
-    private void ConvertFiles(string folderName)
+    private async SystemTasks.Task ConvertFilesAsync(string folderName)
     {
         var audioQuality = _appSettings.AudioQuality ?? DefaultBitRate;
         var audioSamplingRate = _appSettings.AudioSamplingRate ?? DefaultAudioSamplingRate;
@@ -171,13 +172,20 @@ public class HearingRecordingTransferService : CmServiceBase, IHearingRecordingT
         var di = new DirectoryInfo(folderName);
         var items = di.GetFiles($"?????????????????????.{OriginalFileExtension}");
 
-        var audioCodec = new AudioConversionUtils();
+        var audioCodec = new AudioConversionUtils(Logger);
         foreach (var item in items)
         {
             try
             {
                 var fileFullName = Path.ChangeExtension(item.FullName, ConvertedFileExtension);
-                audioCodec.Convert(item.FullName, fileFullName, audioQuality, audioSamplingRate, channels);
+                await audioCodec.ConvertAsync(item.FullName, fileFullName, audioQuality, audioSamplingRate, channels);
+                Thread.Sleep(1000);
+
+                var areEqualDuration = await AreEqualDuration(audioCodec, item.FullName, fileFullName);
+                if (areEqualDuration == false)
+                {
+                    Logger.Error("{Converted} and source {Original} has different duration", fileFullName, item.FullName);
+                }
 
                 var policy = Policy
                     .Handle<IOException>()
@@ -191,6 +199,15 @@ public class HearingRecordingTransferService : CmServiceBase, IHearingRecordingT
                 Logger.Error(e, "Audio encoding error");
             }
         }
+    }
+
+    private async SystemTasks.Task<bool> AreEqualDuration(AudioConversionUtils audioCodec, string original, string destination)
+    {
+        const int toleranceInSeconds = 1;
+        var durationBefore = await audioCodec.GetDuration(original);
+        var durationAfter = await audioCodec.GetDuration(destination);
+
+        return Math.Abs(durationBefore - durationAfter) <= toleranceInSeconds;
     }
 
     private DateTime? GetDateTimeFromString(string dateAsString)

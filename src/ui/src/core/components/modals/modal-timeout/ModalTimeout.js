@@ -1,6 +1,7 @@
 /**
  * @class core.components.modals.modal-timeout.ModalTimeoutView
  * @augments Marionette.View
+ * @fileoverview - Modal that acts as a logout warning timer.
  */
 
 import Marionette from 'backbone.marionette';

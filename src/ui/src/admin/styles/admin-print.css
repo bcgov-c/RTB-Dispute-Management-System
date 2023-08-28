@@ -63,7 +63,6 @@
   /* Evidence page */
   .dispute-notice-service-name > span { margin-left: 0!important; }
   .service-view .dispute-notice-service-name { min-width: 200px; width: 200px; }
-  .service-view .dispute-notice-service-details-container + div { margin-left: 200px!important; }
   .evidence-page .hearing-tools-container { border: none; }
   .evidence-page .hearing-tools-edit { display: none; }
 
@@ -104,7 +103,7 @@
   /* Notice Page */
   .hearing-tools-container { border: none; }
   .hearing-tools-edit { display: none; }
-  .service-type, .respondent-notice-delivery-method, .respondent-notice-delivery-date, .respondent-notice-received-date { margin-right: 15px; }
+  .dispute-service__type, .dispute-service__delivery-method, .dispute-service__delivery-date, .dispute-service__received-date { margin-right: 15px; }
   .notice-sub-service-print { display: inline-flex; font-size: 17px; padding-left: 10px; }
   .hearing-tools-header.service-view { padding-left: 0!important; }
 
@@ -159,6 +158,7 @@
   .calendar-grid-event { padding-left: 0; padding-right: 0;}
   .calendar-grid-event-text { text-align: center !important; }
 
+  .calendar-grid-time-item--block-offsets,
   .calendar-grid-time-item--block-start-offset,
   .calendar-grid-time-item--block-end-offset { display: none; }
 

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - A tab in the left navigation menu that provides site navigation
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';

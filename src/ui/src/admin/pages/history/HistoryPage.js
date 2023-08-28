@@ -13,6 +13,10 @@ import { showQuickAccessModalWithEditCheck, isQuickAccessEnabled } from '../../c
 import { routeParse } from '../../routers/mainview_router';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import template from './HistoryPage_template.tpl';
+import Audit_collection from '../../components/audit/Audit_collection';
+
+const AUDIT_LOAD_COUNT = 20;
+let UAT_TOGGLING = {};
 
 const loaderChannel = Radio.channel('loader');
 const configChannel = Radio.channel('config');
@@ -21,8 +25,6 @@ const statusChannel = Radio.channel('status');
 const Formatter = Radio.channel('formatter').request('get');
 const auditChannel = Radio.channel('audits');
 const disputeChannel = Radio.channel('dispute');
-
-let UAT_TOGGLING = {};
 
 export default PageView.extend({
   template,
@@ -94,25 +96,54 @@ export default PageView.extend({
 
   clickViewMore() {
     this.auditIndex++;
-    this.loadAuditLogs(this.auditLogFilterModel.getData());
+    this.loadAuditLogs();
   },
 
   initialize() {
     UAT_TOGGLING = configChannel.request('get', 'UAT_TOGGLING') || {};
     this.statusEvents = statusChannel.request('get:all');
     this.processDetails = statusChannel.request('get:processDetails');  
-    
-    this.auditsPerLoad = 20;
-    this.auditIndex = 1;
-    this.createAuditLogSubModels();
-    this.loadAuditLogs(this.auditLogFilterModel.getData());
-    this.setupListeners();
-    this.loadStatusEvents({ no_loader: true });
 
+    this.auditIndex = 0;
+    this.auditLogs = new Audit_collection();
+    this.createSubModels();
+    this.setupListeners();
+    
+    this.loadStatusEvents({ no_loader: true });
+    this.loadAuditLogs();
+    
     // Hide any loaders on init, because there is an internal page loader already
     loaderChannel.trigger('page:load:complete');
   },
 
+
+  createSubModels() {
+    this.auditLogFilterModel = new RadioModel({
+      optionData:
+        [{value: 1, text: 'All Changes'},
+        {value: 2, text: 'Additions Only'},
+        {value: 3, text: 'Modifications Only'},
+        {value: 4, text: 'Deletions Only'}],
+      value: 1,
+    });
+
+    this.includeErrorsModel = new CheckboxModel({
+      html: 'Include Errors',
+      checked: false
+    });
+  },
+
+  setupListeners() {
+    const handleAuditLogFilterChange = () => {
+      this.auditIndex = 0;
+      this.auditLogs.reset([], { silent: true });
+      this.loadAuditLogs();
+    };
+
+    this.listenTo(this.model, 'save:status', this.loadStatusEvents, this);
+    this.listenTo(this.auditLogFilterModel, 'change:value', handleAuditLogFilterChange);
+    this.listenTo(this.includeErrorsModel, 'change:checked', handleAuditLogFilterChange);
+  },
 
   loadStatusEvents(options) {
     options = options || {};
@@ -136,73 +167,42 @@ export default PageView.extend({
       });
   },
 
-  loadAuditLogs(callType, options) {
-    options = options || {};
-    if (!options.no_loader) {
-      loaderChannel.trigger('page:load');
-    }
-    const self = this;
+  loadAuditLogs(options={}) {
+    if (!options?.no_loader) loaderChannel.trigger('page:load');
+
+    const callType = this.auditLogFilterModel.getData();
+    const showErrors = this.includeErrorsModel.getData() ? 1 : 0;
     this.auditLog_loaded = false;
+
     auditChannel.request('load', this.model.get('dispute_guid'), {
-      callType: callType ? callType : null,
-      count: (self.auditsPerLoad * self.auditIndex),
-      showErrors: this.includeErrorsModel.getData() ? 1 : 0
-      }).done(function(audit_collection) {
+      callType: callType || null,
+      count: AUDIT_LOAD_COUNT,
+      index: this.auditIndex * AUDIT_LOAD_COUNT,
+      showErrors
+    }).done(auditResponse => {
+        this.auditLogs.add(auditResponse, { merge: true, silent: true });
+        this.auditLog_loaded = true;
+        this.render();
         loaderChannel.trigger('page:load:complete');
-        self.auditLogs = audit_collection;
-        self.auditLog_loaded = true;
-        self.render();
-      }).fail(err => {
-        loaderChannel.trigger('page:load:complete');
-        const handler = generalErrorFactory.createHandler('ADMIN.AUDIT.LOAD', () => {
-          self.auditLog_loaded = true;
-          self.render();
-        });
-        handler(err);
+    }).fail(err => {
+      loaderChannel.trigger('page:load:complete');
+      const handler = generalErrorFactory.createHandler('ADMIN.AUDIT.LOAD', () => {
+        this.auditLog_loaded = true;
+        this.render();
       });
-  },
-
-  createAuditLogSubModels() {
-    this.auditLogFilterModel = new RadioModel({
-      optionData:
-        [{value: 1, text: 'All Changes'},
-        {value: 2, text: 'Additions Only'},
-        {value: 3, text: 'Modifications Only'},
-        {value: 4, text: 'Deletions Only'}],
-      value: 1,
+      handler(err);
     });
-
-    this.includeErrorsModel = new CheckboxModel({
-      html: 'Include Errors',
-      checked: false
-    });
-  },
-
-  setupListeners() {
-     this.listenTo(this.auditLogFilterModel, 'change:value', this.handleAuditLogFilterChange, this);
-     this.listenTo(this.model, 'save:status', this.loadStatusEvents, this);
-     this.listenTo(this.includeErrorsModel, 'change:checked', this.handleAuditLogFilterChange, this);
-  },
-
-  handleAuditLogFilterChange(model, value) {
-    this.resetDisplayedAuditLogs();
-    this.loadAuditLogs(value);
-  },
-
-  resetDisplayedAuditLogs() {
-    this.auditIndex = 1;
   },
 
   onRender() {
-    if (!this.statusEvents_loaded || !this.auditLog_loaded) {
-      return;
-    }
+    if (!this.statusEvents_loaded || !this.auditLog_loaded) return;
+
     this.getUI('printHeader').html(PrintHeaderTemplate({
       printTitle: `File number ${this.model.get('file_number')}: History Page`
     }));
     this.showChildView('disputeFlags', new DisputeFlags());
-    this.renderAuditLog();
     this.renderProcessGroups();
+    this.renderAuditLogs();
   },
 
   renderProcessGroups() {
@@ -214,7 +214,7 @@ export default PageView.extend({
     loaderChannel.trigger('page:load:complete');
   },
 
-  renderAuditLog() {
+  renderAuditLogs() {
     this.showChildView('auditFilterRegion', new RadioView({ model: this.auditLogFilterModel }));
     this.showChildView('includeErrorRegion', new CheckboxView({ model: this.includeErrorsModel }));
     this.showChildView('auditList', new AuditList({ collection: this.auditLogs }));
@@ -226,7 +226,7 @@ export default PageView.extend({
       isLoaded: this.statusEvents_loaded && this.auditLog_loaded,
       lastRefreshTime: Moment(),
       hasAuditLogs: (this.auditLogs || []).length,
-      shouldDisplayViewMore: this.auditLogs && this.auditLogs.length >= this.auditsPerLoad * this.auditIndex,      
+      shouldDisplayViewMore: this.auditLogs && (this.auditLogs.length >= (AUDIT_LOAD_COUNT * (this.auditIndex+1))),
       enableQuickAccess: isQuickAccessEnabled(this.model),
       printAuditFilterText: this.auditLogFilterModel.getSelectedText(),
       printAuditIncludeErrorsSelected: this.includeErrorsModel.getData() 

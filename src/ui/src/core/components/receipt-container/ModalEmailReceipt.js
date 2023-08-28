@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Called from ReceiptContainer - modal that appears when clicking on email receipt button. Allows user to select an email to send receipt to, and to change saved participant email on file.
+ */
+
 import React from 'react';
 import Radio from 'backbone.radio';
 import InputView from '../../../core/components/input/Input';
@@ -23,6 +27,15 @@ const USE_EXISTING_EMAIL = 1;
 const USE_NEW_EMAIL = 2;
 const RADIO_YES_CODE = 1;
 const RADIO_NO_CODE = 0;
+
+/**
+ * 
+ * @param {String} subject - Email subject text
+ * @param {String} htmlBody - Body of email in html string 
+ * @param {DisputeEvidenceModel} emailUpdateParticipantId - The participantId for which the email will be sent/updated
+ * @param {Model} participantSaveModel - Type of model to use for saving participant: ParticipantModel|ExternalParticipantModel
+ * @param {String} messageSubType - Sub type used to keep track of where receipt originated from
+ */
 
 const ModalEmailReceipt = ModalBaseView.extend({
   id: 'emailReceipt_modal',

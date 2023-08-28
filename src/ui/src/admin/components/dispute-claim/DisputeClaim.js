@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Chris to review
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ViewMixin from '../../../core/utilities/ViewMixin';
@@ -69,7 +72,7 @@ export default Marionette.View.extend({
   showRemoveConfirmModal() {
     const modal = new ModalAmendmentConfirmView({
       title: `Remove Issue?`,
-      bodyHtml: `<p>Warning - this will remove the issue: <b>${this.model.getClaimTitleWithCode()}</b> and store the change as an amendment.  Amendments must be served to responding parties.  After removing this issue, it will be indicated as removed in the dispute view, but will no longer be visible.  Any evidence associated to this issue will still be visible in the evidence view but it will be displayed as removed.`
+      bodyHtml: `<p>Warning - this will remove the issue: <b>${this.model.getClaimTitleWithCode()}</b> and store the change as an amendment.  Amendments must be served to responding parties unless they are RTB Initiated.  After removing this issue, it will be indicated as removed in the dispute view, but will no longer be visible.  Any evidence associated to this issue will still be visible in the evidence view but it will be displayed as removed.`
         + `<p>Associated evidence: <b>${this.model.getUploadedFiles().length} files</b></p>`
         + `<p>This action cannot be undone.  Are you sure you want to remove this issue?</p>`,
     });
@@ -96,7 +99,7 @@ export default Marionette.View.extend({
     const modal = new ModalAmendmentConfirmView({
       title: `Amend Issue?`,
       bodyHtml: `<p>Warning - this will modify the issue: <b>${this.model.getClaimTitleWithCode()}</b> and store the change as an amendment.`
-        + `&nbsp;Amendments must be served to responding parties.</p>`
+        + `&nbsp;Amendments must be served to responding parties unless they are RTB Initiated.</p>`
         + `<p>Are you sure you want to amend this issue?`,
     });
 
@@ -226,15 +229,24 @@ export default Marionette.View.extend({
 
   _applyPageModelChanges(childViews) {
     const data = {};
-    _.each(childViews, function(component_name) {
-      const component = this.getChildView(component_name);
+    (childViews || []).forEach(componentName => {
+      const component = this.getChildView(componentName);
       if (component.isActive()) {
         // Save the local data into the participant model
         if (component.subView && component.getApiData) {
-          _.extend(data, component.getApiData());
+          const changeData = component.getApiData();
+          // Handle request amounts for reverse-award issue saves
+          if (this.model.isReverseAward()) {
+            (Object.keys(changeData) || []).forEach(function(key) {
+              if (_.isNumber(changeData[key])) {
+                changeData[key] = changeData[key] * -1;
+              }
+            });
+          }
+          _.extend(data, changeData);
         }
       }
-    }, this);
+    });
     this.updateLocalModel(data);
   },
 
@@ -310,7 +322,7 @@ export default Marionette.View.extend({
       inputType: 'currency',
       maxNum: configChannel.request('get', 'CLAIM_AMOUNT_MAX_NUM'),
       errorMessage: 'Please enter the amount',
-      value: amount ? amount : null,
+      value: amount ? Math.abs(amount) : null,
       required: !!this.issueConfig.useAmount,
       apiMapping: 'amount'
     });
@@ -427,7 +439,7 @@ export default Marionette.View.extend({
     this.showChildView('amountRegion', new EditableComponentView({
       state: 'view',
       label: this.amountEditModel.get('labelText'),
-      view_value: Formatter.toAmountDisplay(amount),
+      view_value: Formatter.toAmountDisplayWithNegative(amount),
       subView: new InputView({
         model: this.amountEditModel
       })

@@ -34,4 +34,8 @@ public class InternalUserRoleRequest
 
     [JsonProperty("access_sub_types")]
     public byte? AccessSubTypes { get; set; }
+
+    [StringLength(255)]
+    [JsonProperty("role_note")]
+    public string RoleNote { get; set; }
 }

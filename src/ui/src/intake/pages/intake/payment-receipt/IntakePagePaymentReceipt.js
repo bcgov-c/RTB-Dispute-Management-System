@@ -8,6 +8,7 @@ import QuestionView from '../../../../core/components/question/Question';
 import { ReceiptContainer } from '../../../../core/components/receipt-container/ReceiptContainer';
 import ParticipantModel from '../../../../core/components/participant/Participant_model';
 import IntakeReviewReceipt from '../review/IntakeReviewReceipt';
+import ApplicantRequiredService from '../../../../core/components/service/ApplicantRequiredService';
 
 import TrialLogic_BIGEvidence from '../../../../core/components/trials/BIGEvidence/TrialLogic_BIGEvidence';
 import ModalIntakeRating from '../../../../core/components/trials/BIGEvidence/ModalIntakeRating';
@@ -26,6 +27,8 @@ const Formatter = Radio.channel('formatter').request('get');
 const emailsChannel = Radio.channel('emails');
 const modalChannel = Radio.channel('modals');
 const sessionChannel = Radio.channel('session');
+const animationChannel = Radio.channel('animations');
+const claimsChannel = Radio.channel('claims');
 
 const YES_BUTTON_VALUE = 1;
 const NO_BUTTON_VALUE = 0;
@@ -44,6 +47,7 @@ const IntakePagePaymentReceiptView = PageView.extend({
     this.respondents = participantsChannel.request('get:respondents');
     this.showSubServeRouting = activePayment && activePayment.isApproved() && this.respondents.filter(p => !p.hasContactAddress() && p.get('known_contact_fields')).length;
     const dispute = disputeChannel.request('get');
+    this.isARSDispute = ApplicantRequiredService.onlineIntake_isAvailableForARS(dispute, claimsChannel.request('get'));
 
     if (TrialLogic_BIGEvidence.canViewIntakeOutcome(dispute)) {
       const modalView = new ModalIntakeRating();
@@ -75,6 +79,10 @@ const IntakePagePaymentReceiptView = PageView.extend({
     return 'page/9';
   },
 
+  scrollToSubServMessage() {
+    animationChannel.request('queue', $('.sub-service-alert'), 'scrollPageTo');
+  },
+
   onRender() {
     const dispute = disputeChannel.request('get');
     const activePayment = paymentsChannel.request('get:payment:intake');
@@ -94,7 +102,11 @@ const IntakePagePaymentReceiptView = PageView.extend({
       emailUpdateParticipantId: primaryApplicant ? primaryApplicant.id : null,
       autoSendEmail: false,
       participantSaveModel: ParticipantModel,
-      messageSubType: configChannel.request('get', activePayment.isApproved() ? 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_PAID' : 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_UNPAID')
+      submissionMessage: <>
+      <p>Print or email a copy of this submission for your records - it is proof of the information submitted to the Residential Tenancy Branch.</p>
+      </>,
+      messageSubType: configChannel.request('get', activePayment.isApproved() ? 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_PAID' : 'EMAIL_MESSAGE_SUB_TYPE_INTAKE_UNPAID'),
+      displayJunkMailMsg: true,
     }));
 
     this.showChildView('reviewPageReceipt', new IntakeReviewReceipt());
@@ -161,7 +173,7 @@ const IntakePagePaymentReceiptView = PageView.extend({
     return <div className="step payment-type-description">
       
       <div className="payment-page-title hidden-print">{PAGE_TITLE}</div>
-      <p className="payment-page-receipt-container-top-text">Your application for dispute resolution has been submitted. Please note your file number and dispute access code. </p>
+      <p className="payment-page-receipt-container-top-text">Your application for dispute resolution has been submitted. Please note your file number and dispute access code.</p>
       <div className="payment-page-receipt-container">{this.receiptPageHtml()}</div>
 
       {this.renderJsxSubServeSection()}
@@ -183,7 +195,7 @@ const IntakePagePaymentReceiptView = PageView.extend({
     if (!this.showSubServeRouting) return;
     return (
       <div className="payment-page-subservice-container">
-        <p className="payment-page-subservice-description"><span className="warning-label--with-icon">IMPORTANT:</span> You <b>must</b> be able to serve documents and evidence to each tenant in a <a className='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution'>method allowed by BC tenancy laws</a>. If you cannot serve documents in person, do not have the service address of each tenant or do not have a written agreement with the tenant to serve documents by email, you can apply for substituted service.</p>
+        <p className="payment-page-subservice-description sub-service-alert"><span className="warning-label--with-icon">IMPORTANT:</span> You <b>must</b> be able to serve documents and evidence to each tenant in a <a className='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution'>method allowed by BC tenancy laws</a>. If you cannot serve documents in person, do not have the service address of each tenant or do not have a written agreement with the tenant to serve documents by email, you can apply for substituted service.</p>
         <p className="payment-page-subservice-respondents">You have indicated that you do not have the addresses for the following respondent(s)</p>
         <ul>
         {

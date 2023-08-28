@@ -17,14 +17,14 @@
           </div>
           <div class="special-instructions"></div>
 
-          <div id="notice-preview"></div>
+          <div id="notice-preview" class="previewableContainer"></div>
           <div class="upload-button-container clearfix">
             <div class="float-right">
               <button type="button" class="btn btn-lg btn-default btn-cancel">
                 <span>Cancel</span>
               </button>
               <button type="button" class="btn btn-lg btn-default btn-primary btn-upload">
-                <span>Download</span>
+                <span>Download and Close</span>
               </button>
             </div>
           </div>

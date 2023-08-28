@@ -28,7 +28,7 @@ const FORM_EVIDENCE_DESCRIPTION = 'This is the original amendment application fo
 const LANDLORD_FORM_CODE = 74;
 const TENANT_FORM_CODE = 75;
 
-const FORM_EVIDENCE_HELP = `Upload the main application form(s) and related forms i.e. schedule of parties for additional parties, other issue form for additional issues).
+const FORM_EVIDENCE_HELP = `Upload the main application form(s) and related forms (e.g. RTB-26 Schedule of parties form, Other Issues form, or RTB-13 Application for Substituted Service form).
 <br/>DO NOT UPLOAD EVIDENCE FILES HERE - SEPARATE THEM FROM THE APPLICATION FORMS`;
 const BULK_EVIDENCE_HELP = `Upload evidence, evidence worksheets (i.e. monetary order worksheets, direct request worksheets) and tenancy agreements here.
 <br/>DO NOT UPLOAD APPLICATION FORMS HERE`;
@@ -149,17 +149,12 @@ const AmendmentPageView = PageView.extend({
   },
 
   _createAmendmentNotice() {
-    const uploadedAmendmentFiles = this.formEvidenceModel.getUploadedFiles();
-    const length = uploadedAmendmentFiles.length;
-    if (!length || length > this.NOTICE_FILES_MAX) {
-      console.log(`[Warning] ${length} amendment files were uploaded, expected between 1 and 5.`);
-    }
-
     const amendmentNoticeModel = new ExternalNoticeModel({
       notice_file_description_id: this.formEvidenceModel.get('file_description').id,
       parent_notice_id: this.dispute.get('currentNoticeId'),
       notice_delivered_to: this._getParticipantIdForUploads(),
-      notice_delivered_date: this.getFileDate()
+      notice_delivered_date: this.getFileDate(),
+      notice_type: configChannel.request('get', 'NOTICE_TYPE_UPLOADED_AMENDMENT')
     });
 
     return amendmentNoticeModel.save()
@@ -283,6 +278,7 @@ const AmendmentPageView = PageView.extend({
     });
     
     this.firstNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'First name',
       errorMessage: 'First name is required',
@@ -293,6 +289,7 @@ const AmendmentPageView = PageView.extend({
     });
 
     this.lastNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Last name',
       errorMessage: 'Last name is required',
@@ -403,7 +400,7 @@ const AmendmentPageView = PageView.extend({
       helpHtml: FORM_EVIDENCE_HELP,
       title: this.formConfig.title,
       evidence_id: this.formCode,
-      category: configChannel.request('get', 'EVIDENCE_CATEGORY_GENERAL'),
+      category: this.formConfig.category,
       mustProvideNowOrLater: true,
       required: true,
 

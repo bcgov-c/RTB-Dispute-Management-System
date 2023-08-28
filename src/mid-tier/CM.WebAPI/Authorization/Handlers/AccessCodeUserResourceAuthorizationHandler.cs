@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CM.Business.Entities.Models.OfficeUser;
+using CM.Business.Entities.Models.PollResponse;
 using CM.Business.Entities.Models.TrialDispute;
 using CM.Business.Entities.Models.TrialParticipant;
 using CM.Business.Services.CustomDataObject;
@@ -10,6 +11,7 @@ using CM.Business.Services.NoticeService;
 using CM.Business.Services.OutcomeDocRequest;
 using CM.Business.Services.Parties;
 using CM.Business.Services.Payment;
+using CM.Business.Services.Poll;
 using CM.Business.Services.RemedyServices;
 using CM.Business.Services.TrialDispute;
 using CM.Business.Services.TrialParticipant;
@@ -17,6 +19,7 @@ using CM.Common.Utilities;
 using CM.WebAPI.Controllers;
 using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MimeKit;
 
 namespace CM.WebAPI.Authorization.Handlers;
 
@@ -29,8 +32,15 @@ public class AccessCodeUserResourceAuthorizationHandler : IResourceAuthorization
         var fileService = context.GetService<IFileService>();
         var filePackageService = context.GetService<IFilePackageService>();
         var disputeService = context.GetService<IDisputeService>();
+        var partyService = context.GetService<IParticipantService>();
+        var pollResponseService = context.GetService<IPollResponseService>();
         var noticeServiceService = context.GetService<INoticeServiceService>();
         var trialDisputeDisputeGuid = Guid.Empty;
+
+        if (action == null)
+        {
+            return false;
+        }
 
         var isAuthorized = false;
         var participantDisputeGuid = await participantService.ResolveDisputeGuid(userId);
@@ -241,6 +251,7 @@ public class AccessCodeUserResourceAuthorizationHandler : IResourceAuthorization
                         }
 
                     case "PatchHearingParticipation":
+                    case "PostHearingParticipation":
                         {
                             var disputeGuid = context.GetContextId<Guid>("disputeGuid");
                             if (participantDisputeGuid == disputeGuid)
@@ -466,7 +477,22 @@ public class AccessCodeUserResourceAuthorizationHandler : IResourceAuthorization
                     }
                 }
 
+                if (action.Equals("PostVerificationMessage") || action.Equals("PostEmailVerification"))
+                {
+                    var headerGuid = context.HttpContext.Request.Headers["disputeGuid"].ToString();
+                    var disputeGuid = Guid.Empty;
+                    var isValid = Guid.TryParse(headerGuid, out disputeGuid);
+                    if (isValid)
+                    {
+                        if (participantDisputeGuid == disputeGuid)
+                        {
+                            isAuthorized = true;
+                        }
+                    }
+                }
+
                 break;
+
             case CustomDataObjectController:
                 var customObjectDisputeGuid = Guid.Empty;
 
@@ -512,6 +538,36 @@ public class AccessCodeUserResourceAuthorizationHandler : IResourceAuthorization
                     {
                         isAuthorized = true;
                     }
+                }
+
+                break;
+
+            case PollResponseController:
+                var pollResponseDisputeGuid = Guid.Empty;
+                if (action.Equals("Post"))
+                {
+                    pollResponseDisputeGuid = context.GetContextId<PollRespRequest>("request").DisputeGuid;
+                }
+                else if (action.Equals("GetDisputePollResponses"))
+                {
+                    pollResponseDisputeGuid = context.GetContextId<Guid>("disputeGuid");
+                }
+                else if (action.Equals("Patch") || action.Equals("Delete") || action.Equals("Get"))
+                {
+                    var pollResponseId = context.GetContextId<int>("pollResponseId");
+                    var pollResponse = await pollResponseService.GetNoTrackingAsync(pollResponseId);
+                    pollResponseDisputeGuid = pollResponse.DisputeGuid;
+                }
+                else if (action.Equals("GetParticipantPollResponses"))
+                {
+                    var participantId = context.GetContextId<int>("participantId");
+                    var participant = await partyService.GetByIdAsync(participantId);
+                    pollResponseDisputeGuid = participant.DisputeGuid;
+                }
+
+                if (participantDisputeGuid == pollResponseDisputeGuid)
+                {
+                    isAuthorized = true;
                 }
 
                 break;

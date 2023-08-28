@@ -23,10 +23,9 @@ export default Backbone.Model.extend({
     const thirdDropdownModel = this.get('thirdDropdown');
     const fourthDropdownModel = this.get('fourthDropdown');
 
-
     [dropdownModel, secondDropdownModel, thirdDropdownModel, fourthDropdownModel].forEach(model => {
       this.listenTo(model, 'change:value', function() {
-        this.trigger('dropdownChanged', this);
+        this.trigger('dropdownChanged', model);
       }, this);
     });
     

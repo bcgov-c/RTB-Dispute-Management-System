@@ -1,12 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace CM.Services.PostedDecision.PostedDecisionDataService.Entities;
 
 public class PostedDecisionSearchRequest
 {
-    [JsonProperty("posted_file_number")]
-    public int? FileNumber { get; set; }
+    [JsonProperty("anon_decision_id")]
+    [MaxLength(50)]
+    public string AnonDecisionId { get; set; }
 
     public DateTime? ApplicationSubmittedDateGreaterThan { get; set; }
 

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles creating, and loading of all types of system notes across admin
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';
@@ -91,7 +94,7 @@ const NotesManager = Marionette.Object.extend({
     this.allNotes = new NoteCollection();
   },
 
-  loadNotesPromise(dispute_guid, linkTo) {
+  loadNotesPromise(dispute_guid, options={}) {
     const dfd = $.Deferred();
 
     if (!dispute_guid) {
@@ -104,14 +107,18 @@ const NotesManager = Marionette.Object.extend({
     const params = $.param(_.extend({
       index: default_index,
       count: default_count
-    }, linkTo ? { note_linked_to: linkTo } : {} ));
+    }, options?.note_linked_to ? { note_linked_to: options.note_linked_to } : {} ));
 
     apiChannel.request('call', {
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_name}/${dispute_guid}?${params}`
     }).done(response => {
-      this.allNotes.reset(response);
-      dfd.resolve(this.allNotes);
+      if (options.no_cache) {
+        return dfd.resolve(new NoteCollection(response));
+      } else {
+        this.allNotes.reset(response);
+        dfd.resolve(this.allNotes);
+      }
     }).fail(dfd.reject);
     return dfd.promise();
   },

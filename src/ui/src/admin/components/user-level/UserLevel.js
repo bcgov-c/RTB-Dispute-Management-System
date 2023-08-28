@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - File containing functions for displaying user roles groupings, types, and scheduler privileges
+ */
 import Radio from 'backbone.radio';
 import React from 'react';
 import { renderToString } from 'react-dom/server';

@@ -180,6 +180,7 @@ export default Marionette.View.extend({
       missing_evidences: this.missing_evidences,
       related_other_evidences: this.related_other_evidences,
       hasUploadedEvidence: !_.isEmpty(this.provided_evidences) || this.uploadedOtherEvidenceCount,
+      isUploadingOtherEvidence: this.evidenceCollection.filter(evidence => (evidence.getReadyToUploadFiles().length && evidence.isCustom()))?.length,
       uploadedOtherEvidenceCount: this.uploadedOtherEvidenceCount,
       isUpload: this.mode === 'upload',
       isDisplayOnly: this.mode === 'displayOnly',

@@ -3,6 +3,7 @@ import CMModel from '../model/CM_model';
 
 const api_name = 'outcomedocdelivery';
 const configChannel = Radio.channel('config');
+const emailsChannel = Radio.channel('emails');
 
 export default CMModel.extend({
   idAttribute: 'outcome_doc_delivery_id',
@@ -11,7 +12,6 @@ export default CMModel.extend({
     dispute_guid: null,
     outcome_doc_file_id: null,
     participant_id: null,
-    
     delivery_method: null,
     delivery_comment: null,
     delivery_priority: null,
@@ -20,6 +20,7 @@ export default CMModel.extend({
     confirmed_received: null,
     received_date: null,
     ready_for_delivery: null,
+    associated_email_id: null,
 
     created_date: null,
     created_by: null,
@@ -41,7 +42,8 @@ export default CMModel.extend({
     'delivery_date',
     'confirmed_received',
     'received_date',
-    'ready_for_delivery'
+    'ready_for_delivery',
+    'associated_email_id',
   ],
 
   urlRoot() {
@@ -52,7 +54,16 @@ export default CMModel.extend({
     return this.get('delivery_method') === configChannel.request('get', 'SEND_METHOD_OTHER');
   },
 
+  isEmailDeliveryMethod() {
+    return this.get('delivery_method') === configChannel.request('get', 'SEND_METHOD_EMAIL');
+  },
+
   isNonParticipant() {
     return !this.get('participant_id');
   },
+
+  getEmailModel() {
+    return this.get('associated_email_id') ? emailsChannel.request('get:email:by:id', this.get('associated_email_id')) : null;
+  },
+
 });

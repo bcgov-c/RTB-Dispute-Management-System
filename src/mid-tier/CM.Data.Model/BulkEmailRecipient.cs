@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CM.Data.Model;
 
@@ -19,6 +20,8 @@ public class BulkEmailRecipient : BaseEntity
     public string RecipientEmailAddress { get; set; }
 
     public int? RecipientParticipantId { get; set; }
+
+    public Participant RecipientParticipant { get; set; }
 
     public DateTime? PreferredSendDate { get; set; }
 

@@ -27,4 +27,6 @@ public interface INoticeService : IServiceBase, IDisputeResolver
     Task<bool> NoticeExists(int noticeId);
 
     Task<bool> GetParentNotice(int parentNoticeId, Guid disputeGuid);
+
+    Task<List<ExternalNoticeResponse>> GetExternalDisputeNotices(Guid disputeGuid);
 }

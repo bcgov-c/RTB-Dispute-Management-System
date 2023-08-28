@@ -8,7 +8,7 @@ namespace CM.Business.Entities.Models.ExternalCustomDataObject;
 public class ExternalCustomObjectPatchRequest
 {
     [JsonProperty("external_user_session_expiry")]
-    public DateTime Expiry { get; set; }
+    public DateTime? Expiry { get; set; }
 
     [JsonProperty("owner_id")]
     public int? OwnerId { get; set; }

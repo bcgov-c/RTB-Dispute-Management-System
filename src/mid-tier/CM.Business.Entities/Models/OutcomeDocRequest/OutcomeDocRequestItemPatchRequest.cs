@@ -24,7 +24,7 @@ public class OutcomeDocRequestItemPatchRequest
     public string ItemDescription { get; set; }
 
     [JsonProperty("file_description_id")]
-    public int FileDescriptionId { get; set; }
+    public int? FileDescriptionId { get; set; }
 
     [JsonProperty("item_note")]
     [StringLength(500)]

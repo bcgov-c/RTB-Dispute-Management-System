@@ -90,4 +90,32 @@ public class SystemUser : BaseEntity
     public virtual ICollection<ScheduleRequest> OwnerScheduleRequests { get; set; }
 
     public virtual ICollection<ExternalCustomDataObject> ExternalCustomDataObjects { get; set; }
+
+    public virtual ICollection<DisputeFlag> DisputeFlags { get; set; }
+
+    public virtual ICollection<SubstitutedService> SubstitutedServices { get; set; }
+
+    public virtual ICollection<InternalUserRole> ManagedByInternalUserRoles { get; set; }
+
+    public virtual ICollection<Remedy> Remedies { get; set; }
+
+    public virtual ICollection<NoticeService> NoticeServices { get; set; }
+
+    public virtual ICollection<HearingParticipation> HearingParticipations { get; set; }
+
+    public virtual ICollection<HearingParticipation> PreHearingParticipations { get; set; }
+
+    public virtual ICollection<FilePackageService> FilePackageServices { get; set; }
+
+    public virtual ICollection<TrialDispute> TrialDisputes { get; set; }
+
+    public virtual ICollection<TrialParticipant> TrialParticipants { get; set; }
+
+    public virtual ICollection<ScheduleRequest> SubmitterScheduleRequests { get; set; }
+
+    public virtual ICollection<ExternalErrorLog> ExternalErrorLogs { get; set; }
+
+    public virtual ICollection<ParticipantIdentity> ParticipantIdentities { get; set; }
+
+    public virtual ICollection<DisputeVerification> DisputeVerifications { get; set; }
 }

@@ -35,7 +35,12 @@ public class NoticeServiceService : CmServiceBase, INoticeServiceService
         var result = await UnitOfWork.Complete();
         if (result.CheckSuccess())
         {
-            return MapperService.Map<Data.Model.NoticeService, NoticeServiceResponse>(noticeServiceResult);
+            var logResult = await CreateNoticeSal(ServiceChangeType.CreateRecord, noticeServiceResult);
+
+            if (logResult)
+            {
+                return MapperService.Map<Data.Model.NoticeService, NoticeServiceResponse>(noticeServiceResult);
+            }
         }
 
         return null;
@@ -43,26 +48,36 @@ public class NoticeServiceService : CmServiceBase, INoticeServiceService
 
     public async Task<bool> DeleteAsync(int noticeServiceId)
     {
-        var noticeService = await UnitOfWork.NoticeServiceRepository.GetByIdAsync(noticeServiceId);
+        var noticeService = await UnitOfWork.NoticeServiceRepository.GetNServiceWithNotice(noticeServiceId);
         if (noticeService != null)
         {
             noticeService.IsDeleted = true;
             UnitOfWork.NoticeServiceRepository.Attach(noticeService);
             var result = await UnitOfWork.Complete();
-            return result.CheckSuccess();
+
+            if (result.CheckSuccess())
+            {
+                var logResult = await CreateNoticeSal(ServiceChangeType.DeleteRecord, noticeService);
+
+                return logResult;
+            }
         }
 
         return false;
     }
 
-    public async Task<Data.Model.NoticeService> PatchAsync(Data.Model.NoticeService noticeService)
+    public async Task<Data.Model.NoticeService> PatchAsync(Data.Model.NoticeService noticeService, ServiceChangeType? serviceChangeType)
     {
         UnitOfWork.NoticeServiceRepository.Attach(noticeService);
         var result = await UnitOfWork.Complete();
 
         if (result.CheckSuccess())
         {
-            return noticeService;
+            var logResult = await CreateNoticeSal(serviceChangeType, noticeService);
+            if (logResult)
+            {
+                return noticeService;
+            }
         }
 
         return null;
@@ -86,5 +101,105 @@ public class NoticeServiceService : CmServiceBase, INoticeServiceService
         var lastModifiedDate = await UnitOfWork.NoticeServiceRepository.GetLastModifiedDate((int)noticeServiceId);
 
         return lastModifiedDate;
+    }
+
+    public ServiceChangeType? GetServiceAuditLogUseCase(Data.Model.NoticeService originalNoticeService, NoticeServicePatchRequest noticeServiceToPatch)
+    {
+        if ((originalNoticeService.IsServed == false || originalNoticeService.IsServed == null) && noticeServiceToPatch.IsServed == true)
+        {
+            return ServiceChangeType.MarkServed;
+        }
+
+        if (originalNoticeService.IsServed == true && (noticeServiceToPatch.IsServed == false || noticeServiceToPatch.IsServed == null))
+        {
+            return ServiceChangeType.MarkNotServed;
+        }
+
+        if ((originalNoticeService.ServiceMethod != noticeServiceToPatch.ServiceMethod ||
+            originalNoticeService.ServiceDate != noticeServiceToPatch.ServiceDate ||
+            originalNoticeService.ReceivedDate != noticeServiceToPatch.ReceivedDate ||
+            originalNoticeService.ServedBy != noticeServiceToPatch.ServedBy ||
+            originalNoticeService.ProofFileDescriptionId != noticeServiceToPatch.ProofFileDescriptionId) &&
+            originalNoticeService.ArchivedBy == noticeServiceToPatch.ArchivedBy &&
+            originalNoticeService.ArchiveServiceMethod == noticeServiceToPatch.ArchiveServiceMethod &&
+            originalNoticeService.ArchiveServiceDate == noticeServiceToPatch.ArchiveServiceDate &&
+            originalNoticeService.ArchiveReceivedDate == noticeServiceToPatch.ArchiveReceivedDate &&
+            originalNoticeService.ArchiveServiceDateUsed == noticeServiceToPatch.ArchiveServiceDateUsed &&
+            originalNoticeService.ArchiveServedBy == noticeServiceToPatch.ArchiveServedBy)
+        {
+            return ServiceChangeType.EditServiceInformation;
+        }
+
+        if (
+            (originalNoticeService.ValidationStatus == 0 ||
+            originalNoticeService.ValidationStatus == null ||
+            originalNoticeService.ValidationStatus == 3 ||
+            originalNoticeService.ValidationStatus == 4)
+            &&
+            (noticeServiceToPatch.ValidationStatus == 1 ||
+            noticeServiceToPatch.ValidationStatus == 2)
+            )
+        {
+            return ServiceChangeType.ConfirmRecord;
+        }
+
+        if (
+            (originalNoticeService.ValidationStatus == 0 ||
+            originalNoticeService.ValidationStatus == null ||
+            originalNoticeService.ValidationStatus == 1 ||
+            originalNoticeService.ValidationStatus == 2)
+            &&
+            (noticeServiceToPatch.ValidationStatus == 3 ||
+            noticeServiceToPatch.ValidationStatus == 4)
+            )
+        {
+            return ServiceChangeType.InvalidateRecord;
+        }
+
+        if (originalNoticeService.ArchivedBy != noticeServiceToPatch.ArchivedBy ||
+            originalNoticeService.ArchiveServiceMethod != noticeServiceToPatch.ArchiveServiceMethod ||
+            originalNoticeService.ArchiveServiceDate != noticeServiceToPatch.ArchiveServiceDate ||
+            originalNoticeService.ArchiveReceivedDate != noticeServiceToPatch.ArchiveReceivedDate ||
+            originalNoticeService.ArchiveServiceDateUsed != noticeServiceToPatch.ArchiveServiceDateUsed ||
+            originalNoticeService.ArchiveServedBy != noticeServiceToPatch.ArchiveServedBy)
+        {
+            return ServiceChangeType.ArchiveRecord;
+        }
+
+        return null;
+    }
+
+    private async Task<bool> CreateNoticeSal(ServiceChangeType? serviceChangeType, Data.Model.NoticeService noticeService)
+    {
+        if (serviceChangeType == null)
+        {
+            return true;
+        }
+
+        await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = noticeService.Notice.DisputeGuid,
+                    ServiceType = ServiceType.Notice,
+                    ServiceChangeType = serviceChangeType,
+                    ParticipantId = noticeService.ParticipantId,
+                    NoticeServiceId = noticeService.NoticeServiceId,
+                    ProofFileDescriptionId = noticeService.ProofFileDescriptionId,
+                    OtherParticipantRole = noticeService.OtherParticipantRole,
+                    IsServed = noticeService.IsServed,
+                    ServiceMethod = noticeService.ServiceMethod != null ? (ServiceMethod)noticeService.ServiceMethod : null,
+                    ReceivedDate = noticeService.ReceivedDate,
+                    ServiceDateUsed = noticeService.ServiceDateUsed,
+                    ServiceDate = noticeService.ServiceDate,
+                    ServiceBy = noticeService.ServedBy,
+                    ServiceComment = noticeService.ServiceComment,
+                    ValidationStatus = noticeService.ValidationStatus,
+                    ServiceDescription = noticeService.ServiceDescription,
+                    OtherProofFileDescriptionId = noticeService.OtherProofFileDescriptionId
+                });
+
+        var result = await UnitOfWork.Complete();
+
+        return result.CheckSuccess();
     }
 }

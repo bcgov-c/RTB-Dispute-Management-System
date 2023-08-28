@@ -15,6 +15,12 @@
       background-image: url('../../../../../static/Icon_Admin_OutcomeDoc_Working.png');
       margin-top: 40px;
     }
+
+    &--public {
+      @extend .bulk-upload-documents__header;
+      background-image: url('../../../../../static/Icon_Admin_OutcomeDoc_Public.png');
+      margin-top: 40px;
+    }
   }
 
   .dispute-outcome-doc-files-external {
@@ -27,16 +33,9 @@
     margin-bottom: 20px;
   }
 
-  &__document {
-    margin-bottom: 20px;
-
-    &__header {
-      font-weight: bold;
-      font-size: 20px;
-    }
-  }
-
   .modal .button-row { margin: 0; }
 }
+
+.bulk-upload-document-public .bulk-upload-files__document__header { display: none; }
 
 #bulkUploadDocuments_modal .modal-dialog { width: 1000px; }

@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Modal that displays information about a PFR dispute, and includes ability to download a .csv file containing the unit data.
+ */
+
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';

@@ -2,6 +2,8 @@
  * Manages the claimsChannel.  Exports a singleton instance of {@link core.components.claim.ClaimsManagerClass|ClaimsManagerClass}.
  * @namespace core.components.claim.ClaimsManager
  * @memberof core.components.claim
+ * @fileoverview - Manager that handles all claim/issues related functionality. 
+ * This includes creation, deletion, and retrieval of issues and their supporting data, as well as helper functions related retrieving issues for the loaded dispute 
  */
 
 import Marionette from 'backbone.marionette';
@@ -28,7 +30,7 @@ const ClaimsManager = Marionette.Object.extend({
    */
 
   channelName: 'claims',
-
+  //TODO: refactor all instances of issues, claims, remedies, to a single word
   radioRequests: {
     'is:directRequest': 'claimsContainDirectRequest',
 
@@ -134,11 +136,12 @@ const ClaimsManager = Marionette.Object.extend({
     return disputeClaims && disputeClaims.any(function(disputeClaim) { return disputeClaim.isDirectRequest(); });
   },
 
-  loadAllClaims(dispute_guid, claim_collection_options) {
-    claim_collection_options = claim_collection_options || {};
-    
-    const dfd = $.Deferred(),
-      self = this;
+  /**
+   * @param {*} options - Passed to the claim collection creation, also contains options for controlling loading
+   */
+  loadAllClaims(dispute_guid, options={}) {
+    const dfd = $.Deferred();
+    const self = this;
 
     if (!dispute_guid) {
       console.log("[Error] No dispute guid provided, can't get claim dispute participants");
@@ -149,20 +152,25 @@ const ClaimsManager = Marionette.Object.extend({
       type: 'GET',
       url: `${configChannel.request('get', 'API_ROOT_URL')}${api_load_name}/${dispute_guid}`
     }).done(function(response) {
-      // Set any passed-in options to the claim collections
-      self.disputeClaims = new DisputeClaimCollection(null, claim_collection_options);
-      self.removed = new DisputeClaimCollection(null, claim_collection_options);
-      self.mainGroupDisputeClaims = new DisputeClaimCollection(null, claim_collection_options);
+      const disputeClaims = new DisputeClaimCollection(null, options);
+      const removed = new DisputeClaimCollection(null, options);
+      const mainGroupDisputeClaims = new DisputeClaimCollection(null, options);
 
       _.each(response, function(data) {
         const disputeClaimModel = new DisputeClaimModel(data);
         if (disputeClaimModel.isRemoved()) {
-          self.removed.add(disputeClaimModel, {silent: true});
+          removed.add(disputeClaimModel, {silent: true});
         } else {
-          self.disputeClaims.add(disputeClaimModel, {silent: true});
+          disputeClaims.add(disputeClaimModel, {silent: true});
         }
       });
-      dfd.resolve(self.disputeClaims);
+
+      if (!options.no_cache) {
+        self.disputeClaims = disputeClaims
+        self.removed = removed;
+        self.mainGroupDisputeClaims = mainGroupDisputeClaims;
+      }
+      dfd.resolve([disputeClaims, removed]);
     }).fail(dfd.reject);
 
     return dfd.promise();

@@ -144,4 +144,13 @@ public class UsersController : BaseController
 
         return NotFound();
     }
+
+    [HttpGet("recentlogins")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.User, RoleNames.OfficePay, RoleNames.AccessCode })]
+    public async Task<IActionResult> GetRecentLogins()
+    {
+        var userId = GetLoggedInUserId();
+        var recentLogins = await _userService.GetRecentLogins(userId);
+        return Ok(recentLogins);
+    }
 }

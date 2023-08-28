@@ -8,7 +8,6 @@ using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -96,10 +95,12 @@ public class PartiesController : BaseController
                     return BadRequest(ModelState);
                 }
 
+                var abbrUpdate = _participantService.NeedAbbrUpdate(participantToPatch, originalParty);
+
                 await DisputeResolveAndSetContext(_participantService, participantId);
                 _mapper.Map(participantToPatch, originalParty);
                 originalParty.ParticipantId = participantId;
-                var result = await _participantService.PatchAsync(originalParty, patchType);
+                var result = await _participantService.PatchAsync(originalParty, patchType, abbrUpdate);
                 EntityIdSetContext(participantId);
                 return Ok(_mapper.Map<Participant, ParticipantResponse>(result));
             }

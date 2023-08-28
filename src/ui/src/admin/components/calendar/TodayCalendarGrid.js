@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays hearings occuring today. Used on Personal and My Schedule view
+ */
 import BaseCalendarGridView from './BaseCalendarGrid';
 import CalendarGridEventView from './CalendarGridEvent';
 import template from './TodayCalendarGrid_template.tpl';

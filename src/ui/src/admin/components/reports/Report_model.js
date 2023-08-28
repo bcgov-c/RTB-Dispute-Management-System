@@ -1,10 +1,8 @@
 import Radio from 'backbone.radio';
 import CMModel from '../../../core/components/model/CM_model';
-
-const api_name = 'adhocdlreport';
+import ReportContent_model from './ReportContent_model';
 
 const configChannel = Radio.channel('config');
-const sessionChannel = Radio.channel('session');
 
 export default CMModel.extend({
   idAttribute: 'adhoc_dl_report_id',
@@ -12,6 +10,7 @@ export default CMModel.extend({
   defaults: {
     adhoc_dl_report_id: null,
     title: null,
+    parameter_config: null,
     description: null,
     html_data_dictionary: null,
     type: null,
@@ -19,43 +18,58 @@ export default CMModel.extend({
     query_for_name: null,
     query_for_report: null,
     is_active: null,
-    created_date: null
+    created_date: null,
+    user_group: null,
+    excel_template_exists: false,
+    excel_template_id: false,
+
+    // Parsed json data from parameter_config
+    jsonData: null,
   },
 
   API_SAVE_ATTRS: [],
+
+  initialize() {
+    CMModel.prototype.initialize.call(this, ...arguments);
+    
+    this.parseJsonParamConfig();
+    this.on('change:parameter_config', () => {
+      this.parseJsonParamConfig();
+    });
+  },
+
+  parseJsonParamConfig(parameterConfig) {
+    if (parameterConfig || this.get('parameter_config')) {
+      try {
+        this.set('jsonData', JSON.parse(parameterConfig || this.get('parameter_config')));
+      } catch (e) {
+        this.set('jsonData', null);
+      }
+    }
+  },
+
+  getResponseConfig() {
+    return this.get('jsonData')?.responseConfig || {};
+  },
 
   sync() {
     console.log(`[Warning] No REST apis defined for Report object, and should not be called`);
   },
 
-  // Uses Blob, and HTML5 download in order to start a file download in the user's browser
-  downloadHTML5() {
-    const xhr = new XMLHttpRequest();
-    const downloadUrl = `${configChannel.request('get', 'API_ROOT_URL')}${api_name}/${this.id}`;
-    const downloadFilename = `${this.get('title')}_${Moment().format('YYYY_MMMDD')}_${sessionChannel.request('get:user').get('user_name')}.csv`;
-
-    const xhrOnLoadFn = () => {
-      const blob = new Blob([xhr.response], { type: xhr.getResponseHeader('Content-Type') });
-      const dataUrl = (window.URL || window.webkitURL).createObjectURL(blob);
-      
-      $('<a />', {
-         'href': dataUrl,
-         'download': downloadFilename,
-         'text': "click"
-       }).hide().appendTo("body")[0].click();
-    };
-
-    xhr.responseType = 'arraybuffer';
-    xhr.onload = xhrOnLoadFn;
-    xhr.onerror = function(error_response) {
-      console.log(`[Error] Download failed`, error_response);
-    };
-
-    xhr.open('GET', downloadUrl);
-    xhr.setRequestHeader('Token', sessionChannel.request('token'));
-    xhr.send();
+  async load(parameters=[]) {
+    const reportContent = new ReportContent_model({ reportModel: this, parameters });
+    return reportContent.load();
   },
 
+  download(downloadParams=[]) {
+    const reportContent = new ReportContent_model({ reportModel: this, parameters: downloadParams });
+    return reportContent.download();
+  },
+
+  isExcelReport() {
+    return !!this.get('excel_template_exists') && !!this.get('excel_template_id');
+  },
+  
   _isTypeEqualTo(configCode) {
     return this.get('type') === configChannel.request('get', configCode) && this.get('type');
   },
@@ -70,5 +84,6 @@ export default CMModel.extend({
 
   isTypeOther() {
     return this._isTypeEqualTo('REPORT_TYPE_OTHER');
-  }
+  },
+
 });

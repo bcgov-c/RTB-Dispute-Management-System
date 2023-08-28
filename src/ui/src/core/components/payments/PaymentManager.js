@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles all forms of payments and payment configs
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UtilityMixin from '../../../core/utilities/UtilityMixin';
@@ -275,8 +278,8 @@ const PaymentManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
-  createOfficePaymentTransaction() {
-    return this._createIntakePaymentTransaction({ transaction_method: configChannel.request('get', 'PAYMENT_METHOD_OFFICE') });
+  createOfficePaymentTransaction(paymentData={}) {
+    return this._createIntakePaymentTransaction(Object.assign({}, paymentData, { transaction_method: configChannel.request('get', 'PAYMENT_METHOD_OFFICE') }));
   },
 
   createFeeWaiverPaymentTransaction() {

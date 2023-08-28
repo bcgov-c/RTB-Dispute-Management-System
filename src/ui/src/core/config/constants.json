@@ -2,6 +2,7 @@
   "CLAIM_TOTAL_LIMIT": 35000,
   "CLAIM_AMOUNT_MAX_NUM": 1000000,
   "CLAIM_DESCRIPTION_MAX": 500,
+  "USER_ROLE_NOTE_MAX": 255,
   "EVIDENCE_DESCRIPTION_MAX": 200,
   "ADDRESS_FIELD_MIN": 6,
   "ADDRESS_FIELD_MAX": 48,
@@ -24,8 +25,8 @@
   "FEE_DESCRIPTION_MAX_LENGTH": 255,
   "AWARD_DETAILS_MAX_LENGTH": 250,
   "OUTCOME_DOC_FILE_COMMENT_MAX_LENGTH": 495,
-  "SERVICE_COMMENT_MIN_LENGTH": 10,
-  "SERVICE_COMMENT_MAX_LENGTH": 255,
+  "SERVICE_COMMENT_MIN_LENGTH": 25,
+  "SERVICE_COMMENT_MAX_LENGTH": 400,
   "OUTCOME_DOC_FILE_TITLE_MAX_LENGTH": 45,
   "OUTCOME_DOC_FILE_ACRONYM_MAX_LENGTH": 5,
   "OUTCOME_DOC_DELIVERY_COMMENT_MAX_LENGTH": 495,
@@ -35,7 +36,9 @@
   "SERVICE_FILES_MAX": 5,
   "NOTICE_FILES_MAX": 5,
   "BUSINESS_NAME_MAX_NUM_WORDS": 9,
+  "HEARING_PARTICIPANT_MAX_NUM_WORDS": 5,
   "IMPORT_NOTE_MAX_LENGTH": 255,
+  "HEARING_DEFAULT_REGION": "-",
   "HEARING_MIN_BOOKING_TIME": "8:00AM",
   "HEARING_MAX_BOOKING_TIME": "5:00PM",
   "HEARING_DEFAULT_START_TIME": "8:30AM",
@@ -55,6 +58,8 @@
   "OFFICE_PAYOR_NAME_MIN_LENGTH": 3,
   "OFFICE_PAYOR_NAME_MAX_LENGTH": 200,
   "FEE_WAIVER_MAX_FAMILY_MEMBERS": 7,
+  "INTAKE_DESCRIPTION_FIELD_MIN_LENGTH": 20,
+  "IVD_RECEIPT_LOAD_COUNT": 20,
   "OFFICE_BULK_EVIDENCE_DESCRIPTION": "This is the evidence provided with the original application at the office.",
   "OFFICE_FORM_EVIDENCE_DESCRIPTION": "This is the original application and additional forms provided at the office.",
   "RTB_STAFF_CODE_DISPLAY": "RTB Staff",
@@ -66,6 +71,11 @@
   "DEFICIENT_REASON_MIN_LENGTH": 10,
   "DEFICIENT_REASON_MAX_LENGTH": 250,
   "SEARCH_CROSS_APP_ACTIVE_HEARING_DAY_OFFSET": 23,
+  "IVD_HIDDEN_CLOSE_DAYS": 180,
+  
+  "GRAPH_TYPE_BAR": "bar",
+  "GRAPH_TYPE_LINE": "line",
+  "GRAPH_TYPE_TABLE": "table",
 
   "TENANCY_START_YEAR_MIN": 1950,
   "DATE_MIN_YEAR_OFFSET": 10,
@@ -151,8 +161,8 @@
   },
 
   "DISPUTE_CREATION_METHOD_DISPLAY": {
-    "1": "Online Standard App",
-    "2": "Paper Standard App",
+    "1": "Online App",
+    "2": "Paper App",
     "99": "Migrated Legacy File",
     "4": "Online Rent Increase",
     "5": "Paper Rent Increase",
@@ -281,16 +291,16 @@
   
 
   "NOTE_LINK_DISPLAY": {
-    "0": "Dispute",
+    "0": "General",
     "1": "Participant",
-    "2": "Claim / Issue",
+    "2": "Issue",
     "3": "File",
     "4": "Notice",
     "5": "Hearing",
-    "6": "General Evidence",
-    "7": "Dispute Information",
-    "8": "Evidence File",
-    "9": "Evidence File",
+    "6": "Evidence",
+    "7": "Dispute",
+    "8": "File",
+    "9": "File",
     "99": "Legacy Amendment"
   },
 
@@ -412,6 +422,25 @@
     "23": "Put on hold"
   },
 
+  "SERVICE_AUDIT_TYPE_DISPLAY": {
+    "1": "Create Record",
+    "2": "Delete Record",
+    "3": "Mark Served",
+    "4": "Mark Not Served",
+    "5": "Edit Service Info",
+    "6": "Confirm Record",
+    "7": "Refute Record",
+    "8": "Archive Record"
+  },
+
+  "SERVICE_AUDIT_VALIDATION_STATUS_DISPLAY": {
+    "0": "Not validated",
+    "1": "Confirmed externally",
+    "2": "Confirmed internally",
+    "3": "Refuted externally",
+    "4": "Refuted internally"
+  },
+
   "HEARING_PRIORITY_DISPLAY": {
     "1": "Emergency",
     "2": "Standard",
@@ -428,6 +457,17 @@
     "FAX": 6,
     "OTHER": 7,
     "EMAIL": 8
+  },
+
+  "SERVICE_METHOD_DISPLAYS": {
+    "1": "by attaching to the door",
+    "2": "in mail slot or box",
+    "3": "by registered mail",
+    "4": "by regular mail",
+    "5": "in person",
+    "6": "by fax",
+    "7": "by another method",
+    "8": "by email"
   },
 
   "SERVICE_METHOD_TYPE_CODES": [
@@ -473,7 +513,7 @@
   },
 
   "NOTICE_METHOD_TYPES_DISPLAY": {
-    "1": "Posted on the door",
+    "1": "Attached to the door",
     "2": "Left in mail slot or box",
     "3": "Sent by registered mail",
     "4": "Sent by regular mail",
@@ -484,10 +524,10 @@
   },
 
   "REMEDY_STATUS_REASONS_DISPLAY": {
-    "1": "The arbitrator permitted the issue to be removed through amendment at the applicant's request",
+    "1": "The arbitrator permitted the issue to be withdrawn through amendment at the applicant's request",
     "2": "This issue was determined as not related to the main issue in the dispute and was severed as per Rules of Procedure",
-    "3": "The arbitrator permitted the issue to be removed through amendment at the respondent's request",
-    "4": "The arbitrator removed this issue through amendment"
+    "3": "The arbitrator permitted the issue to be withdrawn through amendment at the respondent's request",
+    "4": "The arbitrator withdrew this issue through amendment of the application"
   },
 
 
@@ -558,6 +598,12 @@
     "5": "Paid but cancelled"
   },
 
+  "USER_ROLE_SUB_TYPE_DISPLAY": {
+    "1": "CEU",
+    "2": "Reports",
+    "3": "CEU and Reports"
+  },
+
   "USER_ROLE_TYPE_DISPLAY": {
     "11": "Standard",
     "12": "Senior",
@@ -567,13 +613,13 @@
     "23": "Team Lead",
     "24": "Adjudicator",
     "25": "Level 3",
-    "41": "Admin"
+    "41": "Office Admin"
   },
 
   "USER_ROLE_GROUP_MAPPINGS": {
     "1" : "Information Officer",
     "2" : "Arbitrator",
-    "4" : "Admin",
+    "4" : "Office Admin",
     "5" : "Management",
     "9" : "Other"
   },
@@ -630,15 +676,14 @@
     "SECONDARY_DIAL_IN_TITLE": "(Elsewhere in BC - Toll Free)"
   },
 
+  "NOTICE_GENERATION_UNIT_COUNT": 20,
   "EXPENSE_WARNING_MONTHS_OFFSET": 18,
-
   "APPLICANT_EVIDENCE_WARNING_DAY_OFFSET": 14,
   "RESPONDENT_EVIDENCE_WARNING_DAY_OFFSET": 7,
-
+  "RESPONDENT_EVIDENCE_URGENT_WARNING_DAY_OFFSET": 2,
   "MAX_NON_VIDEO_FILESIZE_BYTES": 10000000,
   "MAX_VIDEO_FILESIZE_BYTES": 200000000,
-
-  "EMAIL_ATTACHMENT_MAX_FILESIZE_BYTES": 10000000,
+  "INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES": 20000000,
 
   "PDF_FILE_TYPES": {
     "DISPUTE_NOTICE": 1,
@@ -729,6 +774,23 @@
     "TenantSeekingOther": "QT06",
     "TenantFilingLate": "QT08"
   },
+
+  "PROVINCE_CODE_MAPPINGS": {
+    "AB": "Alberta",
+    "BC": "British Columbia",
+    "MB": "Manitoba",
+    "NB": "New Brunswick",
+    "NL": "Newfoundland and Labrador",
+    "NT": "Northwest Territories",
+    "NS": "Nova Scotia",
+    "NU": "Nunavut",
+    "ON": "Ontario",
+    "PE": "Prince Edward Island",
+    "QC": "Quebec",
+    "SK": "Saskatchewan",
+    "YT": "Yukon"
+  },
+
   "PROVINCES": [
     "Alberta",
     "British Columbia",
@@ -744,6 +806,7 @@
     "Saskatchewan",
     "Yukon"
   ],
+
   "PARTY_TYPES": {
     "applicant": 0,
     "respondent": 1,
@@ -782,42 +845,43 @@
     "5": "System Administrators and Support"
   },
 
+
   "LICO_TABLE": {
     "0": {
-      "1": 1756,
-      "2": 2186,
-      "3": 2688,
-      "4": 3263,
-      "5": 3701,
-      "6": 4174,
-      "7": 4648
+      "1": 1526,
+      "2": 1857,
+      "3": 2314,
+      "4": 2885,
+      "5": 3287,
+      "6": 3644,
+      "7": 4003
     },
     "1": {
-      "1": 1998,
-      "2": 2487,
-      "3": 3058,
-      "4": 3713,
-      "5": 4211,
-      "6": 4749,
-      "7": 5287
+      "1": 1747,
+      "2": 2126,
+      "3": 2647,
+      "4": 3303,
+      "5": 3761,
+      "6": 4171,
+      "7": 4580
     },
     "2": {
-      "1": 2197,
-      "2": 2735,
-      "3": 3363,
-      "4": 4083,
-      "5": 4630,
-      "6": 5222,
-      "7": 5814
+      "1": 1973,
+      "2": 2401,
+      "3": 2990,
+      "4": 3731,
+      "5": 4248,
+      "6": 4712,
+      "7": 5175
     },
     "3": {
-      "1": 2551,
-      "2": 3176,
-      "3": 3905,
-      "4": 4741,
-      "5": 5377,
-      "6": 6064,
-      "7": 6575
+      "1": 2333,
+      "2": 2839,
+      "3": 3536,
+      "4": 4411,
+      "5": 5023,
+      "6": 5571,
+      "7": 6119
     }
   },
   "victoria_poly_fill":[

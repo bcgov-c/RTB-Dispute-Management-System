@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays hearing information for dispute.
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import PageView from '../../../core/components/page/Page';
@@ -14,6 +17,9 @@ import { showQuickAccessModalWithEditCheck, isQuickAccessEnabled } from '../../c
 import { routeParse } from '../../routers/mainview_router';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import template from './HearingPage_template.tpl';
+import ModalAddHearingNotice from './ModalAddHearingNotice';
+import ModalSelectHearingNotice from './ModalSelectHearingNotice';
+import { HEARING_NOTICE_GENERATE_TYPES } from '../../../core/components/hearing/Hearing_model';
 
 const participantsChannel = Radio.channel('participants');
 const hearingChannel = Radio.channel('hearings');
@@ -25,6 +31,7 @@ const configChannel = Radio.channel('config');
 const Formatter = Radio.channel('formatter').request('get');
 const disputeChannel = Radio.channel('dispute');
 const filesChannel = Radio.channel('files');
+const noticeChannel = Radio.channel('notice');
 
 let UAT_TOGGLING = {};
 
@@ -41,6 +48,7 @@ export default PageView.extend({
     close: '.header-close-icon',
     hearings: '#hearings-list',
     addHearing: '.add-hearing-btn-container',
+    generateHearing: '.generate-hearing-btn-container',
     goToNotice: '.goto-notice-btn-container',
     goToScheduleHistory: '.goto-schedule-history-btn-container',
     printHeader: '.print-header'
@@ -59,6 +67,7 @@ export default PageView.extend({
     'click @ui.print': 'clickPrint',
     'click @ui.refresh': 'clickRefresh',
     'click @ui.addHearing': 'clickAddHearing',
+    'click @ui.generateHearing': 'clickGenerateHearing',
     'click @ui.goToNotice': 'clickGoToNotice',
     'click @ui.goToScheduleHistory': 'clickGoToScheduleHistoryDispute',
     'click @ui.close': 'clickClose'
@@ -120,6 +129,38 @@ export default PageView.extend({
     modalChannel.request('add', modalAddHearing, { duration: 350, duration2: 300 });
   },
 
+  clickGenerateHearing() {
+    const active_hearing = hearingChannel.request('get:active');
+    if (!active_hearing) {
+      return alert("No future hearing");
+    }
+    let generationType;
+    const openModalHearingNotice = (generationType) => {
+      const modalGenerateHearing = new ModalAddHearingNotice({ model: this.model, generationType });
+      this.stopListening(this.model, 'hearings:refresh');
+      this.listenTo(this.model, 'hearings:refresh', () => {
+        modalChannel.request('remove', modalGenerateHearing);
+        this.clearEditModeAndRefresh();
+      });
+      modalChannel.request('add', modalGenerateHearing, { duration: 350, duration2: 300 });
+    };
+    
+    if (this.model.checkStageStatus(6, 63)) {
+      if (this.model.isCreatedIntake() || this.model.isCreatedExternal()) {
+        generationType = HEARING_NOTICE_GENERATE_TYPES.ADJOURNED;
+      } else if (this.model.isCreatedRentIncrease() || this.model.isCreatedPfr()) {
+        const eventDispatcher = new Backbone.Model();
+        modalChannel.request('add', new ModalSelectHearingNotice({ parentModel: eventDispatcher }));
+        this.listenTo(eventDispatcher, 'click:continue', (_generationType) => openModalHearingNotice(_generationType));
+      }
+    } else if (this.model.isCreatedIntake() || this.model.isCreatedExternal() || this.model.isCreatedRentIncrease() || this.model.isCreatedPfr()) {
+      generationType = HEARING_NOTICE_GENERATE_TYPES.RESCHEDULED;
+    }
+
+    if (!generationType) return;
+    openModalHearingNotice(generationType);
+  },
+
   clickClose() {
     menuChannel.trigger('close:active');
     Backbone.history.navigate(routeParse('overview_item', this.model.get('dispute_guid')), {trigger: true});
@@ -164,7 +205,7 @@ export default PageView.extend({
     this.setHearingRecordings();
 
     this.hearingToolsModel = new CheckboxModel({
-      html: 'Show hearing tools',
+      html: 'Hearing tools',
       disabled: false,
       checked: this.model.get('sessionSettings')?.hearingToolsEnabled && !this.model.isMigrated()
     });
@@ -198,16 +239,23 @@ export default PageView.extend({
     this.model.stopEditInProgress();
 
     this.hearings_loaded = false;
-    hearingChannel.request('load:conferencebridges')
-      .done(() => {
-        this.hearings_loaded = true;
-        this.clearListeners();
-        this.hearings = hearingChannel.request('get');
-        this.setupListeners();
-        this.render();
-      })
-      .fail(generalErrorFactory.createHandler('DISPUTE.LOAD.CORE', () => this.render()))
-      .always(() => loaderChannel.trigger('page:load:complete'));
+    const onHoldSearchParams = { FilterDisputeGuid: this.model.id };
+    Promise.all([
+      hearingChannel.request('load:onholdhearings', onHoldSearchParams).then(res => {
+        this.onHoldHearings = res;
+      }),
+      hearingChannel.request('load:conferencebridges')
+        .done(() => {
+          this.hearings_loaded = true;
+          this.clearListeners();
+          this.hearings = hearingChannel.request('get');
+          this.setupListeners();
+        })
+        .fail(generalErrorFactory.createHandler('DISPUTE.LOAD.CORE', () => this.render()))
+    ]).finally(() => {
+      loaderChannel.trigger('page:load:complete');
+      this.render();
+    })
   },
 
   clearEditModeAndRefresh() {
@@ -252,7 +300,7 @@ export default PageView.extend({
 
     this.showChildView('disputeFlags', new DisputeFlags());
     this.showChildView('showHearingToolsRegion', new CheckboxView({ model: this.hearingToolsModel }));
-    this.showChildView('hearingsRegion', new HearingCollectionView({ collection: this.hearings, unitCollection: this.unitCollection, hearingRecordings: this.linkedRecordings }));
+    this.showChildView('hearingsRegion', new HearingCollectionView({ collection: this.hearings, unitCollection: this.unitCollection, hearingRecordings: this.linkedRecordings, onHoldHearings: this.onHoldHearings }));
     if (this.unlinkedRecordings.length) this.showChildView('unlinkedRecordingsRegion', new FileBlockDisplay({ collection: this.unlinkedRecordings }));
 
     if (this.model.get('sessionSettings')?.hearingToolsEnabled) {
@@ -267,6 +315,9 @@ export default PageView.extend({
       Formatter,
       isLoaded: this.hearings_loaded,
       showHearingTools: UAT_TOGGLING.SHOW_ARB_TOOLS && !dispute.isMigrated(),
+      showNoticeGeneration: hearingChannel.request('get:active')?.checkIsDisputePrimaryLink(dispute) &&
+        (dispute.isCreatedIntake() || dispute.isCreatedExternal() || dispute.isCreatedRentIncrease() || dispute.isCreatedPfr()) &&
+        (noticeChannel.request('get:all')?.length),
       isSchedulerUser: sessionChannel.request('is:scheduler'),
       lastRefreshTime: Moment(),
       enableQuickAccess: isQuickAccessEnabled(this.model),

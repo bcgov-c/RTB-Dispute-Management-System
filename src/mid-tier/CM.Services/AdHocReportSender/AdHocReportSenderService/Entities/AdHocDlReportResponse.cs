@@ -1,10 +1,9 @@
-using System;
-using CM.Services.AdHocReportSender.AdHocReportSenderService.Models;
+using CM.Common.Utilities;
 using Newtonsoft.Json;
 
 namespace CM.Services.AdHocReportSender.AdHocReportSenderService.Entities;
 
-public class AdHocDlReportResponse
+public class AdHocDlReportResponse : CommonResponse
 {
     [JsonProperty("adhoc_dl_report_id")]
     public long AdHocDlReportId { get; set; }
@@ -27,15 +26,23 @@ public class AdHocDlReportResponse
     [JsonProperty("user_group")]
     public byte? ReportUserGroup { get; set; }
 
-    [JsonProperty("query_for_name")]
-    public string QueryForName { get; set; }
-
-    [JsonProperty("query_for_report")]
-    public string QueryForReport { get; set; }
-
     [JsonProperty("is_active")]
     public bool IsActive { get; set; }
 
-    [JsonProperty("created_date")]
-    public DateTime CreatedDate { get; set; }
+    public TargetDatabase TargetDatabase { get; set; }
+
+    [JsonIgnore]
+    public string QueryForName { get; set; }
+
+    [JsonIgnore]
+    public string QueryForReport { get; set; }
+
+    [JsonProperty("excel_template_exists")]
+    public bool? ExcelTemplateExists { get; set; }
+
+    [JsonProperty("excel_template_id")]
+    public int? ExcelTemplateId { get; set; }
+
+    [JsonProperty("parameter_config")]
+    public string ParameterConfig { get; set; }
 }

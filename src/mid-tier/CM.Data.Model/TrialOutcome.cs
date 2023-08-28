@@ -17,9 +17,15 @@ public class TrialOutcome : BaseEntity
 
     public Guid? TrialParticipantGuid { get; set; }
 
+    public TrialParticipant TrialParticipant { get; set; }
+
     public Guid? TrialDisputeGuid { get; set; }
 
+    public TrialDispute TrialDispute { get; set; }
+
     public Guid? TrialInterventionGuid { get; set; }
+
+    public TrialIntervention TrialIntervention { get; set; }
 
     public byte OutcomeType { get; set; }
 

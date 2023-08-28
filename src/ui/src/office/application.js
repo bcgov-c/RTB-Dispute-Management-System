@@ -96,6 +96,7 @@ import { loadAndCheckMaintenance } from '../core/components/maintenance/Maintena
 import { ApplicationBaseModelMixin } from '../core/components/app/ApplicationBase';
 import OfficePickupReceiptPage from './pages/pickup/OfficePickupReceiptPage';
 import { generalErrorFactory } from '../core/components/api/ApiLayer';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 // Add site name
 var g = window || global;
@@ -304,6 +305,26 @@ const AppModel = Backbone.Model.extend({
     const geozoneChannel = Radio.channel('geozone');
     const dfd = $.Deferred();
 
+    // Setup login and logout listeners - they will be triggered when `mixin_checkSiteVersionAndLogin` runs
+    this.listenTo(sessionChannel, 'login:complete', (options={}) => {
+      sessionChannel.request('clear:timers');
+      sessionChannel.request('create:timers', options);
+      const currentUser = sessionChannel.request('get:user');
+      if (!currentUser.isOfficeUser() && !currentUser.isSystemUser()) {
+        console.log(`[Warning] Login success, but user is not an Office user or Staff user. Logging out.`);
+        Backbone.history.navigate('logout', { trigger: true });
+        return;
+      } else {
+        Backbone.history.navigate('main', { trigger: true });
+      }
+    });
+    this.listenTo(sessionChannel, 'logout:complete', () => {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('_dmsDaAuthToken');
+      applicationChannel.request('clear');
+      sessionChannel.request('clear:timers');
+    });
+
     $.when(
       this.loadConfigs()
         .then(geozoneChannel.request.bind(geozoneChannel, 'load'), () => sessionChannel.trigger('redirect:config:error'))
@@ -356,6 +377,7 @@ const AppModel = Backbone.Model.extend({
     
     // Also store some disputeaccess specific info here
     filtered_keys.accessCode = access_code;
+    filtered_keys._routingAccessCode = access_code;
     filtered_keys.tokenParticipantId = dispute_data.token_participant_id;
     filtered_keys.hearingStartDate = dispute_data.hearing_start_datetime;
     filtered_keys.currentNoticeId = dispute_data.current_notice_id;
@@ -412,10 +434,11 @@ const App = Marionette.Application.extend({
     this.model.set('topSearchModel', new OfficeTopSearchModel({ appModel: this.model }));
   },
 
-  initializeCustomAnimations() {
+  initializeEventsAndAnimations() {
     $.initializeCustomAnimations({
       scrollableContainerSelector: '.page-view'
     });
+    $.initializeDatepickerScroll();
   },
 
   initializeSiteDependentData() {
@@ -423,11 +446,19 @@ const App = Marionette.Application.extend({
   },
 
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
-    this.initializeCustomAnimations();
+    this.initializeEventsAndAnimations();
     this.initializeViews();
     this.initializeRoutersAndRouteListeners();
     this.model.mixin_checkClientTimeSyncAndLogout();
+    AnalyticsUtil.initializeAnalyticsTracking();
+  },
+
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_OFFICE')
+    });
   },
 
   clearReceiptData() {
@@ -445,7 +476,7 @@ const App = Marionette.Application.extend({
     new AppRouter({ controller: this });
   },
 
-  onLoginComplete() {
+  showDefaultView() {
     const currentUser = sessionChannel.request('get:user');
     
     if (!currentUser.isOfficeUser() && !currentUser.isSystemUser()) {
@@ -454,23 +485,11 @@ const App = Marionette.Application.extend({
       return;
     }
 
-    sessionChannel.request('clear:timers');
-    sessionChannel.request('create:timers');
-
     Backbone.history.navigate('main', { trigger: true });
   },
 
   initializeRoutersAndRouteListeners() {
     this.initializeAppRouter();
-
-    this.listenTo(sessionChannel, 'login:complete', this.onLoginComplete, this);
-
-    this.listenTo(sessionChannel, 'logout:complete', function() {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('_dmsDaAuthToken');
-      applicationChannel.request('clear');
-      sessionChannel.request('clear:timers');
-    });
 
     Backbone.history.start();
   },

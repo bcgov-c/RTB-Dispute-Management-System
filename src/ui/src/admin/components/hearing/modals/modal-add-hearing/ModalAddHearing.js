@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal for selecting a hearing to add to a dispute. Has functionality for filtering by urgency, arb level, and date
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import DropdownView from '../../../../../core/components/dropdown/Dropdown';
@@ -100,6 +103,9 @@ export default ModalBaseView.extend({
     return is_valid;
   },
 
+  /**
+   * @param {DisputeModel} model
+   */
   initialize() {
     this.hearingResultsCollection = null;
     this.forceHideLoadMore = false;

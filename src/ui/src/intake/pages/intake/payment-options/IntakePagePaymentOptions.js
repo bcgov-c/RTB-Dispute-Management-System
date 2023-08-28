@@ -286,7 +286,7 @@ export default PageView.extend({
   },
 
   getPageApiUpdatesNoStatus() {
-    const createPaymentFn = (request_str) => _.bind(paymentsChannel.request, paymentsChannel, request_str),
+    const createPaymentFn = (request_str, options) => _.bind(paymentsChannel.request, paymentsChannel, request_str, options),
       payment_method_value = this.getPageItem('paymentMethod').getModel().getData(),
       activePayment = paymentsChannel.request('get:payment:intake'),
       last_transaction_method = activePayment ? activePayment.get('transaction_method') : null,
@@ -295,7 +295,7 @@ export default PageView.extend({
     if (payment_method_value === configChannel.request('get', 'PAYMENT_METHOD_ONLINE')) {
       all_xhr.push(createPaymentFn('create:payment:online:intake'));
     } else if (payment_method_value !== last_transaction_method && payment_method_value === configChannel.request('get', 'PAYMENT_METHOD_OFFICE')) {
-      all_xhr.push(createPaymentFn('create:payment:office:intake'));
+      all_xhr.push(createPaymentFn('create:payment:office:intake', { transaction_amount: paymentsChannel.request('get:fee:intake')?.get('amount_due') }));
     } else if (payment_method_value !== last_transaction_method && payment_method_value === configChannel.request('get', 'PAYMENT_METHOD_FEE_WAIVER')) {
       all_xhr.push(createPaymentFn('create:payment:feeWaiver:intake'));
     }

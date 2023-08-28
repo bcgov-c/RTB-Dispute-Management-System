@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CM.Data.Model;
 
@@ -133,11 +134,24 @@ public class Participant : BaseEntity
 
     public int? DecisionDeliveryMethod { get; set; }
 
-    public bool AddressIsValidated { get; set; }
+    public bool? AddressIsValidated { get; set; }
 
     public byte? KnownContactFields { get; set; }
 
     public byte? ReceivesTextMessages { get; set; }
+
+    public bool? MailAddressIsValidated { get; set; }
+
+    public bool? IsParty { get; set; }
+
+    [StringLength(20)]
+    public string EmailVerifyCode { get; set; }
+
+    [StringLength(20)]
+    public string PrimaryPhoneVerifyCode { get; set; }
+
+    [StringLength(20)]
+    public string SecondaryPhoneVerifyCode { get; set; }
 
     public virtual ICollection<ClaimGroupParticipant> ClaimGroupParticipants { get; set; }
 
@@ -176,4 +190,48 @@ public class Participant : BaseEntity
     public virtual ICollection<FilePackageService> ServedFilePackageServices { get; set; }
 
     public virtual ICollection<OutcomeDocRequest> OutcomeDocRequests { get; set; }
+
+    public virtual ICollection<Dispute> Disputes { get; set; }
+
+    public virtual ICollection<Dispute> SubPartDisputes { get; set; }
+
+    public virtual ICollection<DisputeFlag> DisputeFlags { get; set; }
+
+    public virtual ICollection<SubstitutedService> BySubstitutedServices { get; set; }
+
+    public virtual ICollection<SubstitutedService> ToSubstitutedServices { get; set; }
+
+    public virtual ICollection<ClaimGroupParticipant> PrimaryContactClaimGroupParticipants { get; set; }
+
+    [InverseProperty("Served")]
+    public virtual ICollection<NoticeService> ServedNoticeServices { get; set; }
+
+    [InverseProperty("ArchiveServedParticipant")]
+    public virtual ICollection<NoticeService> ArchiveServedNoticeServices { get; set; }
+
+    public virtual ICollection<FilePackageService> ArchiveServedFilePackageServices { get; set; }
+
+    [InverseProperty("Participant")]
+    public virtual ICollection<ServiceAuditLog> ServiceAuditLogs { get; set; }
+
+    [InverseProperty("Served")]
+    public virtual ICollection<ServiceAuditLog> ServedServiceAuditLogs { get; set; }
+
+    public virtual ICollection<SubmissionReceipt> SubmissionReceipts { get; set; }
+
+    public virtual ICollection<BulkEmailRecipient> BulkEmailRecipients { get; set; }
+
+    public virtual ICollection<DisputeFee> DisputeFees { get; set; }
+
+    public virtual ICollection<TrialDispute> TrialDisputes { get; set; }
+
+    public virtual ICollection<TrialParticipant> TrialParticipants { get; set; }
+
+    public virtual ICollection<PollResponse> PollResponses { get; set; }
+
+    public virtual ICollection<ParticipantIdentity> ParticipantIdentities { get; set; }
+
+    public virtual ICollection<ParticipantIdentity> IdentityParticipants { get; set; }
+
+    public virtual ICollection<VerificationAttempt> VerificationAttempts { get; set; }
 }

@@ -16,6 +16,8 @@ import FileCollection from '../../../../core/components/files/File_collection';
 import ModalAddOutcomeFile from '../outcome-doc-file/modals/ModalAddOutcomeFile';
 import ModalAddPublicDoc from '../outcome-doc-file/ModalAddPublicDoc';
 import ModalAddOutcomeDelivery from '../outcome-doc-delivery/modals/ModalAddOutcomeDelivery';
+import ModalOutcomeDeliveryAutoEmail from '../outcome-doc-delivery/modals/ModalOutcomeDeliveryAutoEmail';
+import DeliveryAutoActions from '../../../../core/components/auto-actions/DeliveryAutoActions';
 import ModalAddFiles from '../../../../core/components/modals/modal-add-files/ModalAddFiles';
 import ModalBulkUploadDocument from '../outcome-doc-file/modals/modal-bulk-upload-documents/ModalBulkUploadDocuments';
 import RadioIconView from '../../../../core/components/radio/RadioIcon';
@@ -108,7 +110,7 @@ export default Marionette.View.extend({
   },
 
   clickAddOtherDelivery() {
-    const modalAddOutcomeDelivery = new ModalAddOutcomeDelivery({ model: this.model });
+    const modalAddOutcomeDelivery = new ModalAddOutcomeDelivery({ model: this.model, deliverySaveData: { ready_for_delivery: this.readyForDeliveryModel.getData() } });
     this.stopListening(modalAddOutcomeDelivery);
     this.listenTo(modalAddOutcomeDelivery, 'save:complete', function(outcome_doc_file_model, outcome_doc_delivery_model, ) {
       this.participantOutcomeDeliveryCollection.add({
@@ -302,7 +304,17 @@ export default Marionette.View.extend({
 
   setupListeners() {
     this.listenTo(this.model.getOutcomeFiles(), 'destroy', () => this.trigger('contextRender', {deliveryEdit: true}), this);
-    this.listenTo(this.model.getOutcomeFiles(), 'change', this.setWritingTime)
+    this.listenTo(this.model.getOutcomeFiles(), 'change', this.setWritingTime);
+    this.listenTo(this.model.getOutcomeFiles(), 'validate:docDate', (docFileModel) => {
+      this.deliveryDateModel.set({ required: true });
+      const isValid = this.getChildView('serviceDateRegion').validateAndShowErrors() && this.deliveryDateModel.getData();
+      if (isValid) {
+        this.model.set(this.deliveryDateModel.getPageApiDataAttrs());
+        docFileModel.trigger('documentDate:valid');
+      }
+
+      this.deliveryDateModel.set({ required: false });
+    });
 
     this.listenTo(this.participantOutcomeDeliveryCollection, 'deliveries:changed', () => {
       const validParticipantDeliveries = this.participantOutcomeDeliveryCollection.map(model => model.getIncludedDeliveries())
@@ -428,8 +440,6 @@ export default Marionette.View.extend({
     this.participantOutcomeDeliveryCollection.each(model => {
       const outcomeDocGroupModel = model.get('outcome_doc_group_model');
       if (outcomeDocGroupModel) {
-        outcomeDocGroupModel.trigger('update:ready_for_delivery', false);
-
         outcomeDocGroupModel.getOutcomeFiles().each(outcomeFile => {
           outcomeFile.getDeliveries().each(delivery => {
             if (!delivery.isNew()) deliveriesToUpdate[delivery.id] = delivery;
@@ -438,9 +448,20 @@ export default Marionette.View.extend({
       }
     });
 
-    const hasSentDeliveries = Object.values(deliveriesToUpdate).filter(d => d.get('is_delivered')).length;
+
+    const emailDeliveries = this.participantOutcomeDeliveryCollection.map(model => model.getIncludedDeliveries())
+      .filter(deliveries => !_.isEmpty(deliveries) && deliveries.some(d => d.isEmailDeliveryMethod()));
+    const hasPendingEmailDeliveries = emailDeliveries.some(deliveries => DeliveryAutoActions.getUnsentPendingDeliveries(deliveries)).length;
+    const hasSentNotPendingDeliveries = Object.values(deliveriesToUpdate).filter(d => {
+      return d.get('is_delivered') && !DeliveryAutoActions.getUnsentPendingDeliveries([d]).length;
+    }).length;
+    
     const saveDeliveriesAsNotReady = () => {
       loaderChannel.trigger('page:load');
+      this.participantOutcomeDeliveryCollection.each(model => {
+        const outcomeDocGroupModel = model.get('outcome_doc_group_model');
+        if (outcomeDocGroupModel) outcomeDocGroupModel.trigger('update:ready_for_delivery', false);
+      });
       Promise.all(Object.values(deliveriesToUpdate).map(delivery => delivery.save(delivery.getApiChangesOnly())))
         .then(() => this._saveDocStatus(configChannel.request('get', 'OUTCOME_DOC_GROUP_STATUS_ACTIVE')),
           err => {
@@ -450,7 +471,7 @@ export default Marionette.View.extend({
         );
     };
 
-    if (hasSentDeliveries) {
+    if (hasSentNotPendingDeliveries) {
       modalChannel.request('show:standard', {
         title: 'Re-Open Not Available',
         bodyHtml: `<p>You cannot re-open a document set that has any sent items (documents that are already delivered). If you have more documents to be sent you will have to create a new Outcome Document Set.</p>`,
@@ -460,13 +481,18 @@ export default Marionette.View.extend({
     } else {
       modalChannel.request('show:standard', {
         title: 'Confirm Re-Open of Document Set',
-        bodyHtml: `<p>If a document set is marked as "Ready to deliver", even if it does not have any delivered documents right now, may be in the process of being delivered. In order to avoid documents being sent at the same time that you are modifying the document set, this document set will be immediately set as not not ready to deliver.</p>
-        <p><b>Important:</b> After you have made your changes make sure to mark this as ready to deliver again.</p>`,
+        bodyHtml: `<p>If a document set is marked as "Ready to deliver", even if it does not have any delivered documents right now, it may be in the process of being delivered.${hasPendingEmailDeliveries ? ` This document set also includes automated future email deliveries.` : ''}</p>
+          <p>In order to avoid documents being sent at the same time that you are modifying the document set, this document set will be immediately set as not ready to deliver${hasPendingEmailDeliveries ? ` and all future email deliveries will be deleted and not sent` : ''}.</p>
+          <p><b>Important:</b> After you have made your changes make sure to mark this as ready to deliver again.</p>`,
         primaryButtonText: 'Continue and Re-Open',
         cancelButtonText: 'Cancel',
-        onContinueFn(modalView) {
-          saveDeliveriesAsNotReady();
-          modalView.close();
+        onContinueFn: (modalView) => {
+          DeliveryAutoActions.startDocDeliveryCleanup(emailDeliveries, this.model).then(() => {
+            saveDeliveriesAsNotReady();
+            modalView.close();
+          }, err => {
+            modalView.close();
+          });
         },
       })
     }
@@ -483,6 +509,7 @@ export default Marionette.View.extend({
             modalView.close();
             loaderChannel.trigger('page:load')
             this.model.destroy()
+              .done(() => this.dispute.stopEditInProgress())
               .fail(generalErrorFactory.createHandler('ADMIN.OUTCOMEDOCGROUP.REMOVE.FULL'))
               .always(() => loaderChannel.trigger('page:load:complete'))
           }
@@ -529,7 +556,7 @@ export default Marionette.View.extend({
     this.stopListening(modalAddOutcomeFile);
     this.listenTo(modalAddOutcomeFile, 'save:complete', function() {
       modalChannel.request('remove', modalAddOutcomeFile);
-      this.trigger('contextRender', {deliveryEdit: true});
+      this.trigger('contextRender', { deliveryEdit: true });
     }, this);
     modalChannel.request('add', modalAddOutcomeFile);
   },
@@ -539,7 +566,10 @@ export default Marionette.View.extend({
     modalChannel.request('add', modalBulkUploadDocuments);
 
     this.listenTo(modalBulkUploadDocuments, 'save:complete', () => {
-      this.trigger('contextRender', {deliveryEdit: true});
+      // After bulk uploads is closed, any anon decisions should default to Visible to Public for the next save
+      this.model.getOutcomeFilePublicFinal()?.set('visible_to_public', true);
+
+      this.trigger('contextRender', { deliveryEdit: true });
     });
   },
 
@@ -548,7 +578,7 @@ export default Marionette.View.extend({
     this.stopListening(modalAddPublicDocView);
     this.listenTo(modalAddPublicDocView, 'save:complete', function() {
       modalChannel.request('remove', modalAddPublicDocView);
-      this.trigger('contextRender', {deliveryEdit: true});
+      this.trigger('contextRender', { deliveryEdit: true });
     }, this);
     modalChannel.request('add', modalAddPublicDocView);
   },  
@@ -572,9 +602,12 @@ export default Marionette.View.extend({
     ].map(m => m.getPageApiDataAttrs());
     modelDataToSet.forEach(data => this.model.set(data));
 
-    const outcomeDocFileDCN = this.model.getOutcomeFileDCN();
-    if (outcomeDocFileDCN) {
-      outcomeDocFileDCN.set(Object.assign({}, this.materiallyDifferentModel.getPageApiDataAttrs(), this.noteworthyModel.getPageApiDataAttrs()));
+    // Set note_worthy and materially_different on the DCN and the Anon doc
+    const noteworthyMaterialAttrs = Object.assign({}, this.materiallyDifferentModel.getPageApiDataAttrs(), this.noteworthyModel.getPageApiDataAttrs());
+    const outcomeFileDCN = this.model.getOutcomeFileDCN();
+    if (outcomeFileDCN) {
+      outcomeFileDCN.set(noteworthyMaterialAttrs);
+      this.model.getOutcomeFilePublicFinal()?.set(noteworthyMaterialAttrs);
     }
 
     _.each(this.documentsEditGroup, function(component_name) {
@@ -598,18 +631,6 @@ export default Marionette.View.extend({
           const delivery_model = checkboxModel.get('_associated_delivery_model');
           deliveries_to_delete_lookup[delivery_model.id] = delivery_model;
           deliveries_to_delete.push(delivery_model);
-        });
-      }
-    });
-
-    this.model.getOutcomeFiles().each(function(outcome_doc_file_model) {
-      if (!outcome_doc_file_model.isActive()) {
-        outcome_doc_file_model.getDeliveries().each(function(delivery_model) {
-          const delivery_model_id = delivery_model.id;
-          if (!_.has(deliveries_to_delete_lookup, delivery_model_id)) {
-            deliveries_to_delete_lookup[delivery_model_id] = delivery_model;
-            deliveries_to_delete.push(delivery_model);
-          }
         });
       }
     });
@@ -646,6 +667,8 @@ export default Marionette.View.extend({
 
       this._deleteDeliveryModels()
         .done(() => {
+          // Set anon doc modified time to now so that a conflict should never occur - this can happen because the mid-ter changes the record on file upload
+          this.model.getOutcomeFilePublicFinal()?.set({ modified_date: Moment().toISOString() });
           this.model.saveAll()
             .done(() => {
               this.reinitialize();
@@ -671,8 +694,7 @@ export default Marionette.View.extend({
 
     const isReadyForDelivery = !!this.readyForDeliveryModel.get('checked');
     const deliveryPriority = this.deliveryPriorityModel.getData({ parse: true });
-    const saveDeliveriesFn = () => new Promise((res, rej) => {
-      loaderChannel.trigger('page:load');
+    const prepareDeliveriesForSave = () => {
       _.each(this.deliveriesEditGroup, function(component) {
         const view = this.getChildView(component);
         if (view) view.saveInternalDataToModel();
@@ -686,9 +708,11 @@ export default Marionette.View.extend({
           outcomeDocGroupModel.trigger('update:delivery_priority', deliveryPriority);
         }
       });
-
+    };
+    const saveDeliveriesFn = () => new Promise((res, rej) => {
+      loaderChannel.trigger('page:load');
       this._deleteDeliveryModels().done(() => {
-        // All un-delivered deliveries destroyed.  Move onto saving deliveries
+        // All un-delivered deliveries destroyed. Move onto saving deliveries
         this.model.saveAll({ deliveries: true })
           .done(() => res())
           .fail(generalErrorFactory.createHandler('ADMIN.OUTCOMEDOCGROUP.SAVE.ALL', () => rej(), EXTRA_API_ERROR_MSG))
@@ -698,18 +722,95 @@ export default Marionette.View.extend({
       });
     });
 
+    prepareDeliveriesForSave();    
+    const emailDeliveries = this.participantOutcomeDeliveryCollection.map(model => model.getIncludedDeliveries())
+      .filter(deliveries => !_.isEmpty(deliveries) && deliveries.some(d => d.isEmailDeliveryMethod()));
+    const autoEmailDeliveries = emailDeliveries.filter(deliveries => DeliveryAutoActions.getAvailableDeliveryEmailTemplateForDocs(deliveries));
+
+    let isCancelled = undefined;
+    let autoSendEmailTime = null;
+    const showModalAutoEmailPromise = () => new Promise((res, rej) => {
+      // Enable auto email deliveries only if we are setting "Ready to deliver" initially
+      const shouldTriggerAutoDelivery = isReadyForDelivery && !this.model.isCompleted() && emailDeliveries.length;
+      if (!shouldTriggerAutoDelivery) return res();
+      
+      let modalView;
+      if (autoEmailDeliveries.length) {
+        modalView = new ModalOutcomeDeliveryAutoEmail({
+          model: this.model,
+          showEmailWarning: emailDeliveries.length > autoEmailDeliveries.length
+        });
+        this.listenTo(modalView, 'update:emailSendTime', (_autoSendEmailTime) => {
+          isCancelled = false;
+          autoSendEmailTime = _autoSendEmailTime;
+        });
+        modalChannel.request('add', modalView);
+      } else {
+        modalView = modalChannel.request('show:standard', {
+          title: `Automated Email Delivery Unavailable`,
+          bodyHtml: `<p>This document set includes unsent documents that are indicated as being ready for delivery by email, but cannot be automatically sent because the documents do not have a matching delivery email template.</p>`,
+          primaryButtonText: 'Continue',
+          onContinueFn: m => {
+            isCancelled = false;
+            m.close();
+          }
+        });
+      }
+
+      if (modalView) {
+        this.listenTo(modalView, 'removed:modal', () => {
+          if (isCancelled !== false || isCancelled) {
+            isCancelled = true;
+            rej();
+          } else {
+            res();
+          }
+        });
+      }
+    });
+
+    let hasAttachmentSizeExceededLimit = false;
+    const attachmentSizes = autoEmailDeliveries.map(participantDeliveries => (DeliveryAutoActions.checkAttachmentSize(participantDeliveries)));
+    if (attachmentSizes.some(size => size > configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'))) {
+      hasAttachmentSizeExceededLimit = true;
+      loaderChannel.trigger('page:load:complete');
+      modalChannel.request('show:standard', {
+        title: `Email attachment size limit exceeded`,
+        bodyHtml: `<p>The email attachments for this delivery exceeds 20MB. Please manually send the attachments.</p>`,
+        primaryButtonText: 'Continue',
+        hideCancelButton: true,
+        onContinueFn: (modalView) => {
+          modalView.close();
+        }
+      });
+    }
+
+    if (hasAttachmentSizeExceededLimit) return;
+
     this.checkAndShowWarningItems()
+      .then(() => showModalAutoEmailPromise())
       .then(saveDeliveriesFn)
       .then(() => isReadyForDelivery ?
         this.model.save({ doc_status: configChannel.request('get', 'OUTCOME_DOC_GROUP_STATUS_COMPLETED') }).fail(generalErrorFactory.createHandler('ADMIN.OUTCOMEDOCGROUP.SAVE'))
         : null
       )
       .then(() => this.updateParticipants())
+      
+      // If a time was chosen, then proceed with auto email
+      .then(() => {
+        if (autoSendEmailTime) {
+          // Start auto action modal process
+          return DeliveryAutoActions.startDocDeliveryAutoEmail(autoEmailDeliveries, autoSendEmailTime, this.model)
+            .finally(() => Promise.resolve());
+        }
+      })
       .then(()=> {
         this.trigger('contextRender');
         loaderChannel.trigger('page:load:complete');
       })
-      .catch(() => {
+      .catch(err => {
+        console.debug(err);
+        if (isCancelled) return;
         if (this.dispute) this.dispute.stopEditInProgress();
         Backbone.history.loadUrl(Backbone.history.fragment);
       });
@@ -887,18 +988,19 @@ export default Marionette.View.extend({
       highest_undelivered_priority === this.DELIVERY_PRIORITY_NORMAL ? 'task-priority-medium-small' :
       highest_undelivered_priority === this.DELIVERY_PRIORITY_LOW ? 'task-priority-low-small' :
       'task-priority-none-small';
-
+    const publicDoc = this.model.getOutcomeFilePublicFinal();
     return {
       Formatter,     
-      hideDeliveries: this.dispute && this.dispute.isMigrated(),
+      hideDeliveries: this.dispute?.isMigrated(),
       hidePublicDocs: !UAT_TOGGLING.SHOW_OUTCOME_PUBLIC_DOCS,
-      hasFinalDocs: outcomeFiles && outcomeFiles.any(model => !model.isExternal() && !model.isPublic()),
-      hasPublicDocs: outcomeFiles && outcomeFiles.any(model => model.isPublic()),
+      hasFinalDocs: outcomeFiles?.any(model => !model.isExternal() && !model.isPublic()),
+      hasPublicDocs: !!publicDoc,
+      hasPublicDocError: publicDoc?.hasPublicError(),
       allIncludedCheckboxesDelivered,
       earliestReadyForDeliveryDate,
       showNoteworthyDisplay: !!outcomeFileDCN,
-      materiallyDifferentDisplay: outcomeFileDCN && outcomeFileDCN.get('materially_different') ? 'Materially different decision' : '',
-      noteworthyDisplay: outcomeFileDCN && outcomeFileDCN.get('note_worthy') ? 'Noteworthy decision' : '',
+      materiallyDifferentDisplay: outcomeFileDCN?.get('materially_different') ? 'Materially different decision' : '',
+      noteworthyDisplay: outcomeFileDCN?.get('note_worthy') ? 'Noteworthy decision' : '',
       priorityIconClass,
     };
   }

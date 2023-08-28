@@ -51,6 +51,14 @@
     "5": "Schedule Adjustment"
   },
 
+  "SCHEDULE_BLOCK_TIME_OFF_TYPES": {
+    "1": "Sick time",
+    "2": "Medical appointment",
+    "3": "Part time staff day off",
+    "4": "Other"
+  },
+  "SCHEDULE_BLOCK_TIME_OFF_TYPE_OTHER": "4",
+
   "SCHEDULE_PERIODS_STATUS_DISPLAY": {
     "1": "Active",
     "100": "Inactive",

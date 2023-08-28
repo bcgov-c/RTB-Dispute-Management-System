@@ -86,6 +86,11 @@ public class FileController : BaseController
                 return BadRequest(string.Format(ApiReturnMessages.WrongToken));
             }
 
+            if (file.IsSourceFileDeleted)
+            {
+                return BadRequest(string.Format(ApiReturnMessages.DeletedSource));
+            }
+
             var tokenWithFileId = token.Base64Decode().Split(":", StringSplitOptions.RemoveEmptyEntries);
             var fileToken = tokenWithFileId[0];
             var fileId = tokenWithFileId[1];

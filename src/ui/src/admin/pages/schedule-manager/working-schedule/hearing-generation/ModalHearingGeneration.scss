@@ -1,0 +1,135 @@
+.hearing-generation {
+  min-width: 1250px;
+  &__close { cursor: pointer; }
+  &__date-wrapper { display: flex; }
+  &__start-date { margin-right: 20px; width: 200px; margin-right: 20px; }
+  &__end-date { width: 200px; }
+  &__date-duration {
+    position: relative;
+    top: 30px;
+    margin-left: 20px;
+  }
+
+  &__schedule-period { margin-bottom: 10px; }
+
+  &__add-hearings {
+    margin-top: 30px;
+    
+    &__area {
+      margin-top: 10px;
+    }
+    
+    &__add {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      width: fit-content;
+
+      &__icon {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  &__hearings { 
+    display: flex;
+    margin-top: 5px;
+  }
+
+  &__hearing-number {
+    background-color: #eee;
+    padding: 8px;
+    font-weight: bold;
+    height: 50px;
+  }
+  &__hearing-start, &__hearing-end { margin: 0 10px; width: 150px; position: relative; bottom: 10px; }
+  &__hearing-end-wrapper { min-width: 110px; position: relative; top: 20px; }
+  &__hearing-end { margin-right: 20px; }
+  &__to { position: relative; top: 20px; }
+  &__hearing-priority {
+    position: relative;
+    bottom: 10px;
+    margin-left: 20px;
+    min-width: 158px;
+    width: 158px;
+  }
+  &__delete { cursor: pointer; margin-left: 10px; width: 27px; height: 26px; position: relative; top: 20px; }
+
+  &__user-selects { margin-top: 30px; }
+
+  &__role-type, &__engagement-type {
+    padding-bottom: 15px;
+    .intake-checkboxes-component { display: flex; flex-wrap: wrap; }
+    .form-group { margin-right: 15px; }
+    .error-block { width: 100%; }
+  }
+
+  &__change-selection {
+    margin-left: 10px!important;
+  }
+
+  &__staff-select { 
+    margin: 40px 0 20px 0;
+
+    .disabled {
+      opacity: 0.7;
+    } 
+  }
+
+  &__step-three {
+    display: flex;
+  }
+
+  &__duty-generation { margin-top: 30px; }
+
+  &__user-emergency { 
+    margin-top: 21px;
+    margin-right: 35px;
+  }
+
+  &__emergency-user { margin-right: 10px; }
+  &__daily-emergency { min-width: 229px; width: 229px; margin-right: 10px; }
+  &__emergency-update-btn { 
+    height: fit-content;
+    margin-top: 23px;
+  }
+
+  &__tou-row { margin-top: 15px; }
+  &__title {
+    color: #a8a095;
+    border-bottom-color: #4d5356;
+  }
+  &__tou {
+    margin-top: 30px;
+  }
+
+  &__import-wrapper { justify-content: flex-end; }
+
+  &__import-stats { 
+    display: flex;
+    width: 800px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    &__emergency { color: #ff0000 }
+    &__deferred { color: #0075ff }
+    &__standard { color: #339966 }
+  }
+
+  &__generate-import-button {
+    margin-left: 10px!important;
+  }
+
+  &__upload-alert {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+
+    > span { color: #d80000 }
+  }
+
+  .modal-button-container {
+    display: flex;
+    .btn-continue { margin-left: 0; }
+  }
+}

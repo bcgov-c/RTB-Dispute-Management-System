@@ -67,10 +67,12 @@ public class FactHearingSummaryManager : StatisticManagerBase
     private async Task<FactHearingSummary> GetRecord(Hearing hearing)
     {
         LogInformation($"Start get record for hearing Id = {hearing.HearingId}");
-        var diputeHearings = hearing.DisputeHearings;
-        LogInformation($"DiputeHearings count = {diputeHearings.Count}");
-        var primaryDisputeHearing = diputeHearings.FirstOrDefault(d => d.DisputeHearingRole == (byte)DisputeHearingRole.Active);
-        var secondaryDisputeHearings = diputeHearings.Where(x => x.DisputeGuid.HasValue && x.DisputeHearingRole == (byte)DisputeHearingRole.Secondary).ToList();
+        var disputeHearings = hearing.DisputeHearings;
+
+        LogInformation($"DisputeHearings count = {disputeHearings.Count}");
+
+        var primaryDisputeHearing = disputeHearings.FirstOrDefault(d => d.DisputeHearingRole == (byte)DisputeHearingRole.Active);
+        var secondaryDisputeHearings = disputeHearings.Where(x => x.DisputeGuid.HasValue && x.DisputeHearingRole == (byte)DisputeHearingRole.Secondary).ToList();
         var primaryDispute = primaryDisputeHearing?.Dispute;
         var primaryDisputeGuid = primaryDisputeHearing.DisputeGuid.Value;
         var primaryDisputeStatuses = await UnitOfWork.DisputeStatusRepository.FindAllAsync(x => x.DisputeGuid == primaryDisputeGuid);
@@ -137,7 +139,7 @@ public class FactHearingSummaryManager : StatisticManagerBase
         var primaryTotalStage6TimeMin = CommonFieldsLoader.GetTotalStage6TimeMin(UnitOfWork, primaryDisputeStatuses.ToList());
         var primaryTotalStage8TimeMin = CommonFieldsLoader.GetTotalStage8TimeMin(UnitOfWork, primaryDisputeStatuses.ToList());
 
-        var hearingAllDisputes = diputeHearings.Select(x => x.DisputeGuid).ToList();
+        var hearingAllDisputes = disputeHearings.Select(x => x.DisputeGuid).ToList();
         var allLinkedEvidenceFiles = await CommonFieldsLoader.GetLinkedEvidenceFiles(UnitOfWork, hearingAllDisputes);
         LogInformation($"AllLinkedEvidenceFiles count = {allLinkedEvidenceFiles.Count}");
         var fileIds = allLinkedEvidenceFiles.Select(x => x.FileId);

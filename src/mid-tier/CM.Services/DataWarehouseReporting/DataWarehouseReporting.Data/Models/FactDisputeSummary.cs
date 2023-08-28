@@ -219,4 +219,16 @@ public class FactDisputeSummary
     public DateTime? FirstDecisionDateTime { get; set; }
 
     public int? FirstDecisionDateTimeId { get; set; }
+
+    public int? NoticeNotServed { get; set; }
+
+    public int? CaseManagedTimeMin { get; set; }
+
+    public bool? IsMissingResolutionTime { get; set; }
+
+    public bool? RequestedPossession { get; set; }
+
+    public bool? IsMissingIssueOutcomes { get; set; }
+
+    public bool? IsMissingNoticeService { get; set; }
 }

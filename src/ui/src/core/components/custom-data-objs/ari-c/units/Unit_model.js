@@ -47,14 +47,17 @@ export default Backbone.Model.extend({
 
   createSubModels() {
     this.set('addressModel', new AddressModel({
-      useDefaultProvince: true,
       useSubLabel: false,
       name: `address${this.get('unit_id')}`,
       json: {
         street: this.get('address'),
         city: this.get('city'),
         postalCode: this.get('postal_zip'),
-      }
+      },
+      showUpdateControls: false,
+      useAddressValidation: false,
+      useCPToolBackup: false,
+      selectProvinceAndCountry: false,
     }));
 
     try {

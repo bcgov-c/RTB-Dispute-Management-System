@@ -17,4 +17,40 @@ public static class MimeExtension
 
         return contentType;
     }
+
+    public static FileCategory GetTypeFromMime(this string mimeType)
+    {
+        if (string.IsNullOrWhiteSpace(mimeType))
+        {
+            return FileCategory.Unknown;
+        }
+
+        var prefix = mimeType.Split('/')[0];
+
+        if (mimeType == FileMimeTypes.Pdf)
+        {
+            return FileCategory.Pdf;
+        }
+
+        return prefix switch
+        {
+            "image" => FileCategory.Image,
+            "video" => FileCategory.Video,
+            "audio" => FileCategory.Audio,
+            "application" => FileCategory.Document,
+            "text" => FileCategory.Text,
+            _ => FileCategory.Unknown
+        };
+    }
+}
+
+public enum FileCategory
+{
+    Image,
+    Video,
+    Audio,
+    Document,
+    Pdf,
+    Text,
+    Unknown
 }

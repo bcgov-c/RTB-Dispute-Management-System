@@ -1,9 +1,6 @@
-﻿using System;
-using CM.Common.Utilities;
+﻿using CM.Common.Utilities;
 using CM.Data.Model;
-using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.DisputeStatusHandler;
 
@@ -22,8 +19,10 @@ public abstract class DisputeTransition
         ToDisputeStatus = toDisputeStatus;
         ToDisputeStage = toDisputeStage;
         Process = process;
-        MessageBus = messageBus;
+        Bus = messageBus;
     }
+
+    protected IBus Bus { get; }
 
     private DisputeStatuses FromDisputeStatus { get; }
 
@@ -34,8 +33,6 @@ public abstract class DisputeTransition
     private DisputeStage ToDisputeStage { get; }
 
     private DisputeProcess Process { get; }
-
-    private IBus MessageBus { get; }
 
     private DisputeTransition Next { get; set; }
 
@@ -68,21 +65,4 @@ public abstract class DisputeTransition
     }
 
     protected abstract void Handle(Dispute dispute);
-
-    protected void Publish(EmailGenerateIntegrationEvent message)
-    {
-        MessageBus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"CorrelationGuid = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
-    }
 }

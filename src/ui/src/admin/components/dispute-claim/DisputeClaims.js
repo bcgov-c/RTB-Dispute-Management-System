@@ -11,6 +11,7 @@ import ViewMixin from '../../../core/utilities/ViewMixin';
 
 import ModalAriDashboardView from '../../../core/components/custom-data-objs/ari-c/ri-dashboard/ModalAriDashboard';
 import ModalPermitsDashboardView from '../../../core/components/custom-data-objs/ari-c/permits-dashboard/ModalPermitsDashboard';
+import SessionCollapse from '../session-settings/SessionCollapseHandler';
 
 const HEARING_TOOLS_CLAIMS_CLASS = 'hearing-tools-enabled';
 const FILTER_CLASS_HIDE_CONSIDERED = 'filter-hide-not-considered';
@@ -87,11 +88,10 @@ const DisputeClaimsCollectionView = Marionette.CollectionView.extend({
       menu_states: this._getMenuStates(child),
       menu_events: this._getMenuTransitions(),
       onMenuOpenFn: () => _.isFunction(this.onMenuOpenFn) ? this.onMenuOpenFn() : null,
-      contextRender() {
-        self.render();
-      },
+      contextRender: () => this.model.trigger('claims:render'),
       cssClass: isSupportingEvidence ? 'dispute-claim-supporting' : null,
-      disputeModel: this.model
+      disputeModel: this.model,
+      collapseHandler: SessionCollapse.createHandler(this.model, 'DisputeView', 'claims', isSupportingEvidence ? 'supporting' : child.id),
     });
     // Create the child view instance
     const view = isSupportingEvidence ? claimViewWithMenu :
@@ -110,7 +110,7 @@ const DisputeClaimsCollectionView = Marionette.CollectionView.extend({
 
   _getMenuStates(claimModel) {
     const default_menu = [];
-    const isReverseApplicantIssue = claimModel.isReverseAward();
+    const isSingletonIssue = claimModel.isReverseAward();
     const uploadedFiles = claimModel.getUploadedFiles();
     const fileCountDisplay = `${uploadedFiles.length} file${uploadedFiles.length === 1 ? '' : 's'}`;
     const totalFileSizeDisplay = Formatter.toFileSizeDisplay(_.reduce(uploadedFiles, function(memo, file) { return memo + file.get('file_size'); }, 0));
@@ -126,7 +126,7 @@ const DisputeClaimsCollectionView = Marionette.CollectionView.extend({
       }
     }
 
-    if (!this.model.isPostNotice() || isReverseApplicantIssue) {
+    if (!this.model.isPostNotice() || isSingletonIssue) {
       default_menu.unshift({ name: 'Edit', event: 'edit:pre:notice' });
     } else {
       default_menu.unshift({ name: 'Amend', event: 'amend' });
@@ -135,7 +135,7 @@ const DisputeClaimsCollectionView = Marionette.CollectionView.extend({
     return {
       default: default_menu,
       edit_pre_notice: [
-        ...(isReverseApplicantIssue ? [] : [{ name: 'Save', event: 'save:pre:notice' }]),
+        { name: 'Save', event: 'save:pre:notice' },
         { name: 'Cancel', event: 'cancel' },
         { name: 'Delete', event: 'delete' }
       ],
@@ -174,11 +174,12 @@ export default Marionette.View.extend({
 
   ui: {
     add: '.claim-add-icon',
-    addReverseApplicantIssue: '.claim-add-reverse-applicant-text',
+    addSingletonIssue: '.claim-add-singleton-issue-text',
     ariDashboard: '.claim-ari-dashboard-btn',
     permitsDashboard: '.claim-permits-dashboard-btn',
     claimsRegion: '.dispute-overview-claims',
-    printFilterText: '.print-filter-text'
+    printFilterText: '.print-filter-text',
+    collapse: '.dispute-section-title-add.collapse-icon',
   },
 
   regions: {
@@ -191,13 +192,13 @@ export default Marionette.View.extend({
 
   events: {
     'click @ui.add': 'clickAdd',
-    'click @ui.addReverseApplicantIssue': 'clickAddReverseApplicantIssue',
+    'click @ui.addSingletonIssue': 'clickAddSingletonIssue',
     'click @ui.ariDashboard': function() { this.clickOpenDashboard(ModalAriDashboardView) },
     'click @ui.permitsDashboard': function() { this.clickOpenDashboard(ModalPermitsDashboardView) },
+    'click @ui.collapse': 'clickCollapse',
   },
 
   clickAdd() {
-    
     if (!participantChannel.request('get:primaryApplicant:id')) {
       alert("Add a primary applicant before adding any claims");
       return;
@@ -229,16 +230,16 @@ export default Marionette.View.extend({
     );
   },
 
-  clickAddReverseApplicantIssue(ev) {
+  clickAddSingletonIssue(ev) {
     const issueElement = $(ev.currentTarget);
     const claimCode = issueElement.data('code');
-    const matchingIssue = this.reverseApplicantIssues.find(issue => issue.getClaimCode() === claimCode);
+    const matchingIssue = this.singletonIssues.find(issue => issue.getClaimCode() === claimCode);
     if (!matchingIssue) {
       console.log(`[Error] No claim to add`);
       return;
     }
 
-    const addReverseApplicantClaimFn = () => {
+    const addClaimDirectFn = () => {
       loaderChannel.trigger('page:load');
       matchingIssue.save().done(() => {
         this.collection.add(matchingIssue, { merge: true });
@@ -252,12 +253,28 @@ export default Marionette.View.extend({
         handler(err);
       });
     };
+    const showModalPreloadedClaimFn = () => {
+      // Singleton issue never have amendments - they are not amendable
+      const modalAddClaim = new ModalAddClaim(_.extend({}, this.options, { preLoadedClaim: matchingIssue, is_post_notice: false }));
+      this.stopListening(modalAddClaim);
+      this.listenToOnce(modalAddClaim, 'save:complete', claimModel => {
+        modalChannel.request('remove', modalAddClaim);
+        // Make sure added claim is added to all claims
+        if (claimModel) claimsChannel.request('add:claim', claimModel);
+        // Refresh the main page to get the order of issues correct
+        this.collection.trigger('contextRender:refresh');
+      });
+      modalChannel.request('add', modalAddClaim);
+    };
 
-    this.model.checkEditInProgressPromise().then(
-      addReverseApplicantClaimFn,
-      () => {
-        this.model.showEditInProgressModalPromise()
+    this.model.checkEditInProgressPromise().then(() => {
+      if (matchingIssue.isRetainSecurityDeposit()) {
+        showModalPreloadedClaimFn();
+      } else {
+        addClaimDirectFn();
       }
+    },
+      () => this.model.showEditInProgressModalPromise()
     );
   },
 
@@ -270,6 +287,12 @@ export default Marionette.View.extend({
     );
   },
 
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
+  },
+
   initialize(options) {
     UAT_TOGGLING = configChannel.request('get', 'UAT_TOGGLING') || {};
     _.extend(this.options, {}, options);
@@ -277,6 +300,8 @@ export default Marionette.View.extend({
     this.disputeIsMigrated = this.model && this.model.isMigrated();
     this.showHearingToolsBool = UAT_TOGGLING.SHOW_ARB_TOOLS && !this.disputeIsMigrated;
 
+    this.collapseHandler = SessionCollapse.createHandler(this.model, 'DisputeView', 'Claims');
+    this.isCollapsed = this.collapseHandler?.get();
     this.createSubModels();
     this.setupListeners();
   },
@@ -343,9 +368,14 @@ export default Marionette.View.extend({
       this.model.set({ sessionSettings: { ...this.model.get('sessionSettings'), notConsideredEvidence: value } });
       this.showOrHideNotConsidered(value)
     });
+
+    this.listenTo(this.model, 'claims:render', () => {
+      this.render();
+    });
   },
 
   showOrHideNotConsidered(notConsidered) {
+    if (this.isCollapsed) return;
     this.getUI('printFilterText').html(this.getPrintPageFiltersText());
     if (notConsidered) {
       this.$el.removeClass(FILTER_CLASS_HIDE_CONSIDERED);
@@ -355,7 +385,7 @@ export default Marionette.View.extend({
   },
 
   showHearingTools() {
-    const ele = this.getUI('addReverseApplicantIssue');
+    const ele = this.getUI('addSingletonIssue');
     if (ele && ele.length) {
       ele.removeClass('hidden-item');
     }
@@ -378,7 +408,7 @@ export default Marionette.View.extend({
   },
 
   hideHearingTools() {
-    const ele = this.getUI('addReverseApplicantIssue');
+    const ele = this.getUI('addSingletonIssue');
     if (ele && ele.length) {
       ele.addClass('hidden-item');
     }
@@ -400,23 +430,26 @@ export default Marionette.View.extend({
     }
   },
 
-  getReverseApplicantIssueConfigs() {
+  getSingletonIssueConfigs() {
     const dispute = disputeChannel.request('get');
     const LL_POSSESSION_TENANT_APP_ISSUE_CODE = configChannel.request('get', 'LL_POSSESSION_TENANT_APP_ISSUE_CODE');
     const TT_DEPOSIT_AWARD_LANDLORD_APP_ISSUE_CODE = configChannel.request('get', 'TT_DEPOSIT_AWARD_LANDLORD_APP_ISSUE_CODE');
     const LL_UNPAID_RENT_AWARD_TENANT_APP_ISSUE_CODE = configChannel.request('get', 'LL_UNPAID_RENT_AWARD_TENANT_APP_ISSUE_CODE');
+    const LL_RETAIN_SECURITY_DEPOSIT_CODE = configChannel.request('get', 'LL_RETAIN_SECURITY_DEPOSIT_CODE');
     const canAddCNOP = dispute.isTenant() && !dispute.isPastTenancy() && this.collection.hasTenantMoveOut() && !this.collection.find(c => c.getClaimCode() === LL_POSSESSION_TENANT_APP_ISSUE_CODE);
     const canAddOLRD = dispute.isLandlord() && dispute.isPastTenancy() && this.collection.hasLandlordDeposit() && !this.collection.find(c => c.getClaimCode() === TT_DEPOSIT_AWARD_LANDLORD_APP_ISSUE_CODE);
-    const canAddCNMN = dispute.isTenant() && this.collection.find(c => c.isCNR() || c.isCNOP()) && !this.collection.find(c => c.getClaimCode() === LL_UNPAID_RENT_AWARD_TENANT_APP_ISSUE_CODE);
+    const canAddCNMN = dispute.isTenant() && this.collection.find(c => c.isCNR()) && !this.collection.find(c => c.getClaimCode() === LL_UNPAID_RENT_AWARD_TENANT_APP_ISSUE_CODE);
+    const canAddLRSD = dispute.isLandlord() && this.collection.find(c => c.isLandlordDeposit()) && !this.collection.find(c => c.getClaimCode() === LL_RETAIN_SECURITY_DEPOSIT_CODE);
     return [
       ...(canAddCNOP ? [LL_POSSESSION_TENANT_APP_ISSUE_CODE] : []),
       ...(canAddOLRD ? [TT_DEPOSIT_AWARD_LANDLORD_APP_ISSUE_CODE] : []),
       ...(canAddCNMN ? [LL_UNPAID_RENT_AWARD_TENANT_APP_ISSUE_CODE] : []),
+      ...(canAddLRSD ? [LL_RETAIN_SECURITY_DEPOSIT_CODE] : []),
     ].map(issueId => configChannel.request('get:issue', issueId) || {});
   },
 
   onBeforeRender() {
-    this.reverseApplicantIssues = this.getReverseApplicantIssueConfigs().map(issueConfig => (
+    this.singletonIssues = this.getSingletonIssueConfigs().map(issueConfig => (
       this.collection.createClaimWithRemedy({
         claim_title: issueConfig.issueTitle,
         claim_code: Number(issueConfig.id),
@@ -427,23 +460,22 @@ export default Marionette.View.extend({
   onRender() {
     this.showChildView('showThumbnailsRegion', new CheckboxView({ model: this.showThumbnailsModel }));
     this.showChildView('showEvidenceRegion', new CheckboxView({ model: this.showEvidenceModel }));
-
-    this.renderClaimsAndEvidence();
-    
     if (this.showHearingToolsBool) {
       this.showChildView('showHearingToolsRegion', new CheckboxView({ model: this.hearingToolsModel }));
+      
       if (this.model.get('sessionSettings')?.hearingToolsEnabled) {
         this.showHearingTools();
-        this.getUI('addReverseApplicantIssue').popover();
       }
     }
 
+    this.renderClaimsAndEvidence();
     this.showOrHideNotConsidered(this.showEvidenceModel.getData());
-
+    this.getUI('addSingletonIssue').popover();
     ViewMixin.prototype.initializePopovers(this);
   },
 
   renderClaimsAndEvidence() {
+    if (this.isCollapsed) return;
     this.showChildView('claimsRegion', new DisputeClaimsCollectionView(_.extend({
       showThumbnails: this.showThumbnailsModel.get('checked')
     }, this.options)));
@@ -498,14 +530,16 @@ export default Marionette.View.extend({
       showPermitsDashboardButton: !this.disputeIsMigrated && isCreatedPfr,
       addButtonDisplay: this.getOption('addButtonDisplay') ? this.getOption('addButtonDisplay') : 'Add',
       disputeIsMigrated: this.disputeIsMigrated,
-      reverseApplicantIssues: this.reverseApplicantIssues,
-      totalRequestedAmount,
+      singletonIssues: this.singletonIssues,
+      totalRequestedAmount: Formatter.toAmountDisplayWithNegative(totalRequestedAmount),
       grantedNumDisplayString: !allIssuesCompleted ? '?' : grantedCount,
       grantedDisplayString: this.model.isCreatedPfr() ? 'See Issues' :
         !allIssuesCompleted ? 'Incomplete Issue Outcomes' : `${Formatter.toAmountDisplayWithNegative(totalGrantedAmount)}` +
           (oldestModifiedGrantedMoveOutClaim ? ` - ${oldestModifiedGrantedMoveOutClaim.getClaimCodeReadable()}${grantedMoveOutClaims.length>1?', See issues' : (dateDisplay ? `, ${dateDisplay}` : '')}` : ''),
       isEmpty : this.collection && this.collection.isEmpty(),
-      printFilterText: this.getPrintPageFiltersText()
+      printFilterText: this.getPrintPageFiltersText(),
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 

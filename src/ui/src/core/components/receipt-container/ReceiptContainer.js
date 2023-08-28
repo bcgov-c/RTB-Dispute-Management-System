@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Displays saved receipt html and allows for emailing/downloading of receipt. Uses iframe to get around print issue where multi page receipts were being cut off.
+ */
+
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import React from 'react';
@@ -15,6 +19,7 @@ import EmailFailIcon from '../../../admin/static/Icon_Admin_DeliverNotReadyX.png
 const RECEIPT_CONTAINER_CLASSNAME = `receipt-container`;
 const DEFAULT_SUBMISSION_TITLE = `Thank you for your submission`;
 const DEFAULT_SUBMISSION_MESSAGE = `Print or email a copy of this submission for your records - it is proof of the information submitted to the Residential Tenancy Branch.`;
+const JUNK_MAIL_MESSAGE = 'You will be receiving e-mails directly from the Residential Tenancy Branch with important information and documents. It is important to check your Junk e-mail folders and add noreply.rtb@gov.bc.ca to your preferred contacts when possible.';
 const EMAIL_SEND_SUCCESS = 'A copy of this receipt has been automatically emailed to';
 const EMAIL_SEND_FAIL = 'Automatic sending of email failed, please try again';
 const RECEIPT_FONT_SIZE_PX = 16;
@@ -27,21 +32,21 @@ const participantsChannel = Radio.channel('participants');
 
 const ReceiptContainer = Marionette.View.extend({
   /**
-   * @param {String|JSX} displayHtml - 
-   * @param {Boolean} [disableEmail] - hides email button, disables autoEmail
-   * @param {String} [enableLogout] - adds a logout link
-   * @param {Function} [logoutWarningFn] - adds an optional warning when the logout triggers. Should return a Promise, which will trigger logout when resolved
-   * @param {String} [containerTitle] - used for the receipt container: "Receipt: <containerTitle>"  
-   * @param {Boolean} [hideSubmissionText] - custom string to use in the default submission text
-   * @param {String} [submissionTitle] - custom string to use instead of the default submission title
-   * @param {String} [submissionMessage] - custom string to use instead of the default submission text
-   * @param {String} [emailSubject] - used for email subject and print header
-   * @param {String} [emailUpdateParticipantId] used for emailing to participant email on file.
-   * @param {String} [participantSaveModel] - if passed in will trigger the "do you want to update email ui".
-   * @param {String} [autoSendEmail] - automatically emails receipt if participant has an email on file.
-   * @param {Number} [messageSubType] - the email message sub type value to use on the sent email
-   * @param {String} [customButtonText] - the title of the optional custom button
-   * @param {Function} [customButtonFn] - the action function for the optional custom button
+   * @param {String|JSX} displayHtml - Contains the receipt html. Can be either a string or jsx.
+   * @param {Boolean} [disableEmail] - Hides email button, disables autoEmail
+   * @param {String} [enableLogout] - Adds a logout link
+   * @param {Function} [logoutWarningFn] - Adds a warning when the logout triggers. Should return a Promise, which will trigger logout when resolved
+   * @param {String} [containerTitle] - Used for the receipt container: "Receipt: <containerTitle>"  
+   * @param {Boolean} [hideSubmissionText] - Custom string to use in the default submission text
+   * @param {String} [submissionTitle] - Custom string to use instead of the default submission title
+   * @param {String} [submissionMessage] - Custom string to use instead of the default submission text
+   * @param {String} [emailSubject] - Used for email subject and print header
+   * @param {String} [emailUpdateParticipantId] - Used for emailing to participant email on file.
+   * @param {String} [participantSaveModel] - If passed in will trigger the "do you want to update email ui".
+   * @param {String} [autoSendEmail] - Automatically emails receipt if participant has an email on file.
+   * @param {Number} [messageSubType] - The email message sub type value to use on the sent email
+   * @param {String} [customButtonText] - The title of the optional custom button
+   * @param {Function} [customButtonFn] - The action function for the optional custom button
    */
   initialize(options) {
     this.mergeOptions(options, [
@@ -49,6 +54,7 @@ const ReceiptContainer = Marionette.View.extend({
       'hideSubmissionText', 'submissionTitle', 'submissionMessage', 
       'emailSubject', 'emailUpdateParticipantId', 'participantSaveModel', 'autoSendEmail', 'messageSubType',
       'customButtonText', 'customButtonFn',
+      'displayJunkMailMsg',
     ]);
     this.template = this.template.bind(this);
     this.displayHtml = this.prepareDisplayHtml(this.displayHtml);
@@ -192,6 +198,7 @@ const ReceiptContainer = Marionette.View.extend({
     return <div className="receipt-container__thank-you">
       <div className="receipt-container__thank-you__title">{this.submissionTitle || DEFAULT_SUBMISSION_TITLE}</div>
       <p>{this.submissionMessage || DEFAULT_SUBMISSION_MESSAGE}</p>
+      {this.displayJunkMailMsg ? <p>{JUNK_MAIL_MESSAGE}</p> : null }
       {renderJsxAutoEmailText()}
     </div>;
   },

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CM.Common.Utilities;
 using CM.Data.Model;
@@ -8,8 +7,6 @@ namespace CM.Services.DataWarehouse.FactDisputeService.Helper;
 
 public static class Utils
 {
-    public const int SecondsInMinute = 60;
-
     internal static int GetTasksAverageDuration(List<Task> tasks)
     {
         var totalCount = tasks.Count(x => x.DateTaskCompleted != null);
@@ -31,15 +28,7 @@ public static class Utils
 
     internal static int GetEvidenceOverridesOnCount(List<DisputeStatus> disputeStatuses)
     {
-        var count = 0;
-
-        for (var i = 1; i < disputeStatuses.Count - 1; i++)
-        {
-            if (disputeStatuses[i].EvidenceOverride == 1 && disputeStatuses[i - 1].EvidenceOverride != 1)
-            {
-                count += 1;
-            }
-        }
+        var count = disputeStatuses.Where(x => x.EvidenceOverride == 1).DistinctBy(x => x.DisputeGuid).Count();
 
         return count;
     }
@@ -70,21 +59,15 @@ public static class Utils
     internal static int GetStatusesTotalOpenTime(List<DisputeStatus> disputeStatuses)
     {
         var total = 0;
+        var notAllowedStatuses = new byte[] { 103, 90, 91, 94 };
 
-        for (var i = 1; i < disputeStatuses.Count - 1; i++)
-        {
-            if (disputeStatuses[i].Stage != (byte)DisputeStage.ApplicationInProgress)
-            {
-                var durationSeconds = disputeStatuses[i].DurationSeconds;
+        var filteredStatuses = disputeStatuses
+            .Where(x => !notAllowedStatuses.Contains(x.Status) &&
+                        x.Stage != (byte)DisputeStage.ApplicationInProgress &&
+                        x.DurationSeconds.HasValue);
+        total = filteredStatuses.Sum(x => x.DurationSeconds.Value);
 
-                if (durationSeconds != null)
-                {
-                    total += durationSeconds.Value;
-                }
-            }
-        }
-
-        return total / SecondsInMinute;
+        return total / Constants.SecondsInMinute;
     }
 
     internal static int GetStatusesTotalTime(List<DisputeStatus> disputeStatuses)
@@ -119,7 +102,7 @@ public static class Utils
             }
         }
 
-        return total / SecondsInMinute;
+        return total / Constants.SecondsInMinute;
     }
 
     internal static int GetStatusesTotalArbTime(List<DisputeStatus> disputeStatuses)
@@ -150,11 +133,6 @@ public static class Utils
             }
         }
 
-        return total / SecondsInMinute;
-    }
-
-    internal static int ConvertBytesToMegabytes(long bytes)
-    {
-        return (int)Math.Round((bytes / Constants.UnitMultiplier) / Constants.UnitMultiplier);
+        return total / Constants.SecondsInMinute;
     }
 }

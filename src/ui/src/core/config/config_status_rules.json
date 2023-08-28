@@ -8,8 +8,8 @@
   "STAGE_APPLICATION_SCREENING": 2,
   "STATUS_APPLICATION_RECEIVED": 20,
   "STATUS_ADJOURNED": 63,
-
-  "STATUS_WARN_INCOMPLETE": [90, 91, 93, 94, 103],
+  "STATUS_ADJOURNED_APPLICANT_INACTION": 93,
+  "EXCLUDED_TASK_DISPUTE_STATUSES": [90, 91, 94],
   "STAGE_0_STATUSES_THAT_CANNOT_BE_SET": [0, 5, 99],
   "STATUS_CLOSED": 103,
 
@@ -90,6 +90,7 @@
       "statuses": [
         41,
         90,
+        93,
         94,
         95
       ]
@@ -237,15 +238,15 @@
     },
     "93": {
       "id": 93,
-      "title": "Dismissed"
+      "title": "Applicant action required - Adjourned"
     },
     "94": {
       "id": 94,
-      "title": "Abandoned applicant inaction"
+      "title": "Abandoned application inaction"
     },
     "95": {
       "id": 95,
-      "title": "Process decision required"
+      "title": "Sub-service requested"
     },
     "96": {
       "id": 96,
@@ -429,6 +430,12 @@
       "ownerSubTypes": null,
       "processOptional": false
     },
+    "4:93": {
+      "ownerOptional": true,
+      "ownerTypes": null,
+      "ownerSubTypes": null,
+      "processOptional": false
+    },
     "4:94": {
       "ownerOptional": true,
       "ownerTypes": null,
@@ -593,6 +600,7 @@
       "dest_owner": null,
       "dest_stage": 2,
       "dest_status": 21,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -606,8 +614,9 @@
       "dest_owner": null,
       "dest_stage": 0,
       "dest_status": 1,
+      "dest_process": null,
       "dest_override": null,
-      "order": 2
+      "order": 3
     }, {
       "stage": 2,
       "status": 21,
@@ -618,8 +627,9 @@
       "dest_owner": null,
       "dest_stage": 0,
       "dest_status": 6,
+      "dest_process": null,
       "dest_override": null,
-      "order": 2
+      "order": 3
     }, {
       "stage": 2,
       "status": 21,
@@ -630,8 +640,9 @@
       "dest_owner": "same",
       "dest_stage": 2,
       "dest_status": 22,
+      "dest_process": null,
       "dest_override": null,
-      "order": 4
+      "order": 5
     }, {
       "stage": 2,
       "status": 21,
@@ -642,8 +653,9 @@
       "dest_owner": null,
       "dest_stage": 2,
       "dest_status": 96,
+      "dest_process": null,
       "dest_override": null,
-      "order": 3
+      "order": 4
     }, {
       "stage": 2,
       "status": 21,
@@ -654,6 +666,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 60,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     }, {
@@ -666,8 +679,22 @@
       "dest_owner": null,
       "dest_stage": 4,
       "dest_status": 41,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
+    }, {
+      "stage": 2,
+      "status": 21,
+      "processes": [1,2],
+      "creation_methods": [1,2],
+      "title": "ARS - Waiting for Proof of Service",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 4,
+      "dest_status": 41,
+      "dest_process": null,
+      "dest_override": null,
+      "order": 2
     }, {
       "stage": 2,
       "status": 21,
@@ -678,10 +705,10 @@
       "dest_owner": null,
       "dest_stage": 2,
       "dest_status": 95,
+      "dest_process": null,
       "dest_override": null,
-      "order": 5
+      "order": 6
     },
-    
     {
       "stage": 2,
       "status": 95,
@@ -692,6 +719,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 60,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -705,6 +733,7 @@
       "dest_owner": null,
       "dest_stage": 2,
       "dest_status": 90,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -718,6 +747,7 @@
       "dest_owner": null,
       "dest_stage": 4,
       "dest_status": 41,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -732,6 +762,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 60,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -746,6 +777,7 @@
       "dest_owner": null,
       "dest_stage": 8,
       "dest_status": 80,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -759,6 +791,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 62,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -772,6 +805,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 90,
+      "dest_process": null,
       "dest_override": null,
       "order": 3
     },
@@ -786,6 +820,7 @@
       "dest_owner": null,
       "dest_stage": 8,
       "dest_status": 80,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -799,6 +834,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 62,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -812,6 +848,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 90,
+      "dest_process": null,
       "dest_override": null,
       "order": 3
     },
@@ -826,6 +863,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 60,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -839,6 +877,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 61,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -853,6 +892,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 61,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -866,10 +906,24 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 60,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
-    
+    {
+      "stage": 6,
+      "status": 63,
+      "processes": [1,2],
+      "creation_methods": [1,2],
+      "title": "ARS - Waiting for Proof of Service",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 4,
+      "dest_status": 41,
+      "dest_process": null,
+      "dest_override": null,
+      "order": 3
+    },
     {
       "stage": 8,
       "status": 80,
@@ -880,6 +934,7 @@
       "dest_owner": null,
       "dest_stage": 10,
       "dest_status": 103,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -893,6 +948,7 @@
       "dest_owner": "same",
       "dest_stage": 10,
       "dest_status": 100,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -906,6 +962,7 @@
       "dest_owner": "same",
       "dest_stage": 10,
       "dest_status": 101,
+      "dest_process": null,
       "dest_override": null,
       "order": 3
     },
@@ -919,8 +976,23 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 63,
+      "dest_process": null,
       "dest_override": null,
       "order": 4
+    },
+    {
+      "stage": 8,
+      "status": 80,
+      "processes": [2],
+      "creation_methods": [1,2,4,5,6,99],
+      "title": "Adjourn DR to Hearing",
+      "ownerTypes": null,
+      "dest_owner": null,
+      "dest_stage": 6,
+      "dest_status": 63,
+      "dest_process": 1,
+      "dest_override": null,
+      "order": 5
     },
     {
       "stage": 8,
@@ -932,8 +1004,9 @@
       "dest_owner": "same",
       "dest_stage": 8,
       "dest_status": 81,
+      "dest_process": null,
       "dest_override": true,
-      "order": 5
+      "order": 6
     },
 
     {
@@ -946,6 +1019,7 @@
       "dest_owner": null,
       "dest_stage": 10,
       "dest_status": 103,
+      "dest_process": null,
       "dest_override": false,
       "order": 1
     }, {
@@ -958,6 +1032,7 @@
       "dest_owner": "same",
       "dest_stage": 10,
       "dest_status": 100,
+      "dest_process": null,
       "dest_override": false,
       "order": 2
     }, {
@@ -970,6 +1045,7 @@
       "dest_owner": "same",
       "dest_stage": 10,
       "dest_status": 101,
+      "dest_process": null,
       "dest_override": false,
       "order": 3
     }, {
@@ -982,6 +1058,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 63,
+      "dest_process": null,
       "dest_override": false,
       "order": 4
     },
@@ -996,6 +1073,7 @@
       "dest_owner": null,
       "dest_stage": 10,
       "dest_status": 103,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -1009,6 +1087,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 63,
+      "dest_process": null,
       "dest_override": null,
       "order": 2
     },
@@ -1023,6 +1102,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 63,
+      "dest_process": null,
       "dest_override": null,
       "order": 1
     },
@@ -1037,6 +1117,7 @@
       "dest_owner": null,
       "dest_stage": 6,
       "dest_status": 62,
+      "dest_process": 4,
       "dest_override": null,
       "order": 1
     }
@@ -1109,5 +1190,31 @@
     "10:104" : "status-IO-owner",
     "10:105" : "status-arb-owner",
     "10:106" : "status-arb-owner"
+  },
+
+  "completenessChecks": {
+    "arbSSPO": [{
+        "status": 90
+      }, {
+        "status": 91
+      }, {
+        "status": 93
+      }, {
+        "status": 94
+      }, {
+        "status": 103
+      }
+    ],
+    "ioSSPO": [{
+        "status": 41,
+        "process": [1,2,4]
+      }, {
+        "status": 60,
+        "process": [1,2,4]
+      }, {
+        "status": 61,
+        "process": [1,2,4]
+      }
+    ]
   }
 }

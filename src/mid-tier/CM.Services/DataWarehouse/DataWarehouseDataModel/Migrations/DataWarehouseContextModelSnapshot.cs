@@ -164,6 +164,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int?>("AwardedReviewConsiderations")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("CaseManagedTimeMin")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -269,6 +272,15 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int>("IsAdjourned")
                         .HasColumnType("integer");
 
+                    b.Property<bool?>("IsMissingIssueOutcomes")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsMissingNoticeService")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsMissingResolutionTime")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
@@ -311,6 +323,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int?>("NoticeDeliveredTimeId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("NoticeNotServed")
+                        .HasColumnType("integer");
+
                     b.Property<int>("NoticeServices")
                         .HasColumnType("integer");
 
@@ -346,6 +361,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
 
                     b.Property<int?>("RequestedCorrections")
                         .HasColumnType("integer");
+
+                    b.Property<bool?>("RequestedPossession")
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("RequestedReviewConsideration")
                         .HasColumnType("integer");
@@ -658,6 +676,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int?>("CreationMethod")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DisputeComplexity")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("DisputeGuid")
                         .HasColumnType("uuid");
 
@@ -690,6 +711,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
 
                     b.Property<int?>("FirstAssignedStatus")
                         .HasColumnType("integer");
+
+                    b.Property<bool?>("HasArsDeadline")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("HearingStartDateTime")
                         .HasColumnType("timestamp without time zone");
@@ -829,6 +853,285 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.ToTable("FactIntakeProcessings");
                 });
 
+            modelBuilder.Entity("CM.Services.DataWarehouse.DataWarehouseDataModel.Models.FactIssueOutcome", b =>
+                {
+                    b.Property<int>("IssueOutcomeRecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IssueOutcomeRecordId"));
+
+                    b.Property<int>("AssociatedOffice")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AwardDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("AwardedAmount")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int?>("AwardedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("AwardedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("AwardedDaysAfterService")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ClaimCode")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ClaimCreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("ClaimGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ClaimId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeCreationMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DisputeSubType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeUrgency")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("InitialPaymentDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("InitialPaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsAmended")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsReviewed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LoadDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("PrevAwardDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("PrevAwardedAmount")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int?>("PrevAwardedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PrevAwardedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("PrevAwardedDaysAfterService")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PrevRemedyStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RemedyStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RemedySubStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("RequestedAmount")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<DateTime?>("SubmittedDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("IssueOutcomeRecordId");
+
+                    b.ToTable("FactIssueOutcomes");
+                });
+
+            modelBuilder.Entity("CM.Services.DataWarehouse.DataWarehouseDataModel.Models.FactResolutionService", b =>
+                {
+                    b.Property<int>("ResolutionServiceRecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ResolutionServiceRecordId"));
+
+                    b.Property<int?>("Applicants")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AssociatedOffice")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("AssociatedToPriorHearing")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("ContainsCorrectionReplacement")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("ContainsMateriallyDifferent")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("ContainsNoteworthy")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("ContainsReviewReplacement")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("ContainsVisibleToPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("CreationMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DeliveryPriority")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DerivedDocumentType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeCreationMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("DisputeGuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("DisputeSubType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeUrgency")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DocCompletedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DocComplexity")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DocGroupCreatedById")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DocGroupCreatedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DocPreparationTime")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DocStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DocStatusDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("DocWritingTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DocumentFileTypes")
+                        .HasMaxLength(75)
+                        .HasColumnType("character varying(75)");
+
+                    b.Property<int?>("DocumentsDeliveredEmail")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DocumentsDeliveredMail")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DocumentsDeliveredOther")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DocumentsDeliveredPickup")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EvidenceFiles")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("EvidenceFilesMb")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("InitialPaymentDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("Issues")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("LastProcess")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("LastStage")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("LastStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("LastStatusDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("LatestDeliveryDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("LatestReadyForDeliveryDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("LoadDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("OutcomeDocGroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PriorHearingComplexity")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PriorHearingDuration")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PriorHearingId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PriorLinkedDisputes")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PriorSharedHearingLinkingType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Respondents")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("SubmittedDateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("TotalDocuments")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TotalDocumentsDelivered")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ResolutionServiceRecordId");
+
+                    b.ToTable("FactResolutionServices");
+                });
+
             modelBuilder.Entity("CM.Services.DataWarehouse.DataWarehouseDataModel.Models.FactTimeStatistic", b =>
                 {
                     b.Property<int>("DisputeSummaryRecordId")
@@ -882,6 +1185,18 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int>("DisputeHearings")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DisputeHearingsDeferred")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeHearingsDuty")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeHearingsEmergency")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("DisputeHearingsStandard")
+                        .HasColumnType("integer");
+
                     b.Property<int>("DocumentsDelivered")
                         .HasColumnType("integer");
 
@@ -901,6 +1216,18 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("EmptyHearings")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EmptyHearingsDeferred")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EmptyHearingsDuty")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EmptyHearingsEmergency")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EmptyHearingsStandard")
                         .HasColumnType("integer");
 
                     b.Property<int>("EvidenceFiles")
@@ -945,6 +1272,18 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<DateTime>("LoadDateTime")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("NoUrgencyDisputesPaid")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("NonParticipatoryClosed")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("NonParticipatoryWaitingDecision")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("NonParticipatoryWaitingDecisionOldest")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int>("OfficeDisputesPaid")
                         .HasColumnType("integer");
 
@@ -957,6 +1296,18 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int>("OtherIncompleteTasks")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ParticipatoryMissArsDeadline")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ParticipatoryMissReinstateDeadline")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ParticipatoryWaitArsDeadline")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ParticipatoryWaitReinstateDeadline")
+                        .HasColumnType("integer");
+
                     b.Property<int>("PerUnitPayments")
                         .HasColumnType("integer");
 
@@ -964,6 +1315,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("Process2DisputesPaid")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Process7DisputesPaid")
                         .HasColumnType("integer");
 
                     b.Property<int>("ReviewPayments")
@@ -990,8 +1344,17 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                     b.Property<int>("Stage2Unassigned")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Stage2UnassignedDeferred")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("Stage2UnassignedOldest")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<int?>("Stage2UnassignedStandard")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Stage2UnassignedUrgent")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Stage4Open")
                         .HasColumnType("integer");
@@ -1012,6 +1375,9 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("StatusAbandonedNoService")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StatusAdjourned")
                         .HasColumnType("integer");
 
                     b.Property<int>("StatusCancelled")
@@ -1045,6 +1411,15 @@ namespace CM.Services.DataWarehouse.DataWarehouseDataModel.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("TenantDisputesPaid")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("WaitTimeDaysDeferred")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("WaitTimeDaysStandard")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("WaitTimeDaysUrgent")
                         .HasColumnType("integer");
 
                     b.HasKey("DisputeSummaryRecordId");

@@ -7,6 +7,8 @@
 
 #editUser-modal .btn-cancel { margin-right: 10px; }
 
+#editUser-modal .intake-checkbox-component input[disabled] + span { opacity: 1 !important; cursor: pointer !important;}
+
 #editUser-modal .modal-dialog { min-height: 800px; width: 1200px; }
 #editUser-modal .modal-body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.42857143; color: #7f7f7f ; background-color: white; }
 #editUser-modal .admin-access .form-control { max-width: 150px; }
@@ -28,11 +30,11 @@
 
 #usr-management-list .mobile-column { max-width: 115px; min-width: 115px; }
 
-#usr-management-list .user-active-column { max-width: 50px; min-width: 50px; padding-left: 0;}
+#usr-management-list .user-active-column { max-width: 30px; min-width: 30px; padding-left: 0;}
 
 #usr-management-list .user-admin-column { width: 80px; min-width: 80px; }
 
-#usr-management-list .rolegrop-column { min-width: 160px; max-width: 160px; }
+#usr-management-list .rolegroup-column { min-width: 150px; max-width: 150px; }
 
 #usr-management-list .roletype-column { max-width: 100px; min-width: 100px; }
 
@@ -48,7 +50,7 @@
 
 #usr-management-list .user-scheduler-column { min-width: 95px; }
 
-#usr-management-list .user-id-column { min-width: 55px; max-width: 55px; padding-left: 8px; overflow: visible; }
+#usr-management-list .user-id-column { min-width: 85px; max-width: 85px; padding-left: 5px; overflow: visible; }
 
 #usr-management-list .email-column { max-width: 220px; min-width: 220px; }
 

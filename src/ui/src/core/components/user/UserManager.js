@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - Manager that offers functionality relating to DMS users and external users. 
  * @namespace core.components.user.UserManager
  * @memberof core.components.user
  */
@@ -7,6 +8,8 @@ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import UserCollection from './User_collection'
 import InternalUserProfileCollection from './InternalUserProfile_collection';
+import DisputeUserCollection from '../dispute-user/DisputeUser_collection';
+import UserModel from './User_model';
 
 const SYSTEM_ARB_NAME = 'SystemArbitrator';
 const SYSTEM_USER_NAMES = [
@@ -31,7 +34,7 @@ const api_name_load_internal_users = 'users/internaluserslist';
 const api_name_update_user = 'userlogin/update';
 const api_name_create_user = 'userlogin/create';
 const api_name_update_user_status = 'users/internaluserstatus';
-const api_name_load_dispute_users = 'users/disputeuserlist';
+const api_dispute_users = 'dispute/disputeusers';
 
 const _UserManager = Marionette.Object.extend({
   /**
@@ -56,13 +59,14 @@ const _UserManager = Marionette.Object.extend({
     'get:roletypes:by:role': 'getRoleSubTypesByRole',
     
     'get:all:users' : 'getInternalUsers',
+    'get:dispute:users': 'getDisputeUsers',
     'get:users:by:role' : 'getUsersByRoles',
     'get:arbs': 'getArbitratorUsers',
     'get:ios': 'getIOUsers',
     'get:schedulers': 'getSchedulerUsers',
     'get:profiles' : 'getInternalUserProfiles',
     'load:users' : 'loadInternalUsersPromise',
-    'load:dispute:users' : 'loadDisputeUsersPromise',
+    'load:dispute:users': 'loadDisputeUsers',
 
     'set:active' : 'setUserActiveStatus',
     'update:user' : 'updateUser',
@@ -122,17 +126,17 @@ const _UserManager = Marionette.Object.extend({
    * Does not flush any cached data.
    */
   clearInternalData() {
-    this.disputeUsers = new UserCollection();
+    this.disputeUsers = new DisputeUserCollection();
   },
 
   initialize() {
     this.cached_data = {};
     this.internal_users_collection = new UserCollection();
-    this.disputeUsers = new UserCollection();
+    this.disputeUsers = new DisputeUserCollection();
     this.userProfiles = new InternalUserProfileCollection();
   },
 
-  userLoginStatusChange(model, value) {
+  userLoginStatusChange(model, value) {//TODO: duplicate from SessionManager, remove?
     const channel = this.getChannel();
     if (model.previous('token') === null && value !== null) {
       channel.trigger('login:complete');
@@ -182,8 +186,23 @@ const _UserManager = Marionette.Object.extend({
 
   getUserFromUserId(user_id) {
     if (!user_id) return user_id;
-    const matching_user = this.internal_users_collection.findWhere({ user_id }) || this.disputeUsers.findWhere({ user_id });
-    return matching_user ? matching_user : null;
+    const internalUser = this.internal_users_collection.findWhere({ user_id });
+    const externalDisputeUser = this.disputeUsers.findWhere({ system_user_id: user_id });
+    
+    if (internalUser) {
+      return internalUser;
+    } else if (externalDisputeUser) {
+      const userModel = new UserModel(externalDisputeUser.attributes);
+      userModel.set({ 
+        name: externalDisputeUser.get('full_name'),
+        user_id: externalDisputeUser.get('system_user_id'),
+        role_id: externalDisputeUser.get('system_user_role_id') ,
+      });
+
+      return userModel;
+    } else {
+      return null;
+    }
   },
 
   getNameFromUserId(user_id) {
@@ -267,17 +286,20 @@ const _UserManager = Marionette.Object.extend({
     });
   },
 
-  loadDisputeUsersPromise(dispute_guid) {
-    const dfd = $.Deferred();
-    
-    apiChannel.request('call', {
-      method: 'GET',
-      url: `${configChannel.request('get', 'API_ROOT_URL')}${api_name_load_dispute_users}/${dispute_guid}`,
-    }).done(dispute_users_response => {
-      this.disputeUsers.reset(dispute_users_response || []);
-      dfd.resolve();
-    }).fail(dfd.reject);
-    return dfd.promise();
+  loadDisputeUsers(disputeGuid) {
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_dispute_users}/${disputeGuid}`
+      }).done(response => {
+        this.disputeUsers.reset(response);
+        res(this.disputeUsers);
+      }).fail(rej);
+    });
+  },
+
+  getDisputeUsers() {
+    return this.disputeUsers;
   },
 
   setUserActiveStatus(userModel) {

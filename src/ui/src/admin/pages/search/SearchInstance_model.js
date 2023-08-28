@@ -380,7 +380,7 @@ export default DynamicMenuInstanceModel.extend({
 
     this.set('crossAppExcludeActiveHearingsModel', new CheckboxModel({
       html: `Exclude disputes with a hearing less than`,
-      checked: true
+      checked: false
     }));
 
     this.set('crossAppExcludeActiveHearingsAmountModel', new InputModel({

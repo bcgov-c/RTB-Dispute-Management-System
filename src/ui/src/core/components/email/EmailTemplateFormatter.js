@@ -1,10 +1,13 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 
+const documentsChannel = Radio.channel('documents');
 const configChannel = Radio.channel('config');
+const hearingChannel = Radio.channel('hearings');
 const disputeChannel = Radio.channel('dispute');
 const participantsChannel = Radio.channel('participants');
 const Formatter = Radio.channel('formatter').request('get');
+const noticeChannel = Radio.channel('notice');
 
 const EMAIL_CONTENT_CLASS = 'email-content';
 const EMAIL_TABLE_IGNORE_CLASS = 'editor-ignore';
@@ -12,8 +15,10 @@ const EMAIL_P_IGNORE_CLASS = 'clearfloats';
 const EMAIL_ONLY_CLASS = `show-if-email`;
 const PICKUP_NOTICE_ONLY_CLASS = `show-if-pickup-confirmation`;
 
-const getContactNameFn = () => (participantsChannel.request('get:primaryApplicant') || {getContactName(){}}).getContactName();
-const getDateDisplayWithOffsetFn = (offset) => Formatter.toDateDisplay(Moment().add(offset, 'days'));
+const getDateDisplayWithOffsetFn = (offset) => {
+  const timezone = configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING');
+  return Formatter.toDateDisplay(Moment.tz({}, timezone).add(offset, 'days'), timezone);
+};
 
 // By default, clear all styles entered. NOTE:
 // `css(attr, '');` removes that property from an element if it has already been directly applied, whether in the HTML style attribute,
@@ -104,30 +109,75 @@ const EmailTemplateFormatter = Marionette.Object.extend({
 
   // Provides replacement functionality
   mergeFieldConversions: {
-    '<file_number>': () => disputeChannel.request('get:filenumber'),
-    '{file_number}': () => disputeChannel.request('get:filenumber'),
+    '<file_number>': (contextData={}) => {
+      const dispute = contextData?.dispute || disputeChannel.request('get');
+      return dispute.get('file_number');
+    },
+    '{file_number}': (contextData={}) => {
+      const dispute = contextData?.dispute || disputeChannel.request('get');
+      return dispute.get('file_number');
+    },
     '{now_plus_1_day}': () => getDateDisplayWithOffsetFn(1),
     '{now_plus_3_days}': () => getDateDisplayWithOffsetFn(3),
     '{now_plus_21_days}': () => getDateDisplayWithOffsetFn(21),
-    '{primary_applicant_access_code}': () => (participantsChannel.request('get:primaryApplicant') || {get(){}}).get('access_code'),
-    '{primary_applicant_name}': getContactNameFn,
-    '{primary_applicant_first_name}': () => {
-      const contactName = getContactNameFn();
+    '{primary_applicant_access_code}': (contextData={}) => {
+      const primaryApplicant = contextData?.primary || participantsChannel.request('get:primaryApplicant');
+      return primaryApplicant?.get('access_code');
+    },
+    '{primary_applicant_name}': (contextData={}) => {
+      const primaryApplicant = contextData?.primary || participantsChannel.request('get:primaryApplicant');
+      return primaryApplicant?.getContactName();
+    },
+    '{primary_applicant_first_name}': (contextData={}) => {
+      const primaryApplicant = contextData?.primary || participantsChannel.request('get:primaryApplicant');
+      const contactName = primaryApplicant?.getContactName();
       if (!contactName) return;
       const nameParts = String(contactName).split(/\s+/g);
       return nameParts.length ? nameParts[0] : contactName;
     },
-    '{dispute_rental_address}': () => {
-      const dispute = disputeChannel.request('get');
-      const unitTypeToDisplay = dispute.getDisputeUnitTypeDisplay();
-      return `${unitTypeToDisplay ? `(${unitTypeToDisplay}) ` : ''}${dispute.get('tenancy_address')}, ${dispute.get('tenancy_city')}, BC, Canada, ${dispute.get('tenancy_zip_postal')}`;
+    '{dispute_rental_address}': (contextData={}) => {
+      const dispute = contextData?.dispute || disputeChannel.request('get');
+      return dispute?.getCompleteAddress();
     },
-    '{comma_separated_respondent_list}': () => participantsChannel.request('get:respondents').map(p => p.getDisplayName()).join(', '),
+    '{initial_submission_date}': (contextData={}) => {
+      const dispute = contextData?.dispute || disputeChannel.request('get');
+      return dispute?.get('submitted_date') ? Formatter.toFullDateDisplay(dispute.get('submitted_date')) : '';
+    },
+    '{comma_separated_respondent_list}': (contextData={}) => {
+      const respondents = contextData?.respondents || participantsChannel.request('get:respondents');
+      return respondents?.map(p => p.getDisplayName()).join(', ');
+    },
+    '{comma_separated_applicant_list}': (contextData={}) => {
+      const applicants = contextData?.applicants || participantsChannel.request('get:applicants');
+      return applicants?.map(p => p.getDisplayName()).join(', ');
+    },
     '{dispute_access_url}': () => configChannel.request('get', 'DISPUTE_ACCESS_URL'),
     '{intake_url}': () => configChannel.request('get', 'INTAKE_URL'),
     '{additional_landlord_intake_url}': () => {
       const INTAKE_URL = configChannel.request('get', 'INTAKE_URL');
       return INTAKE_URL && INTAKE_URL.replace('/Intake', '/AdditionalLandlordIntake');
+    },
+    '{secondary_file_numbers}': (contextData={}) => {
+      const targetHearing = contextData?.hearing || hearingChannel.request('get:latest');
+      return targetHearing?.getSecondaryDisputeHearings()?.map(dh => dh.getFileNumber()).join(', ') || '-'
+    },
+    '{recipient_access_code}': (contextData={}) => contextData?.recipientModel?.get('access_code') || '',
+    '{recipient_first_name}': (contextData={}) => contextData?.recipientModel?.get('first_name') || contextData?.recipientModel?.get('bus_contact_first_name') || '',
+    '{notice_service_deadline_date}': (contextData={}) => {
+      const notice = contextData?.notice || noticeChannel.request('get:active');
+      return notice?.get('service_deadline_date') ? Formatter.toFullDateAndTimeDisplay(notice.get('service_deadline_date'), configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING')) : '';
+    },
+    '{notice_service_second_service_deadline_date}': (contextData={}) => {
+      const notice = contextData?.notice || noticeChannel.request('get:active');
+      return notice?.get('second_service_deadline_date') ? Formatter.toFullDateAndTimeDisplay(notice.get('second_service_deadline_date'), configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING')) : '';
+    },
+    '{linked_file_numbers}': (contextData={}) => {
+      const targetHearing = contextData?.hearing || hearingChannel.request('get:latest');
+      return targetHearing?.getDisputeHearings()?.map(dh => dh.getFileNumber()).join(', ') || '-'
+    },
+    '{hearing_start_date}': (contextData={}) => {
+      const targetHearing = contextData?.hearing || hearingChannel.request('get:latest');
+      return targetHearing?.get('hearing_start_datetime') ? Formatter.toFullDateAndTimeDisplay(targetHearing?.get('hearing_start_datetime'), configChannel.request('get', 'RTB_OFFICE_TIMEZONE_STRING')) : '';
     }
   },
 
@@ -161,6 +211,52 @@ const EmailTemplateFormatter = Marionette.Object.extend({
         const dispute = disputeChannel.request('get');
         return dispute && dispute.isCreatedPaper();
       }
+    },
+    '{start_show_created_online}': {
+      endTag: '{end_show_created_online}',
+      validate() {
+        const dispute = disputeChannel.request('get');
+        return dispute && dispute.isCreatedIntake();
+      }
+    },
+    '{start_show_corrected}': {
+      endTag: '{end_show_corrected}',
+      validate(contextData={}) {
+        return contextData && contextData.outcomeDocFiles?.[0]?.get('file_sub_type') === configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_CORR');
+      }
+    },
+    '{start_show_reviewed}': {
+      endTag: '{end_show_reviewed}',
+      validate(contextData={}) {
+        return contextData && contextData.outcomeDocFiles?.[0]?.get('file_sub_type') === configChannel.request('get', 'OUTCOME_DOC_FILE_SUB_TYPE_REVIEW');
+      }
+    },
+    '{start_show_op}': {
+      endTag: '{end_show_op}',
+      validate(contextData={}) {
+        const opCode = "OP";
+        return contextData && contextData.outcomeDocFiles?.filter(docFile => {
+          const docConfig = documentsChannel.request('config:file', docFile.get('file_type'));
+          return docConfig?.code === opCode;
+        }).length;
+      }
+    },
+    '{start_show_mn}': {
+      endTag: '{end_show_mn}',
+      validate(contextData={}) {
+        const mnCode = "MN";
+        return contextData && contextData.outcomeDocFiles?.filter(docFile => {
+          const docConfig = documentsChannel.request('config:file', docFile.get('file_type'));
+          return docConfig?.code === mnCode;
+        }).length;
+      }
+    },
+    '{start_show_ars_deadline}': {
+      endTag: '{end_show_ars_deadline}',
+      validate(contextData={}) {
+        const notice = contextData?.notice || noticeChannel.request('get:active');
+        return notice?.get('has_service_deadline');
+      }
     }
   },
 
@@ -171,23 +267,23 @@ const EmailTemplateFormatter = Marionette.Object.extend({
     }
   },
 
-  load(html) {
+  load(html, contextData={}) {
     this.emailModel = null;
     this.html = html;
-    this.createMergeHtml();
+    this.createMergeHtml(contextData);
   },
 
-  createMergeHtml() {
-    this.mergedHtml = this.applyConversionsTo(this.html);
+  createMergeHtml(contextData={}) {
+    this.mergedHtml = this.applyConversionsTo(this.html, contextData);
   },
 
-  applyConversionsTo(html='') {
+  applyConversionsTo(html='', contextData={}) {
     let mergedHtml = html;
     const allMergeFieldConversions = Object.assign({}, this.mergeFieldConversions);
 
     Object.keys(this.mergeFieldRanges).forEach(mergeRangeStart => {
       const mergeRangeEnd = this.mergeFieldRanges[mergeRangeStart].endTag;
-      const isValid = this.mergeFieldRanges[mergeRangeStart].validate.bind(this)();
+      const isValid = this.mergeFieldRanges[mergeRangeStart].validate.bind(this)(contextData);
       const regExp = new RegExp(`${mergeRangeStart}.*?${mergeRangeEnd}`, 'gms');
       if (isValid) {
         // Remove tags only - treat them as merge fields and remove them on next step
@@ -201,7 +297,7 @@ const EmailTemplateFormatter = Marionette.Object.extend({
 
     Object.keys(allMergeFieldConversions).forEach(mergeField => {
       const fieldConversion = allMergeFieldConversions[mergeField];
-      mergedHtml = mergedHtml.replaceAll(mergeField, _.isFunction(fieldConversion) ? fieldConversion(this) : fieldConversion);
+      mergedHtml = mergedHtml.replaceAll(mergeField, _.isFunction(fieldConversion) ? fieldConversion.bind(this)(contextData) : fieldConversion);
     });
 
     return mergedHtml;

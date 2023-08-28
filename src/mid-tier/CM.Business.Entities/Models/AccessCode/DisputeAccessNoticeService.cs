@@ -22,33 +22,33 @@ public class DisputeAccessNoticeService
     [JsonProperty("service_method")]
     public byte? ServiceMethod { get; set; }
 
-    [JsonProperty("service_comment")]
-    public string ServiceComment { get; set; }
-
     [JsonProperty("service_date")]
     public string ServiceDate { get; set; }
 
-    [JsonProperty("notice_service_file_1id")]
-    public int? NoticeServiceFile1Id { get; set; }
-
-    [JsonProperty("notice_service_file_2id")]
-    public int? NoticeServiceFile2Id { get; set; }
-
-    [JsonProperty("notice_service_file_3id")]
-    public int? NoticeServiceFile3Id { get; set; }
-
-    [JsonProperty("notice_service_file_4id")]
-    public int? NoticeServiceFile4Id { get; set; }
-
-    [JsonProperty("notice_service_file_5id")]
-    public int? NoticeServiceFile5Id { get; set; }
-
     [JsonProperty("proof_file_description_id")]
     public int? ProofFileDescriptionId { get; set; }
+
+    [JsonProperty("validation_status")]
+    public byte? ValidationStatus { get; set; }
+
+    [JsonProperty("has_service_deadline")]
+    public bool? HasServiceDeadline { get; set; }
+
+    [JsonProperty("service_deadline_days")]
+    public int? ServiceDeadlineDays { get; set; }
+
+    [JsonProperty("service_deadline_date")]
+    public string ServiceDeadlineDate { get; set; }
 
     [JsonProperty("modified_date")]
     public string ModifiedDate { get; set; }
 
     [JsonProperty("modified_by")]
     public int? ModifiedBy { get; set; }
+
+    [JsonProperty("other_proof_file_description_id")]
+    public int? OtherProofFileDescriptionId { get; set; }
+
+    [JsonProperty("second_service_deadline_date")]
+    public string SecondServiceDeadlineDate { get; set; }
 }

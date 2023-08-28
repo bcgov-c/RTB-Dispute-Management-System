@@ -1,5 +1,5 @@
 /**
- * The FileUploader wraps functionality from the jQuery fileupload widget and offers a default UI for file uploading.
+ * @fileoverview - The FileUploader wraps functionality from the jQuery fileupload widget and offers a default UI for file uploading.
  * @class core.components.file-upload.FileUploader
  * @memberof core.components.files.file-upload
  */
@@ -21,6 +21,8 @@ const filesChannel = Radio.channel('files');
 const modalChannel = Radio.channel('modals');
 const sessionChannel = Radio.channel('session');
 
+const loaderChannel = Radio.channel('loader');
+
 export default Marionette.View.extend({
   template: _.template(`<form method="POST" enctype="multipart/form-data"><div class="file-upload-child-region"</div></form>`),
 
@@ -28,6 +30,53 @@ export default Marionette.View.extend({
     childRegion: '.file-upload-child-region',
     fileuploader: 'form'
   },
+
+  events: {
+    'click input': 'clickFileUpload',
+  },
+
+    // NOTE: If passing in a template, it must define a <form> element that the fileupload will be initialized on
+    /**
+     * @param {Boolean} is_uploading //TODO: unused? not being passed in anywhere
+     * @param {FileCollection} files
+     * @param {FileDescriptionModel} file_description 
+     * @param {String} [child_template] - can pass in custom file upload region HTML
+     * @param {Function} [file_creation_fn] - Pass in custom file creation function. Look at defaultFileCreationFn for example function
+     */
+    initialize(options) {
+      this.mergeOptions(options, ['is_uploading', 'files', 'file_description', 'child_template', 'file_creation_fn']);//TODO: refactor to camelCase
+      options = options || {};
+  
+      this.processing_options = {};
+      this.files = this.files || new FileCollection();
+      this.child_template = this.child_template || default_child_template;
+      this.file_description = this.file_description || null;
+      this.file_creation_fn = this.file_creation_fn || this.defaultFileCreationFn;
+  
+      this.fileupload_options = _.extend(this.getDefaultComponentOptions(), options);
+      this.processing_options = _.extend(this.getDefaultProcessingOptions(), options.processing_options || {});
+  
+      this.isFileInputSelectComplete = false;
+  
+      this.listenTo(this.files, 'add remove', () => this.trigger('change:files'));
+    },
+
+  clickFileUpload() {
+    this.isFileInputSelectComplete = false;
+    loaderChannel.trigger('page:load');
+
+    const interval = setInterval(() => {
+      if (!this?.isRendered()) return clearInterval(this._internalLoaderInterval);
+      if (this.isFileInputSelectComplete) {
+        loaderChannel.trigger('page:load:complete');
+        return clearInterval(interval);
+      }
+    }, 500);
+    // After the file dialog is opened, the window will always get focus back once the file input returns
+    // This listener is needed to handle file input closed, as the browser does not provide any event
+    window.addEventListener('focus', () => this.isFileInputSelectComplete = true, { once: true });
+  },
+  
 
   // Can be used to simulate clicking the "Add Files" button from the default view
   openFileDialog() {
@@ -73,23 +122,6 @@ export default Marionette.View.extend({
     };
   },
 
-  // NOTE: If passing in a template, it must define a <form> element that the fileupload will be initialized on
-  initialize(options) {
-    this.mergeOptions(options, ['is_uploading', 'files', 'file_description', 'child_template', 'file_creation_fn']);
-    options = options || {};
-
-    this.processing_options = {};
-    this.files = this.files || new FileCollection();
-    this.child_template = this.child_template || default_child_template;
-    this.file_description = this.file_description || null;
-    this.file_creation_fn = this.file_creation_fn || this.defaultFileCreationFn;
-
-    this.fileupload_options = _.extend(this.getDefaultComponentOptions(), options);
-    this.processing_options = _.extend(this.getDefaultProcessingOptions(), options.processing_options || {})
-
-    this.listenTo(this.files, 'add remove', () => this.trigger('change:files'));
-  },
-
   defaultFileCreationFn(fileObj, processing_result) {
     return {
       fileObj: fileObj,
@@ -120,8 +152,12 @@ export default Marionette.View.extend({
       fileInput: this.$('input[type=file]'),
       dropZone: this.$('.file-upload-dropzone')
     }, this.processing_options);
+    let generatedUploadId;
 
     this.getUI('fileuploader').fileupload(all_fileuploader_options)
+    .on('fileuploadchange', (e, data) => {
+      this.isFileInputSelectComplete = true;
+    })
     .on('fileuploadadd', (e, data) => {
       const processing_options = this.processing_options;
       console.log("Adding ", data.originalFiles);
@@ -181,7 +217,7 @@ export default Marionette.View.extend({
         error_state: null
       });
 
-      sessionChannel.request('set:upload', file_model.attributes);
+      generatedUploadId = sessionChannel.request('add:active:api', file_model.toJSON());
     })
     .on('fileuploadprogress', (e, data) => {
       console.log("file upload progress...", e, data);
@@ -203,8 +239,6 @@ export default Marionette.View.extend({
         console.log(`[Error] Can't find a file model to update for this file `, e, data);
         return false;
       }
-
-      sessionChannel.request('remove:upload', file_model.attributes);
     })
     .on('fileuploadfail', (e, data) => {
       console.log("file upload done...", e, data);
@@ -214,8 +248,9 @@ export default Marionette.View.extend({
         console.log(`[Error] Can't find a file model to update for this file `, e, data);
         return false;
       }
-
-      sessionChannel.request('remove:upload', file_model.attributes);
+    })
+    .on('fileuploadalways', (e, data) => {
+      if (generatedUploadId) sessionChannel.request('remove:active:api', generatedUploadId);
     });
   },
 

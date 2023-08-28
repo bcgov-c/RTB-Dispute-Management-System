@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Contains UI and logic binding for ModalDeleteHearing
+ */
 import Radio from 'backbone.radio';
 import template from './ModalBaseDeleteHearing_template.tpl';
 import hearingDisplayDateTemplate from '../../../../../core/components/hearing/hearing-display/HearingDisplayDate_template.tpl';

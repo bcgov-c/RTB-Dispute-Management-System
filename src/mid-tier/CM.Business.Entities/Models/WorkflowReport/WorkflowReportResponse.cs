@@ -47,4 +47,6 @@ public class WorkflowReportResponse
     public int DocumentsMissingDeliveries { get; set; }
 
     public int MissingEvidenceService { get; set; }
+
+    public int MissingNoticeServiceConfirmations { get; set; }
 }

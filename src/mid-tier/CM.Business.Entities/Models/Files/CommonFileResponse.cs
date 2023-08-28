@@ -35,4 +35,7 @@ public class CommonFileResponse : CommonResponse
 
     [JsonProperty("file_url")]
     public string FileUrl { get; set; }
+
+    [JsonProperty("file_status")]
+    public byte? FileStatus { get; set; }
 }

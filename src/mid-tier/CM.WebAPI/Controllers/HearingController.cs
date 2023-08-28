@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using CM.Business.Entities.Models.Hearing;
 using CM.Business.Services.ConferenceBridge;
 using CM.Business.Services.DisputeHearing;
 using CM.Business.Services.DisputeServices;
+using CM.Business.Services.Files;
 using CM.Business.Services.Hearings;
 using CM.Business.Services.SystemSettingsService;
 using CM.Business.Services.TokenServices;
 using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
+using CM.Data.Model;
 using CM.WebAPI.Filters;
 using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
@@ -24,14 +28,25 @@ public class HearingController : BaseController
     private readonly IConferenceBridgeService _conferenceBridgeService;
     private readonly IDisputeHearingService _disputeHearingService;
     private readonly IDisputeService _disputeService;
+    private readonly IFileDescriptionService _fileDescriptionService;
 
     private readonly IHearingService _hearingService;
     private readonly ISystemSettingsService _systemSettingsService;
 
     private readonly ITokenService _tokenService;
     private readonly IUserService _userService;
+    private readonly IMapper _mapper;
 
-    public HearingController(IHearingService hearingService, IUserService userService, IDisputeService disputeService, IConferenceBridgeService conferenceBridgeService, IDisputeHearingService disputeHearingService, ISystemSettingsService systemSettingsService, ITokenService tokenService)
+    public HearingController(
+        IHearingService hearingService,
+        IUserService userService,
+        IDisputeService disputeService,
+        IConferenceBridgeService conferenceBridgeService,
+        IDisputeHearingService disputeHearingService,
+        ISystemSettingsService systemSettingsService,
+        ITokenService tokenService,
+        IFileDescriptionService fileDescriptionService,
+        IMapper mapper)
     {
         _hearingService = hearingService;
         _userService = userService;
@@ -40,6 +55,8 @@ public class HearingController : BaseController
         _disputeService = disputeService;
         _systemSettingsService = systemSettingsService;
         _tokenService = tokenService;
+        _fileDescriptionService = fileDescriptionService;
+        _mapper = mapper;
     }
 
     [AuthorizationRequired(new[] { RoleNames.Admin })]
@@ -57,7 +74,7 @@ public class HearingController : BaseController
             return BadRequest(ApiReturnMessages.DurationIsNotValid);
         }
 
-        var validationResult = await ValidateRequest(request, -1);
+        var validationResult = await ValidatePostRequest(request, -1);
         if (validationResult.GetType() != typeof(OkResult))
         {
             return validationResult;
@@ -71,30 +88,51 @@ public class HearingController : BaseController
     [AuthorizationRequired(new[] { RoleNames.Admin })]
     [ApplyConcurrencyCheck]
     [HttpPatch("api/hearing/{hearingId:int}")]
-    public async Task<IActionResult> Patch(int hearingId, [FromBody]JsonPatchDocumentExtension<HearingPatchRequest> hearing)
+    public async Task<IActionResult> Patch(int hearingId, [FromBody]JsonPatchDocumentExtension<HearingPatchRequest> request)
     {
         if (CheckModified(_hearingService, hearingId))
         {
             return StatusConflicted();
         }
 
-        var hearingToPatch = await _hearingService.GetForPatchAsync(hearingId);
+        var hearing = await _hearingService.GetForPatchAsync(hearingId);
+        var hearingToPatch = _mapper.Map<Hearing, HearingPatchRequest>(hearing);
         if (hearingToPatch != null)
         {
-            hearing.ApplyTo(hearingToPatch);
+            request.ApplyTo(hearingToPatch);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var validationResult = await ValidateRequest(hearingToPatch, hearingId);
+            var validationResult = await ValidatePatchRequest(hearingToPatch, hearingId, hearing);
             if (validationResult.GetType() != typeof(OkResult))
             {
                 return validationResult;
             }
 
-            var(exists, value) = hearing.GetValue<int>("/hearing_owner");
+            var(fileDescExists, fileDescValue) = request.GetValue<int?>("/notification_file_description_id");
+            if (fileDescExists && fileDescValue.HasValue)
+            {
+                var fileDescription = await _fileDescriptionService.GetAsync(fileDescValue.Value);
+                var disputeHearings = await _disputeHearingService.GetDisputeHearingsByHearing(hearingId);
+                if (disputeHearings == null || disputeHearings.Count == 0)
+                {
+                    return BadRequest(ApiReturnMessages.EmptyDisputeHearings);
+                }
+
+                var disputeGuid = disputeHearings
+                    .FirstOrDefault(x => x.DisputeHearingRole == (byte)DisputeHearingRole.Active)
+                    .DisputeGuid;
+
+                if (fileDescription == null || fileDescription.DisputeGuid != disputeGuid)
+                {
+                    return BadRequest(ApiReturnMessages.InvalidFileDescription);
+                }
+            }
+
+            var(exists, value) = request.GetValue<int>("/hearing_owner");
             var hearingOwnerId = exists ? value : 0;
             var result = await _hearingService.PatchAsync(hearingId, hearingToPatch, hearingOwnerId);
 
@@ -198,13 +236,13 @@ public class HearingController : BaseController
         var firstHearing = await _hearingService.GetHearingAsync(request.FirstHearingId);
         var secondHearing = await _hearingService.GetHearingAsync(request.SecondHearingId);
 
-        var firstHearingStartDateTime = DateTime.Parse(firstHearing.HearingStartDateTime, styles: DateTimeStyles.AdjustToUniversal);
+        var firstHearingStartDateTime = DateTime.Parse(firstHearing.HearingEndDateTime, styles: DateTimeStyles.AdjustToUniversal);
         if (firstHearingStartDateTime <= now)
         {
             return BadRequest(string.Format(ApiReturnMessages.InvalidHearingForSwitch, request.FirstHearingId));
         }
 
-        var secondHearingStartDateTime = DateTime.Parse(secondHearing.HearingStartDateTime, styles: DateTimeStyles.AdjustToUniversal);
+        var secondHearingStartDateTime = DateTime.Parse(secondHearing.HearingEndDateTime, styles: DateTimeStyles.AdjustToUniversal);
         if (secondHearingStartDateTime <= now)
         {
             return BadRequest(string.Format(ApiReturnMessages.InvalidHearingForSwitch, request.SecondHearingId));
@@ -245,13 +283,13 @@ public class HearingController : BaseController
             return BadRequest(string.Format(ApiReturnMessages.ReservedHearing, request.SecondHearingId));
         }
 
-        var firstHearingStartDateTime = DateTime.Parse(firstHearing.HearingStartDateTime, styles: DateTimeStyles.AdjustToUniversal);
+        var firstHearingStartDateTime = DateTime.Parse(firstHearing.HearingEndDateTime, styles: DateTimeStyles.AdjustToUniversal);
         if (firstHearingStartDateTime <= now)
         {
             return BadRequest(string.Format(ApiReturnMessages.InvalidHearingForSwitch, request.FirstHearingId));
         }
 
-        var secondHearingStartDateTime = DateTime.Parse(secondHearing.HearingStartDateTime, styles: DateTimeStyles.AdjustToUniversal);
+        var secondHearingStartDateTime = DateTime.Parse(secondHearing.HearingEndDateTime, styles: DateTimeStyles.AdjustToUniversal);
         if (secondHearingStartDateTime <= now)
         {
             return BadRequest(string.Format(ApiReturnMessages.InvalidHearingForSwitch, request.SecondHearingId));
@@ -313,8 +351,9 @@ public class HearingController : BaseController
         }
 
         var token = Request.GetToken();
+        var disputeGuid = Request.GetDisputeGuid();
 
-        var reserveAvailableHearings = await _hearingService.ReserveAvailableHearings(request, token);
+        var reserveAvailableHearings = await _hearingService.ReserveAvailableHearings(request, token, disputeGuid);
         if (reserveAvailableHearings != null)
         {
             return Ok(reserveAvailableHearings);
@@ -325,8 +364,13 @@ public class HearingController : BaseController
 
     [AuthorizationRequired(new[] { RoleNames.Admin })]
     [HttpPost("api/hearings/holdhearing/{hearingId:int}")]
-    public async Task<IActionResult> HoldHearing(int hearingId)
+    public async Task<IActionResult> HoldHearing(int hearingId, HoldHearingRequest request)
     {
+        if (request.HearingReservedUntil < DateTime.UtcNow)
+        {
+            return BadRequest(ApiReturnMessages.InvalidReservedUntilDateTime);
+        }
+
         var hearing = await _hearingService.GetHearingWithDisputeHearings(hearingId);
         if (hearing == null)
         {
@@ -343,8 +387,17 @@ public class HearingController : BaseController
             return BadRequest(ApiReturnMessages.HearingIsReservedForHold);
         }
 
+        if (request.HearingReservedDisputeGuid.HasValue)
+        {
+            var disputeExists = await _disputeService.DisputeExistsAsync(request.HearingReservedDisputeGuid.Value);
+            if (!disputeExists)
+            {
+                return BadRequest(string.Format(ApiReturnMessages.DisputeDoesNotExist, request.HearingReservedDisputeGuid.Value));
+            }
+        }
+
         var token = Request.GetToken();
-        var result = await _hearingService.HoldHearing(hearingId, token);
+        var result = await _hearingService.HoldHearing(hearingId, token, request);
         if (result)
         {
             return Ok(ApiReturnMessages.Ok);
@@ -422,67 +475,79 @@ public class HearingController : BaseController
         return BadRequest();
     }
 
-    private async Task<IActionResult> ValidateRequest(HearingRequest request, int hearingId)
+    [HttpGet("/api/hearings/onholdhearings")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.User })]
+    public async Task<IActionResult> GetOnHoldHearings(OnHoldHearingsRequest request, int index, int count)
     {
-        if (request.HearingOwner == null)
+        var onHoldHearings = await _hearingService.GetOnHoldHearings(request, index, count);
+        if (onHoldHearings != null)
         {
-            return BadRequest(ApiReturnMessages.HearingOwnerIsRequired);
+            return Ok(onHoldHearings);
         }
 
-        var userIsValid = await _hearingService.HearingOwnerIsValid((int)request.HearingOwner);
-        if (!userIsValid)
+        return NotFound();
+    }
+
+    [AuthorizationRequired(new[] { RoleNames.Admin })]
+    [HttpPost("api/hearings/linkpasthearings")]
+    public async Task<IActionResult> LinkPastHearings(Guid staticDisputeGuid, Guid movedDisputeGuid)
+    {
+        var staticDispute = await _disputeService.GetDisputeNoTrackAsync(staticDisputeGuid);
+        if (staticDispute == null)
         {
-            return BadRequest(ApiReturnMessages.HearingTypeAssignIsNotValid);
+            return BadRequest(string.Format(ApiReturnMessages.DisputeDoesNotExist, staticDisputeGuid));
         }
 
-        var ownerIsBlocked1 = await _hearingService.HearingOwnerIsBlocked((int)request.HearingOwner, request.HearingStartDateTime, request.HearingEndDateTime, hearingId);
-        if (ownerIsBlocked1)
+        var staticDisputeHearings = await _disputeHearingService.GetDisputeHearings(staticDisputeGuid);
+        var staticHearings = staticDisputeHearings.Select(x => x.Hearing);
+        var pastStaticHearing = staticHearings.Where(x => x.HearingStartDateTime < DateTime.UtcNow).OrderByDescending(x => x.HearingStartDateTime).FirstOrDefault();
+        if (pastStaticHearing == null)
         {
-            return BadRequest(ApiReturnMessages.HearingOwnerIsBlocked);
+            return BadRequest(ApiReturnMessages.NotAssociatedStaticDisputeGuidInPast);
         }
 
+        var otherExistedHearings = await _disputeHearingService.GetDisputeHearingsByHearing(pastStaticHearing.HearingId);
+        otherExistedHearings = otherExistedHearings.Where(x => x.DisputeGuid != staticDisputeGuid).ToList();
+        if (otherExistedHearings != null && otherExistedHearings.Count > 0)
+        {
+            return BadRequest(ApiReturnMessages.StaticAlreadyLinkedToAnotherDispute);
+        }
+
+        var movedDispute = await _disputeService.GetDisputeNoTrackAsync(movedDisputeGuid);
+        if (movedDispute == null)
+        {
+            return BadRequest(string.Format(ApiReturnMessages.DisputeDoesNotExist, movedDisputeGuid));
+        }
+
+        var movedDisputeHearings = await _disputeHearingService.GetDisputeHearings(movedDisputeGuid);
+        var movedHearings = movedDisputeHearings.Select(x => x.Hearing);
+        var pastMovedHearing = movedHearings.Where(x => x.HearingStartDateTime > DateTime.UtcNow).OrderByDescending(x => x.HearingStartDateTime).FirstOrDefault();
+        if (pastMovedHearing == null)
+        {
+            return BadRequest(ApiReturnMessages.NotAssociatedStaticDisputeGuidInPast);
+        }
+
+        otherExistedHearings = await _disputeHearingService.GetDisputeHearingsByHearing(pastMovedHearing.HearingId);
+        otherExistedHearings = otherExistedHearings.Where(x => x.DisputeGuid != movedDisputeGuid).ToList();
+        if (otherExistedHearings != null && otherExistedHearings.Count > 0)
+        {
+            return BadRequest(ApiReturnMessages.MovedAlreadyLinkedToAnotherDispute);
+        }
+
+        var result = await _disputeHearingService.LinkPastHearing(staticDisputeGuid, movedDisputeGuid);
+        if (result != null)
+        {
+            return Ok(result);
+        }
+
+        return NotFound();
+    }
+
+    private async Task<IActionResult> ValidatePostRequest(HearingRequest request, int hearingId)
+    {
         switch (request.HearingType)
         {
             case (byte)HearingType.ConferenceCall:
-                if (request.ConferenceBridgeId == null)
-                {
-                    return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeIsNotProvided, (byte)HearingType.ConferenceCall));
-                }
-                else
-                {
-                    var conferenceBridgeExists = await _conferenceBridgeService.ConferenceBridgeExists((int)request.ConferenceBridgeId);
-                    if (!conferenceBridgeExists)
-                    {
-                        return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeDoesNotExist, request.ConferenceBridgeId));
-                    }
-
-                    var conferenceBridgeIsBooked = await
-                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime, request.HearingEndDateTime);
-                    if (conferenceBridgeIsBooked)
-                    {
-                        return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
-                    }
-                }
-
-                break;
-            case (byte)HearingType.FaceToFace:
-                if (request.ConferenceBridgeId != null)
-                {
-                    var conferenceBridgeExists = await _conferenceBridgeService.ConferenceBridgeExists((int)request.ConferenceBridgeId);
-                    if (!conferenceBridgeExists)
-                    {
-                        return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeDoesNotExist, request.ConferenceBridgeId));
-                    }
-
-                    var conferenceBridgeIsBooked = await
-                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime, request.HearingEndDateTime);
-                    if (conferenceBridgeIsBooked)
-                    {
-                        return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
-                    }
-                }
-
-                break;
             case (byte)HearingType.PreConferenceCall:
                 if (request.ConferenceBridgeId == null)
                 {
@@ -497,7 +562,7 @@ public class HearingController : BaseController
                     }
 
                     var conferenceBridgeIsBooked = await
-                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime, request.HearingEndDateTime);
+                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime);
                     if (conferenceBridgeIsBooked)
                     {
                         return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
@@ -505,6 +570,7 @@ public class HearingController : BaseController
                 }
 
                 break;
+            case (byte)HearingType.FaceToFace:
             case (byte)HearingType.Other:
                 if (request.ConferenceBridgeId != null)
                 {
@@ -515,7 +581,7 @@ public class HearingController : BaseController
                     }
 
                     var conferenceBridgeIsBooked = await
-                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime, request.HearingEndDateTime);
+                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime);
                     if (conferenceBridgeIsBooked)
                     {
                         return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
@@ -523,6 +589,82 @@ public class HearingController : BaseController
                 }
 
                 break;
+        }
+
+        return await ValidateRequest(request, hearingId);
+    }
+
+    private async Task<IActionResult> ValidatePatchRequest(HearingRequest request, int hearingId, Hearing hearing)
+    {
+        switch (request.HearingType)
+        {
+            case (byte)HearingType.ConferenceCall:
+            case (byte)HearingType.PreConferenceCall:
+                if (request.ConferenceBridgeId == null)
+                {
+                    return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeIsNotProvided, (byte)HearingType.PreConferenceCall));
+                }
+                else
+                {
+                    if (request.ConferenceBridgeId != hearing.ConferenceBridgeId)
+                    {
+                        var conferenceBridgeExists = await _conferenceBridgeService.ConferenceBridgeExists((int)request.ConferenceBridgeId);
+                        if (!conferenceBridgeExists)
+                        {
+                            return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeDoesNotExist, request.ConferenceBridgeId));
+                        }
+
+                        var conferenceBridgeIsBooked = await
+                            _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime);
+                        if (conferenceBridgeIsBooked)
+                        {
+                            return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
+                        }
+                    }
+                }
+
+                break;
+            case (byte)HearingType.FaceToFace:
+            case (byte)HearingType.Other:
+                if (request.ConferenceBridgeId != null && request.ConferenceBridgeId != hearing.ConferenceBridgeId)
+                {
+                    var conferenceBridgeExists = await _conferenceBridgeService.ConferenceBridgeExists((int)request.ConferenceBridgeId);
+                    if (!conferenceBridgeExists)
+                    {
+                        return BadRequest(string.Format(ApiReturnMessages.ConferenceBridgeDoesNotExist, request.ConferenceBridgeId));
+                    }
+
+                    var conferenceBridgeIsBooked = await
+                        _conferenceBridgeService.ConferenceBridgeIsBooked((int)request.ConferenceBridgeId, request.HearingStartDateTime);
+                    if (conferenceBridgeIsBooked)
+                    {
+                        return BadRequest(ApiReturnMessages.ConferenceBridgeIsBooked);
+                    }
+                }
+
+                break;
+        }
+
+        return await ValidateRequest(request, hearingId);
+    }
+
+    private async Task<IActionResult> ValidateRequest(HearingRequest request, int hearingId)
+    {
+        if (request.HearingOwner == null)
+        {
+            return BadRequest(ApiReturnMessages.HearingOwnerIsRequired);
+        }
+
+        var userIsValid = await _hearingService.HearingOwnerIsValid((int)request.HearingOwner);
+        if (!userIsValid)
+        {
+            return BadRequest(ApiReturnMessages.HearingTypeAssignIsNotValid);
+        }
+
+        var ownerIsBlocked = await _hearingService.HearingOwnerIsBlocked((int)request.HearingOwner, request.HearingStartDateTime, request.HearingEndDateTime, hearingId);
+        if (ownerIsBlocked)
+        {
+            return BadRequest(ApiReturnMessages.HearingOwnerIsBlocked);
         }
 
         if (request.StaffParticipant1 != null)

@@ -160,7 +160,7 @@ export default Marionette.View.extend({
       this.menu.addDashboard('ceu_complaints_dashboard');
     }
 
-    if (currentUser.isSuperUser() || currentUser.isManagement() || currentUser.isArbitratorLead() || currentUser.isInformationOfficerSupervisor()) {
+    if (currentUser.isReportsUser()) {
       this.menu.addDashboard('report_viewer_dashboard');
     }
 
@@ -389,7 +389,8 @@ export default Marionette.View.extend({
   loadAndUpdateUserMenuCounts(onDoneFn) {
     const defaultSearchParams = { index: 0, count: 1 };
     const taskSearchParams = Object.assign({}, defaultSearchParams, {
-      RestrictTaskStatus: configChannel.request('get', 'TASK_STATUS_INCOMPLETE')
+      RestrictTaskStatus: configChannel.request('get', 'TASK_STATUS_INCOMPLETE'),
+      ExcludeDisputeStatuses: configChannel.request('get', 'EXCLUDED_TASK_DISPUTE_STATUSES')
     });
     const currentUser = sessionChannel.request('get:user');
     const currentUserId = currentUser ? currentUser.id : null;
@@ -551,8 +552,11 @@ export default Marionette.View.extend({
     }));
   },
 
-  routingShowCEUComplaints() {
-    this.withPageLoader(() => this.showPageViewGeneralWithMenuLoadUpdate(CEUComplaintsPage, { model: new Backbone.Model() }));
+  routingShowCEUComplaints(param) {
+    this.withPageLoader(() => this.showPageViewGeneralWithMenuLoadUpdate(CEUComplaintsPage, {
+      complaintId: param,
+      model: this.adminSessionSettings,
+    }));
   },
 
   routingShowComposer(dispute_guid, composer_id) {
@@ -609,12 +613,12 @@ export default Marionette.View.extend({
       viewAllDisputesTitle: 'All Arb Statuses',
       taskSubType: configChannel.request('get', 'TASK_SUB_TYPE_ARB'),
       stage_status_list: arbStageStatusList,
-      nonParticipatoryStageStatusList: null,
+      enableNonParticipatoryStageStatusList: true,
       users: [],
       title: 'Unassigned',
 
       // Used for URL sub-routing
-      initialRadioSelection: $.trim(param) || null,
+      initialRadioSelection: $.trim(param) || 'non-participatory',
       subRoutingRouteName: 'unassigned_arb_param_item',
     });
   },
@@ -644,7 +648,12 @@ export default Marionette.View.extend({
   },
 
   routingShowScheduleRequests() {
-    this.showPageViewGeneralWithMenuLoadUpdate(MySchedulePage, { model: this.adminSessionSettings, personal: true, });
+    const latestScheduleRequestPageRoute = localStorage.getItem('latestScheduleRequestPageRoute');
+    if (latestScheduleRequestPageRoute) {
+      Backbone.history.navigate(latestScheduleRequestPageRoute, {trigger: true, replace: false });
+    } else {
+      this.showPageViewGeneralWithMenuLoadUpdate(MySchedulePage, { model: this.adminSessionSettings, personal: true, });
+    }
   },
 
   routingShowSchedule() {
@@ -688,6 +697,10 @@ export default Marionette.View.extend({
       initialHearingId: param && param.match(/^\d+$/) ? param : null,
       initialFileNumber: null,
     });
+  },
+
+  routingShowScheduleOnHold() {
+    this.showPageViewGeneralWithMenuLoadUpdate(ScheduledHearingsPage, { model: this.adminSessionSettings, onHold: true });
   },
 
   routingShowCMSPage(cms_file_number) {

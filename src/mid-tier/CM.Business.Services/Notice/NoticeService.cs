@@ -162,6 +162,17 @@ public class NoticeService : CmServiceBase, INoticeService
         return false;
     }
 
+    public async Task<List<ExternalNoticeResponse>> GetExternalDisputeNotices(Guid disputeGuid)
+    {
+        var notices = await UnitOfWork.NoticeRepository.GetManyWithIncludedAsync(disputeGuid);
+        if (notices != null)
+        {
+            return MapperService.Map<List<Data.Model.Notice>, List<ExternalNoticeResponse>>(notices.ToList());
+        }
+
+        return null;
+    }
+
     private async System.Threading.Tasks.Task CreateNoticeServices(byte? noticeAssociatedTo, int noticeId, Guid disputeGuid)
     {
         var claimGroups = new List<ClaimGroupParticipant>();
@@ -207,6 +218,18 @@ public class NoticeService : CmServiceBase, INoticeService
                 IsServed = null
             };
             await UnitOfWork.NoticeServiceRepository.InsertAsync(newNoticeService);
+
+            await UnitOfWork.Complete();
+
+            await UnitOfWork.ServiceAuditLogRepository.InsertAsync(
+                new Data.Model.ServiceAuditLog
+                {
+                    DisputeGuid = disputeGuid,
+                    ServiceType = ServiceType.Notice,
+                    ServiceChangeType = ServiceChangeType.CreateRecord,
+                    ParticipantId = participantId,
+                    NoticeServiceId = newNoticeService.NoticeServiceId
+                });
         }
 
         await UnitOfWork.Complete();

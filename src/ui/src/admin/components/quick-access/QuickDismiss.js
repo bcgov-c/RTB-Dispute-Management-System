@@ -1,5 +1,11 @@
+/**
+ * @fileoverview - Extra set of options available in ModalQuickAccess. Allows a dispute under certain conditions to have all of it's issues dismissed with or without leave to reapply
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
+
+const HEARING_PREP_TIME_MINUTES_DEFAULT = 30;
+const DOUBLE_NO_SHOW_HEARING_DURATION_MINUTES = 10;
 
 const configChannel = Radio.channel('config');
 const disputeChannel = Radio.channel('dispute');
@@ -37,9 +43,11 @@ export default Backbone.Model.extend({
       });
 
       Promise.all(claimsToDismiss.map(claim => {
-        const remedy = claim.getApplicantsRemedy();
-        if (remedy) remedy.set(remedyData)
-        return remedy.save(remedy.getApiChangesOnly());
+        const remedies = claim.getAllRemedies();
+        remedies?.forEach(remedy => {
+          if (remedy) remedy.set(remedyData)
+        });
+        return Promise.all(remedies.map(r => r.save(r.getApiChangesOnly())));
       })).then(res, rej);
     });
   },
@@ -114,7 +122,8 @@ export default Backbone.Model.extend({
       this.loadFullHearingsDataPromise()
         .then(() => this.promiseSetHearingParticipationNotAttended())
         .then(() => this.promiseSetLatestHearing({
-          hearing_duration: 10,
+          hearing_prep_time: HEARING_PREP_TIME_MINUTES_DEFAULT,
+          hearing_duration: DOUBLE_NO_SHOW_HEARING_DURATION_MINUTES,
           hearing_method: this.hearingMethodAdjudication,
           hearing_complexity: this.hearingComplexitySimple,  
         }))
@@ -124,7 +133,8 @@ export default Backbone.Model.extend({
   performDismissApplicantNoShow() {
     return Promise.all([
       this.promiseSetIssuesToDismissedNoLeave(),
-      this.loadFullHearingsDataPromise().then(() => this.promiseSetLatestHearing({        
+      this.loadFullHearingsDataPromise().then(() => this.promiseSetLatestHearing({
+        hearing_prep_time: HEARING_PREP_TIME_MINUTES_DEFAULT,
         hearing_method: this.hearingMethodAdjudication,
       }))
     ]);
@@ -136,6 +146,7 @@ export default Backbone.Model.extend({
       this.promiseSetIssuesToDismissedNoLeave({ include_claim_codes: this.filingFees }),
       this.loadNoticesPromise().then(() => this.promiseSetNoticeNotServed()),
       this.loadFullHearingsDataPromise().then(() => this.promiseSetLatestHearing({
+        hearing_prep_time: HEARING_PREP_TIME_MINUTES_DEFAULT,
         hearing_method: this.hearingMethodAdjudication
       }))
     ]);
@@ -146,6 +157,7 @@ export default Backbone.Model.extend({
       this.promiseSetIssuesToDismissedWithLeave({ exclude_claim_codes: this.filingFees }),
       this.promiseSetIssuesToDismissedNoLeave({ include_claim_codes: this.filingFees }),
       this.loadFullHearingsDataPromise().then(() => this.promiseSetLatestHearing({
+        hearing_prep_time: HEARING_PREP_TIME_MINUTES_DEFAULT,
         hearing_method: this.hearingMethodAdjudication
       }))
     ]);
@@ -155,6 +167,7 @@ export default Backbone.Model.extend({
     return Promise.all([
       this.promiseSetIssuesToDismissedNoLeave(),
       this.loadFullHearingsDataPromise().then(() => this.promiseSetLatestHearing({
+        hearing_prep_time: HEARING_PREP_TIME_MINUTES_DEFAULT,
         hearing_method: this.hearingMethodAdjudication
       }))
     ]);

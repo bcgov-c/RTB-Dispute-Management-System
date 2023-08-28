@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CM.ServiceBase;
+using CM.ServiceBase.ApiKey;
 using CM.Services.AdHocReportSender.AdHocReportSenderService.Job;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +30,9 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddOptions();
+        services.Configure<ApiKeySettings>(Configuration.GetSection("ApiKeySettings"));
+
         services.AddControllers().AddNewtonsoftJson();
         services
             .AddLogger(Configuration)
@@ -37,7 +42,7 @@ public class Startup
             .AddCustomMvc()
             .AddHealthChecks(Configuration)
             .AddCustomDbContext(Configuration)
-            .AddSwagger(Configuration, "AdHoc Report Sender Service")
+            .AddSwagger(Configuration, "AdHoc Report Sender Service", true)
             .AddScheduler(Configuration);
     }
 
@@ -46,6 +51,7 @@ public class Startup
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         loggerFactory.AddSerilog();
 
+        app.UseSafeListFiltering(Configuration);
         app.UseRouting();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
@@ -84,24 +90,21 @@ public class Startup
             var scheduler = services.GetService<IScheduler>();
             var context = services.GetService<AdHocReportContext>();
 
-            if (context != null)
+            if (context == null)
             {
-                var adHocReports = await context.AdHocReports.AsNoTracking().ToListAsync();
+                return await Task.FromResult(false);
+            }
 
-                foreach (var item in adHocReports)
-                {
-                    if (item.IsActive == false)
-                    {
-                        continue;
-                    }
+            var adHocReports = await context.AdHocReports.AsNoTracking().ToListAsync();
 
-                    var cronJob = item.CronJob;
-                    var cronJobName = item.Description;
-                    var jobDataMap = new JobDataMap();
-                    jobDataMap.Put("AdHocReport", item);
+            foreach (var item in adHocReports.Where(item => item.IsActive))
+            {
+                var cronJob = item.CronJob;
+                var cronJobName = item.Description;
+                var jobDataMap = new JobDataMap();
+                jobDataMap.Put("AdHocReport", item);
 
-                    scheduler.StartScheduledJob<AdHocReportJob>(cronJob, cronJobName, jobDataMap);
-                }
+                scheduler.StartScheduledJob<AdHocReportJob>(cronJob, cronJobName, jobDataMap);
             }
         }
 

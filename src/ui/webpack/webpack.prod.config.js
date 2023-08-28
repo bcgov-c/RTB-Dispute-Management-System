@@ -15,7 +15,7 @@ module.exports = (env, argv) => {
   const isPreProd = !!env.preprod;
   return merge(common(env, argv), {
     mode: 'production',
-    devtool: false,
+    devtool: isPreProd ? 'inline-source-map' : false,
     plugins: [
       new webpack.DefinePlugin({
         BUILD_INFO: {

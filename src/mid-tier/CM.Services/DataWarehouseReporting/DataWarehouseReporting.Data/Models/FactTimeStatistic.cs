@@ -56,12 +56,6 @@ public class FactTimeStatistic
 
     public int EmptyHearings { get; set; }
 
-    public decimal AvgNext10EmergHearingDays { get; set; }
-
-    public decimal AvgNext10StandardHearingDays { get; set; }
-
-    public decimal AvgNext10DeferredHearingDays { get; set; }
-
     public int Files { get; set; }
 
     public int FilesMb { get; set; }
@@ -145,4 +139,32 @@ public class FactTimeStatistic
     public DateTime DocumentsUndeliveredUrgentOldest { get; set; }
 
     public int DocumentsDelivered { get; set; }
+
+    public int? Stage2UnassignedDeferred { get; set; }
+
+    public int? Stage2UnassignedStandard { get; set; }
+
+    public int? Stage2UnassignedUrgent { get; set; }
+
+    public int? WaitTimeDaysDeferred { get; set; }
+
+    public int? WaitTimeDaysStandard { get; set; }
+
+    public int? WaitTimeDaysUrgent { get; set; }
+
+    public int? NonParticipatoryWaitingDecision { get; set; }
+
+    public DateTime? NonParticipatoryWaitingDecisionOldest { get; set; }
+
+    public int? NonParticipatoryClosed { get; set; }
+
+    public int? StatusAdjourned { get; set; }
+
+    public int? ParticipatoryWaitArsDeadline { get; set; }
+
+    public int? ParticipatoryMissArsDeadline { get; set; }
+
+    public int? ParticipatoryWaitReinstateDeadline { get; set; }
+
+    public int? ParticipatoryMissReinstateDeadline { get; set; }
 }

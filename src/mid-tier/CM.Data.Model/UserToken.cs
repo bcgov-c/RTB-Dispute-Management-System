@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace CM.Data.Model;
@@ -24,4 +25,6 @@ public class UserToken
     public Guid? SystemUserGuid { get; set; }
 
     public int? ParticipantId { get; set; }
+
+    public virtual ICollection<Hearing> Hearings { get; set; }
 }

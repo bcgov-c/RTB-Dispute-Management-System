@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using CM.Business.Services.Base;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
@@ -42,7 +43,7 @@ public class ParticipatoryApplicationSubmitted : DisputeTransition
             AssignedTemplateId = assignedTemplate
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -80,7 +81,7 @@ public class ParticipatoryApplicationSubmitted2 : DisputeTransition
             AssignedTemplateId = assignedTemplate
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -118,7 +119,7 @@ public class ParticipatoryApplicationSubmitted3 : DisputeTransition
             AssignedTemplateId = assignedTemplate
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }
 
@@ -156,6 +157,6 @@ public class ParticipatoryApplicationSubmitted4 : DisputeTransition
             AssignedTemplateId = assignedTemplate
         };
 
-        Publish(message);
+        message.Publish(Bus);
     }
 }

@@ -66,4 +66,9 @@ public static class ExternalUpdateManager
     {
         return client.PostAsync<OfficeUserPostNoticeResponse>(RouteHelper.PostExternalNotice + disputeGuid, request);
     }
+
+    public static EntityWithStatus<string> GetHearingWaitTime(HttpClient client, ExternalHearingWaitTimeRequest request)
+    {
+        return client.GetAsync<string>(RouteHelper.GetHearingWaitTime, request);
+    }
 }

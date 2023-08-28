@@ -69,14 +69,17 @@ const ReviewPaymentPage = Marionette.View.extend({
     this.reviewDataCache = this.model.get('reviewDataCache') || {};
 
     const reviewFees = paymentsChannel.request('get:fees').filter(f => f.isReviewFee() && f.get('payor_id') === this.loggedInParticipant.id);
-    this.disputeFeeModel = reviewFees.length ? reviewFees[0] : new DisputeFeeModel({
+    const unpaidFees = reviewFees.filter(f => !f.isPaid()).slice(-1);
+    const latestUnpaidFee = unpaidFees?.[0];
+    const areAllReviewFeesPaid = !unpaidFees.length;
+    this.disputeFeeModel = areAllReviewFeesPaid || !latestUnpaidFee ? new DisputeFeeModel({
       fee_type: configChannel.request('get', 'PAYMENT_FEE_TYPE_REVIEW'),
       due_date: Moment().toISOString(),
       is_active: true,
       payor_id: this.loggedInParticipant.id,
       fee_description: configChannel.request('get', 'PAYMENT_FEE_DESCRIPTION_REVIEW'),
       amount_due: configChannel.request('get', 'PAYMENT_FEE_AMOUNT_REVIEW')
-    });
+    }) : latestUnpaidFee;
 
     const activePayment = this.disputeFeeModel.getActivePayment();
     if (activePayment && activePayment.isOnline() && !activePayment.isDeclined()) {
@@ -86,7 +89,7 @@ const ReviewPaymentPage = Marionette.View.extend({
     }
 
     this.createSubModels();
-    this.setupListeners();    
+    this.setupListeners();
   },
 
   setPaymentToSavedAndTransitionDispute(activePayment) {
@@ -368,11 +371,13 @@ const ReviewPaymentPage = Marionette.View.extend({
     this.showChildView('outcomeDocsRegion', new DocRequestSelectView({
       docGroupCollection: documentsChannel.request('get:all'),
       getValidDocFilesFromGroupFn: docGroup => {
-        const hasExistingReviewRequest =  outcomeDocRequestCollection.find(request => (
+        const requestsForGroup = outcomeDocRequestCollection.filter(req => req.get('outcome_doc_group_id') === docGroup.id);
+        const hasCurrentUserReview = requestsForGroup.find(request => (
+          !request.isPastProcess() &&
           request.isReview() &&
           request.get('submitter_id') === this.loggedInParticipant.id
         ));
-        return hasExistingReviewRequest ? [] : docGroup.getDocFilesThatCanRequestReview();
+        return hasCurrentUserReview ? [] : docGroup.getDocFilesThatCanRequestReview();
       },
       model: this.docRequestModel,
     }));
@@ -445,6 +450,13 @@ const ReviewPaymentPage = Marionette.View.extend({
             <p>
             In limited circumstances, a landlord or a tenant may request a review of a decision or order. This is not a chance to reargue the case or review evidence that should have been presented at the original hearing. Instead, it's an opportunity for a landlord or tenant to ask that an arbitrator take a second look at an original decision or order on very specific grounds.  Answer the following questions to learn more.
             </p>
+            <p>
+              <b>Important: All evidence must be provided at the time that the application for review is being completed as there is no opportunity to add more evidence after the application for review is submitted.</b>
+            </p>
+            <div className="dar-step-one__warning error-block warning">
+              If your initial application has been dismissed with leave to reapply, you have the option to reapply. Reapplying for your initial claims based on the instructions in your decision may lead to a quicker resolution than applying
+              for a review of the decision. To re-apply please visit our <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/apply-online">web site</a>.
+            </div>
           </div>
         </div>
         
@@ -497,7 +509,7 @@ const ReviewPaymentPage = Marionette.View.extend({
             </ul>
             <div className="spacer-block-20"></div>
             <p>
-              The filing fee for an Application for Review Consideration is {Formatter.toAmountDisplay(PAYMENT_FEE_AMOUNT_REVIEW, true)}. A fee waiver may be available.  For more information contact the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>.
+              The filing fee for an Application for Review Consideration is {Formatter.toAmountDisplay(PAYMENT_FEE_AMOUNT_REVIEW, true)}. A fee waiver may be available. For more information contact the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>.
               Please review <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Policy Guideline 24: Review Consideration of a Decision or Order</a>&nbsp;or visit the&nbsp;<a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Residential Tenancy Branch website</a>&nbsp;for more information.
             </p>
           </div>
@@ -531,7 +543,10 @@ const ReviewPaymentPage = Marionette.View.extend({
       <div className="office-page-payment-details">
         <div className="spacer-block-20"></div>
         <div className="dar-payment__info">
-          <span className="error-red">Immediate payment required!</span>&nbsp;You must pay a {paymentAmountDisplay} filing fee to continue. When your payment is completed, you will be taken to the online form to submit our review request. As an alternative to the online process, you can submit a paper application at a Service BC or Residential Tenancy office where additional payment methods are accepted.
+          <span className="error-red">
+            Immediate payment required!</span>&nbsp;You must pay a {paymentAmountDisplay} filing fee to continue. When your payment is completed, you will be taken to the online form to submit your review consideration. 
+            As an alternative to the online process, you can submit a paper application at a Service BC or Residential Tenancy office where additional payment methods are accepted. 
+            You must complete step 2 after payment or fee waiver in order to complete your application for review consideration.
         </div>
         <div className="spacer-block-10"></div>
         <div className="">

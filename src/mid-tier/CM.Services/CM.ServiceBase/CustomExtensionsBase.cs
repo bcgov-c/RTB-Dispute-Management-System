@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Authentication;
+using System.Net.Security;
+using Amazon;
 using CM.Common.Utilities;
 using CM.Messages;
 using CM.Messages.PollyHandler;
@@ -35,7 +36,7 @@ public static class CustomExtensionsBase
             {
                 webBuilder
                     .ConfigureKestrel(_ => { })
-                    .UseConfiguration(config) //// Important, preserve that
+                    .UseConfiguration(config)
                     .UseStartup<TStartup>()
                     .UseIIS();
             });
@@ -50,6 +51,26 @@ public static class CustomExtensionsBase
         var sharedFolder = Path.Combine(hostingEnvironment.ContentRootPath, "..", "shared");
         var sharedFile = Path.Combine(sharedFolder, "appsettings.json");
 
+        var env = hostingEnvironment.EnvironmentName;
+        var appName = hostingEnvironment.ApplicationName;
+        if (Environment.GetEnvironmentVariable("AWS_PROFILE") != null)
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(hostingEnvironment.ContentRootPath)
+                .AddJsonFile("appsettings.json", false, true)
+                .AddSecretsManager(
+                    region: RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("AWS_PROFILE")),
+                    configurator: options =>
+                    {
+                        options.SecretFilter = entry => entry.Name.StartsWith($"{env}_{appName}");
+                        options.KeyGenerator = (_, s) => s
+                                .Replace($"{env}_{appName}", string.Empty)
+                                .Replace(":", string.Empty)
+                                .Replace("__", ":");
+                    })
+                .AddEnvironmentVariables();
+        }
+
         return new ConfigurationBuilder()
             .SetBasePath(hostingEnvironment.ContentRootPath)
             .AddJsonFile("appsettings.json", false, true)
@@ -60,11 +81,37 @@ public static class CustomExtensionsBase
             .AddEnvironmentVariables();
     }
 
-    public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration, string title)
+    public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration, string name, bool useApiKey = false)
     {
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo());
+
+            if (useApiKey)
+            {
+                c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+                {
+                    Name = "x-api-key",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Description = "Authorization by x-api-key inside request's header",
+                    Scheme = "ApiKeyScheme"
+                });
+
+                var key = new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "ApiKey"
+                    },
+                    In = ParameterLocation.Header
+                };
+
+                var requirement = new OpenApiSecurityRequirement { { key, new List<string>() } };
+
+                c.AddSecurityRequirement(requirement);
+            }
         });
 
         services.AddSwaggerGenNewtonsoftSupport();
@@ -74,6 +121,33 @@ public static class CustomExtensionsBase
 
     public static IServiceCollection AddCustomMvc(this IServiceCollection services)
     {
+        return services;
+    }
+
+    public static IServiceCollection AddCustomCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var origins = configuration.GetSection("Cors:AllowedOriginList");
+
+        services.AddCors(
+            options => options.AddPolicy(
+                "AllowCors",
+                builder =>
+                {
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithExposedHeaders(ApiHeader.Token, "Content-Type", ApiHeader.Authorization);
+
+                    if (origins.Exists())
+                    {
+                        builder.WithOrigins(origins.Get<string[]>());
+                    }
+                    else
+                    {
+                        builder.AllowAnyOrigin();
+                    }
+                }));
+
         return services;
     }
 
@@ -115,36 +189,44 @@ public static class CustomExtensionsBase
 
     public static IServiceCollection AddEventBus(this IServiceCollection services, IConfiguration configuration, int retryCount = 0)
     {
-        if (configuration.GetSection("MQTLS").Exists())
+        if (configuration.GetSection("MQX").Exists())
         {
-            var cf = new ConnectionConfiguration
+            var connectionString =
+                $"host={configuration["MQX:Hostname"]}:{configuration["MQX:Port"]};username={configuration["MQX:UserName"]};password={configuration["MQX:Password"]}";
+
+            services.RegisterEasyNetQ(
+                connectionString,
+                registerServices => registerServices.UseMessageWaitAndRetryHandlerPolicy(retryCount));
+        }
+        else if (configuration.GetSection("MQTLS").Exists())
+        {
+            var connection = new ConnectionConfiguration
             {
-                Hosts = new List<HostConfiguration>
-                {
-                    new()
-                    {
-                        Host = configuration["MQTLS:Host"],
-                        Port = 5671
-                    }
-                },
-                VirtualHost = configuration["MQTLS:VirtualHost"],
-                AuthMechanisms = new IAuthMechanismFactory[] { new ExternalMechanismFactory() },
+                VirtualHost = configuration["MQTLS:VirtualHost"] ?? "/"
+            };
+
+            var host = new HostConfiguration
+            {
+                Port = Convert.ToUInt16(configuration["MQTLS:Port"]),
+                Host = configuration["MQTLS:Host"],
                 Ssl =
                 {
                     Enabled = true,
-                    ServerName = System.Net.Dns.GetHostName(),
+                    ServerName = configuration["MQTLS:ServerName"],
                     CertPath = configuration["MQTLS:CertPath"],
                     CertPassphrase = configuration["MQTLS:CertPassphrase"],
-                    Version = SslProtocols.Tls12
-                },
-                PublisherConfirms = true
+                    AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateChainErrors
+                                             | SslPolicyErrors.RemoteCertificateNameMismatch
+                                             | SslPolicyErrors.RemoteCertificateNotAvailable
+                }
             };
 
-            services.RegisterEasyNetQ(
-                _ => cf,
-                registerServices => registerServices.UseMessageWaitAndRetryHandlerPolicy(retryCount));
+            connection.Hosts = new List<HostConfiguration> { host };
+            connection.AuthMechanisms.Add(new ExternalMechanismFactory());
+
+            services.RegisterEasyNetQ(_ => connection, registerServices => registerServices.UseMessageWaitAndRetryHandlerPolicy(retryCount));
         }
-        else
+        else if (configuration.GetSection("MQ").Exists())
         {
             services.RegisterEasyNetQ(
                 configuration["MQ:Cluster"],
@@ -192,6 +274,16 @@ public static class CustomExtensionsBase
     {
         var messageJson = JsonConvert.SerializeObject(messageObject);
         logger.Error(exception, "{Message} {MessageJson}", message, messageJson);
+    }
+
+    public static void UseSafeListFiltering(this IApplicationBuilder applicationBuilder, IConfiguration configuration)
+    {
+        var ipList = configuration.GetSection("SafeList").Get<List<string>>();
+
+        if (ipList != null)
+        {
+            applicationBuilder.UseMiddleware<SafeListMiddleware>(ipList);
+        }
     }
 
     private static IConfigurationRoot GetWebHostDefaultsConfiguration()

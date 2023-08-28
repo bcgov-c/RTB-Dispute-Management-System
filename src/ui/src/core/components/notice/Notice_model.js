@@ -20,11 +20,6 @@ export default CMModel.extend({
     parent_notice_id: null,
     notice_associated_to: null,
     notice_file_description_id: null,
-    notice_file1_id: null,
-    notice_file2_id: null,
-    notice_file3_id: null,
-    notice_file4_id: null,
-    notice_file5_id: null,
     notice_title: null,
     notice_type: null,
     is_initial_dispute_notice: null, // Note: This is not used to tag a notice as initial.  Its created_date in relation to other dispute notices is how original notice is distinguished
@@ -38,7 +33,10 @@ export default CMModel.extend({
     notice_delivered_to: null,
     notice_delivered_date: null,
     notice_delivered_to_other: null,
-    notice_service: null, 
+    notice_service: null,
+    has_service_deadline: null,
+    service_deadline_date: null,
+    second_service_deadline_date: null,
     created_date: null,
     created_by: null,
     modified_date: null,
@@ -50,18 +48,16 @@ export default CMModel.extend({
     'notice_title',
     'notice_type',
     'notice_file_description_id',
-    'notice_file1_id',
-    'notice_file2_id',
-    'notice_file3_id',
-    'notice_file4_id',
-    'notice_file5_id',
     'notice_special_instructions',
     'notice_delivery_method',
     'notice_delivered_to',
     'notice_delivered_date',
     'notice_delivered_to_other',
     'hearing_id',
-    'hearing_type'
+    'hearing_type',
+    'has_service_deadline',
+    'service_deadline_date',
+    'second_service_deadline_date',
   ],  
 
   API_POST_ONLY_ATTRS: [
@@ -151,6 +147,10 @@ export default CMModel.extend({
     return this._isNoticeTypeInConfigCodes(['NOTICE_TYPE_UPLOADED_OTHER']);
   },
 
+  isParticipatoryNotice() {
+    return this.get('hearing_type') === configChannel.request('get', 'PROCESS_ORAL_HEARING');
+  },
+
   isDeliveryMethodUser() {
     return this.get('notice_delivery_method') === configChannel.request('get', 'NOTICE_DELIVERY_TYPE_USER');
   },
@@ -158,6 +158,14 @@ export default CMModel.extend({
   isServedByRTB() {
     return this.get('notice_delivery_method') === configChannel.request('get', 'NOTICE_DELIVERY_TYPE_EMAIL_AND_MAIL') 
     || this.get('notice_delivery_method') === configChannel.request('get', 'NOTICE_DELIVERY_TYPE_OTHER');
+  },
+
+  isArsActive() {
+    return this.get('has_service_deadline') && (
+      (this.get('service_deadline_date') && Moment(this.get('service_deadline_date')).isAfter(Moment()))
+      || 
+      (this.get('second_service_deadline_date') && Moment(this.get('second_service_deadline_date')).isAfter(Moment()))
+    )
   },
 
   createNoticeFileDescription(fileDescriptionAttrs) {

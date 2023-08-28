@@ -20,15 +20,46 @@
   "ARI_E_ISSUE_CODE": 134,
   "ARI_C_ISSUE_CODE": 135,
   "PFR_ISSUE_CODE": 141,
+  "LL_RETAIN_SECURITY_DEPOSIT_CODE": 142,
   "PERMITS_REQUIRED_EVIDENCE_CODE": 153,
   "NO_PERMITS_REQUIRED_EVIDENCE_CODE": 155,
   "OPC_ISSUE_CODE": 104,
+  "AMENDMENT_FORM_CODES": [74, 75, 78],
   "dr_issue_to_monetary_codes": {
     "123": 125,
     "124": 126,
     "137": 125,
     "138": 126
   },
+  "HEARING_TOOLS_LANDLORD_MOVE_OUT_CLAIMS": [
+    "OPR-DR",
+    "OPU-DR",
+    "OPR",
+    "OPU",
+    "OPC",
+    "OPE",
+    "OPL",
+    "OPQ",
+    "OPL-4M",
+    "OPLC",
+    "OPB",
+    "OPM",
+    "OPN",
+    "ET",
+    "PFR",
+    "OPR-DR-PP",
+    "OPU-DR-PP",
+    "OPR-PP",
+    "OPU-PP",
+    "OPT",
+    "CNOP",
+    "OFL",
+
+    "OPC-DR",
+    "OPE-DR",
+    "OPQ-DR",
+    "OPL-4M-DR"
+  ],
   "basic_complexity_issue_codes": [
     113,
     102,
@@ -63,18 +94,15 @@
     137,
     138,
     139,
-    140
-  ],
-  "direct_request_issue_codes": [
-    123,
-    124,
-    125,
-    126,
-    137,
-    138,
-    237,
-    238,
-    239
+    140,
+    243,
+    246,
+    108,
+    128,
+    143,
+    144,
+    145,
+    146
   ],
   "high_urgency_issue_codes": [
     113,
@@ -134,7 +162,11 @@
     235,
     240,
     241,
-    245
+    245,
+    143,
+    144,
+    145,
+    146
   ],
   "deferred_urgency_issue_codes": [
     107,
@@ -153,29 +185,81 @@
     237,
     238,
     239,
-    243
+    243,
+    246
+  ],
+
+  "direct_request_issue_codes": [
+    123,
+    124,
+    125,
+    126,
+    137,
+    138,
+    237,
+    238,
+    239,
+    143,
+    144,
+    145,
+    146
   ],
 
   "tenant_cn_issue_codes": [
-      208,
-      230,
-      205,
-      231,
-      204,
-      232,
-      207,
-      233,
-      203,
-      234,
-      224,
-      235,
-      206
+    208,
+    230,
+    205,
+    231,
+    204,
+    232,
+    207,
+    233,
+    203,
+    234,
+    224,
+    235,
+    206,
+    236,
+    218
   ],
 
   "landlord_deposit_issue_codes": [
     127,
     128,
     129
+  ],
+
+  "landlord_op_issue_codes": [
+    113,
+    102,
+    123,
+    122,
+    124,
+    104,
+    101,
+    103,
+    130,
+    105,
+    131,
+    106,
+    227,
+    226,
+    132,
+    242,
+    143,
+    144,
+    145,
+    146
+  ],
+
+  "mn_issue_codes": [
+    244, 108, 128, 125, 126, 107, 127, 110, 129, 142,
+    209, 210, 202, 222, 211, 237, 238, 239, 243, 246, 245
+  ],
+
+  "other_issue_codes": [
+    133, 114,
+    213, 214, 219, 215, 217, 220, 216, 221, 212, 240, 241
   ],
 
   "cnl_issue_codes": [
@@ -194,7 +278,8 @@
 
   "opl_issue_codes": [
     103,
-    131
+    131,
+    146
   ],
 
   "cnr_issue_codes": [
@@ -211,9 +296,9 @@
     "113": {
       "code": "ET",
       "id": 113,
-      "issueTitle": "This is an urgent application about a tenant who poses an immediate and severe risk to the rental property, other occupants or the landlord and I want an order of possession",
+      "issueTitle": "This is an application for an early end to the tenancy as it would be unreasonable, or unfair to the landlord or other occupants to wait for a Notice to End Tenancy for Cause to take effect",
       "useTextDescription": true,
-      "textDescriptionTitle": "Please describe the threat to life and/or property that the tenant is posing",
+      "textDescriptionTitle": "Please describe why you require an early end to the tenancy",
       "useNoticeMethod": true,
       "noticeMethodTitle": "How will you serve within 1 day?",
       "allowedNoticeMethodCodes": ["ON_DOOR", "REGISTERED_MAIL", "IN_PERSON", "EMAIL"],
@@ -470,7 +555,7 @@
       "useNoticeMethod": true,
       "useTextDescription": true,
       "textDescriptionTitle": "Describe why possession of the unit is being requested",
-      "selectionHelp": "This notice is given if you believe the tenant or the tenant's guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of the tenant's employment and the tenant's employment has ended. If this notice was not given as part of an employment arrangement, select \"Other Cause (Not Employment).\"",
+      "selectionHelp": "This notice is given if you believe the tenant or the tenant's guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of the tenant's employment and the tenant's employment has ended. If this notice was not given as part of an employment arrangement, select \"For Cause.\"",
       "issueHelp": "If you file your application too early, it may be dismissed.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html'>Verify that you can apply for possession now</a>.<br/><br/>Ensure you have read the information on the second page of the notice carefully.<br/><br/>You must provide evidence to prove the cause(s) on the notice.",
       "associatedEvidence": [
         {
@@ -611,7 +696,7 @@
       "useTextDescription": true,
       "textDescriptionTitle": "Describe why possession of the unit is being requested",
       "selectionHelp": "This notice is used if you will be converting a manufactured home park to another use.  You cannot submit your application until after the tenant deadline for disputing the notice has passed.",
-      "issueHelp": "If you file your application too early, it may be dismissed.<br/><br/>The tenant must dispute this notice within 15 days of receiving it.  To determine when you can make your application, you must consider how you served the notice and when documents served in that manner are deemed received.  For example, if you served the notice by posting it to the door, it is deemed received three days after it was served.<br/><br/>Ensure you have read the information on the second page of the notice carefully.<br/><br/>You must provide evidence to prove that you intend in good faith to convert the manufactured home park to another use.",
+      "issueHelp": "If you file your application too early, it may be dismissed.<br/><br/>The tenant must dispute this notice within 15 days of receiving it.  To determine when you can make your application, you must consider how you served the notice and when documents served in that manner are deemed received.  For example, if you served the notice by attaching it to the door, it is deemed received three days after it was served.<br/><br/>Ensure you have read the information on the second page of the notice carefully.<br/><br/>You must provide evidence to prove that you intend in good faith to convert the manufactured home park to another use.",
       "associatedEvidence": [
         {
           "id": 135,
@@ -627,6 +712,10 @@
         },
         {
           "id": 141,
+          "required": false
+        },
+        {
+          "id": 164,
           "required": false
         }
       ],
@@ -742,6 +831,7 @@
       "associatedToAct": "both",
       "associatedToDeposit": "any",
       "reverseAward": true,
+      "alwaysAwarded": true,
       "hiddenExternal": true
     },
     "137": {
@@ -789,7 +879,8 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "invalidWithClaims": [],
-      "servedWaitDays": 5
+      "servedWaitDays": 5,
+      "canStaffCreate": false
     },
     "138": {
       "code": "OPU-DR-PP",
@@ -852,7 +943,8 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "invalidWithClaims": [123, 125],
-      "servedWaitDays": 5
+      "servedWaitDays": 5,
+      "canStaffCreate": false
     },
     "139": {
       "code": "OPR-PP",
@@ -891,7 +983,8 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "invalidWithClaims": [],
-      "servedWaitDays": 5
+      "servedWaitDays": 5,
+      "canStaffCreate": false
     },
     "140": {
       "code": "OPU-PP",
@@ -950,7 +1043,8 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "invalidWithClaims": [],
-      "servedWaitDays": 5
+      "servedWaitDays": 5,
+      "canStaffCreate": false
     },
     "141": {
       "code": "PFR",
@@ -983,6 +1077,159 @@
       "associatedToDeposit": "no",
       "invalidWithClaims": []
     },
+    "142": {
+      "code": "LRSD",
+      "id": 142,
+      "issueTitle": "Landlord request to Retain the Security/Pet Damage Deposit",
+      "useAmount": true,
+      "useNoticeDueDate": false,
+      "useNoticeMethod": false,
+      "useTextDescription": false,
+      "helpName": "",
+      "issueHelp": "",
+      "associatedEvidence": [],
+      "associatedToApplicantType": "landlord",
+      "associatedToTenancyStatus": "current",
+      "associatedToAct": "both",
+      "associatedToDeposit": "no",
+      "invalidWithClaims": [],
+      "reverseAward": true,
+      "alwaysAwarded": false,
+      "hiddenExternal": true
+    },
+
+    "143": {
+      "code": "OPC-DR",
+      "id": 143,
+      "selectionTitle": "I issued a <b>One Month Notice to End Tenancy for Cause</b> and I want an Order of Possession",
+      "issueTitle": "I issued a One Month Notice to end tenancy for cause (not end of employment) and I want an order of possession",
+      "useNoticeDueDate": true,
+      "useNoticeMethod": true,
+      "useTextDescription": true,
+      "textDescriptionTitle": "Describe why possession of the unit is being requested",
+      "selectionHelp": "This notice is given if you believe the tenant or the tenant's guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of the tenant's employment and the tenant's employment has ended. If this notice was not given as part of an employment arrangement, select \"For Cause.\"",
+      "issueHelp": "If you file your application too early, it may be dismissed.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html'>Verify that you can apply for possession now</a>.<br/><br/>Ensure you have read the information on the second page of the notice carefully.<br/><br/>You must provide evidence to prove the cause(s) on the notice.",
+      "associatedEvidence": [
+        {
+          "id": 156,
+          "required": true
+        },
+        {
+          "id": 162,
+          "required": true
+        },
+        {
+          "id": 167,
+          "required": false
+        }
+      ],
+      "associatedToApplicantType": "landlord",
+      "associatedToTenancyStatus": "current",
+      "associatedToAct": "both",
+      "associatedToDeposit": "no",
+      "invalidWithClaims": null,
+      "servedWaitDays": 10,
+      "canStaffCreate": false
+    },
+    "144": {
+      "code": "OPE-DR",
+      "id": 144,
+      "selectionTitle": "I issued a <b>One Month Notice to End Tenancy for End of Employment</b> and I want an Order of Possession",
+      "issueTitle": "I issued a One Month Notice to end tenancy for end of employment and I want an order of possession",
+      "useNoticeDueDate": true,
+      "useNoticeMethod": true,
+      "useTextDescription": true,
+      "textDescriptionTitle": "Describe why possession of the unit is being requested",
+      "issueHelp": "If you file your application too early, it may be dismissed.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html'>Verify that you can apply for possession now</a>.<br/><br/>Ensure you have read the information on the second page of the notice carefully.<br/><br/>You must provide evidence to prove that the rental unit or site was provided as part of the tenant's employment and that the tenant's employment has ended.",
+      "associatedEvidence": [
+        {
+          "id": 157,
+          "required": true
+        },
+        {
+          "id": 162,
+          "required": true
+        },
+        {
+          "id": 167,
+          "required": false
+        }
+      ],
+      "associatedToApplicantType": "landlord",
+      "associatedToTenancyStatus": "current",
+      "associatedToAct": "both",
+      "associatedToDeposit": "no",
+      "invalidWithClaims": null,
+      "servedWaitDays": 10,
+      "canStaffCreate": false
+    },
+    "145": {
+      "code": "OPQ-DR",
+      "id": 145,
+      "selectionTitle": "I issued a <b>Two Month Notice to End Tenancy Because Tenant Does Not Qualify for Subsidized Rental Unit</b> and I want an Order of Possession",
+      "issueTitle": "I issued a Two Month Notice to End Tenancy - Tenant Does Not Qualify for Subsidized Rental Unit - and I want an order of possession",
+      "useNoticeDueDate": true,
+      "useNoticeMethod": true,
+      "useTextDescription": true,
+      "textDescriptionTitle": "Describe why possession of the unit is being requested",
+      "issueHelp": "If applicable, provide evidence to show that the notice is not valid.<br/><br/>You must submit your application within 15 days of receiving this notice.  If you file your application too late, the landlord may request an order of possession.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/DisputeLandlordNotice.html'>Verify that your dispute deadline has not passed</a>.<br/><br/>Ensure you have read the information on the notice carefully.",
+      "associatedEvidence": [
+        {
+          "id": 158,
+          "required": true
+        },
+        {
+          "id": 162,
+          "required": true
+        },
+        {
+          "id": 167,
+          "required": false
+        }
+      ],
+      "associatedToApplicantType": "landlord",
+      "associatedToTenancyStatus": "current",
+      "associatedToAct": "rta",
+      "associatedToDeposit": "no",
+      "invalidWithClaims": null,
+      "servedWaitDays": 15,
+      "canStaffCreate": false
+    },
+    "146": {
+      "code": "OPL-4M-DR",
+      "id": 146,
+      "selectionTitle": "I issued a <b>Four Month Notice For Demolition of Conversion of a Rental Unit</b> and I want an Order of Possession",
+      "issueTitle": "I issued a Four Month Notice to End Tenancy for Demolition or Conversion of a Rental Unit",
+      "useNoticeDueDate": true,
+      "useNoticeMethod": true,
+      "useTextDescription": true,
+      "textDescriptionTitle": "Describe why possession of the unit is being requested",
+      "helpName": "Four Month Notice",
+      "selectionHelp": "This notice is used if you are requiring the unit to be vacant for demolition or conversion to another use such as conversion to a strata lot under the <i>Strata Property Act</i> or other non-residential use.<br/><br/>Effective July 1, 2021, the process for ending a tenancy for extensive renovations and repairs has changed. Learn more on <a class=\"static-external-link\" href=\"javascript:;\" url=\"https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy/renovictions\">the website</a>.",
+      "issueHelp": "If you file your application too early, it may be dismissed.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/OrderOfPossessionLandlord.html'>Verify that you can apply for possession now.</a><br><br>Ensure you have read the information on the notice carefully.<br><br>You must provide evidence to prove that you intend in good faith to use the property as stated on the notice.",
+      "associatedEvidence": [
+        {
+          "id": 160,
+          "required": true
+        },
+        {
+          "id": 162,
+          "required": true
+        },
+        {
+          "id": 167,
+          "required": false
+        }
+      ],
+      "associatedToApplicantType": "landlord",
+      "associatedToTenancyStatus": "current",
+      "associatedToAct": "rta",
+      "associatedToDeposit": "no",
+      "invalidWithClaims": null,
+      "servedWaitDays": 30,
+      "canStaffCreate": false
+    },
+
     "227": {
       "code": "OPM",
       "id": 227,
@@ -1034,12 +1281,13 @@
     "107": {
       "code": "MNDL",
       "id": 107,
+      "textDescriptionTitle": "Provide a complete list of the items you are requesting compensation for",
       "selectionTitle": "I want the tenant to pay to repair the damage that they, their pets or their guests caused during their tenancy",
       "issueTitle": "I want compensation for damage caused by the tenant, their pets or guests to the unit, site or property ",
       "useAmount": true,
       "useTextDescription": true,
       "selectionHelp": "Select this issue if you are requesting an order that the tenant pay for the cost of repairs for damage that they, their pets or their guests caused.  This may also include the costs of cleaning at the end of a tenancy.<br/><br/>If you are asking to hold the security deposit or pet damage deposit to offset the claim, select that you want to hold the deposit below.  You must provide evidence to prove that you are holding a deposit and that you have a right to claim against the deposit.",
-      "issueHelp": "You must provide evidence below to prove your monetary issue.<br/><br/>The tenant is responsible for the costs to repair damage that they, their pets or their guests cause during their tenancy.  The tenant must leave the rental unit reasonably clean at the end of the tenancy.  A tenant is not responsible for wear and tear to the rental unit.  Typically wear and tear is anything that wears out naturally with regular, responsible use.",
+      "issueHelp": "You must include all items for which you are applying for compensation and submit only relevant evidence to support your claim. Failure to list any items or provide evidence may result in those items not being considered. The total amount requested should reflect the complete total of all items listed. Any amounts claimed over the \"Amount Requested\" in the application may result in those amounts not being considered.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1073,8 +1321,9 @@
       "id": 127,
       "issueTitle": "I want the tenant to pay to repair the damage that they, their pets or their guests caused during their tenancy - request to retain security and/or pet damage deposit",
       "useAmount": true,
+      "textDescriptionTitle": "Provide a complete list of the items you are requesting compensation for",
       "useTextDescription": true,
-      "issueHelp": "You must provide evidence below to prove your monetary issue. Because you are asking to keep a security deposit and/or pet damage deposit to offset the costs, you must provide a copy of the completed condition inspection report and may wish to include evidence to show the amount of the deposit you collected and when (usually on the tenancy agreement).<br/><br/>You cannot hold a deposit for damages or cleaning if the report was not conducted at the beginning and end of the tenancy.<br/><br/>The tenant is responsible for the costs to repair damage that they, their pets or their guests cause during their tenancy.  The tenant must leave the rental unit reasonably clean at the end of the tenancy.  A tenant is not responsible for wear and tear to the rental unit.  Typically wear and tear is anything that wears out naturally with regular, responsible use.<br/><br/>A pet damage deposit may only be used for damages caused by a pet.",
+      "issueHelp": "You must include all items for which you are applying for compensation and submit only relevant evidence to support your claim. Failure to list any items or provide evidence may result in those items not being considered. The total amount requested should reflect the complete total of all items listed. Any amounts claimed over the \"Amount Requested\" in the application may result in those amounts not being considered.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1102,12 +1351,12 @@
     "108": {
       "code": "MNRL",
       "id": 108,
-      "selectionTitle": "I want to recover the money for the unpaid rent",
-      "issueTitle": "I want to recover the money for the unpaid rent",
+      "selectionTitle": "I want to recover the money for the unpaid rent and/or utilities",
+      "issueTitle": "I want to recover the money for the unpaid rent and/or utilities",
       "useAmount": true,
       "useTextDescription": true,
       "selectionHelp": "Select this issue for current rent that is unpaid.  If you are requesting to keep a security deposit to offset the unpaid rent, you must indicate that you are holding the deposit.",
-      "issueHelp": "You must provide evidence below to prove your monetary claim for unpaid rent.<br/><br/>Future rent losses may be claimed by selecting \"I want compensation for my monetary loss or other money owed\" below.",
+      "issueHelp": "You must provide evidence below to prove your monetary claim for unpaid rent and/or utilities.<br/><br/>Future rent losses may be claimed by selecting \"I want compensation for my monetary loss or other money owed\" below.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1135,10 +1384,10 @@
     "128": {
       "code": "MNRL-S",
       "id": 128,
-      "issueTitle": "I want to recover the money for the  unpaid rent - request to retain security and/or pet damage deposit",
+      "issueTitle": "I want to recover the money for the unpaid rent and/or utilities - request to retain security and/or pet damage deposit",
       "useAmount": true,
       "useTextDescription": true,
-      "issueHelp": "You must provide evidence below to prove your monetary claim for unpaid rent.<br/><br/>Because you are asking to keep a security deposit and/or pet damage deposit to offset the costs, you may wish to include evidence to show the amount of the deposit you collected and when (usually on the tenancy agreement).<br/><br/>A pet damage deposit may only be used for damage caused by a pet.<br/><br/>Future rent losses may be claimed by selecting \"I want compensation for my monetary loss or other money owed\" below.",
+      "issueHelp": "You must provide evidence below to prove your monetary claim for unpaid rent and/or utilities.<br/><br/>Because you are asking to keep a security deposit and/or pet damage deposit to offset the costs, you may wish to include evidence to show the amount of the deposit you collected and when (usually on the tenancy agreement).<br/><br/>A pet damage deposit may only be used for damage caused by a pet.<br/><br/>Future rent losses may be claimed by selecting \"I want compensation for my monetary loss or other money owed\" below.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1165,9 +1414,10 @@
       "selectionTitle": "I want compensation for my monetary loss or other money owed",
       "issueTitle": "I want compensation for my monetary loss or other money owed",
       "useAmount": true,
+      "textDescriptionTitle": "Provide a complete list of the items you are requesting compensation for",
       "useTextDescription": true,
       "selectionHelp": "Select this issue for compensation for any financial loss or other money owed.  This may include rental loss, strata fines, late fees or any other monetary loss that is not damage or unpaid rent.",
-      "issueHelp": "You must provide evidence below to prove your monetary claim.",
+      "issueHelp": "You must include all items for which you are applying for compensation and submit only relevant evidence to support your claim. Failure to list any items or provide evidence may result in those items not being considered. The total amount requested should reflect the complete total of all items listed. Any amounts claimed over the \"Amount Requested\" in the application may result in those amounts not being considered.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1189,8 +1439,9 @@
       "id": 129,
       "issueTitle": "I want compensation for my monetary loss or other money owed - request to retain security and/or pet damage deposit",
       "useAmount": true,
+      "textDescriptionTitle": "Provide a complete list of the items you are requesting compensation for",
       "useTextDescription": true,
-      "issueHelp": "You must provide evidence below to prove your monetary claim.  Because you are asking to keep a security deposit and/or pet damage deposit to offset the costs, you must provide a copy of the completed condition inspection report and may wish to include evidence to show the amount of the deposit you collected and when (usually on the tenancy agreement).<br/><br/>A pet damage deposit may only be used for damage caused by a pet.",
+      "issueHelp": "You must include all items for which you are applying for compensation and submit only relevant evidence to support your claim. Failure to list any items or provide evidence may result in those items not being considered. The total amount requested should reflect the complete total of all items listed. Any amounts claimed over the \"Amount Requested\" in the application may result in those amounts not being considered.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1223,13 +1474,26 @@
     "133": {
       "code": "ORL",
       "id": 133,
-      "selectionTitle": "I want an Order for my tenant(s) to follow Manufactured Home Park rules",
+      "selectionTitle": "I want an order for my tenant to comply with the manufactured home park rules",
+      "selectionHelp": "If your tenant is not complying with the manufactured home park rules after written notice to do so, you may select this option.",
       "issueTitle": "I want an Order for my tenant(s) to follow Manufactured Home Park rules",
       "useTextDescription": true,
       "associatedEvidence": [
+        {
+          "id": 253,
+          "required": true
+        },
+        {
+          "id": 254,
+          "required": true
+        },
+        {
+          "id": 108,
+          "required": true
+        }
       ],
       "associatedToApplicantType": "landlord",
-      "associatedToTenancyStatus": "current",
+      "associatedToTenancyStatus": "both",
       "associatedToAct": "mhpta",
       "associatedToDeposit": "no"
     },
@@ -1334,6 +1598,10 @@
         {
           "id": 147,
           "required": false
+        },
+        {
+          "id": 163,
+          "required": false
         }
       ],
       "associatedToApplicantType": "landlord",
@@ -1352,7 +1620,7 @@
       "useNoticeDueDate": true,
       "useNoticeMethod": true,
       "useTextDescription": true,
-      "selectionHelp": "This notice is used if a landlord believes you or your guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of your employment and the employment has ended. If this notice was not given as part of an employment arrangement, select \"Other Cause (Not Employment)\" as the reason on the one month notice below.",
+      "selectionHelp": "This notice is used if a landlord believes you or your guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of your employment and the employment has ended. If this notice was not given as part of an employment arrangement, select \"For Cause\" as the reason on the one month notice below.",
       "issueHelp": "If applicable, provide evidence to show that the notice is not valid.<br/><br/>You must submit your application within 10 days of receiving this notice.  If you file your application too late, the landlord may request an order of possession.  <a class=\"static-external-link\" href=\"javascript:;\" url=\"http://www.housing.gov.bc.ca/rtb/WebTools/DisputeLandlordNotice.html\">Verify that your dispute deadline has not passed</a>.<br/><br/>Ensure you have read the information on the second page of the notice carefully.",
       "associatedEvidence": [
         {
@@ -1378,7 +1646,7 @@
       "useNoticeMethod": true,
       "useTextDescription": true,
       "textDescriptionTitle": "Describe why you are disputing the notice and why you are filing late",
-      "selectionHelp": "This notice is used if a landlord believes you or your guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of your employment and the employment has ended. If this notice was not given as part of an employment arrangement, select \"Other Cause (Not Employment)\" as the reason on the one month notice below.<br/><br/>You have the right to dispute this Notice within 10 days after you receive it. An arbitrator may extend your time to file an Application, but you must provide proof of your serious and compelling reason to miss the deadline.",
+      "selectionHelp": "This notice is used if a landlord believes you or your guests have done something to cause the tenancy to end or if the rental unit or site is provided as part of your employment and the employment has ended. If this notice was not given as part of an employment arrangement, select \"For Cause\" as the reason on the one month notice below.<br/><br/>You have the right to dispute this Notice within 10 days after you receive it. An arbitrator may extend your time to file an Application, but you must provide proof of your serious and compelling reason to miss the deadline.",
       "issueHelp": "If applicable, provide evidence to show that the notice is not valid.<br><br>You must submit your application within 10 days of receiving this notice.  If you file your application too late, the landlord may request an order of possession.  <a class='static-external-link' href='javascript:;' url='http://www.housing.gov.bc.ca/rtb/WebTools/DisputeLandlordNotice.html'>Verify that your dispute deadline has not passed</a>.<br><br>Ensure you have read the information on the second page of the notice carefully.",
       "associatedEvidence": [
         {
@@ -1633,7 +1901,7 @@
       "useAmount": true,
       "useNoticeDueDate": true,
       "noticeDueDateTitle": "Date forwarding address was served",
-      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, posting it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
+      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, attaching it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
       "useNoticeMethod": true,
       "noticeMethodTitle": "How address was provided to Landlord",
       "allowedNoticeMethodCodes": ["REGISTERED_MAIL", "IN_PERSON", "OTHER"],
@@ -1688,7 +1956,7 @@
       "useAmount": true,
       "useNoticeDueDate": true,
       "noticeDueDateTitle": "Date forwarding address was served",
-      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, posting it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
+      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, attaching it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
       "useNoticeMethod": true,
       "noticeMethodTitle": "How address was provided to Landlord",
       "allowedNoticeMethodCodes": ["REGISTERED_MAIL", "IN_PERSON", "OTHER"],
@@ -1743,7 +2011,7 @@
       "useAmount": true,
       "useNoticeDueDate": true,
       "noticeDueDateTitle": "Date forwarding address was served",
-      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, posting it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
+      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, attaching it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
       "useNoticeMethod": true,
       "noticeMethodTitle": "How address was provided to Landlord",
       "allowedNoticeMethodCodes": ["REGISTERED_MAIL", "IN_PERSON", "OTHER"],
@@ -1819,9 +2087,10 @@
       "selectionTitle": "I want compensation for my monetary loss or other money owed",
       "issueTitle": "I want compensation for my monetary loss or other money owed",
       "useAmount": true,
+      "textDescriptionTitle": "Provide a complete list of the items you are requesting compensation for",
       "useTextDescription": true,
       "selectionHelp": "Select this issue for compensation for financial losses other than emergency repairs or the return of a deposit.",
-      "issueHelp": "You must provide evidence below to prove your monetary claim.",
+      "issueHelp": "You must include all items for which you are applying for compensation and submit only relevant evidence to support your claim. Failure to list any items or provide evidence may result in those items not being considered. The total amount requested should reflect the complete total of all items listed. Any amounts claimed over the \"Amount Requested\" in the application may result in those amounts not being considered.",
       "associatedEvidence": [
         {
           "id": 102,
@@ -1846,7 +2115,7 @@
       "useAmount": true,
       "useNoticeDueDate": true,
       "noticeDueDateTitle": "Date forwarding address was served",
-      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, posting it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
+      "noticeDueDateHelp": "This is the date the tenant served the written forwarding address in person, attaching it to the door, placing it in the mail box or sending it by fax or mail. This information must also be provided on form RTB-41.",
       "useNoticeMethod": true,
       "noticeMethodTitle": "How address was provided to Landlord",
       "allowedNoticeMethodCodes": ["REGISTERED_MAIL", "IN_PERSON", "OTHER"],
@@ -1956,7 +2225,7 @@
         }
       ],
       "associatedToApplicantType": "tenant",
-      "associatedToTenancyStatus": "both",
+      "associatedToTenancyStatus": "current",
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "invalidWithClaims": null
@@ -2189,8 +2458,8 @@
     "224": {
       "code": "CNL-4M",
       "id": 224,
-      "selectionTitle": "I want to dispute a <b>Four Month Notice to End Tenancy<b> for Demolition, Renovation, or Conversion to Another Use",
-      "issueTitle": "I want to dispute a Four Month Notice to End Tenancy for Demolition, Renovation, or Conversion to Another Use",
+      "selectionTitle": "I want to dispute a <b>Four Month Notice to End Tenancy<b> for Demolition, or Conversion to Another Use",
+      "issueTitle": "I want to dispute a Four Month Notice to End Tenancy for Demolition, or Conversion to Another Use",
       "useNoticeDueDate": true,
       "useNoticeMethod": true,
       "useTextDescription": true,
@@ -2229,7 +2498,7 @@
     "235": {
       "code": "CNL-4M-MT",
       "id": 235,
-      "issueTitle": "I want to dispute a Four Month Notice to End Tenancy for Demolition, Renovation, or Conversion to Another Use and I need more time to dispute this notice",
+      "issueTitle": "I want to dispute a Four Month Notice to End Tenancy for Demolition, or Conversion to Another Use and I need more time to dispute this notice",
       "useNoticeDueDate": true,
       "useNoticeMethod": true,
       "useTextDescription": true,
@@ -2259,14 +2528,22 @@
     "240": {
       "code": "OJT",
       "id": 240,
-      "selectionTitle": "I am occupying a room in a residential hotel and I want an Arbitrator to determine whether the Residential Tenancy Branch has jurisdiction over my tenancy",
-      "issueTitle": "I am occupying a room in a residential hotel and I want an Arbitrator to determine whether the Residential Tenancy Branch has jurisdiction over my tenancy",
+      "selectionTitle": "I am occupying a room in a residential hotel and I want the Residential Tenancy Branch to determine whether they have jurisdiction over my tenancy",
+      "issueTitle": "I am occupying a room in a residential hotel and I want the Residential Tenancy Branch to determine whether they have jurisdiction over my tenancy",
+      "selectionHelp": "Select this option if you are living in a residential hotel and you want to know whether the Residential Tenancy Act applies to your tenancy",
       "useTextDescription": true,
-      "associatedEvidence": [
+      "associatedEvidence": [{
+          "id": 252,
+          "required": true
+        },
+        {
+          "id": 108,
+          "required": false
+        }
       ],
       "associatedToApplicantType": "tenant",
       "associatedToTenancyStatus": "both",
-      "associatedToAct": "both",
+      "associatedToAct": "rta",
       "associatedToDeposit": "no"
     },
     "241": {
@@ -2294,12 +2571,13 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "reverseAward": true,
+      "alwaysAwarded": true,
       "hiddenExternal": true
     },
     "243": {
       "code": "MNETC",
       "id": 243,
-      "issueTitle": "I want compensation from the landlord related to a Notice to End Tenancy for Landlord's Use of Property",
+      "issueTitle": "I want compensation because my tenancy ended as a result of a two, four, or 12 Month Notice to End Tenancy, and the landlord has not complied with the Act or used the rental unit/site for the stated purpose",
       "issueHelp": "<p>A tenant may apply for this where a landlord:<ul><li>has not accomplished the stated purpose for ending the tenancy within a reasonable period of time; or</li><li>has not used the rental unit for the stated purpose for at least 6 months within a reasonable period of time; or</li><li>failed to give the tenant a notice of availability (Form #RTB-35) at least 45 days before the rental unit will be available to rent.</li></ul></p><p>To learn more about claims for compensation related to a landlord's use of property, view the applicable policy guideline:<ul><li><a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl50.pdf'>Compensation for Ending a Tenancy (Residential Tenancy Act)</a></li><li><a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl33.pdf'>Ending a Manufactured Home Park Tenancy Agreement - Landlord Use of Property</a></li></ul></p>",
       "useAmount": true,
       "useTextDescription": true,
@@ -2332,6 +2610,7 @@
       "associatedToAct": "both",
       "associatedToDeposit": "no",
       "reverseAward": true,
+      "alwaysAwarded": true,
       "hiddenExternal": true
     },
     "245": {
@@ -2361,6 +2640,25 @@
       "associatedToAct": "rta",
       "associatedToDeposit": "no",
       "invalidWithClaims": [202]
+    },
+    "246": {
+      "code": "MNEVC",
+      "id": 246,
+      "issueTitle": "I want compensation from the landlord related to a fixed term tenancy with a requirement to vacate the rental unit at the end of the term",
+      "issueHelp": "<p>A tenant may apply for this where a landlord has ended a fixed term tenancy with a requirement to vacate, and:<ul><li>has not taken steps to accomplish the stated purpose, within a reasonable period from the date the tenancy ended; or</li><li>has not used the rental unit for the stated purpose for at least 6 months within a reasonable period from the date the tenancy ended.</li></ul></p>",
+      "useAmount": true,
+      "useTextDescription": true,
+      "noAmountLimit": true,
+      "associatedEvidence": [
+        {
+          "id": 248,
+          "required": true
+        }
+      ],
+      "associatedToApplicantType": "tenant",
+      "associatedToTenancyStatus": "past",
+      "associatedToAct": "rta",
+      "associatedToDeposit": "no"
     },
     "223": {
       "code": "FFT",
@@ -2454,21 +2752,21 @@
       "category": 4,
       "title": "One Month Notice to End Tenancy Form",
       "helpName": "One Month Notice to End Tenancy Form",
-      "helpHtml": "Provide a copy of the notice delivered to the tenant.  You must use the approved One Month Notice to End Tenancy for Cause or for End of Employment (form RTB-33).  A tenant is not required to dispute a verbal notice to end a tenancy."
+      "helpHtml": "Provide a copy of the notice delivered to the tenant.  You must use the approved One Month Notice to End Tenancy for Cause or for End of Employment (form RTB-33 or RTB-33s).  A tenant is not required to dispute a verbal notice to end a tenancy."
     },
     "112": {
       "id": 112,
       "category": 4,
       "title": "Proof of Cause",
       "helpName": "Proof of Cause",
-      "helpHtml": "Provide evidence to prove that the cause is warranted.  Evidence may include photos, witness statements, written communications, audio or video recordings, police file numbers any other evidence to support that the tenant is an immediate threat to life or property."
+      "helpHtml": "Provide evidence to prove that the cause is warranted. Evidence may include photos, witness statements, written communications, audio or video recordings, police file numbers any other evidence to support that the landlord has cause under the Act to end the tenancy."
     },
     "113": {
       "id": 113,
       "category": 4,
       "title": "Proof of End of Employment",
       "helpName": "Proof of End of Employment",
-      "helpHtml": "Provide evidence to prove that the rental unit or site was provided as part of the tenant's employment and that the tenant's employment has ended.  Evidence may include dismissal letters, records of employment, photos, written agreements, written communications any other evidence to support that the tenant is an immediate threat to life or property."
+      "helpHtml": "Provide evidence to prove that the rental unit or site was provided as part of the tenant's employment and that the tenant's employment has ended."
     },
     "114": {
       "id": 114,
@@ -2482,7 +2780,7 @@
       "category": 4,
       "title": "Two Month Notice to End Tenancy Form",
       "helpName": "Two Month Notice to End Tenancy Form",
-      "helpHtml":"Provide a copy of the notice delivered by the landlord. The landlord must use the approved three-page Two Month Notice to End Tenancy for Landlord's Use of Property (form RTB-32). You are not required to dispute a verbal notice to end a tenancy.<br/><br/>There is important information on the notice that you should read carefully."
+      "helpHtml":"Provide a copy of the notice delivered by the landlord. The landlord must use the approved four-page Two Month Notice to End Tenancy for Landlord's Use of Property (form RTB-32). You are not required to dispute a verbal notice to end a tenancy.<br/><br/>There is important information on the notice that you should read carefully."
     },
     "116": {
       "id": 116,
@@ -2750,6 +3048,70 @@
       "helpName": "Proof that permits or approvals are not required",
       "helpHtml": "If permits are not required for the work, a landlord must provide evidence, such as confirmation from a certified tradesperson or copy of a current building bylaw that permits are not required but that the work requires the vacancy of the unit in a way that necessitates ending the tenancy.<br/>Some local governments have additional requirements, policies and bylaws that apply when landlords are performing renovations to a rental unit. Landlords should check with the local government where the rental unit is located to determine the requirements and submit evidence of meeting these requirements.<br/>You can learn more about permit requirements on the <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/ending-a-tenancy/renovictions'>Residential Tenancy Branch website</a> and <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl2b.pdf'>Policy Guideline 2B: Ending a Tenancy to Demolish, Renovate, or Convert a Rental Unit to a Permitted Use</a>."
     },
+    "156": {
+      "id": 156,
+      "category": 4,
+      "title": "One Month Notice to End Tenancy For Cause - RTB 33",
+      "helpName": "One Month Notice to End Tenancy For Cause - RTB 33",
+      "helpHtml": "You must provide a copy of the notice to end tenancy delivered to the tenant. You must use the approved notice to end tenancy form found <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/forms'>here</a>. A tenant is not required to dispute a verbal notice to end tenancy."
+    },
+    "157": {
+      "id": 157,
+      "category": 4,
+      "title": "One Month Notice to End Tenancy For End of Employment - RTB 33",
+      "helpName": "One Month Notice to End Tenancy For End of Employment - RTB 33",
+      "helpHtml": "You must provide a copy of the notice to end tenancy delivered to the tenant. You must use the approved notice to end tenancy form found <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/forms'>here</a>. A tenant is not required to dispute a verbal notice to end tenancy."
+    },
+    "158": {
+      "id": 158,
+      "category": 4,
+      "title": "Two Month Notice to End Tenancy - Tenant Does Not Qualify For Subsidized Rental Unit - RTB 32",
+      "helpName": "Two Month Notice to End Tenancy Because Tenant Does Not Qualify For Subsidized Rental Unit - RTB 32",
+      "helpHtml": "You must provide a copy of the notice to end tenancy delivered to the tenant. You must use the approved notice to end tenancy form found <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/forms'>here</a>. A tenant is not required to dispute a verbal notice to end tenancy."
+    },
+    "160": {
+      "id": 160,
+      "category": 4,
+      "title": "Four Month Notice to End Tenancy For Demolition or Conversion of a Rental Unit - RTB 29",
+      "helpName": "Four Month Notice to End Tenancy For Demolition or Conversion of a Rental Unit - RTB 29",
+      "helpHtml": "You must provide a copy of the notice to end tenancy delivered to the tenant. You must use the approved notice to end tenancy form found <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/forms'>here</a>. A tenant is not required to dispute a verbal notice to end tenancy."
+    },
+    "161": {
+      "id": 161,
+      "category": 4,
+      "title": "12 Month Notice to End Tenancy For Conversion of Manufactured Home Park - RTB 31",
+      "helpName": "12 Month Notice to End Tenancy For Conversion of Manufactured Home Park - RTB 31",
+      "helpHtml": "You must provide a copy of the notice to end tenancy delivered to the tenant. You must use the approved notice to end tenancy form found <a href='javascript:;' class='static-external-link' url='https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/forms'>here</a>. A tenant is not required to dispute a verbal notice to end tenancy."
+    },
+    "162": {
+      "id": 162,
+      "category": 4,
+      "title": "Proof of Service Notice to End Tenancy - RTB 34",
+      "helpName": "Proof of Service Notice to End Tenancy - RTB 34",
+      "helpHtml": "Provide a completed Proof of Service Notice to End Tenancy and Written Demand to Pay Utilities (form RTB-34) to prove that the notice was delivered to the tenant.<br/><br/>Download a copy <a class=\"static-external-link\" href=\"javascript:;\" url=\"http://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/forms/rtb34.pdf\">here</a>."
+    },
+    "163": {
+      "id": 163,
+      "category": 4,
+      "title": "Proof of Demolition or Conversion of a Rental unit",
+      "helpName": "Proof of Demolition or Conversion of a Rental unit",
+      "helpHtml": "You must provide a copy of all permits and approvals that are required by law to either demolish the rental unit or convert it to another use.  Review our policy guideline <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl2b.pdf'>here</a>."
+    },
+    "164": {
+      "id": 164,
+      "category": 4,
+      "title": "Proof of Conversion of Manufactured Home Park",
+      "helpName": "Proof of Conversion of Manufactured Home Park",
+      "helpHtml": "You must provide a copy of all permits and approvals that are required by law to convert the manufactured home park. Review our policy guideline <a class='static-external-link' href='javascript:;' url='https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl33.pdf'>here</a>."
+    },
+    "167": {
+      "id": 167,
+      "category": 4,
+      "title": "Registered mail receipt or other proof of service for notice",
+      "helpName": "Registered mail receipt or other proof of service for notice",
+      "helpHtml": "If the notice to end tenancy was sent by registered mail, you must provide a copy of the registered mail receipt. If the notice was sent by e-mail, you must provide proof of pre-agreement for sending documents by e-mail to demonstrate that the tenant has allowed for service in this manner."
+    },
+
     "201": {
       "id": 201,
       "category": 4,
@@ -2769,7 +3131,7 @@
       "category": 4,
       "title": "One Month Notice to End Tenancy Form",
       "helpName": "One Month Notice to End Tenancy Form",
-      "helpHtml": "Provide a copy of the notice delivered by the landlord.  The landlord must use the approved One Month Notice to End Tenancy for Cause (form RTB-33).  You are not required to dispute a verbal notice to end a tenancy. <br>There is important information on page two of the notice that you should read carefully."
+      "helpHtml": "Provide a copy of the notice delivered by the landlord.  The landlord must use the approved One Month Notice to End Tenancy for Cause (form RTB-33 or RTB-33s).  You are not required to dispute a verbal notice to end a tenancy. <br>There is important information on page two of the notice that you should read carefully."
     },
     "205": {
       "id": 205,
@@ -3056,7 +3418,7 @@
       "category": 4,
       "title": "Copy of notice to end tenancy (Forms #RTB-29, 31, or 32)",
       "helpName": "Copy of notice to end tenancy (Forms #RTB-29, 31, or 32)",
-      "helpHtml": "You must provide a copy of one of these notices to end tenancy:<ul><li>Form #RTB-29 Four Month Notice to End Tenancy for Demolition, Renovation or Conversion of the Rental Unit to Another Use</li><li>Form #RTB-31 12 Month Notice to End Tenancy for Conversion of Manufactured Home Park</li><li>Form #RTB-32 Two Month Notice to End Tenancy for Landlord's Use of Property</li></ul>"
+      "helpHtml": "You must provide a copy of one of these notices to end tenancy:<ul><li>Form #RTB-29 Four Month Notice to End Tenancy for Demolition or Conversion of the Rental Unit to Another Use</li><li>Form #RTB-31 12 Month Notice to End Tenancy for Conversion of Manufactured Home Park</li><li>Form #RTB-32 Two Month Notice to End Tenancy for Landlord's Use of Property</li></ul>"
     },
     "248": {
       "id": 248,
@@ -3086,6 +3448,28 @@
       "helpName": "Previous Notices of Rent Increase(s)",
       "helpHtml": "If you have a previous Notice of Rent Increase form you may submit it here"
     },
+    "252": {
+      "id": 252,
+      "category": 4,
+      "title": "Proof of tenancy",
+      "helpName": "Proof of tenancy",
+      "helpHtml": "Provide proof that the your tenancy is under the jurisdiction of the Residential Tenancy Branch"
+    },
+    "253": {
+      "id": 253,
+      "category": 4,
+      "title": "Copy of manufactured home park rules",
+      "helpName": "Copy of manufactured home park rules",
+      "helpHtml": "Provide a copy of your manufactured home park rules"
+    },
+    "254": {
+      "id": 254,
+      "category": 4,
+      "title": "Proof tenant not complying with manufactured home park rules",
+      "helpName": "Proof tenant not complying with manufactured home park rules",
+      "helpHtml": "Provide evidence that the tenant is not complying with the manufactured home park rules"
+    },
+
 
     "9": {
       "id": 9,
@@ -3237,21 +3621,21 @@
     },
     "73": {
       "id": 73,
-      "category": 7,
+      "category": 8,
       "title": "Paper Application Form",
       "helpName": null,
       "helpHtml": null
     },
     "74": {
       "id": 74,
-      "category": 7,
+      "category": 8,
       "title": "Application, Landlord Request to Amend (RTB-42L or RTB-42O)",
       "helpName": null,
       "helpHtml": null
     }, 
     "75": {
       "id": 75,
-      "category": 7,
+      "category": 8,
       "title": "Application, Tenant Request to Amend (RTB-42T or RTB-42O)",
       "helpName": null,
       "helpHtml": null
@@ -3386,7 +3770,7 @@
     "95": {
       "id": 95,
       "category": 8,
-      "title": "Landlord Application, Current Tenancy (RTB-12L-CT or RTB-16)",
+      "title": "Landlord Application, Current Tenancy (RTB-12L-CT)",
       "helpName": null,
       "helpHtml": null
     },

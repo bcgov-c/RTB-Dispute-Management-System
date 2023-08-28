@@ -320,7 +320,6 @@ export default Marionette.View.extend({
     this.createSubModels();
     this.setupListeners();
     this.model.trigger('cancel');
-    //this.render();
   },
 
   _onMenuEdit(regions) {

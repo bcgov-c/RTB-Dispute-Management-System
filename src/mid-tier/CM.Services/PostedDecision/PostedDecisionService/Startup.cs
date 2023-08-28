@@ -59,6 +59,8 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseSafeListFiltering(Configuration);
+
         app.UseRouting();
         app.UseCors("AllowCors");
         app.UseEndpoints(endpoints =>

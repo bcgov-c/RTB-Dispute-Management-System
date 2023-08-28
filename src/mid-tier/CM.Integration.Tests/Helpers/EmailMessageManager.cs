@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using CM.Business.Entities.Models.BulkEmailRecipient;
 using CM.Business.Entities.Models.EmailMessage;
 using CM.Integration.Tests.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
@@ -38,5 +39,15 @@ public static class EmailMessageManager
     public static EntityWithStatus<EmailMessageListResponse> GetDisputeEmailMessages(HttpClient client, Guid disputeGuid)
     {
         return client.GetAsync<EmailMessageListResponse>(RouteHelper.GetDisputeEmailMessages + disputeGuid);
+    }
+
+    public static EntityWithStatus<ExternalEmailMessageResponse> GetExternalEmailMessages(HttpClient client, Guid disputeGuid, ExternalEmailMessagesRequest request)
+    {
+        return client.GetAsync<ExternalEmailMessageResponse>(RouteHelper.GetExternalEmailMessages + disputeGuid, request);
+    }
+
+    public static EntityWithStatus<string> CreateBulkEmailMessage(HttpClient client, BulkEmailRecipientRequest request)
+    {
+        return client.PostAsync<string>(RouteHelper.PostBulkEmailMessage, request);
     }
 }

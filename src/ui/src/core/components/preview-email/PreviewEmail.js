@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal that displays the sent email html
+ */
 import Marionette from 'backbone.marionette';
 import React from 'react';
 import { ViewJSXMixin } from '../../utilities/JsxViewMixin';
@@ -9,6 +12,9 @@ import './PreviewEmail.scss';
 const PICKUP_INSTRUCTIONS = `The following is your receipt of the documents you picked up from the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**)`;
 
 const PreviewEmail = Marionette.View.extend({
+    /**
+   * @param {EmailModel} emailModel 
+   */
   initialize(options) {
     this.template = this.template.bind(this);
     this.mergeOptions(options, ['emailModel']); 
@@ -44,10 +50,11 @@ const PreviewEmail = Marionette.View.extend({
   },
 
   template() {
-    return <>
+    return <div className={`preview-email__inner ${this.emailModel?.isPickup() ? 'preview-email-pickup' : 'preview-email-email'}`}>
       {this.emailModel.isPickup() ? <div className="preview-email__styles" dangerouslySetInnerHTML={{ __html: templateEmailStyles() }}></div> : null}
       <div dangerouslySetInnerHTML={{__html: this.html}}></div>
-      <div className="preview-email-print-frame hidden"></div>    </>
+      <div className="preview-email-print-frame hidden"></div>
+    </div>;
   },    
 });
 

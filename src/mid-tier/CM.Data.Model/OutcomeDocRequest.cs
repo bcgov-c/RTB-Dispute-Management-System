@@ -33,7 +33,11 @@ public class OutcomeDocRequest : BaseEntity
 
     public int? OutcomeDocGroupId { get; set; }
 
+    public OutcomeDocGroup OutcomeDocGroup { get; set; }
+
     public int? FileDescriptionId { get; set; }
+
+    public FileDescription FileDescription { get; set; }
 
     public byte? RequestStatus { get; set; }
 
@@ -52,6 +56,8 @@ public class OutcomeDocRequest : BaseEntity
     public DateTime? RequestDate { get; set; }
 
     public byte? RequestSource { get; set; }
+
+    public byte? RequestSubStatus { get; set; }
 
     public virtual ICollection<OutcomeDocReqItem> OutcomeDocReqItems { get; set; }
 }

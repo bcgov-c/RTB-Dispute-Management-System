@@ -51,9 +51,10 @@ export default Marionette.View.extend({
     }
     loaderChannel.trigger('page:load');
     const created_outcome_delivery = matching_file.createDelivery(_.extend(
-        { delivery_method: configChannel.request('get', 'SEND_METHOD_OTHER') },
-        this.descriptionModel.getPageApiDataAttrs()
-      ));
+      { delivery_method: configChannel.request('get', 'SEND_METHOD_OTHER') },
+      this.descriptionModel.getPageApiDataAttrs(),
+      (this.deliverySaveData || {})
+    ));
 
     created_outcome_delivery.save()
       .done(() => this.trigger('save:complete', matching_file, created_outcome_delivery))
@@ -88,6 +89,7 @@ export default Marionette.View.extend({
       console.log(`[Error] Need the outcome document group model to add outcome document to`);
       return;
     }
+    this.mergeOptions(options, ['deliverySaveData']);
     this.createSubModels();
   },
 

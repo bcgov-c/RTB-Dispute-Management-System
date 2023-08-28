@@ -1,5 +1,5 @@
 /**
- * The DisputeHistory manages the transitions between disputes, and manages the menu interactions
+ * @fileoverview - Manager that handles the transitions between disputes, and manages the menu interactions
  * @namespace admin.components.dispute-history.DisputeHistory
  * @memberof admin.components.dispute-history
  */

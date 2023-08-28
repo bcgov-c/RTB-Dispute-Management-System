@@ -3,6 +3,7 @@ import FileDescriptionModel from '../../files/file-description/FileDescription_m
 import ServiceModel from '../../service/Service_model';
 
 const api_name = 'filepackageservice';
+const FILE_DESCRIPTION_TITLE = `Evidence Service Proof`;
 
 const configChannel = Radio.channel('config');
 const participantsChannel = Radio.channel('participants');
@@ -38,14 +39,4 @@ export default ServiceModel.extend({
   urlRoot() {
     return `${configChannel.request('get', 'API_ROOT_URL')}${api_name}/${ this.isNew() ? this.get('file_package_id') : '' }`;
   },
-
-  createPackageServiceFileDescription() {
-    return new FileDescriptionModel({
-      title: `Evidence Service Proof - Uploaded ${Formatter.toDateDisplay(Moment())}`,
-      description: `Proof of Evidence Service Files`,
-      description_by: participantsChannel.request('get:primaryApplicant:id'),
-      description_category: configChannel.request('get', 'EVIDENCE_CATEGORY_SERVICE_EVIDENCE')
-    });
-  }
-
 });

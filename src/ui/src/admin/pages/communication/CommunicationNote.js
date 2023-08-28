@@ -84,7 +84,7 @@ export default Marionette.View.extend({
       Formatter,
       isDecisionNote: this.model.isDecision(),
       userCanModifyNote: this.getCanUserModifyNote(),
-      linkToDisplay: this.NOTE_LINK_DISPLAY[this.model.get('note_linked_to')],
+      linkToDisplay: this.model.getTypeDisplay(),
       noteCreatorRoleDisplay: this.NOTE_CREATOR_ROLE_DISPLAY ? this.NOTE_CREATOR_ROLE_DISPLAY : 'N/A',
     };
   }

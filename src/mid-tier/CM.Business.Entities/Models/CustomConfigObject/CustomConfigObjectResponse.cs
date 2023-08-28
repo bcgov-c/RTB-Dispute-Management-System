@@ -36,7 +36,7 @@ public class CustomConfigObjectResponse : CommonResponse
     [JsonProperty("is_public")]
     public bool IsPublic { get; set; }
 
-    [JsonProperty("object_storage_type ")]
+    [JsonProperty("object_storage_type")]
     public byte ObjectStorageType { get; set; }
 
     [JsonProperty("object_json")]

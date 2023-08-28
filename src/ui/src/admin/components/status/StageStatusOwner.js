@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that contains editable view for the stage, status, and owner of a dispute
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 

@@ -64,8 +64,8 @@ export default CMModel.extend({
   },
 
   urlRoot() {
-    const dispute_id = disputeChannel.request('get:id');
-    return `${configChannel.request('get', 'API_ROOT_URL')}${api_name}` + (this.isNew() ? `/${dispute_id}` : '');
+    const disputeGuid = this.get('dispute_guid') || disputeChannel.request('get:id');
+    return `${configChannel.request('get', 'API_ROOT_URL')}${api_name}${this.isNew() ? `/${disputeGuid}` : ''}`;
   },
 
   isUnsentPending() {
@@ -73,7 +73,7 @@ export default CMModel.extend({
   },
 
   isUnsentDraft() {
-    return this.get('send_status') === configChannel.request('get', 'EMAIL_SEND_STATUS_UNSENT') && !this.get('is_active');
+    return this.get('send_status') === configChannel.request('get', 'EMAIL_SEND_STATUS_UNSENT') && !this.get('is_active') && !this.get('preferred_send_date');
   },
 
   isSent() {
@@ -81,7 +81,7 @@ export default CMModel.extend({
   },
 
   isSentPending() {
-    return this.get('send_status') === configChannel.request('get', 'EMAIL_SEND_STATUS_PENDING');
+    return this.get('send_status') === configChannel.request('get', 'EMAIL_SEND_STATUS_UNSENT') && this.get('preferred_send_date');
   },
 
   isSentError() {
@@ -99,6 +99,12 @@ export default CMModel.extend({
 
   isPickupConfirmation() {
     return this.get('message_type') === configChannel.request('get', 'EMAIL_MESSAGE_TYPE_PICKUP_CONFIRMATION');
+  },
+
+  // Manually send the header so that emails can be sent and associated to other disputes
+  saveAsSent() {
+    this.set('is_active', true);
+    return this.save(this.getApiChangesOnly(), { headers: { DisputeGuid: this.get('dispute_guid') } });
   },
 
   toStatusDisplay() {
@@ -119,7 +125,7 @@ export default CMModel.extend({
     return this.get('email_attachments');
   },
 
-  createAttachment(emailAttachmentData) {
+  createAttachment(emailAttachmentData={}) {
     const attachmentCollection = this.getAttachments();
     const newAttachmentModel = new EmailAttachmentModel(Object.assign({ email_id: this.id }, emailAttachmentData));
     return new Promise((res, rej) => {
@@ -129,5 +135,6 @@ export default CMModel.extend({
           res();
         }).fail(rej);
     });
-  }
+  },
+
 });

@@ -8,7 +8,6 @@ using CM.Business.Services.TrialIntervention;
 using CM.Business.Services.TrialParticipant;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 

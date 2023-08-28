@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View for assigning a task owner filtered via owner groupings. Automatically selects logged in user as default task owner
+ */
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import { routeParse } from '../../../routers/mainview_router';
@@ -16,6 +19,7 @@ const modalChannel = Radio.channel('modals');
 const configChannel = Radio.channel('config');
 const userChannel = Radio.channel('users');
 const sessionChannel = Radio.channel('session');
+const disputeChannel = Radio.channel('dispute');
 const loaderChannel = Radio.channel('loader');
 
 export default ModalBaseView.extend({
@@ -86,7 +90,7 @@ export default ModalBaseView.extend({
             menuChannel.trigger('add:to:item:count', ['my_tasks_item_io', 'my_tasks_item'], 1);
           }
         }
-        if (this.assignedToCurrentUser) {
+        if (this.navigateAfterSave) {
           loaderChannel.trigger('page:load')
           Backbone.history.navigate(routeParse('overview_item', this.model.get('dispute_guid')), { trigger: true })
         }
@@ -100,7 +104,7 @@ export default ModalBaseView.extend({
         })
       )
       .always(() => {
-        if (!this.assignedToCurrentUser) loaderChannel.trigger('page:load:complete');
+        if (!this.navigateAfterSave) loaderChannel.trigger('page:load:complete');
       });
   },
 
@@ -128,6 +132,7 @@ export default ModalBaseView.extend({
     ModalBaseView.prototype.initialize.call(this, options);
     this.mergeOptions(options, ['topText', 'completeTask']);
 
+    this.navigateAfterSave = false;
     this.assignedToCurrentUser = false;
     this.currentUser = sessionChannel.request('get:user');
     this.USER_ROLE_GROUP_IO = configChannel.request('get', 'USER_ROLE_GROUP_IO');
@@ -251,6 +256,10 @@ export default ModalBaseView.extend({
     );
   },
 
+  onBeforeRender() {
+    this.navigateAfterSave = this.assignedToCurrentUser && this.model.get('dispute_guid') !== disputeChannel.request('get:id');
+  },
+
   onRender() {
     this.showChildView('ownerGroupRegion', new RadioIconView({ isSingleViewMode: true, model: this.groupModel }));
     this.showChildView('usernameRegion', new DropdownView({ model: this.usernameDropDownModel }));
@@ -264,7 +273,7 @@ export default ModalBaseView.extend({
       typeDisplay: _.has(TASK_TYPE_DISPLAY, taskType) ? TASK_TYPE_DISPLAY[taskType] : '-',
       subTypeDisplay: this.model.getSubTypeDisplay(),
       isSubTypeArb: this.model.isSubTypeArb(),
-      assignToMeClicked: this.assignedToCurrentUser
+      navigateAfterSave: this.navigateAfterSave,
     };
   }
 });

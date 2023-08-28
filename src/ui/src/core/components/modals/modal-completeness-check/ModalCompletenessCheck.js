@@ -1,4 +1,6 @@
-
+/**
+ * @fileoverview - Modal that displays remaining incomplete Dispute items. Contains item type filtering
+ */
 import React from 'react';
 import Radio from 'backbone.radio';
 import Backbone from 'backbone';
@@ -16,25 +18,34 @@ import SuccessAnimation from '../../../static/DMS_BlueCompleteCheckAnim_sml.gif'
 import './ModalCompletenessCheck.scss';
 
 const sessionChannel = Radio.channel('session');
+const hearingChannel = Radio.channel('hearings');
 
 const SHOW_ALL_DROPDOWN_CODE = '0';
 const SHOW_IO_DROPDOWN_CODE = '1';
 const SHOW_OFFICE_DROPDOWN_CODE = '2';
 const SHOW_ADJUDICATOR_DROPDOWN_CODE = '3';
 const SHOW_ARB_DROPDOWN_CODE = '4';
+const DEFAULT_CLOSE_BUTTON_TEXT = `Ignore Incomplete Warnings and Exit`;
 
 const ModalCompletenessCheck = ModalBaseView.extend({ 
   id: "completenessCheck_modal",
 
+  /**
+   * @param {DisputeModel} model - dispute model to check incomplete items on
+   * @param {Object} incompleteItems - Object containing attributes for each incomplete item to be rendered
+   */
+
   initialize(options) {
     this.template = this.template.bind(this);
-    this.mergeOptions(options, ['incompleteItems']);
+    this.mergeOptions(options, ['incompleteItems', 'closeButtonText', 'submitButtonText', 'autoCloseIfAllComplete']);
 
     this.generalDisputeItemsCollection = new Backbone.Collection();
     this.documentAndDeliveryItemsCollection = new Backbone.Collection();
     this.hearingOutcomeItemsCollection = new Backbone.Collection();
     this.populateCompletenessCollections();
 
+    this.closeButtonText = this.closeButtonText || DEFAULT_CLOSE_BUTTON_TEXT;
+    this.submitButtonText = this.submitButtonText || null;
     this.allCompleteTimer = null;
     
     this.createSubModels();
@@ -70,8 +81,17 @@ const ModalCompletenessCheck = ModalBaseView.extend({
   },
 
   clearTimerAndRender() {
+    // If user interacts with the modal inputs for filters, they must then close it manually
+    this.autoCloseIfAllComplete = false;
     clearTimeout(this.allCompleteTimer);
     this.render();
+  },
+
+  checkAndStartCloseTimer() {
+    if (!this.autoCloseIfAllComplete) return;
+    if (this.isGeneralDisputeItemsComplete() && this.isDocumentAndDeliveryItemsComplete() && this.isHearingOutcomeItemsComplete()) {
+      this.allCompleteTimer = setTimeout(() => this.close(), 4000);
+    }
   },
 
   clickView() {
@@ -99,7 +119,10 @@ const ModalCompletenessCheck = ModalBaseView.extend({
 
       if (config_completeness.generalDisputeItems.includes(key)) this.generalDisputeItemsCollection.add(completenessModel);
       else if (config_completeness.documentAndDeliveryItems.includes(key)) this.documentAndDeliveryItemsCollection.add(completenessModel);
-      else if (config_completeness.hearingOutcomeItems.includes(key)) this.hearingOutcomeItemsCollection.add(completenessModel);
+      else if (config_completeness.hearingOutcomeItems.includes(key)) {
+        if (key === 'missingHearingParticipations' && !hearingChannel.request('get:latest')?.checkIsDisputePrimaryLink(this.model)) return;
+        this.hearingOutcomeItemsCollection.add(completenessModel);
+      }
     });
   },
 
@@ -141,6 +164,10 @@ const ModalCompletenessCheck = ModalBaseView.extend({
     else if (currentUser.isAdjudicator()) return SHOW_ADJUDICATOR_DROPDOWN_CODE;
     else if (currentUser.isArbitrator()) return SHOW_ARB_DROPDOWN_CODE;
     else SHOW_ALL_DROPDOWN_CODE;
+  },
+
+  onBeforeRender() {
+    this.checkAndStartCloseTimer();
   },
 
   onRender() {
@@ -212,7 +239,12 @@ const ModalCompletenessCheck = ModalBaseView.extend({
 
               <div className="button-row">
                 <div className="pull-right">
-                  <button type="button" className="btn btn-lg btn-default btn-cancel" onClick={() => this.close()}><span>Ignore Incomplete Warnings and Exit</span></button>
+                  <button type="button" className="btn btn-lg btn-default btn-cancel" onClick={() => this.close()}>
+                    <span>{this.closeButtonText}</span>
+                  </button>
+                  {this.submitButtonText ? <button type="button" className="btn btn-lg btn-default btn-primary" onClick={() => this.trigger('submit')}>
+                    <span>{this.submitButtonText}</span>
+                  </button> : null}
                 </div>
               </div>
           </div>
@@ -248,7 +280,6 @@ const ModalCompletenessCheck = ModalBaseView.extend({
 
   renderJsxAllItemsComplete() {
     if (!this.isGeneralDisputeItemsComplete() || !this.isDocumentAndDeliveryItemsComplete() || !this.isHearingOutcomeItemsComplete()) return;
-    this.allCompleteTimer = setTimeout(() => this.close(), 4000);
     return <div className="completeness-check__success__wrapper">
       <img className="completeness-check__success" src={`${SuccessAnimation}?t=${Math.random()}`} alt="Success" />
       <span className="completeness-check__success__text">No incomplete items in selected validation</span>

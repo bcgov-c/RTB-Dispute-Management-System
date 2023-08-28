@@ -1,0 +1,16 @@
+.report-results-table {
+  display: table;
+  border-collapse: collapse; 
+  width:100%;
+
+  .standard-list-header, .standard-list-item {
+    display: table-row;
+    > div {
+      display: table-cell;
+      min-width: 110px;
+      max-width: 300px;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
+  }
+}

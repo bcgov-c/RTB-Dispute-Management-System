@@ -26,4 +26,10 @@ public interface IDisputeHearingService : IServiceBase
     Task<List<Data.Model.DisputeHearing>> GetDisputeHearingsByHearing(int hearingId);
 
     Task<Data.Model.DisputeHearing> FindRecordingHearing(string recordCode, DateTime startDate);
+
+    Task<List<Data.Model.DisputeHearing>> GetDisputeHearings(Guid disputeGuid);
+
+    Task<DisputeHearingGetResponse> LinkPastHearing(Guid staticDisputeGuid, Guid movedDisputeGuid);
+
+    Task<bool> IsExistedDisputeHearing(int? hearingId, Guid disputeGuid);
 }

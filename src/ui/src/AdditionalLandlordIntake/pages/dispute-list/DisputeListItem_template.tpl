@@ -1,15 +1,12 @@
 
 <% if (showReviewRequest) { %>
-  <div class="dispute-list-review-block"><span class="dispute-list-review-bloc-label">Important Notification!</span><span class="dispute-list-review-notification">See Details</span></div>
+  <div class="warning-alert"><span class="dispute-list-review-bloc-label">Important Notification!</span><span class="dispute-list-review-notification">See Details</span></div>
 <% } %>
 
 <div class="dispute-list-file">
   <% if (file_number) { %>
     <span class="dispute-list-file-number-label dispute-list-main-text">Dispute:&nbsp;</span>
     <span class="dispute-list-file-number"><%= file_number %></span>
-    <% if (showDetailsLink) { %>
-      <span class="dispute-list-details-btn">Details</span>
-    <% } %>
   <% } else { %>
     <span class="dispute-list-main-text <%= hasStatusTextHighlight ? 'error-red' : '' %>">Incomplete</span>
   <% } %>

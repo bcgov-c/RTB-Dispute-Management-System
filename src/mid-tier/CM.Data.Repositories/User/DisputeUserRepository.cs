@@ -32,4 +32,21 @@ public class DisputeUserRepository : CmRepository<DisputeUser>, IDisputeUserRepo
             .ToListAsync();
         return res;
     }
+
+    public async Task<DisputeUser> GetDisputeUser(Guid disputeGuid, int userId)
+    {
+        var res = await Context.DisputeUsers
+            .FirstOrDefaultAsync(x => x.DisputeGuid == disputeGuid && x.SystemUserId == userId);
+        return res;
+    }
+
+    public async Task<DateTime?> GetLastModifiedDate(int disputeUserId)
+    {
+        var dates = await Context.DisputeUsers
+            .Where(c => c.DisputeUserId == disputeUserId)
+            .Select(d => d.ModifiedDate)
+            .ToListAsync();
+
+        return dates?.FirstOrDefault();
+    }
 }

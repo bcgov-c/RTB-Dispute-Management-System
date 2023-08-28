@@ -247,7 +247,10 @@ public class ParticipantRepository : CmRepository<Participant>, IParticipantRepo
 
     public async Task<int> GetSameAbbreviationsCount(Guid disputeGuid, string abbreviation)
     {
-        var parties = await Context.Participants.IgnoreQueryFilters().Where(x => x.DisputeGuid == disputeGuid && x.NameAbbreviation.StartsWith(abbreviation)).ToListAsync();
+        var parties = await Context.Participants
+            .IgnoreQueryFilters()
+            .Where(x => x.DisputeGuid == disputeGuid && x.NameAbbreviation.StartsWith(abbreviation))
+            .ToListAsync();
         return parties.Count;
     }
 
@@ -261,13 +264,26 @@ public class ParticipantRepository : CmRepository<Participant>, IParticipantRepo
         return participant;
     }
 
-    public async Task<bool> IsActiveParticipantExists(int descriptionBy)
+    public async Task<bool> IsActiveParticipantExists(int participantId)
     {
         var exists = await Context
             .Participants
-            .AnyAsync(x => x.ParticipantId == descriptionBy &&
+            .AnyAsync(x => x.ParticipantId == participantId &&
                            x.ParticipantStatus != (byte)ParticipantStatus.Removed &&
                            x.ParticipantStatus != (byte)ParticipantStatus.Deleted);
         return exists;
+    }
+
+    public async Task<List<Participant>> GetPrimaryApplicants(List<Guid> disputes)
+    {
+        var participants = new List<Participant>();
+
+        foreach (var dispute in disputes)
+        {
+            var participant = await GetPrimaryApplicantAsync(dispute);
+            participants.Add(participant);
+        }
+
+        return participants;
     }
 }

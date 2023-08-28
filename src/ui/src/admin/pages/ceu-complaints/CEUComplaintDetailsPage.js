@@ -9,8 +9,6 @@ import CeuReceiptRendererMixin from '../../../core/components/custom-data-objs/c
 import EditableComponentView from '../../../core/components/editable-component/EditableComponent';
 import DropdownModel from '../../../core/components/dropdown/Dropdown_model';
 import DropdownView from '../../../core/components/dropdown/Dropdown';
-import TextareaView from '../../../core/components/textarea/Textarea';
-import TextareaModel from '../../../core/components/textarea/Textarea_model';
 import { ReceiptContainer } from '../../../core/components/receipt-container/ReceiptContainer';
 import IntakeCeuDataParser from '../../../core/components/custom-data-objs/ceu/IntakeCeuDataParser';
 import ExternalFile_collection from '../../../core/components/custom-data-objs/external/ExternalFile_collection';
@@ -18,6 +16,8 @@ import FileDisplayView from '../common-files/FileDisplay';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
 import './CEUComplaintDetailsPage.scss';
 import wordTemplate from '../../../core/components/custom-data-objs/ceu/CeuReceiptWord_template.tpl';
+import Editor_model from '../../../core/components/editor/Editor_model';
+import EditorView from '../../../core/components/editor/Editor';
 
 const RECEIPT_TITLE = `CEU Complaint Submission`;
 
@@ -78,8 +78,9 @@ const CEUComplaint = Marionette.View.extend({
     const CEU_URGENCY_STANDARD = configChannel.request('get', 'CEU_URGENCY_STANDARD');
     const CEU_URGENCY_DEFERRED = configChannel.request('get', 'CEU_URGENCY_DEFERRED');
     const CEU_URGENCY_DISPLAY = configChannel.request('get', 'CEU_URGENCY_DISPLAY') || {};
-    const ceuUsers = userChannel.request('get:all:users').filter();
-
+    const ceuUsers = userChannel.request('get:all:users').filter(user => user.isActive() && user.isCeuUser());
+    ceuUsers.sort();
+    
     this.fileStatusModel = new DropdownModel({
       optionData: [
         { text: CEU_STATUS_DISPLAY[CEU_STATUS_SUBMITTED], value: CEU_STATUS_SUBMITTED },
@@ -116,12 +117,10 @@ const CEUComplaint = Marionette.View.extend({
       apiMapping: 'owner_id',
     });
 
-    this.internalDescriptionModel = new TextareaModel({
+    this.internalDescriptionModel = new Editor_model({
       labelText: 'Internal Description',
       required: false,
-      max: 240,
-      min: 10,
-      countdown: true,
+      maxLength: 30000,
       value: this.model.get('object_description'),
       apiMapping: 'object_description'
     });
@@ -138,7 +137,18 @@ const CEUComplaint = Marionette.View.extend({
     });
   },
 
+  validateAndShowErrors() {
+    let isValid = true;
+    ['statusRegion', 'urgencyRegion', 'ownerRegion', 'descriptionRegion'].forEach(regionName => {
+      const childView = this.getChildView(regionName);
+      isValid = (typeof childView?.validateAndShowErrors === 'function' ? childView.validateAndShowErrors() : true) && isValid;
+    });
+    return isValid;
+  },
+
   onMenuSave() {
+    if (!this.validateAndShowErrors()) return;
+
     this.ceuEditGroup.forEach((componentName) => {
       const component = this.getChildView(componentName);
       if (component) this.model.set(component.getApiData());
@@ -243,8 +253,8 @@ const CEUComplaint = Marionette.View.extend({
     this.showChildView('descriptionRegion', new EditableComponentView({
       state: 'view',
       label: this.internalDescriptionModel.get('labelText'),
-      view_value: this.model.get('object_description') ? this.model.get('object_description') : '-',
-      subView: new TextareaView({
+      view_value: this.model.get('object_description') ? this.model.get('object_description') : `<span></span>`,
+      subView: new EditorView({
         model: this.internalDescriptionModel
       })
     }));

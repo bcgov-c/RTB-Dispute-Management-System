@@ -10,12 +10,14 @@ import SubstitutedServiceModel from '../../../core/components/substituted-servic
 import ExternalDisputeStatusModel from '../../../office/components/external-api/ExternalDisputeStatus_model';
 import FileDescription from '../../../core/components/files/file-description/FileDescription_model';
 import DisputeEvidenceModel from '../../../core/components/claim/DisputeEvidence_model';
-import Question from '../../../core/components/question/Question';
-import Question_model from '../../../core/components/question/Question_model';
+import QuestionView from '../../../core/components/question/Question';
+import QuestionModel from '../../../core/components/question/Question_model';
 import DropdownModel from '../../../core/components/dropdown/Dropdown_model';
 import DropdownView from '../../../core/components/dropdown/Dropdown';
 import TextareaModel from '../../../core/components/textarea/Textarea_model';
 import TextareaView from '../../../core/components/textarea/Textarea';
+import InputModel from '../../../core/components/input/Input_model';
+import InputView from '../../../core/components/input/Input';
 import PageItem from '../../../core/components/page/PageItem';
 import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
 import ViewMixin from '../../../core/utilities/ViewMixin';
@@ -33,38 +35,38 @@ const claimsChannel = Radio.channel('claims');
 
 const YES_CODE = 1;
 const NO_CODE = 0;
+const DROPDOWN_CODE_EMAIL = '1';
+const DROPDOWN_CODE_TEXT = '2';
+const DROPDOWN_CODE_SOCIAL_MEDIA = '3';
+const DROPDOWN_CODE_OTHER = '4';
+
 const FILE_DESCRIPTION_TITLE = 'Proof to Support Requested Service Method';
 const FILE_DESCRIPTION_DESCRIPTION = 'Supporting evidence that shows that the requested substituted service method is a valid way of serving the associated respondent';
-const QUESTION_ONE_LABEL = 'Are you seeking substituted service for one or more of the documents listed above?';
+const QUESTION_ONE_LABEL = 'Do you have the document(s) listed above and need a substituted service order?';
 const QUESTION_ONE_DESCRIPTION_LABEL = 'Describe the specific documents that are you seeking substituted service for';
 const QUESTION_ONE_DESCRIPTION_HELP_TEXT = 'Provide the name and a brief description of the document that you are seeking substituted service for.';
-const QUESTION_ONE_HELP_TEXT = 'Based on the status of your dispute file, you can request substituted service on one or more of the documents listed above. If you would like to serve another type of document that is not listed above, select "No" and provide further details.'
-
 const QUESTION_TWO_LABEL = 'Who are you serving the above document(s) to?';
-const QUESTION_TWO_HELP_TEXT = 'Select the party that you are requesting to serve documents to using a method not allowed by law.';
-const QUESTION_THREE_HELP_HTML = `
-  <span>Serving documents by email can only be used if a party has provided an email address specifically for service. Learn more about</span>
-  <a className="static-external-link" href="javascript:;" url="http://www.gov.bc.ca/landlordtenant/service">service rules</a> or contact the <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>
+const QUESTION_TWO_HELP_TEXT = `
+<p>Select the party that you are requesting to serve.</p>
+<p>If two parties have the same initials, refer to each party's unique access code on your Notice of dispute resolution proceeding.</p>
 `;
+const QUESTION_THREE_HELP_HTML = `
+<span>Serving documents by email can only be used if a party has provided an email address specifically for service. Learn more about</span>
+<a className="static-external-link" href="javascript:;" url="http://www.gov.bc.ca/landlordtenant/service">service rules</a> or contact the <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a>
+`;
+
 const SERVICE_OPTION_DESCRIPTION_HELP_TEXT = 'Proof is required that shows reasonable effort to serve the documents via one of the available options.';
 const SERVICE_METHOD_DESCRIPTION_HELP_TEXT = 'Please describe the method of service that you would like to use that is not allowed by law. For example: if requesting to serve using email/social media account/alternate address, provide the account information.';
-
 const DOCUMENTS_TO_SERVE_HELP_TEXT = `
-<span>You can request a special order to serve one or more of the above documents in a different way than is allowed by law.</span>
-<p>Proof is required that shows:</p>
-<ul>
-  <li>Reasonable effort to serve the documents via one of the available options allowed by law</li>
-  <li>The other party is likely to receive the document using the proposed method</li>
-  <li>If you would like to serve a document that is not listed above, select "No".</li>
-</ul>`;
-
+<p>You can request a special order to serve document(s) in a different way than is allowed by law. <b>Proof</b> is required that shows the party cannot be served via one of the available options allowed by law.</p>
+<p>If you cannot serve documents using a method listed below, and would like to use a different method, select "No"</p>
+`;
 const SERVICE_OPTIONS_HELP_TEXT = `
 <span>Documents must be served to another party in certain methods according to the law. Learn more about </span>
 <a className="static-external-link" href="javascript:;" url="http://www.gov.bc.ca/landlordtenant/service">service rules</a> or contact the <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/contact-the-residential-tenancy-branch">Residential Tenancy Branch</a> if you are unsure. 
 `;
 
 const SubstitutedServicePage = PageView.extend({
-  className: `subserv ${PageView.prototype.className}`,
 
   initialize() {
     this.template = this.template.bind(this);
@@ -75,10 +77,15 @@ const SubstitutedServicePage = PageView.extend({
 
   createViewVars() {
     this.showQuestionOneNoDisplay = false;
+    this.showInputOne = false;
+    this.showInputTwo = false;
+    this.showInputThree = false;
+    this.showMethodError = false;
     this.stepObj = {
       stepOneComplete: false,
       stepTwoComplete: false,
-      stepThreeComplete: false
+      stepThreeComplete: false,
+      stepFourComplete: false,
     }
     this.dispute = disputeChannel.request('get');
     this.participant = participantsChannel.request('get:participant', this.dispute.get('tokenParticipantId'));
@@ -102,7 +109,7 @@ const SubstitutedServicePage = PageView.extend({
   },
 
   createSubModels() {
-    this.questionOneModel = new Question_model({
+    this.questionOneModel = new QuestionModel({
       optionData: [{ name: 'sub-serve-q1-no', value: 0, cssClass: 'option-button dac__yes-no', text: 'NO'},
           { name: 'sub-serve-q1-yes', value: 1, cssClass: 'option-button dac__yes-no', text: 'YES'}],
       question_answer: null
@@ -125,13 +132,50 @@ const SubstitutedServicePage = PageView.extend({
       showValidate: true,
     });
 
-    this.questionThreeModel = new Question_model({
+    this.questionThreeModel = new QuestionModel({
       optionData: [{ name: 'sub-serve-q3-no', value: 0, cssClass: 'option-button dac__yes-no', text: 'NO'},
           { name: 'sub-serve-q3-yes', value: 1, cssClass: 'option-button dac__yes-no', text: 'YES'}],
       question_answer: null
     });
 
     this.serviceOptionDescriptionModel = new TextareaModel({
+      errorMessage: 'Description is required',
+      max: 255,
+      min: 25,
+      required: true,
+      countdown: true,
+      value: null,
+    });
+
+    this.serviceOptionQuestionModel = new QuestionModel({
+      optionData: [{ name: 'sub-serve-opts-no', value: NO_CODE, cssClass: 'option-button dac__yes-no', text: 'NO'},
+          { name: 'sub-serve-opts-yes', value: YES_CODE, cssClass: 'option-button dac__yes-no', text: 'YES'}],
+      question_answer: null,
+    });
+
+    this.serviceMethodTypeModel = new DropdownModel({
+      labelText: 'Requested Method',
+      optionData: [], // Will be set each render to get correct state
+      defaultBlank: true,
+      required: true,
+      value: null,
+    });
+    
+
+    this.serviceMethodTypeInputModel = new InputModel({
+      value: null,
+      required: false,
+      maxLength: 200,
+      minLength: 3,
+    });
+    this.serviceMethodTypeInput2Model = new InputModel({
+      inputType: 'string',
+      value: null,
+      required: false,
+      maxLength: 200,
+      minLength: 3,
+    });
+    this.serviceMethodTypeInput3Model = new TextareaModel({
       errorMessage: 'Description is required',
       max: 255,
       min: 25,
@@ -161,53 +205,45 @@ const SubstitutedServicePage = PageView.extend({
 
   setupListeners() {
     this.listenTo(this.questionOneModel, 'page:itemComplete', () => {
-      this.setAssociatedQuestionOneData();
+      this.stepObj.stepOneComplete = this.questionOneModel.getData() === YES_CODE;
+      this.render();
     });
 
     this.listenTo(this.questionTwoModel, 'page:itemComplete', () => {
-      this.setAssociatedQuestionTwoData();
+      this.stepObj.stepTwoComplete = this.questionTwoModel.getData() !== null;
+      this.render();
     });
 
     this.listenTo(this.questionThreeModel, 'page:itemComplete', () => {
       this.stepObj.stepThreeComplete = this.questionThreeModel.getData() !== null;
       this.render();
-    })
+    });
+
+    this.listenTo(this.serviceOptionQuestionModel, 'page:itemComplete', () => {
+      this.showMethodError = this.serviceOptionQuestionModel.getData() === YES_CODE;
+      this.stepObj.stepFourComplete = this.serviceOptionQuestionModel.getData() !== null;
+      this.render();
+    });
+
+    this.listenTo(this.serviceMethodTypeModel, 'change:value', () => {
+      this.serviceMethodTypeInputModel.set('value', null);
+      this.serviceMethodTypeInput2Model.set('value', null);
+      this.render();
+    });
 
     this.listenTo(this.uploadModel, 'file:added', () => {
       this.getUI('addFileError').addClass('hidden');
     });
   },
 
-  setAssociatedQuestionOneData() {
-    const isNoSelected = this.questionOneModel.getData() === NO_CODE;
-    this.showQuestionOneNoDisplay = isNoSelected;
-    this.questionOneDescriptionModel.set({ required: isNoSelected, disabled: false });
-    if (this.questionOneModel.getData() === YES_CODE) this.questionOneDescriptionModel.set({ value: null });
-    this.stepObj.stepOneComplete = this.questionOneModel.getData() === YES_CODE;
-    this.render();
-  },
-
-  setAssociatedQuestionTwoData() {
-    this.stepObj.stepTwoComplete = !!this.questionTwoModel.getData();
-    if (!this.stepObj.stepTwoComplete) {
-      this.render();
-      return;
-    };
-
-    const participantDisplay = this.questionTwoModel.getSelectedOption().display;
-    this.QUESTION_THREE_LABEL = `Do you have a written agreement with (${participantDisplay}) to serve documents by email?`;
-    this.SERVICE_METHOD_RESULT_DESCRIPTION_LABEL = `Describe the reasons you believe that (${participantDisplay}) will receive the documents using the requested method`;
-    this.SERVICE_METHOD_DESCRIPTION_LABEL = `What substituted service method are you requesting to serve ${participantDisplay}`;
-    this.SERVICE_METHOD_RESULT_DESCRIPTION_HELP_TEXT = `
-    <p>Evidence is required that shows the other party is likely to receive the documents using the proposed method of service. For example: if requesting to serve using email/social media account/alternate address, provide proof of recent activity or contact to demonstrate that the other party will receive documents.</p>
-    <p>A substituted service request is unlikely to be granted if you do no provide proof (evidence) that the requested method will work.</p>`;
-    this.render();
+  isPreAgreedEmailAvailable() {
+    return this.questionThreeModel.getData() === YES_CODE;
   },
 
   getServiceOptionListText() {
     if (this.questionOneModel.getData() === NO_CODE) {
-      return ['Registered Mail', 'In Person', 'Posted on Door', 'Regular Mail', 'Mail Slot or Box', 'Pre-agreed Fax', 
-        ...this.questionThreeModel.getData() === YES_CODE ? ['Pre-agreed email'] : []]
+      return ['Registered Mail', 'In Person', 'Attached to Door', 'Regular Mail', 'Mail Slot or Box', 'Pre-agreed Fax', 
+        ...(this.isPreAgreedEmailAvailable() ? ['Pre-agreed email'] : [])]
     }
     const isQuadrant1 = this.serviceQuadrant.quadrantId === 1;
     const isQuadrant2 = this.serviceQuadrant.quadrantId === 2;
@@ -219,19 +255,19 @@ const SubstitutedServicePage = PageView.extend({
     const isLandlord = this.participant.isLandlord();
     const claims = claimsChannel.request('get');
     const postOnDoorClaimList = configChannel.request('get', 'POST_ON_DOOR_CLAIM_CODE_LIST');
-    const nonPostOnDoorCodesList = claims.filter(claimModel => {
+    const nonPostOnDoorCodesList = claims?.filter(claimModel => {
       const claimCode = claimModel.getClaimCode() || '';
       return !postOnDoorClaimList.includes(claimCode);
     });
 
     const defaultServiceOptions = ['Registered Mail', 'In Person'];
-    const preAgreedEmail = this.questionThreeModel.getData() === YES_CODE ? ['Pre-agreed email'] : [];
+    const preAgreedEmail = this.isPreAgreedEmailAvailable() ? ['Pre-agreed email'] : [];
     const postOnDoor = (
       (isQuadrant1 && isRespondentLogin)
-      || (isQuadrant1 && !isRespondentLogin && isLandlord && (nonPostOnDoorCodesList.length < 1 && claims.length)) 
+      || (isQuadrant1 && !isRespondentLogin && isLandlord && (nonPostOnDoorCodesList?.length < 1 && claims?.length)) 
       || (isQuadrant3 && isRespondentLogin)
       || (isQuadrant2 || isQuadrant4)
-    ) ? ['Posted on Door'] : [];
+    ) ? ['Attached to Door'] : [];
 
     const mailAndFaxOptions = (
       (isQuadrant1 && isRespondentLogin)
@@ -271,7 +307,6 @@ const SubstitutedServicePage = PageView.extend({
     Backbone.history.navigate('#access', { trigger: true });
   },
 
-  /* START of file upload support functions */
   prepareFileDescriptionForUpload(fileDescription) {
     const participantId = disputeChannel.request('get').get('tokenParticipantId');
 
@@ -330,19 +365,18 @@ const SubstitutedServicePage = PageView.extend({
 
     const modalChannel = Radio.channel('modals');
     modalChannel.request('show:standard', {
-      title: 'Continue without providing proof?',
+      title: 'Continue without providing evidence?',
       bodyHtml: `
-        <p>A substituted service request is unlikely to be granted if you do not provide proof (evidence) that the requested method will work. It is highly recommended that all substituted service requests are submitted with proof that the method will work.</p>
-        <p>Are you sure you would like to continue without providing proof? Press 'Cancel' to return to the form and provide the proof or press 'Continue without proof' to proceed without providing the proof.</p>
-        `,
+        <p>Your request will likely be <b>denied</b> if you do not provide evidence that the requested method will work.</p>
+        <p>If you can provide evidence, press 'Cancel' to return to the form.</p>
+        <p>If you are sure you wish to proceed without evidence, press 'Continue without evidence'.</p>
+      `,
       cancelButtonText: 'Cancel',
-      primaryButtonText: 'Continue without proof',
+      primaryButtonText: 'Continue without evidence',
       modalCssClasses: 'dac__opt-out-modal',
       onContinue: onContinue
     });
   },
-
-  /* END of file upload support functions */
 
   validateAndSetQuestionOneDescription() {
     const view = this.getChildView('questionOneDescriptionRegion');
@@ -358,22 +392,25 @@ const SubstitutedServicePage = PageView.extend({
   },
 
   validateAndShowErrors() {
-    const regionsToValidate = ['serviceOptionsDescriptionRegion', 'serviceMethodDescriptionRegion',  'serviceMethodResultDescriptionRegion', 'formEvidenceRegion'];
-    if (this.questionOneModel.getData() === NO_CODE) regionsToValidate.push('questionOneDescriptionRegion');
-
     let isValid = true;
-
+    const regionsToValidate = [
+      'serviceOptionsDescriptionRegion',
+      'serviceMethodTypeRegion',
+      'serviceMethodTypeInputRegion',
+      'serviceMethodTypeInput2Region',
+      'serviceMethodResultDescriptionRegion',
+      'formEvidenceRegion'
+    ];
+    if (this.questionOneModel.getData() === NO_CODE) regionsToValidate.push('questionOneDescriptionRegion');
     if (this.disputeEvidenceModel.get('files').length < 1 && this.evidenceRequired) {
       isValid = false;
       this.getUI('addFileError').removeClass('hidden');
     }
-
     (regionsToValidate || []).forEach(regionName => {
       const view = this.getChildView(regionName);
       if (view && view.subView) isValid = view.subView.validateAndShowErrors() && isValid;
       else if (view) isValid = view.validateAndShowErrors() && isValid;
     });
-
     return isValid;
   },
 
@@ -400,12 +437,17 @@ const SubstitutedServicePage = PageView.extend({
       substitutedServiceModel: this.substitutedServiceModel,
       serviceQuadrant: this.serviceQuadrant,
       serviceTo: this.questionTwoModel.getSelectedOption().display,
-      hasEmailServiceAgreement: this.questionThreeModel.getData() === YES_CODE,
+      hasEmailServiceAgreement: this.isPreAgreedEmailAvailable(),
       disputeEvidenceModel: this.disputeEvidenceModel
     }
   },
 
   createSubServPromise() {
+    const methodOption = this.serviceMethodTypeModel.getSelectedOption();
+    const methodDescription = `${methodOption?.text}: ${
+      methodOption?.value === DROPDOWN_CODE_OTHER ? this.serviceMethodTypeInput3Model.getData() : this.serviceMethodTypeInputModel.getData()}${
+      methodOption?.value === DROPDOWN_CODE_SOCIAL_MEDIA ? `, UserID: ${this.serviceMethodTypeInput2Model.getData()}` : ''
+    }`;
     this.substitutedServiceModel = new SubstitutedServiceModel({
       dispute_guid: this.dispute.get('dispute_guid'),
       request_source: configChannel.request('get', 'SUB_SERVICE_REQUEST_SOURCE_DA'),
@@ -416,11 +458,10 @@ const SubstitutedServicePage = PageView.extend({
       request_doc_type: this.questionOneModel.getData() === NO_CODE ? configChannel.request('get', 'SERVICE_DOC_TYPE_OTHER') : this.serviceQuadrant.documentId,
       request_doc_other_description: this.questionOneModel.getData() === NO_CODE ? this.questionOneDescriptionModel.getData() : null ,
       failed_method1_description: this.serviceOptionDescriptionModel.getData(),
-      requested_method_description: this.serviceMethodDescriptionModel.getData(),
+      requested_method_description: methodDescription,
       requested_method_justification: this.serviceMethodResultDescriptionModel.getData(),
       request_method_file_desc_id: this.disputeEvidenceModel.get('files').length ? this.fileDescription.id : null
     });
-
     return new Promise((res, rej) => this.substitutedServiceModel.save().then(res, generalErrorFactory.createHandler('OS.REQUEST.SUBSERVICE.CREATE', rej)))
   },
 
@@ -437,6 +478,8 @@ const SubstitutedServicePage = PageView.extend({
       task_text: taskDescription,
       dispute_guid: this.dispute.get('dispute_guid'),
       task_activity_type: configChannel.request('get', 'TASK_ACTIVITY_TYPE_DA_SUB_SERVICE'),
+      task_link_id: this.substitutedServiceModel.id,
+      task_linked_to: configChannel.request('get', 'TASK_LINK_SUB_SERVE'),
     };    
     const taskCreator = taskChannel.request(`task:creator`, {
       docGroupId: null,
@@ -446,7 +489,7 @@ const SubstitutedServicePage = PageView.extend({
   },
 
   changeDisputeStatusPromise() {
-    if (this.dispute.checkStageStatus(2, 20) && !this.dispute.getOwner()) {
+    if ((this.dispute.checkStageStatus(2, 20) && !this.dispute.getOwner()) || this.dispute.checkStageStatus(4, 41)) {
       const statusSaveModel = new ExternalDisputeStatusModel({
         file_number: this.dispute.get('file_number'),
         dispute_stage: 2, 
@@ -472,6 +515,7 @@ const SubstitutedServicePage = PageView.extend({
     const changeDisputeStatusPromise = () => this.changeDisputeStatusPromise();
     const createDisputeFlag = () => this.createDisputeFlag();
     
+    // Sub-serve must be created first, as the record's ID is linked to flag and task
     loaderChannel.trigger('page:load');
     createSubServPromise().then(() => {
       return Promise.all([createDisputeFlag(), createTaskPromise()]);
@@ -490,19 +534,108 @@ const SubstitutedServicePage = PageView.extend({
     })
   },
 
+  clickMethodErrorLink() {
+    this.showMethodError = false;
+    this.render();
+  },
+
+  className: `subserv ${PageView.prototype.className}`,
+
+  onBeforeRender() {
+    const isNoSelected = this.questionOneModel.getData() === NO_CODE;
+    this.showQuestionOneNoDisplay = isNoSelected;
+    this.questionOneDescriptionModel.set({ required: isNoSelected, disabled: false });
+    if (this.questionOneModel.getData() === YES_CODE) this.questionOneDescriptionModel.set({ value: null });
+
+    const participantDisplay = this.questionTwoModel?.getSelectedOption()?.display;
+    if (participantDisplay) {
+      this.QUESTION_THREE_LABEL = `Do you have a written agreement with (${participantDisplay}) to serve documents by email?`; 
+    }
+
+    this.serviceMethodTypeModel.set({
+      optionData: [
+        ...(!this.isPreAgreedEmailAvailable() ? [{ value: DROPDOWN_CODE_EMAIL, text: 'Email' }] : []),
+        { value: DROPDOWN_CODE_TEXT, text: 'Text Message' },
+        { value: DROPDOWN_CODE_SOCIAL_MEDIA, text: 'Social Media' },
+        { value: DROPDOWN_CODE_OTHER, text: 'Other' }
+      ],
+    });
+
+    const method = this.serviceMethodTypeModel.getData();
+    if (method === DROPDOWN_CODE_EMAIL && !this.isPreAgreedEmailAvailable()) {
+      this.serviceMethodTypeInputModel.set({
+        labelText: 'Email Address',
+        inputType: 'email',
+        required: true,
+      });
+      this.showInputOne = true;
+      this.showInputTwo = false;
+      this.showInputThree = false;
+    } else if (method === DROPDOWN_CODE_TEXT) {
+      this.serviceMethodTypeInputModel.set({
+        labelText: 'Phone Number',
+        inputType: 'phone',
+        required: true,
+      });
+      this.showInputOne = true;
+      this.showInputTwo = false;
+      this.showInputThree = false;
+    } else if (method === DROPDOWN_CODE_SOCIAL_MEDIA) {
+      this.serviceMethodTypeInputModel.set({
+        labelText: 'Social Media Platform (i.e. Wechat, Facebook Messenger etc.)',
+        inputType: 'string',
+        required: true,
+      });
+      this.serviceMethodTypeInput2Model.set({
+        labelText: 'Platform Username or UserID',
+        inputType: 'string',
+        required: true,
+      });
+      this.showInputOne = true;
+      this.showInputTwo = true;
+      this.showInputThree = false;
+    } else if (method === DROPDOWN_CODE_OTHER) {
+      this.serviceMethodTypeInputModel.set({
+        required: false,
+      });
+      this.serviceMethodTypeInput2Model.set({
+        required: false,
+      });
+      this.serviceMethodTypeInput3Model.set({
+        required: true,
+      });
+      this.showInputOne = false;
+      this.showInputTwo = false;
+      this.showInputThree = true;
+    } else {
+      const resetValues = {
+        required: false,
+      };
+      this.serviceMethodTypeInputModel.set(resetValues);
+      this.serviceMethodTypeInput2Model.set(resetValues);
+      this.serviceMethodTypeInput3Model.set(resetValues);
+      this.showInputOne = false;
+      this.showInputTwo = false;
+      this.showInputThree = false;
+    }
+  },
+
   onRender() {
+    // Always ensure file error is hidden on-render. It will be shown on-click, as needed
+    this.getUI('addFileError').addClass('hidden');
+    
     if (this.isUpload) {
       this.mixin_upload_updateReadyToUploadCount({ force: true });
       this.mixin_upload_updateUploadProgress();
-
+      this.renderEvidence();
     } else {
       ViewMixin.prototype.initializeHelp(this, DOCUMENTS_TO_SERVE_HELP_TEXT);
 
       this.showChildView('disputeRegion', new AccessDisputeOverview({ model: this.model }));
       this.showChildView('questionOneRegion', new PageItem({
         stepText: QUESTION_ONE_LABEL,
-        helpHtml: QUESTION_ONE_HELP_TEXT,
-        subView: new Question({ model: this.questionOneModel }),
+        helpHtml: null,
+        subView: new QuestionView({ model: this.questionOneModel }),
         stepComplete: this.questionOneModel.getData(),
         forceVisible: true
       }));
@@ -533,46 +666,83 @@ const SubstitutedServicePage = PageView.extend({
         this.showChildView('questionThreeRegion', new PageItem({
           stepText: this.QUESTION_THREE_LABEL,
           helpHtml: QUESTION_THREE_HELP_HTML,
-          subView: new Question({ model: this.questionThreeModel }),
+          subView: new QuestionView({ model: this.questionThreeModel }),
           stepComplete: this.questionThreeModel.getData(),
           forceVisible: true
         }));
       }
+      
       //displayed after question 3 is answered
       if (this.stepObj.stepOneComplete && this.stepObj.stepTwoComplete && this.stepObj.stepThreeComplete) {
-        this.showChildView('serviceMethodDescriptionRegion', new PageItem({
-          stepText: this.SERVICE_METHOD_DESCRIPTION_LABEL,
-          helpHtml: SERVICE_METHOD_DESCRIPTION_HELP_TEXT,
-          subView: new TextareaView({ model: this.serviceMethodDescriptionModel }),
-          stepComplete: this.serviceMethodDescriptionModel.getData(),
-          forceVisible: true
-        }));
-
-        this.showChildView('serviceMethodResultDescriptionRegion', new PageItem({
-          stepText: this.SERVICE_METHOD_RESULT_DESCRIPTION_LABEL,
-          helpHtml: this.SERVICE_METHOD_RESULT_DESCRIPTION_HELP_TEXT,
-          subView: new TextareaView({ model: this.serviceMethodResultDescriptionModel }),
-          stepComplete: this.serviceMethodResultDescriptionModel.getData(),
+        this.showChildView('serviceOptionsQuestionRegion', new PageItem({
+          stepText: null,
+          helpHtml: null,
+          subView: new QuestionView({ model: this.serviceOptionQuestionModel }),
+          stepComplete: this.serviceOptionQuestionModel.getData(),
           forceVisible: true
         }));
       }
 
-      if (this.stepObj.stepOneComplete && this.stepObj.stepTwoComplete && this.stepObj.stepThreeComplete) {
-        const participantDisplay = this.questionTwoModel.getSelectedOption().display;
-        this.SERVICE_OPTION_DESCRIPTION_LABEL = `Please explain why you cannot use the method(s) above to serve documents to ${participantDisplay} and describe the attempts you have made using the method(s)`;
+      //displayed after question 4 is answered No
+      if (this.stepObj.stepOneComplete && this.stepObj.stepTwoComplete && this.stepObj.stepThreeComplete && this.stepObj.stepFourComplete
+            && !this.showMethodError) {
+        this.showChildView('serviceMethodTypeRegion', new PageItem({
+          stepText: `What method of substituted service are you requesting?`,
+          helpHtml: SERVICE_METHOD_DESCRIPTION_HELP_TEXT,
+          subView: new DropdownView({ model: this.serviceMethodTypeModel }),
+          stepComplete: this.serviceMethodTypeModel.getData(),
+          forceVisible: true
+        }));
+
+        if (this.showInputOne) {
+          this.showChildView('serviceMethodTypeInputRegion', new InputView({
+            model: this.serviceMethodTypeInputModel
+          }));
+        }
+
+        if (this.showInputTwo) {
+          this.showChildView('serviceMethodTypeInput2Region', new InputView({
+            model: this.serviceMethodTypeInput2Model
+          }));
+        }
+
+        if (this.showInputThree) {
+          this.showChildView('serviceMethodTypeInput3Region', new PageItem({
+            stepText: `List the details of the other method you are requesting`,
+            helpHtml: ``,
+            subView: new TextareaView({
+              model: this.serviceMethodTypeInput3Model
+            }),
+            stepComplete: this.serviceMethodTypeInput3Model.getData(),
+            forceVisible: true,
+          }))
+        }
 
         this.showChildView('serviceOptionsDescriptionRegion', new PageItem({
-          stepText: this.SERVICE_OPTION_DESCRIPTION_LABEL,
+          stepText: `Please explain why you cannot serve the documents using the service methods listed above.`,
           helpHtml: SERVICE_OPTION_DESCRIPTION_HELP_TEXT,
           subView: new TextareaView({ model: this.serviceOptionDescriptionModel }),
           stepComplete: this.serviceOptionDescriptionModel.getData(),
           forceVisible: true
         }));
+
+        this.showChildView('serviceMethodResultDescriptionRegion', new PageItem({
+          stepText: `Why do you think the party will receive the documents using your requested service method?`,
+          helpHtml: `Have they used the service platform recently? Do you have proof of communication using this method?`,
+          subView: new TextareaView({ model: this.serviceMethodResultDescriptionModel }),
+          stepComplete: this.serviceMethodResultDescriptionModel.getData(),
+          forceVisible: true
+        }));
+
+        this.renderEvidence();
       }
     }
+  },
 
-    if (this.stepObj.stepOneComplete && this.stepObj.stepTwoComplete && this.stepObj.stepThreeComplete) {
-      const evidenceView = new UploadEvidenceView({
+  renderEvidence() {
+    this.showChildView('formEvidenceRegion', new PageItem({
+      stepText: 'Provide evidence that the requested method will result in the party receiving the documents',
+      subView: new UploadEvidenceView({
         uploadModel: this.uploadModel,
         model: this.disputeEvidenceModel,
         showDelete: false,
@@ -580,14 +750,9 @@ const SubstitutedServicePage = PageView.extend({
         hideDescription: true,
         fileType: configChannel.request('get', 'FILE_TYPE_USER_EXTERNAL_NON_EVIDENCE'),
         processing_options: this.getProcessingOptions(),
-      });
-  
-      this.showChildView('formEvidenceRegion', new PageItem({
-        stepText: 'Provide proof that the requested method will result in the party receiving the documents',
-        subView: evidenceView,
-        forceVisible: true
-      }));
-    }
+      }),
+      forceVisible: true
+    }));
   },
   
   regions: {
@@ -596,16 +761,22 @@ const SubstitutedServicePage = PageView.extend({
     questionOneDescriptionRegion: '.subserv__question-one__description',
     questionTwoRegion: '.subserv__question-two',
     questionThreeRegion: '.subserv__question-three',
+    serviceOptionsQuestionRegion: '.subserv__service-options__question',
     serviceOptionsDescriptionRegion: '.subserv__service-options__description',
-    serviceMethodDescriptionRegion: '.subserv__service-method__description',
+    serviceMethodTypeRegion: '.subserv__service-method__type',
+    serviceMethodTypeInputRegion: '.subserv__service-method__type-input',
+    serviceMethodTypeInput2Region: '.subserv__service-method__type-input2',
+    serviceMethodTypeInput3Region: '.subserv__service-method__type-input3',
     serviceMethodResultDescriptionRegion: '.subserv__service-method-result__description',
     formEvidenceRegion: '.subserv__evidence-upload'
   },
 
-  ui: {
-    fileCounter: '.file-upload-counter',
-    uploadingFilesProgress: '.da-upload-overall-file-progress',
-    addFileError: '.subserv__evidence-upload__error',
+  ui() {
+    return Object.assign({}, PageView.prototype.ui, {
+      fileCounter: '.file-upload-counter',
+      uploadingFilesProgress: '.da-upload-overall-file-progress',
+      addFileError: '.subserv__evidence-upload__error',
+    });
   },
 
   template() {
@@ -626,15 +797,16 @@ const SubstitutedServicePage = PageView.extend({
             </div>
           </div>
           <div className={`subserv__questions-container ${this.isUpload ? 'hidden' : ''}`}>
-            <span>   	
-              In some cases, parties may have difficulty serving a document using one of the methods required by law. 
-              To serve documents in a different way, you must request a special order called substituted service. 
-              Use this form to apply for substituted service when you want to serve another party using a method not allowed by the law.
-            </span>
-            <span> Learn more about <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/during-a-tenancy/serving-notices-during-tenancy">service rules</a>.</span>
+            <p>   	
+              In some cases, parties cannot serve a document using one of the <a className="static-external-link" href="javascript:;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/serving-notices-for-dispute-resolution">methods required by law</a>.
+              Use this application to apply for substituted service and request a different method of service.
+            </p>
+            <p>
+              Your request will likely be denied if you do not provide <b>evidence</b> that the requested method will work. For example: if you are requesting to serve by email, provide copies of emails to show recent activity.
+            </p>
             <div className="subserv__documents-to-serve-container">
               <div className="subserv__documents-to-serve">
-                <span className="subserv__documents-to-serve__title">Based on the current status of this dispute file, you need to serve <b>one or more</b> of the following documents:</span>
+                <span className="subserv__documents-to-serve__title">Based on the current status of this dispute file, you may need to serve the following document(s):</span>
                 <span className="">
                   <a role="button" className="badge help-icon">?</a>
                   {this.renderJsxDocumentList()}
@@ -650,10 +822,7 @@ const SubstitutedServicePage = PageView.extend({
             </div>
           </div>
           {this.renderJsxSubServRequestFields()}
-          <div className="dac__page-buttons">
-          { !this.isUpload ? <button className="btn btn-cancel btn-lg da-upload-cancel-button" onClick={(ev) => this.mixin_upload_onCancel(ev)}>Cancel</button> : null }
-            <button className={`btn btn-standard btn-lg ${this.isUpload || !this.stepObj.stepThreeComplete || !this.stepObj.stepTwoComplete || !this.stepObj.stepOneComplete  ? 'hidden' : ''}`} onClick={() => this.submitRequest()}>Submit Request</button>
-          </div>
+          {this.renderJsxPageButtons()}
           <div className="spacer-block-10"></div>
         </div>
       </div>
@@ -692,28 +861,31 @@ const SubstitutedServicePage = PageView.extend({
   },
 
   renderJsxServiceOptions() {
-    const renderServiceOptions = () => {
-      if (!this.stepObj.stepOneComplete || !this.stepObj.stepTwoComplete || !this.stepObj.stepThreeComplete) return;
-      const serviceOptions = this.getServiceOptionListText();
-      return (
-        <>
-          <span className="subserv__service-options__title">Based on this dispute file, the following service methods are available <b>without</b> a substituted service request:</span>
-          <a role="button" className="badge help-icon">?</a>
-          <ul>
-            {serviceOptions.map((serviceOption, index) => {
-              return <li key={index}>{serviceOption}</li>
-            })}
-          </ul>
-        </>
-      )
-    }
-    
+    if (!this.stepObj.stepOneComplete || !this.stepObj.stepTwoComplete || !this.stepObj.stepThreeComplete) return;
+    const renderServiceOptions = () => <>
+      <span className="subserv__service-options__title">The following service methods are available. Can you serve using one of these ways?</span>
+      <a role="button" className="badge help-icon">?</a>
+      <ul>
+        {this.getServiceOptionListText().map((serviceOption, index) => {
+          return <li key={index}>{serviceOption}</li>
+        })}
+      </ul>
+    </>;
+
     ViewMixin.prototype.initializeHelp(this, SERVICE_OPTIONS_HELP_TEXT);
     
     return (
       <div>
         <div className="subserv__service-options">
           {renderServiceOptions()}
+          <div className="subserv__service-options__question"></div>
+
+          {this.showMethodError ? <>
+            <div className="error-block"><p>
+              Based on the information provided, you do not need to file a substituted service request. If you still want to proceed, <span className="general-link" onClick={() => this.clickMethodErrorLink()}>click here</span>.
+            </p></div>
+          </> : null}
+
           <div className="subserv__service-options__description"></div>
         </div>
       </div>
@@ -721,9 +893,15 @@ const SubstitutedServicePage = PageView.extend({
   },
 
   renderJsxSubServRequestFields() {
+    if (!this.stepObj.stepOneComplete || !this.stepObj.stepTwoComplete || !this.stepObj.stepThreeComplete) return;
     return (
-      <div className={`subserv__bottom-section${this.isUpload ? 'upload' : '' }`}>
-        <div className="subserv__service-method__description"></div>
+      <div className={`subserv__bottom-section da-upload-page-wrapper ${this.isUpload ? 'upload' : '' }`}>
+        <div className="subserv__service-method__type"></div>
+        <div className="subserv__service-method__type-input-container">
+          {this.showInputOne ? <div className="subserv__service-method__type-input"></div> : null}
+          {this.showInputTwo ? <div className="subserv__service-method__type-input2"></div> : null}
+          {this.showInputThree ? <div className="subserv__service-method__type-input3"></div> : null}
+        </div>
         <div className="subserv__service-method-result__description"></div>
         <div className="subserv__evidence-upload"></div>
         <p className="subserv__evidence-upload__error error-block hidden">Please provide a copy of your proof. If you cannot provide them, <span className="subserv__evidence-upload__open-modal" onClick={() => this.openOptOutModal()}>click here</span></p>
@@ -732,7 +910,15 @@ const SubstitutedServicePage = PageView.extend({
         </div>
       </div>
     );
-  }
+  },
+
+  renderJsxPageButtons() {
+    const allStepsComplete = Object.values(this.stepObj)?.every(step => !!step);
+    return <div className="dac__page-buttons">
+      <button className="btn btn-cancel btn-lg da-upload-cancel-button" onClick={(ev) => this.mixin_upload_onCancel(ev)}>{this.isUpload ? 'Cancel Remaining' : 'Cancel'}</button>
+      {!this.isUpload && !this.showMethodError && allStepsComplete ? <button className="btn btn-standard btn-lg" onClick={() => this.submitRequest()}>Submit Request</button> : null}
+    </div>
+  },
 })
 
 _.extend(SubstitutedServicePage.prototype, ViewJSXMixin, UploadViewMixin);

@@ -1,6 +1,7 @@
 import Radio from 'backbone.radio';
 import React from 'react';
 import PageView from '../../../core/components/page/Page';
+import { routeParse } from '../../routers/mainview_router';
 import ScheduleRequestCollection from '../../components/scheduling/schedule-requests/ScheduleRequest_collection'
 import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
@@ -14,12 +15,13 @@ const STARTING_ITEM_LOAD_COUNT = 20;
 const MyScheduleRequestPage = PageView.extend({
   initialize(options) {
     this.template = this.template.bind(this);
-    this.mergeOptions(options, ['tableView', 'filterToCurrentUser', 'getCurrentFilters']);
+    this.mergeOptions(options, ['tableView', 'getCurrentFilters', 'currentPickedUser']);
+    this.currentPickedUser = this.currentPickedUser || [];
     this.scheduleRequestCollection = new ScheduleRequestCollection();
     this.requiredFilters = {
       index: 0, 
       count: STARTING_ITEM_LOAD_COUNT,
-      RequestSubmitters: this.filterToCurrentUser ? sessionChannel.request('get:user:id') : [],
+      RequestSubmitters: this.currentPickedUser || null,
     };
 
     this.loadScheduleRequests({...this.getCurrentFilters(), ...this.requiredFilters})
@@ -39,7 +41,7 @@ const MyScheduleRequestPage = PageView.extend({
     this.requiredFilters = {
       index: 0,
       count: this.scheduleRequestCollection.lastUsedFetchCount + this.scheduleRequestCollection.length,
-      RequestSubmitters: this.filterToCurrentUser ? sessionChannel.request('get:user:id') : []
+      RequestSubmitters: this.currentPickedUser || []
     };
 
     this.loadScheduleRequests({...this.requiredFilters, ...searchParams})
@@ -57,6 +59,10 @@ const MyScheduleRequestPage = PageView.extend({
     .finally(() => loaderChannel.trigger('page:load:complete'))
   },
 
+  updateSelectedUser(user) {
+    this.currentPickedUser = user;
+  },
+
   parseScheduleRequestResponseFromApi(searchParams, response={}) {
     if (searchParams.index) this.scheduleRequestCollection.lastUsedFetchIndex = searchParams.index;
     if (searchParams.count) this.scheduleRequestCollection.lastUsedFetchCount = searchParams.count;
@@ -71,6 +77,10 @@ const MyScheduleRequestPage = PageView.extend({
 
 
   onRender() {
+    if (this.currentPickedUser) {
+      Backbone.history.navigate(routeParse('scheduled_requests_param_item', null, this.currentPickedUser), { trigger: false, replace: true });
+      localStorage.setItem('latestScheduleRequestPageRoute', Backbone.history.getFragment());
+    }
     this.showChildView('myScheduleRequestTable', new this.tableView({ collection: this.scheduleRequestCollection }));
   },
 

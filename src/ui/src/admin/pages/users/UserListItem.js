@@ -30,7 +30,6 @@ export default Marionette.View.extend({
 
   initialize() {
     this.createSubModels();
-    this.createActiveChangeStatusListeners();
   },
 
   clickEditUser(e) {
@@ -41,34 +40,11 @@ export default Marionette.View.extend({
   },
 
   createSubModels() {
-    const userRoles = this.model.get('internal_user_roles') || {};
     this.checkboxModel = new CheckboxModel({
       // Disable activating the user if the user is inactive and missing an internal user role
-      disabled: !this.model.get('is_active') && (!userRoles || !userRoles.length),
+      disabled: true,
       checked: !!this.model.get('is_active')
     });
-  },
-
-  createActiveChangeStatusListeners() {
-    this.listenTo(this.checkboxModel, 'change:checked', function() {
-      loaderChannel.trigger('page:load');
-      this.model.set({ is_active: this.model.get('is_active') ? 0 : 1 });
-      userChannel.request('set:active', this.model)
-        .done(statusResponse => {
-          // This response returns an empty internal_user_roles array for some reason, so simply delete it
-          delete statusResponse.internal_user_roles;
-          this.model.set(statusResponse);
-          loaderChannel.trigger('page:load:complete');
-          this.model.trigger('refresh:users', this.model);
-        }).fail(
-          generalErrorFactory.createHandler('ADMIN.USER.SAVE', () => {
-            // Change back because of failure
-            this.model.set({ is_active: this.model.get('is_active') ? 0 : 1 });
-            this.model.trigger('refresh:users', this.model);
-          })
-        )
-        .always(() => loaderChannel.trigger('page:load:complete'));
-    }, this);
   },
 
   getSchedulingData() {

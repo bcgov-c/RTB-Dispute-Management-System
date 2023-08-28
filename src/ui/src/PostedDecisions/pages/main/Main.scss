@@ -63,7 +63,13 @@ $headerMobileIcon: url('../../assets/images/PostedDecision_Icon_Small.png');
     display: flex;
     background-color: $filter-bar;
     margin-top: 20px;
-    height: 54px;
+    min-height: 54px;
+
+    .radio {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      label { margin-top: 8px; }
+    }
 
     &__checkbox {
       margin-left: 20px;

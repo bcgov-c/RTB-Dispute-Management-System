@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - Uses Google maps API to lookup address location and determine if address is inside BC
  * @class core.utilities.Geozone
  * @memberof core.utilities
  */

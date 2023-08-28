@@ -81,6 +81,10 @@ export default CMModel.extend({
     return this.getRoleId() === configChannel.request('get', 'USER_ROLE_GROUP_ADMIN');
   },
 
+  isOtherRole() {
+    return this.getRoleId() === configChannel.request('get', 'USER_ROLE_GROUP_OTHER');
+  },
+
   isManagement() {
     return this.getRoleId() === configChannel.request('get', 'USER_ROLE_GROUP_MANAGEMENT');
   },
@@ -109,6 +113,10 @@ export default CMModel.extend({
 
   isAdjudicator() {
     return this.isArbitrator() && this.getRoleSubtypeId() === configChannel.request('get', 'USER_SUBGROUP_ADJUDICATOR');
+  },
+
+  isLevelTwoArb() {
+    return this.isArbitrator() && this.getRoleSubtypeId() === configChannel.request('get', 'USER_SUBGROUP_LVL2');
   },
 
   isSuperUser() {
@@ -150,11 +158,29 @@ export default CMModel.extend({
   },
 
   isCeuUser() {
-    return this.getRoleAccessSubtype() === configChannel.request('get', 'USER_ROLE_ACCESS_SUB_GROUP_CEU');
+    const subType = this.getRoleAccessSubtype();
+    return subType && [
+      configChannel.request('get', 'USER_ROLE_ACCESS_SUB_TYPE_CEU'),
+      configChannel.request('get', 'USER_ROLE_ACCESS_SUB_TYPE_CEU_REPORTS'),
+    ].includes(subType);
+  },
+
+  isReportsUser() {
+    const subType = this.getRoleAccessSubtype();
+    return subType && [
+      configChannel.request('get', 'USER_ROLE_ACCESS_SUB_TYPE_REPORTS'),
+      configChannel.request('get', 'USER_ROLE_ACCESS_SUB_TYPE_CEU_REPORTS'),
+    ].includes(subType);
   },
 
   getEmail() {
     return this.get('email');
+  },
+
+  getObscuredUsername() {
+    const username = this.get('user_name');
+    if (!username) return null;
+    return `${username.slice(0,2)}*******${username.slice(-2, username.length)}`;
   },
 
   getDisplayName() {
@@ -223,6 +249,11 @@ export default CMModel.extend({
   getRoleEngagement() {
     const role = this.getRole();
     return role ? role.get('engagement_type') : null;
+  },
+
+  getRoleNote() {
+    const role = this.getRole();
+    return role ? role.get('role_note') : null;
   },
 
   getRoleSubtypeDisplay() {

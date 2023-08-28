@@ -23,7 +23,7 @@ export default Marionette.AppRouter.extend({
     [routes.loginPage]: 'showLoginView',
     [routes.logoutPage]: 'showLogoutView',
     
-    [routes.default]: 'onLoginComplete'
+    [routes.default]: 'showDefaultView'
   },
 
   pagesNeedingAuth: {

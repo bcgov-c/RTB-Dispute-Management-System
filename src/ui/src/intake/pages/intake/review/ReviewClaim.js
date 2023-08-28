@@ -31,73 +31,8 @@ const ReviewClaim = Marionette.View.extend({
     const issueTitle = this.issueTitle;
     const claimDetail = this.model.getApplicantsClaimDetail();
     const remedyDetail = this.model.getApplicantsRemedyDetail();
-    const later_evidences = this.model.get('dispute_evidences').getProvideLater();
-    const cant_provide_evidences = this.model.get('dispute_evidences').getCantProvide();
     const hasClaimInfo = (remedyDetail && remedyDetail.get('amount')) || (claimDetail && claimDetail.get('notice_date'))
         || (claimDetail && claimDetail.get('notice_method')) || (claimDetail && claimDetail.get('description'));
-
-    const renderJsxEvidence = () => {
-      if (this.model.get('dispute_evidences') && this.model.get('dispute_evidences')?.length) {
-          if (this.model.get('dispute_evidences')?.getProvided()?.length) {
-            return <>
-              <div style={{ width: "100%", marginRight: "5px", color: "#139b39" }}>Evidence Provided:</div>
-              <ul className="review-page-evidence-list">
-              {_.map(_.sortBy(this.model.get('dispute_evidences').getProvided(), 'required'), (dispute_evidence) => {
-                const file_description = dispute_evidence.get('file_description');
-                const files = dispute_evidence.get('files');
-                return <>
-                  <li className="review-page-evidence-item">
-                    <span>{file_description.get('title') + ' ' + (dispute_evidence.get('required') ? '' : '(Optional)')}</span>
-                    <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
-                  </li>
-                
-                  { files && files.length ?
-                    files.map((file, index) => {
-                      return <>
-                        <span class={`${index ? '' : 'hidden' }`}>,&nbsp;</span>
-                        <span style={{ marginRight: "10px", color: "#8e8e8e" }}>{file.get('file_name')}</span>
-                        <span style={{ color: "#b5b5b5", fontSize: "14px" }}>({Filesize(file.get('file_size'))})</span>
-                      </>;
-                    }) : null }
-                </>
-              })}
-              </ul>
-            </>
-          }
-
-          if (later_evidences.length) {
-            return <>
-              <div style={{ width: "100%", color: "#e5b872", marginRight: "5px;" }}>Evidence Provided Later:</div>
-              <ul className="review-page-evidence-list">
-              {_.map(_.sortBy(later_evidences, 'required'), (dispute_evidence) => {
-                const file_description = dispute_evidence.get('file_description');
-                return <li className="review-page-evidence-item">
-                <span>{file_description.get('title') + ' ' + (dispute_evidence.get('required') ? '' : '(Optional)')}</span>
-                <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
-              </li>;
-              })}
-              </ul>
-            </>
-          }
-
-          if (cant_provide_evidences.length) {
-            return <>
-              <div style={{ width:"100%", color: "#d80000", marginRight: "5px" }}>Evidence Not Provided:</div>
-              <ul className="review-page-evidence-list">
-              {_.map(cant_provide_evidences, (dispute_evidence) => {
-                const file_description = dispute_evidence.get('file_description');
-                return <li className="review-page-evidence-item">
-                  <span>{file_description.get('title') + ' ' + (dispute_evidence.get('required') ? '' : '(Optional)')}</span>
-                  <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
-                </li>;
-              })}
-              </ul>
-            </>
-          }
-      } else {
-        return 'None'
-      }
-    }
 
     return (
       <>
@@ -131,7 +66,7 @@ const ReviewClaim = Marionette.View.extend({
                       </div>
                   
                       <div style={hasClaimInfo ? { marginTop: "20px" } : null}>
-                        { renderJsxEvidence() }
+                        {this.renderJsxEvidence()}
                       </div>
                     </div>
                   </td>
@@ -143,6 +78,66 @@ const ReviewClaim = Marionette.View.extend({
       </>
     )
   },
+
+  renderJsxEvidence() {
+    if (!this.model.get('dispute_evidences')?.length) return 'None';
+    
+    const provided_evidences = this.model.get('dispute_evidences')?.getProvided();
+    const later_evidences = this.model.get('dispute_evidences')?.getProvideLater();
+    const cant_provide_evidences = this.model.get('dispute_evidences')?.getCantProvide();
+    const renderFiles = (disputeEvidence) => {
+      return disputeEvidence.get('files')?.length ? <>
+        {disputeEvidence.get('files').map((file, index) => (<>
+            <span class={`${index ? '' : 'hidden' }`}>,&nbsp;</span>
+            <span style={{ marginRight: "10px", color: "#8e8e8e" }}>{file.get('file_name')}</span>
+            <span style={{ color: "#b5b5b5", fontSize: "14px" }}>({Filesize(file.get('file_size'))})</span>
+          </>))}
+        </> : null;
+    };
+    return <>
+        {provided_evidences?.length ? <>
+          <div style={{ width: "100%", marginRight: "5px", color: "#139b39" }}>Evidence Provided:</div>
+          <ul className="review-page-evidence-list">
+          {_.map(_.sortBy(provided_evidences, 'required'), (dispute_evidence) => {
+            const file_description = dispute_evidence.get('file_description');
+            return <>
+              <li className="review-page-evidence-item">
+                <span><b>{file_description.get('title')}</b>&nbsp;{dispute_evidence.get('required') ? '' : '(Optional)'}</span>
+                <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
+              </li>
+              {renderFiles(dispute_evidence)}
+            </>
+          })}
+          </ul>
+        </> : null}
+
+        {later_evidences.length ? <>
+          <div style={{ width: "100%", color: "#e5b872", marginRight: "5px" }}>Evidence Provided Later:</div>
+          <ul className="review-page-evidence-list">
+          {_.map(_.sortBy(later_evidences, 'required'), (dispute_evidence) => {
+            const file_description = dispute_evidence.get('file_description');
+            return <li className="review-page-evidence-item">
+              <span><b>{file_description.get('title')}</b>&nbsp;{dispute_evidence.get('required') ? '' : '(Optional)'}</span>
+              <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
+            </li>;
+          })}
+          </ul>
+        </> : null}
+
+        {cant_provide_evidences.length ? <>
+          <div style={{ width:"100%", color: "#d80000", marginRight: "5px" }}>Evidence Not Provided:</div>
+          <ul className="review-page-evidence-list">
+          {_.map(cant_provide_evidences, (dispute_evidence) => {
+            const file_description = dispute_evidence.get('file_description');
+            return <li className="review-page-evidence-item">
+              <span>{file_description.get('title') + ' ' + (dispute_evidence.get('required') ? '' : '(Optional)')}</span>
+              <span class={`${file_description.get('description') ? '' : 'hidden'}`}>&nbsp;-&nbsp;{file_description.get('description')}</span>
+            </li>;
+          })}
+          </ul>
+        </> : null}
+      </>;
+    }
 });
 
 _.extend(ReviewClaim.prototype, ViewJSXMixin);

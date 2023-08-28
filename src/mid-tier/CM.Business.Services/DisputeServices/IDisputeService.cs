@@ -19,7 +19,7 @@ public interface IDisputeService : IServiceBase
 
     Task<Dispute> GetDisputeNoTrackAsync(Guid disputeGuid);
 
-    Task<DisputeStatusResponse> PostDisputeStatusAsync(DisputeStatusPostRequest request, Guid disputeGuid, int userId);
+    Task<DisputeStatusResponse> PostDisputeStatusAsync(DisputeStatusPostRequest request, Guid disputeGuid);
 
     Task<ExternalUpdateDisputeStatusResponse> PostDisputeStatusAsync(ExternalUpdateDisputeStatusRequest request, Guid disputeGuid, int userId);
 
@@ -38,4 +38,14 @@ public interface IDisputeService : IServiceBase
     Task<ICollection<DisputeUser>> GetDisputeUsersAsync(Guid disputeGuid);
 
     bool StatusChangeAllowed(ExternalUpdateDisputeStatusRequest disputeStatus, DisputeStatusResponse lastDisputeStatus);
+
+    Task<bool> IsDisputeUser(Guid disputeGuid, int userId);
+
+    Task<List<DisputeUserGetResponse>> GetDisputeUsers(Guid disputeGuid);
+
+    Task<bool> IsDisputeUserModified(int disputeUserId, DateTime unmodifiedSince);
+
+    Task<DisputeUser> GetDisputeUser(int disputeUserId);
+
+    Task<DisputeUserGetResponse> PatchDisputeUserAsync(DisputeUser disputeUser);
 }

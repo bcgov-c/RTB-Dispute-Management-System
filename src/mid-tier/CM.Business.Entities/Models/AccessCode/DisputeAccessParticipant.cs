@@ -60,5 +60,17 @@ public class DisputeAccessParticipant
     public string NameAbbreviation { get; set; }
 
     [JsonProperty("access_code_hint")]
+    public string AccessCodeHint { get; set; }
+
+    [JsonProperty("access_code")]
     public string AccessCode { get; set; }
+
+    [JsonProperty("address_is_validated")]
+    public bool AddressIsValidated { get; set; }
+
+    [JsonProperty("mail_address_is_validated")]
+    public bool MailAddressIsValidated { get; set; }
+
+    [JsonProperty("is_party")]
+    public bool? IsParty { get; set; }
 }

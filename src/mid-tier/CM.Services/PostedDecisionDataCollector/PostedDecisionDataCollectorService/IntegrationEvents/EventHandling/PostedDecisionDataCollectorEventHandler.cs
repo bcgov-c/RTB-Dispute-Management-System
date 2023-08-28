@@ -64,7 +64,18 @@ public class PostedDecisionDataCollectorEventHandler : IConsumeAsync<PostedDecis
                 .Select(x => x.BusinessName).ToList();
             var outcomeDocFile = await _unitOfWork.OutcomeDocFileRepository.GetByIdAsync(message.OutcomeDocFileId);
 
-            var searchText = await GetPdfText(message.FileGuid);
+            string searchText;
+            try
+            {
+                searchText = await GetPdfText(message.FileGuid);
+            }
+            catch (Exception e)
+            {
+                outcomeDocFile.FileStatus = FileStatus.Invalid;
+                await _unitOfWork.Complete();
+                Log.Error(e, "Error while reading pdf file");
+                return;
+            }
 
             var postedDecisionEvent = new PostedDecisionDataProcessingEvent
             {
@@ -118,7 +129,7 @@ public class PostedDecisionDataCollectorEventHandler : IConsumeAsync<PostedDecis
                     postedDecisionEvent.PreviousHearingLinkingType = disputeHearings.OrderByDescending(d => d.DisputeHearingId).LastOrDefault().SharedHearingLinkType;
                 }
 
-                hearingParticipations = await _unitOfWork.HearingParticipationRepository.GetHearingParticipationListAsync(latestHearing.HearingId);
+                hearingParticipations = await _unitOfWork.HearingParticipationRepository.GetHearingParticipationsAsync(latestHearing.HearingId, ParticipationStatus.Participated);
 
                 var claimGroupApplicants = await _unitOfWork.ClaimGroupParticipantRepository
                     .FindAllAsync(x => x.DisputeGuid == dispute.DisputeGuid && x.GroupParticipantRole == (byte)ParticipantRole.Applicant);

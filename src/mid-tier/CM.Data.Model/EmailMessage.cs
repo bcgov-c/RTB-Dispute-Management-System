@@ -78,4 +78,6 @@ public class EmailMessage : BaseEntity
     public byte? RecipientGroup { get; set; }
 
     public virtual ICollection<EmailAttachment> EmailAttachments { get; set; }
+
+    public virtual ICollection<OutcomeDocDelivery> OutcomeDocDeliveries { get; set; }
 }

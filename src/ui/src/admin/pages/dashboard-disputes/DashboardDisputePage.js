@@ -33,12 +33,10 @@ const SUB_ROUTES_TO_RADIO_CODES = {
 const SUB_ROUTE_DEFAULT = 'all';
 
 const DOC_FILTER_ALL = '-1';
+const DROPDOWN_CODE_ALL = '-1';
 
-const DROPDOWN_CODE_SOURCE_ALL = '-1';
-const DROPDOWN_CODE_URGENCY_ALL = '-1';
-
-const VIEW_ALL_DISPUTES_DEFAULT_TITLE = 'View All Disputes';
-const NON_PARTICIPATORY_DISPUTES_TITLE = 'Non Participatory Queue';
+const VIEW_ALL_DISPUTES_DEFAULT_TITLE = 'All Disputes';
+const NON_PARTICIPATORY_DISPUTES_TITLE = 'Non-Participatory Queue';
 
 const loaderChannel = Radio.channel('loader');
 const searchChannel = Radio.channel('searches');
@@ -68,7 +66,7 @@ export default TasksDisplayBaseView.extend({
       docsMethodFilterRegion: '.docs-sort-by-filters-method',
       docsPriorityFilterRegion: '.docs-sort-by-filters-priority',
 
-
+      processFilterRegion: '.dashboard-process-filter',
       sourceFilterRegion: '.dashboard-source-filter',
       urgencyFilterRegion: '.dashboard-urgency-filter',
       disputeSortByRegion: '.dashboard-dispute-sort',
@@ -112,7 +110,7 @@ export default TasksDisplayBaseView.extend({
     const existingTaskCount = this.tasks.length;
     this.loadTasksWithLoader({
       index: 0,
-      count: this.tasks.lastUsedFetchCount + existingTaskCount
+      count: this.tasks.lastUsedFetchCount + existingTaskCount,
     });
   },
 
@@ -206,7 +204,8 @@ export default TasksDisplayBaseView.extend({
 
   loadTasks(searchParams) {
     searchParams = _.extend({}, this.mixin_parseSearchParamsFromPage(searchParams),
-      this.taskSubType ? { TaskSubType: this.taskSubType } : {}
+      this.taskSubType ? { TaskSubType: this.taskSubType } : {},
+      { ExcludeDisputeStatuses: configChannel.request('get', 'EXCLUDED_TASK_DISPUTE_STATUSES') }
     );
     this.loaded = false;
 
@@ -257,9 +256,8 @@ export default TasksDisplayBaseView.extend({
       });
     }
 
-    if (!processRestriction && this.showNonParticipatory) {
-      processRestriction = this.PROCESS_WRITTEN_OR_DR;
-    }
+    // TODO: For 1.03.07.01, always use the process filter as the sole process restriction
+    processRestriction = null;
 
     const StageList = this.selected_stage_status ? [this.selected_stage_status.stage] : [];
     const StatusList = this.selected_stage_status ? [this.selected_stage_status.status] : [];
@@ -278,9 +276,14 @@ export default TasksDisplayBaseView.extend({
       });
     }
 
+    const processFilterVal = this.processFilterModel.getData(); 
     const sourceFilterVal = this.sourceFilterModel.getData();
     const urgencyFilterVal = this.urgencyFilterModel.getData();
     const disputeSortVal = this.disputeSortModel.getData();
+
+    if (this.displayProcessFilter && processFilterVal !== DROPDOWN_CODE_ALL) {
+      ProcessList.push(processFilterVal);
+    }
 
     // Make sure all list items are unique, since the lists are flat
     searchParams = Object.assign({},
@@ -288,8 +291,8 @@ export default TasksDisplayBaseView.extend({
       StatusList.length ? { StatusList: [...new Set(StatusList)].join(',') } : {},
       ProcessList.length ? { ProcessList: [...new Set(ProcessList)].join(',') } : {},
 
-      this.displaySourceFilter && sourceFilterVal !== DROPDOWN_CODE_SOURCE_ALL ? { CreationMethod: sourceFilterVal } : {},
-      this.displayUrgencyFilter && urgencyFilterVal !== DROPDOWN_CODE_URGENCY_ALL ? { DisputeUrgency: urgencyFilterVal } : {},
+      this.displaySourceFilter && sourceFilterVal !== DROPDOWN_CODE_ALL ? { CreationMethod: sourceFilterVal } : {},
+      this.displayUrgencyFilter && urgencyFilterVal !== DROPDOWN_CODE_ALL ? { DisputeUrgency: urgencyFilterVal } : {},
       this.displayDisputeSort ? { SortByDateField: disputeSortVal } : {},
 
       searchParams
@@ -327,7 +330,7 @@ export default TasksDisplayBaseView.extend({
  
   initialize(options) {
     this.mergeOptions(options, ['users', 'stage_status_list', 'viewAllDisputesTitle', 'title', 'enableTaskView', 'taskSubType',
-        'enableDocumentView', 'initialRadioSelection', 'subRoutingRouteName',
+        'enableDocumentView', 'initialRadioSelection', 'subRoutingRouteName', 'enableNonParticipatoryStageStatusList',
         'initialDisputeSortSelection']);
 
     this.dashboardPageUserToLoad = this.model.get('menu')?.dashboardPageUser;
@@ -359,28 +362,29 @@ export default TasksDisplayBaseView.extend({
         this.allStageStatusList.push(Object.assign({}, stageObj, { status_process: matchingAllStatusProcesses }));
       }
 
-      if (matchingNonParticipatoryStatusProcesses.length) {
+      if (this.enableNonParticipatoryStageStatusList && matchingNonParticipatoryStatusProcesses.length) {
         this.nonParticipatoryStageStatusList.push(Object.assign({}, stageObj, { status_process: matchingNonParticipatoryStatusProcesses }));
       }
     });
 
     this.cachedFilterData = this.isUnassignedPage ? this.model.get('unassignedDisputes') : this.model.get('myDisputes');
     const cachedViewType = this.cachedFilterData?.filter_viewType;
+    const viewTypeToUse = cachedViewType || SUB_ROUTES_TO_RADIO_CODES[this.initialRadioSelection];
 
     // Set initial selection state based on passed sub routing value, but check that it's a legal selection first
-    if (!this.initialRadioSelection && !cachedViewType) {
+    if (!this.initialRadioSelection && !viewTypeToUse) {
       this.showTasks = false;
       this.showDocs = false;
       this.showNonParticipatory = false;
-    } else if (this.enableTaskView && (SUB_ROUTES_TO_RADIO_CODES[this.initialRadioSelection] === RADIO_CODE_TASKS || cachedViewType === RADIO_CODE_TASKS)) {
+    } else if (this.enableTaskView && viewTypeToUse === RADIO_CODE_TASKS) {
       this.showTasks = true;
       this.showDocs = false;
       this.showNonParticipatory = false;
-    } else if (this.enableDocumentView && (SUB_ROUTES_TO_RADIO_CODES[this.initialRadioSelection] === RADIO_CODE_DOCUMENTS || cachedViewType === RADIO_CODE_DOCUMENTS)) {
+    } else if (this.enableDocumentView && viewTypeToUse === RADIO_CODE_DOCUMENTS) {
       this.showTasks = false;
       this.showDocs = true;
       this.showNonParticipatory = false;
-    } else if (this.nonParticipatoryStageStatusList.length && (SUB_ROUTES_TO_RADIO_CODES[this.initialRadioSelection] === RADIO_CODE_DISPUTES_NON_PARTICIPATORY || cachedViewType === RADIO_CODE_DISPUTES_NON_PARTICIPATORY)) {
+    } else if (this.nonParticipatoryStageStatusList.length && viewTypeToUse === RADIO_CODE_DISPUTES_NON_PARTICIPATORY) {
       this.showTasks = false;
       this.showDocs = false;
       this.showNonParticipatory = true;
@@ -405,6 +409,8 @@ export default TasksDisplayBaseView.extend({
 
     this.createSubModels();
     this.setupListeners();
+    
+    this.cacheFilterData();
     
     this.selected_stage_status = this.viewTypeModel.getData() === RADIO_CODE_VIEW_ALL ? this.cachedFilterData?.filter_stageStatus : null;
     if (this.selected_stage_status) this.deSelectViewAll(); //this.handleFilterSelection(this.selected_stage_status.stage, this.selected_stage_status.value);
@@ -431,8 +437,8 @@ export default TasksDisplayBaseView.extend({
       ...(this.nonParticipatoryStageStatusList.length ? [{
         text: `${NON_PARTICIPATORY_DISPUTES_TITLE}${activeViewType && activeViewType === RADIO_CODE_DISPUTES_NON_PARTICIPATORY ? ` (${this.disputeCollection.totalAvailable})`: ''}`, value: RADIO_CODE_DISPUTES_NON_PARTICIPATORY
       }] : []),
-      ...(this.enableTaskView ? [{ text: `View All Tasks${ activeViewType && activeViewType === RADIO_CODE_TASKS && _.isNumber(this.tasks.totalAvailable) ? ` (${this.tasks.totalAvailable})`: ''}`, value: RADIO_CODE_TASKS }] : []),
-      ...(this.enableDocumentView ? [{ text: `View Undelivered Documents${activeViewType && activeViewType === RADIO_CODE_DOCUMENTS && _.isNumber(this.documentCollection.length) ? ` (${this.documentCollection.length})`: ''}`, value: RADIO_CODE_DOCUMENTS }] : []),
+      ...(this.enableTaskView ? [{ text: `All Tasks${ activeViewType && activeViewType === RADIO_CODE_TASKS && _.isNumber(this.tasks.totalAvailable) ? ` (${this.tasks.totalAvailable})`: ''}`, value: RADIO_CODE_TASKS }] : []),
+      ...(this.enableDocumentView ? [{ text: `Undelivered Documents${activeViewType && activeViewType === RADIO_CODE_DOCUMENTS && _.isNumber(this.documentCollection.length) ? ` (${this.documentCollection.length})`: ''}`, value: RADIO_CODE_DOCUMENTS }] : []),
     ];
   },
 
@@ -457,8 +463,13 @@ export default TasksDisplayBaseView.extend({
   },
 
   _getUndeliveredDocFilterOptions() {
-    const OUTCOME_DOC_DELIVERED_BY_DISPLAY = configChannel.request('get', 'OUTCOME_DOC_DELIVERED_BY_DISPLAY') || [];
+    const OUTCOME_DOC_DELIVERED_BY_DISPLAY = configChannel.request('get', 'OUTCOME_DOC_DELIVERED_BY_DISPLAY') || {};
     return Object.entries(OUTCOME_DOC_DELIVERED_BY_DISPLAY).map( ([value, text]) => ({ value, text }) );
+  },
+
+  _getDisputeProcessFilterOptions() {
+    const PROCESS_DISPLAY = configChannel.request('get', 'PROCESS_DISPLAY') || {};
+    return Object.entries(PROCESS_DISPLAY).map(([value, text]) => ({ value, text }));
   },
 
   _getDisputeSourceFilterOptions() {
@@ -533,22 +544,32 @@ export default TasksDisplayBaseView.extend({
       value:  cachedData?.sort_docPriority || DOC_FILTER_ALL
     });
 
+    this.processFilterModel = new DropdownModel({
+      optionData: [
+        { value: DROPDOWN_CODE_ALL, text: 'All Processes' },
+        ...this._getDisputeProcessFilterOptions()
+      ],
+      defaultBlank: false,
+      disabled: this.showNonParticipatory,
+      value: this.showNonParticipatory ? String(this.PROCESS_WRITTEN_OR_DR) : (cachedData?.filter_process || DROPDOWN_CODE_ALL)
+    });
+
     this.sourceFilterModel = new DropdownModel({
       optionData: [
-        { value: DROPDOWN_CODE_SOURCE_ALL, text: 'All Types' },
+        { value: DROPDOWN_CODE_ALL, text: 'All Types' },
         ...this._getDisputeSourceFilterOptions()
       ],
       defaultBlank: false,
-      value: cachedData?.filter_source || DROPDOWN_CODE_SOURCE_ALL
+      value: cachedData?.filter_source || DROPDOWN_CODE_ALL
     });
 
     this.urgencyFilterModel = new DropdownModel({
       optionData: [
-        { value: DROPDOWN_CODE_URGENCY_ALL, text: 'All Priorities' },
+        { value: DROPDOWN_CODE_ALL, text: 'All Priorities' },
         ...this._getDisputePriorityFilterOptions()
       ],
       defaultBlank: false,
-      value: cachedData?.filter_urgency || DROPDOWN_CODE_URGENCY_ALL
+      value: cachedData?.filter_urgency || DROPDOWN_CODE_ALL
     });
 
     this.disputeSortModel = new DropdownModel({
@@ -601,6 +622,7 @@ export default TasksDisplayBaseView.extend({
 
   updateDisputeFilterEnabling() {
     const showDisputeFilters = !this.showTasks && !this.showDocs;
+    this.displayProcessFilter = showDisputeFilters;
     this.displaySourceFilter = showDisputeFilters;
     this.displayUrgencyFilter = showDisputeFilters;
     this.displayDisputeSort = showDisputeFilters;
@@ -612,6 +634,7 @@ export default TasksDisplayBaseView.extend({
         unassignedDisputes: {
           ...this.model.get('unassignedDisputes'),
           filter_viewType: this.viewTypeModel.getData(),
+          filter_process: (this.showNonParticipatory ? this.processFilterModel.get('_lastValue') : this.processFilterModel.getData()) || this.processFilterModel.getData(),
           filter_source: this.sourceFilterModel.getData(),
           filter_urgency: this.urgencyFilterModel.getData(),
           sort_disputeDate: this.disputeSortModel.getData(),
@@ -629,6 +652,7 @@ export default TasksDisplayBaseView.extend({
         myDisputes: {
           filter_user: this.userDropdownModel.getData(),
           filter_viewType: this.viewTypeModel.getData(),
+          filter_process: this.processFilterModel.getData(),
           filter_source: this.sourceFilterModel.getData(),
           filter_urgency: this.urgencyFilterModel.getData(),
           sort_disputeDate: this.disputeSortModel.getData(),
@@ -654,6 +678,18 @@ export default TasksDisplayBaseView.extend({
       this.showTasks = value === RADIO_CODE_TASKS;
       this.showDocs = value === RADIO_CODE_DOCUMENTS;
       this.showNonParticipatory = value === RADIO_CODE_DISPUTES_NON_PARTICIPATORY;
+      
+      if (this.showNonParticipatory) {
+        this.processFilterModel.set({
+          value: String(this.PROCESS_WRITTEN_OR_DR),
+          _lastValue: !this.processFilterModel.get('disabled') ? this.processFilterModel.getData() : null,
+        }, { silent: true });
+      } else if (this.processFilterModel.get('disabled')) {
+        this.processFilterModel.set({
+          value: this.processFilterModel.get('_lastValue') || this.cachedFilterData?.filter_process || DROPDOWN_CODE_ALL,
+        }, { silent: true });
+      }
+
       this.cacheFilterData();
       this.updateDisputeFilterEnabling();
       // Un-select other filters if we just picked View All disputes
@@ -678,7 +714,7 @@ export default TasksDisplayBaseView.extend({
       if ($.trim(value) === "" || model.isValid()) {
         this.loadTasksWithLoader({
           index: this.tasks.lastUsedFetchIndex || 0,
-          count: this.tasks.lastUsedFetchCount || this.tasks.DEFAULT_API_COUNT || 10
+          count: this.tasks.lastUsedFetchCount || this.tasks.DEFAULT_API_COUNT || 10,
         });
       }
     }, this);
@@ -703,34 +739,24 @@ export default TasksDisplayBaseView.extend({
       this.loadUndeliveredDocs().always(() => loaderChannel.trigger('page:load:complete'));
     });
 
-
+    const onUpdateDisputeFilter = () => {
+      this.cacheFilterData();
+      this.loadPageApiData({
+        disputeIndex: 0,
+        disputeCount: this.disputeCollection.lastUsedFetchCount || 20
+      });
+    };
+    this.stopListening(this.processFilterModel, 'change:value');
+    this.listenTo(this.processFilterModel, 'change:value', () => onUpdateDisputeFilter());
 
     this.stopListening(this.sourceFilterModel, 'change:value');
-    this.listenTo(this.sourceFilterModel, 'change:value', () => {
-      this.cacheFilterData();
-      this.loadPageApiData({
-        disputeIndex: 0,
-        disputeCount: this.disputeCollection.lastUsedFetchCount || 20
-      });
-    });
-
+    this.listenTo(this.sourceFilterModel, 'change:value', () => onUpdateDisputeFilter());
+    
     this.stopListening(this.urgencyFilterModel, 'change:value');
-    this.listenTo(this.urgencyFilterModel, 'change:value', () => {
-      this.cacheFilterData();
-      this.loadPageApiData({
-        disputeIndex: 0,
-        disputeCount: this.disputeCollection.lastUsedFetchCount || 20
-      });
-    });
+    this.listenTo(this.urgencyFilterModel, 'change:value', () => onUpdateDisputeFilter());
 
     this.stopListening(this.disputeSortModel, 'change:value');
-    this.listenTo(this.disputeSortModel, 'change:value', () => {
-      this.cacheFilterData();
-      this.loadPageApiData({
-        disputeIndex: 0,
-        disputeCount: this.disputeCollection.lastUsedFetchCount || 20
-      });
-    });
+    this.listenTo(this.disputeSortModel, 'change:value', () => onUpdateDisputeFilter());
 
     this.listenTo(this.undeliveredDocFilterModel, 'change:value', () => {
       this.cacheFilterData();
@@ -820,20 +846,22 @@ export default TasksDisplayBaseView.extend({
 
 
   onBeforeRender() {
-    // Any dependent UI state data that should be updated at render time?
+    // Set disabled state of process dropdown for the special non-participatory radio state
+    if (this.showNonParticipatory) {
+      this.processFilterModel.set({
+        disabled: true,
+      }, { silent: true });
+    } else if (!this.showNonParticipatory && this.processFilterModel.get('disabled')) {
+      this.processFilterModel.set({
+        disabled: false,
+      }, { silent: true });
+    }
     this.viewTypeModel.set('optionData', this.getViewTypeOptionsWithCount(), { silent: true });
 
     // This displays total available counts to users, which is complex to keep state of when applying additional UI filter
     // For dashboard tasks, perform another API call when a change is made to ensure fully updated count.
     this.stopListening(this.tasks, 'change:task_status assigned');
     this.listenTo(this.tasks, 'change:task_status assigned', this.clickRefresh, this);
-
-    // if(this.isRendered()) {
-    //   const region = this.getRegion('activityTypeFilterRegion');
-    //   if(region.hasView()) {
-    //     this.currentChildView = region.detachView();
-    //   }
-    // }
   },
 
   onRender() {
@@ -904,6 +932,7 @@ export default TasksDisplayBaseView.extend({
 
   renderDisputeList() {
     this.showChildView('urgencyFilterRegion', new DropdownView({ model: this.urgencyFilterModel }));
+    this.showChildView('processFilterRegion', new DropdownView({ model: this.processFilterModel }));
     this.showChildView('sourceFilterRegion', new DropdownView({ model: this.sourceFilterModel }));
     this.showChildView('disputeSortByRegion', new DropdownView({ model: this.disputeSortModel, displayTitle: 'Sort by:' }));
     this.showChildView('filterRegion', new DashboardDisputeFilters({ filter_models: this.disputeFilterModels }));
@@ -921,6 +950,7 @@ export default TasksDisplayBaseView.extend({
       showTasks: this.showTasks,
       displayUserDropdown: !this.isUnassignedPage,
 
+      displayProcessFilter: this.displayProcessFilter,
       displaySourceFilter: this.displaySourceFilter,
       displayUrgencyFilter: this.displayUrgencyFilter,
       displayDisputeSort: this.displayDisputeSort,

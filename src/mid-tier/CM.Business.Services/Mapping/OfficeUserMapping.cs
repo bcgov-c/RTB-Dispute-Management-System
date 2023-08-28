@@ -36,8 +36,6 @@ public class OfficeUserMapping : Profile
             .ForMember(x => x.AcceptedTouDate, opt => opt.MapFrom(src => src.AcceptedTouDate.ToCmDateTimeString()));
 
         CreateMap<Participant, DisputeAccessParticipant>()
-            .ForMember(x => x.AccessCode, opt => opt.MapFrom(src => src.AccessCode.ToAccessCodeHint()))
-            ////.ForMember(x => x.ModifiedDate, opt => opt.MapFrom(src => src.ModifiedDate.ToCmDateTimeString()))
             .ForMember(x => x.AcceptedTouDate, opt => opt.MapFrom(src => src.AcceptedTouDate.ToCmDateTimeString()));
 
         CreateMap<Participant, OfficeUserPostDisputeParticipantResponse>()

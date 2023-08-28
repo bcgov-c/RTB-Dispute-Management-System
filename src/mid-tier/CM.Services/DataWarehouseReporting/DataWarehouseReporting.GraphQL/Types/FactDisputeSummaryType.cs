@@ -116,6 +116,12 @@ public sealed class FactDisputeSummaryType : ObjectGraphType<FactDisputeSummary>
         Field(x => x.DisputeComplexity, true).Description("The complexity rating of a dispute");
         Field(x => x.FirstDecisionDateTime, true).Description("The date that the first decision was added to the dispute");
         Field(x => x.FirstDecisionDateTimeId, true).Description("The date Id that the first decision was added to the dispute");
+        Field(x => x.NoticeNotServed, true).Description("The total number of notices where service was indicated as not served");
+        Field(x => x.CaseManagedTimeMin, true).Description("A sum of all case management time (with or without an owner) on the dispute file in minutes");
+        Field(x => x.IsMissingResolutionTime, true).Description("True = the dispute file has one or more missing (null)  hearing duration, hearing prep duration, or outcome doc set writing duration .");
+        Field(x => x.RequestedPossession, true).Description("Indicates whether the applicant has asked for possession for the dispute (true/false)");
+        Field(x => x.IsMissingIssueOutcomes, true).Description("True = the dispute file has one or more missing issue outcomes, False = all issues have outcomes.");
+        Field(x => x.IsMissingNoticeService, true).Description("True = the dispute file has one or more missing (null) Notice Service, False = all notice service records are completed.");
     }
 }
 

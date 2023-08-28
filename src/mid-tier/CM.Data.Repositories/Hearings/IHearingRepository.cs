@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CM.Business.Entities.Models.ExternalUpdate;
 using CM.Business.Entities.Models.Hearing;
 using CM.Business.Entities.Models.HearingReporting;
 using CM.Common.Utilities;
@@ -17,7 +18,7 @@ public interface IHearingRepository : IRepository<Hearing>
 
     Task<List<Hearing>> GetHearingsByDay(DateTime date);
 
-    Task<List<Hearing>> GetHearingByOwner(int hearingOwnerId, DateTime startDate, DateTime? endDate);
+    Task<List<Hearing>> GetHearingByOwner(int hearingOwnerId, DateTime startDate, DateTime endDate);
 
     Task<List<Hearing>> GetHearingByDate(DateTime date);
 
@@ -35,19 +36,15 @@ public interface IHearingRepository : IRepository<Hearing>
 
     Task<List<AvailableStaffResponse>> GetAvailableStaff(HearingAvailableStaffRequest request, IEnumerable<int> users);
 
-    Task<List<AvailableConferenceBridgesResponse>> GetAvailableHearingsByPeriod(AvailableConferenceBridgesRequest request, IEnumerable<int> activeBridges);
+    Task<List<AvailableConferenceBridgesResponse>> GetAvailableHearingsByPeriod(AvailableConferenceBridgesRequest request);
 
-    Task<List<int>> GetHearingsByHearingStartDate(DateTime startDate, DateTime endDate, List<int> disputeHearings);
+    Task<List<Hearing>> GetHearingsByHearingStartDate(DateTime startDate, DateTime endDate, List<int> disputeHearings);
 
     Task<DateTime?> GetLastModifiedDate(int hearingId);
 
-    Task<bool> IsHearingExist(int userId, DateTime startDateTime, DateTime endDataTime);
-
-    Task<decimal> GetAvgNext10HearingDays(int dayInterval, byte hearingPriority, List<int> disputeHearings);
+    Task<bool> IsHearingExist(int userId, DateTime startDateTime, DateTime endDateTime);
 
     Task<int> GetHearingsCount(int schedulePeriodId, DateTime periodStart, DateTime periodEnd);
-
-    Task<bool> IsAssignedHearings(int userId, DateTime blockStart);
 
     Task<int> GetAssociatedHearingsCount(DateTime blockStart, DateTime blockEnd, int systemUserId);
 
@@ -56,4 +53,14 @@ public interface IHearingRepository : IRepository<Hearing>
     Task<List<Hearing>> GetHearingByDateAndCreationMethod(DateTime date, DisputeCreationMethod disputeCreationMethod);
 
     Task<Hearing> GetWithDisputeHearings(int hearingId);
+
+    Task<int> GetAssociatedBookedHearingsCount(DateTime blockStart, DateTime blockEnd, int systemUserId);
+
+    Task<int?> GetHearingWaitTime(ExternalHearingWaitTimeRequest request);
+
+    Task<List<Hearing>> GetOnHoldHearings(OnHoldHearingsRequest request);
+
+    Task<int?> GetWaitTimeDays(byte urgency, int interval, int limit);
+
+    Task<Hearing> GetHearingWithConferenceBridge(int hearingId);
 }

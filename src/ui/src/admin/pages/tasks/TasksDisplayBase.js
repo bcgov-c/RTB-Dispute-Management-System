@@ -97,6 +97,7 @@ export default Marionette.View.extend({
 
   mixin_initializeTaskDisplayData(options) {
     this.tasks = new TaskCollection();
+    this.mixin_setupTasksListeners();
     this.SORT_DIRECTION_MAP = {
       TaskPriority: 'Desc',
       TaskDueDate: 'Asc',
@@ -120,15 +121,22 @@ export default Marionette.View.extend({
     loaderChannel.trigger('page:load:complete');
   },
 
+  mixin_getTaskTypeFiltersWithCount() {
+    const totalAvailable = this.tasks?.totalAvailable || 0;
+    const selectedValue = this.taskTypeFiltersModel?.getData();
+    const addCount = ({ value, text }) => Number.isInteger(value) && selectedValue === value ? ({ value, text: `${text} (${totalAvailable})` }) : ({ value, text });
+    return [
+      addCount({ value: TASK_FILTER_TYPE_ALL, text: `View All` }),
+      addCount({ value: this.TASK_STATUS_OPEN, text: `Open Only` }),
+      addCount({ value: this.TASK_STATUS_CLOSED, text: `Closed Only` })
+    ];
+  },
+
   mixin_createSubModels(options={}) {
     this.enableCompletedDateSort = !options.no_completed_sort;
     
     this.taskTypeFiltersModel = new RadioModel({
-      optionData: [
-        { value: TASK_FILTER_TYPE_ALL, text: 'View All' },
-        { value: this.TASK_STATUS_OPEN, text: 'Open Only' },
-        { value: this.TASK_STATUS_CLOSED, text: 'Closed Only' }
-      ],
+      optionData: this.mixin_getTaskTypeFiltersWithCount(),
       value: this.TASK_STATUS_OPEN
     });
   
@@ -175,6 +183,20 @@ export default Marionette.View.extend({
         index: this.tasks.lastUsedFetchIndex || 0,
         count: this.tasks.lastUsedFetchCount || this.tasks.DEFAULT_API_COUNT || 20
       });
+    });
+  },
+
+  mixin_setupTasksListeners() {
+    this.stopListening(this.tasks, 'sync');
+    this.listenTo(this.tasks, 'sync', (changedTask) => {
+      console.log(changedTask.id, changedTask);
+      if (
+        (changedTask.isComplete() && this.mixin_isFilterSetToOpen()) ||
+        (!changedTask.isComplete() && this.mixin_isFilterSetToClosed())
+      ) {
+        this.tasks.totalAvailable = this.tasks.totalAvailable - 1;
+        this.render();
+      }
     });
   },
 

@@ -1,5 +1,5 @@
 /**
- * Defines several custom jQuery animations that can be invoked on jQuery selectors in the application.
+ * @fileoverview - Defines several custom jQuery animations that can be invoked on jQuery selectors in the application. 
  * Includes such utilities as scrolling to a given element, and showing floating header elements.
  * @namespace core.components.animations.CustomAnimations
  * @memberof core.components.animations
@@ -114,7 +114,22 @@
     options = options || {};
     _.extend(customAnimationOptions, {}, options);
   };
+  $.initializeDatepickerScroll = function() {
+    document.addEventListener('scroll', function() {
+      try {
+        $('input.hasDatepicker').datepicker("hide");
+      } catch (err) { }
+    }, true);
+  };
 
+  $.getScrollableElement = function() {
+    return $(customAnimationOptions.scrollableContainerSelector);
+  },
+
+  $.scrollPageToTop = function() {
+    const scrollable_ele = $(customAnimationOptions.scrollableContainerSelector);
+    scrollable_ele.scrollTop(0);
+  }
 
   // Add functions on jQuery elements
   $.fn.extend({
@@ -246,14 +261,5 @@
       }, _.extend({duration: customAnimationOptions.scroll_duration}, options));
     }
   });
-
-  $.getScrollableElement = function() {
-    return $(customAnimationOptions.scrollableContainerSelector);
-  },
-
-  $.scrollPageToTop = function() {
-    const scrollable_ele = $(customAnimationOptions.scrollableContainerSelector);
-    scrollable_ele.scrollTop(0);
-  }
   
 })(jQuery);

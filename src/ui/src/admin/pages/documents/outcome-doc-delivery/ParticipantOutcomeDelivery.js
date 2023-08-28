@@ -10,6 +10,8 @@ import DropdownModel from '../../../../core/components/dropdown/Dropdown_model';
 import InputView from '../../../../core/components/input/Input';
 import InputModel from '../../../../core/components/input/Input_model';
 import ModalEditDeliveryAddress from './modals/ModalEditDeliveryAddress';
+import IconAddressNotVerified from '../../../../core/static/Icon_Admin_AddressNotVerified.png';
+import IconAddressVerified from '../../../../core/static/Icon_Admin_AddressVerified.png'
 import { generalErrorFactory } from '../../../../core/components/api/ApiLayer';
 
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
@@ -30,6 +32,9 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
     this.SEND_METHOD_OTHER = String(configChannel.request('get', 'SEND_METHOD_OTHER'));
     this.participantEmail = this.model.get('participant_model') && this.model.get('participant_model').get('email');
     
+    const firstSavedDelivery = this.model.getFirstSavedDelivery();
+    this.linkedEmail = firstSavedDelivery?.getEmailModel();
+
     this.createSubModels();
     this.setEditGroup();
     this.setupListeners();
@@ -341,7 +346,7 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
     
     const deliveryValueToSet = !hasInclusions ? null :
       (this.deliveryMethodModel.get('value') || this.autoDeliveryMethod || null);
-      const disableDeliveryMethod = isEditSendMode || isSent || !hasInclusions;
+    const disableDeliveryMethod = isEditSendMode || isSent || !hasInclusions;
     this.deliveryMethodModel.set({
       disabled: disableDeliveryMethod,
       required: !disableDeliveryMethod,
@@ -354,7 +359,8 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
     });
     
     const disableDeliveryDetails = isEditSendMode || (!this.model.isOther() && (!hasInclusions || !this.deliveryMethodModel.getData({parse: true})));
-    const disableIsSent = !isEditSendMode && disableDeliveryDetails;
+    const disableIsSent = isEditSendMode ? (isSent && this.linkedEmail)
+      : (disableDeliveryDetails && !this.model.isOther());
 
     this.deliveryDetailsModel.set(_.extend({
       required: String(this.deliveryMethodModel.getData()) === this.SEND_METHOD_OTHER,
@@ -363,7 +369,7 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
 
     this.isSentModel.set(_.extend({
       disabled: disableIsSent
-    }, !hasInclusions ? { checked: false } : {})).trigger('render');
+    }, !hasInclusions && !this.model.isOther() ? { checked: false } : {})).trigger('render');
 
     const shouldDateTimeBeDisabled = this.shouldDateTimeBeDisabled();
     const enableMaxTime = !shouldDateTimeBeDisabled && Moment(this.deliveryDateModel.getData({ parse: true })).isSame(Moment(), 'day');
@@ -518,12 +524,15 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
     if (this.model.isOther()) return null;
     const p = this.model.get('participant_model');
     const mailingAddressDisplay = p.hasMailAddress() ? p.getMailingAddressString() : p.getStreetAddressString();
-
+    const dispute = disputeChannel.request('get');
     return <div className="outcome-doc-delivery-method-mail-container">
-      <div className="outcome-doc-delivery-method-mail">{mailingAddressDisplay}</div>
+      <div className="outcome-doc-delivery-method-mail">
+        <img class="address-validated-icon" src={p.get('address_is_validated') || p.get('mail_address_is_validated') ? IconAddressVerified : IconAddressNotVerified} />
+        &nbsp;{mailingAddressDisplay}
+      </div>
       {!this.model.get('_isEditSentMode') && this.model.get('_isEditMode') ?
         <div className="outcome-doc-delivery-method-mail-buttons">
-          <span className="outcome-doc-delivery-method-mail-edit general-link" onClick={() => this.clickMailEdit()}>Edit</span>
+          <span className="outcome-doc-delivery-method-mail-edit general-link" onClick={() => this.clickMailEdit()}>{dispute.isPostNotice()?'Amend':'Edit'}</span>
           {!this.deliveryMethodModel.get('disabled') ? <>
             <span className="outcome-doc-delivery-method-mail-buttons-separator"></span>
             <span className="outcome-doc-delivery-method-mail-email general-link" onClick={() => this.clickEmailEdit()}>{`${this.participantEmail ? 'Change' : 'Add'} Email`}</span>
@@ -548,13 +557,16 @@ const ParticipantOutcomeDelivery = Marionette.View.extend({
   renderJsxDeliveryStatus() {
     const firstSavedDelivery = this.model.getFirstSavedDelivery();
     const firstDeliveryIsDelivered = firstSavedDelivery && firstSavedDelivery.get('is_delivered');
+    const sentLabel = firstSavedDelivery?.get('ready_for_delivery') ?
+      (Moment(firstSavedDelivery.get('delivery_date')).isAfter(Moment(), 'minutes') ? `Pending` : `Sent`)
+      : '';
     return <div className="outcome-doc-delivery-sent-display">
       {
         firstDeliveryIsDelivered ?
           firstSavedDelivery.get('ready_for_delivery') ?
-            <span className="">Sent: {Formatter.toDateDisplay(firstSavedDelivery.get('delivery_date'))}</span>
+            <span className="">{sentLabel}: {Formatter.toDateAndTimeDisplay(firstSavedDelivery.get('delivery_date'))}</span>
           : <span className="outcome-doc-delivery-sent-display--gray">Not Marked Ready</span>
-        : <span className="outcome-doc-delivery-sent-display--red">Not Sent</span>
+        : this.deliveryMethodModel.getData() ? <span className="outcome-doc-delivery-sent-display--red">Not Sent</span> : <span className="outcome-doc-delivery-sent-display--gray">-</span>
       }
     </div>;
   },

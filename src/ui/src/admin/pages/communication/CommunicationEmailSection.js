@@ -5,6 +5,7 @@ import RadioView from '../../../core/components/radio/Radio';
 import CommunicationEmailListView from './CommunicationEmailList';
 import ModalCreateEmailView from './modals/ModalCreateEmail';
 import template from './CommunicationEmailSection_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 let UAT_TOGGLING = {};
 
@@ -17,17 +18,19 @@ export default Marionette.View.extend({
   template,
 
   regions: {
-    emailList: '#comm-email-list',
+    emailList: '.comm-email-list',
     emailTypeFilters: '#comm-email-type-filters'
   },
 
   ui: {
-    'addEmail': '.comm-add-email-btn',
-    'emailFilter': '.email-section-filter'
+    addEmail: '.comm-add-email-btn',
+    emailFilter: '.email-section-filter',
+    collapse: '.dispute-section-title-add.collapse-icon',
   },
 
   events: {
-    'click @ui.addEmail': 'clickAddEmail'
+    'click @ui.addEmail': 'clickAddEmail',
+    'click @ui.collapse': 'clickCollapse',
   },
 
   clickAddEmail() {
@@ -36,25 +39,30 @@ export default Marionette.View.extend({
     modalChannel.request('add', addEmailModalView);
   },
 
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
+  },
+
   initialize(options) {
     this.mergeOptions(options, ['emailFilter', 'sectionTitle', 'disableTypeFilter', 'isPickup', 'isDraft', 'showAddEmail']);
     UAT_TOGGLING = configChannel.request('get', 'UAT_TOGGLING') || {};
+    this.sectionTitle = this.sectionTitle || 'Emails';
     this.showAddEmail = UAT_TOGGLING.SHOW_ADD_CUSTOM_EMAIL && (_.isBoolean(this.showAddEmail) ? this.showAddEmail : true);
+    this.collapseHandler = SessionCollapse.createHandler(this.model, 'Communications', (this.sectionTitle||'')?.replace(/\s/g, ''));
+    this.isCollapsed = this.collapseHandler?.get();
     this.createSubModels();
+    this.setupListeners();
+  },
 
-    this.listenTo(this.collection, 'render', this.render, this);
-    this.listenTo(this.emailTypeFiltersModel, 'change:value', (model, value) => {
-      this.getUI('emailFilter').html(` - ${this.emailTypeFiltersModel?.getSelectedText()}`);
-      this.model.set({
-        sessionSettings: { 
-          ...this.model.get('sessionSettings'), 
-          communicationPage: {
-            ...this.model.get('sessionSettings')?.communicationPage,
-            filter_emailType: value
-          }
-        }
-      });
-    })
+  createSubModels() {
+    if (this.disableTypeFilter) return;
+    const cachedData = this.model.get('sessionSettings')?.communicationPage;
+    this.emailTypeFiltersModel = new RadioModel({
+      optionData: this._getTypeFilterOptions(),
+      value: cachedData?.filter_emailType ? cachedData?.filter_emailType : EMAIL_FILTER_CODE_ALL,
+    });
   },
 
   _getTypeFilterOptions() {
@@ -67,16 +75,26 @@ export default Marionette.View.extend({
     })];
   },
 
-  createSubModels() {
-    if (this.disableTypeFilter) return;
-    const cachedData = this.model.get('sessionSettings')?.communicationPage;
-    this.emailTypeFiltersModel = new RadioModel({
-      optionData: this._getTypeFilterOptions(),
-      value: cachedData?.filter_emailType ? cachedData?.filter_emailType : EMAIL_FILTER_CODE_ALL,
+  setupListeners() {
+    this.listenTo(this.collection, 'render', this.render, this);
+    this.listenTo(this.emailTypeFiltersModel, 'change:value', (model, value) => {
+      this.getUI('emailFilter').html(` - ${this.emailTypeFiltersModel?.getSelectedText()}`);
+      this.model.set({
+        sessionSettings: { 
+          ...this.model.get('sessionSettings'), 
+          communicationPage: {
+            ...this.model.get('sessionSettings')?.communicationPage,
+            filter_emailType: value
+          }
+        }
+      });
     });
   },
 
+
   onRender() {
+    if (this.isCollapsed) return;
+
     this.showChildView('emailList', new CommunicationEmailListView({
       collection: this.collection,
       typeFilter: this.emailTypeFiltersModel,
@@ -92,9 +110,11 @@ export default Marionette.View.extend({
     return {
       showAddEmail: this.showAddEmail,
       hasEmails: this.collection.length,
-      sectionTitle: this.sectionTitle || 'Emails',
+      sectionTitle: this.sectionTitle,
       selectedEmailFilter: this.emailTypeFiltersModel?.getSelectedText() ? `- ${this.emailTypeFiltersModel?.getSelectedText()} Filter ` : '',
-      disableTypeFilter: this.disableTypeFilter
+      disableTypeFilter: this.disableTypeFilter,
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 });

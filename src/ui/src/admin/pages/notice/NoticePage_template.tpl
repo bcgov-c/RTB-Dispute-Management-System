@@ -60,6 +60,15 @@
       <span class="notice-sub-service-print"><%= printParticipantSubServices %></span>
     </div>
   <% } %>
+  <% if (showHearingNotices) { %>
+    <div class="info-banner-with-icon-container">
+      <img src="<%= require('../../static/Icon_HearingNotices_LRG.png') %>" />&nbsp;
+      <div>
+        <b>Hearing notice(s):</b>
+        <span class="notice-page__hearing-notices">-</span>
+      </div>
+    </div>
+  <% } %>
   <div id="notice-list-container"></div>
   <div id="amendment-list-container"></div>
 </div>

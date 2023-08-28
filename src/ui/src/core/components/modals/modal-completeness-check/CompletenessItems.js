@@ -44,11 +44,6 @@ const CompletenessItem = ViewMixin.extend({
 
   template() {
     const value = this.model.get('value');
-    const showIO = this.model.get('showIO');
-    const showAdmin = this.model.get('showAdjudicator');
-    const showAdjudicator = this.model.get('showAdjudicator');
-    const showArb = this.model.get('showArb');
-
     const shouldItemDisplay = this.hideProbablyOk ? value && !this.isHiddenByFilter() : !this.isHiddenByFilter();
     if (!shouldItemDisplay) return;
     

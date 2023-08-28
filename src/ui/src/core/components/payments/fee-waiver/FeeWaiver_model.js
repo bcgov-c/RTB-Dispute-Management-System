@@ -22,7 +22,8 @@ export default Backbone.Model.extend({
 
   initialize() {
     this.disputeFeeModel = this.get('disputeFeeModel') || paymentsChannel.request('get:fees').findWhere({ dispute_fee_id: this.get('disputeFeeId') });
-    this.evidenceModel = new FeeWaiverEvidenceModel();
+    const resetFeeWaiverEvidence = !this.disputeFeeModel.isIntakeFee();
+    this.evidenceModel = new FeeWaiverEvidenceModel({ resetEvidence: resetFeeWaiverEvidence });
     this.uploadModel = this.get('uploadModel') || this.evidenceModel;
     
     this.OFFICE_PAYOR_NAME_MAX_LENGTH = configChannel.request('get', 'OFFICE_PAYOR_NAME_MAX_LENGTH') || 200;

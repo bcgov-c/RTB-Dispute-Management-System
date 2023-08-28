@@ -10,7 +10,7 @@ public class CustomConfigObjectGetRequest
     [JsonProperty("request_object_types")]
     public byte?[] RequestObjectTypes { get; set; }
 
-    [JsonProperty("request_object_statuses ")]
+    [JsonProperty("request_object_statuses")]
     public byte?[] RequestObjectStatuses { get; set; }
 
     [JsonProperty("request_object_storage_types")]

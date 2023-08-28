@@ -134,6 +134,22 @@ export default CMModel.extend({
     return serviceQuadrant.documentsName;
   },
 
+  isSourceOffice() {
+    return this.get('request_source') === configChannel.request('get', 'TASK_REQUEST_SOURCE_OFFICE');
+  },
+
+  isStatusDenied() {
+    return this.get('request_status') === configChannel.request('get', 'SUB_SERVICE_REQUEST_STATUS_DENIED');
+  },
+
+  isStatusApproved() {
+    return this.get('request_status') === configChannel.request('get', 'SUB_SERVICE_REQUEST_STATUS_APPROVED');
+  },
+
+  isStatusWithdrawn() {
+    return this.get('request_status') === configChannel.request('get', 'SUB_SERVICE_REQUEST_STATUS_WITHDRAWN'); 
+  },
+
   urlRoot() {
     const dispute_id = disputeChannel.request('get:id');
     return `${configChannel.request('get', 'API_ROOT_URL')}${api_name}` + (this.isNew() ? `/${dispute_id}` : '');

@@ -22,7 +22,7 @@
               <% var isToday = todayIndicator && todayDate.isSame( periodStartDate.clone().add(labelIndex, 'days'), 'day') %>
               <li class="calendar-header-time-item <%= isToday ? 'clearfix calendar-header-time-item--today' : '' %>">
                 <div class="calendar-header-time-item-container">
-                  <span class="general-link" data-date="<%= labelData.startDate %>"><%= labelData.dateDisplay %></span>
+                  <span class="<%= disableHeaderRouting ? '' : 'general-link' %>" data-date="<%= labelData.startDate %>"><%= labelData.dateDisplay %></span>
                 </div>
 
               <% if (showReporting) { %>
@@ -126,7 +126,7 @@
 
   <% _.escape.each(eventData, function(rowData, rowEventIndex) { %>
     <% _.escape.each(rowData.events, function(event) { %>
-      <div class="block-calendar__saved-block <%= event.cssClass %>"
+      <div class="block-calendar__saved-block <%= event.cssClass %> <%= selectedBlockId === event.blockId && event.blockId ? 'selected' : '' %>"
         data-block-id="<%= event.blockId %>"
         data-owner-offset="<%= event.ownerOffset %>"
         ><%= event.description || '' %>

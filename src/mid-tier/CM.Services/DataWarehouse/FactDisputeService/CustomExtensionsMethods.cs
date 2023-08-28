@@ -4,6 +4,7 @@ using CM.Services.DataWarehouse.DataWarehouseDataModel;
 using CM.Services.DataWarehouse.DataWarehouseRepository.DimCity;
 using CM.Services.DataWarehouse.DataWarehouseRepository.DimTime;
 using CM.Services.DataWarehouse.DataWarehouseRepository.FactDisputeSummary;
+using CM.Services.DataWarehouse.DataWarehouseRepository.FactIssueOutcome;
 using CM.Services.DataWarehouse.DataWarehouseRepository.LoadingHistory;
 using CM.Services.DataWarehouse.DataWarehouseRepository.UnitOfWork;
 using CM.Services.DataWarehouse.FactDisputeService.IntegrationEvents.EventHandling;
@@ -24,6 +25,7 @@ public static class CustomExtensionsMethods
         services.AddTransient<IDimCityRepository, DimCityRepository>();
         services.AddTransient<IDimTimeRepository, DimTimeRepository>();
         services.AddTransient<IFactDisputeSummaryRepository, FactDisputeSummaryRepository>();
+        services.AddTransient<IFactIssueOutcomeRepository, FactIssueOutcomeRepository>();
         services.AddTransient<ILoadingHistoryRepository, LoadingHistoryRepository>();
 
         return services;
@@ -52,6 +54,8 @@ public static class CustomExtensionsMethods
         services.AddTransient<FactTimeStatisticsIntegrationEventHandler, FactTimeStatisticsIntegrationEventHandler>();
         services.AddTransient<FactHearingSummaryIntegrationEventHandler, FactHearingSummaryIntegrationEventHandler>();
         services.AddTransient<FactIntakeProcessingIntegrationEventHandler, FactIntakeProcessingIntegrationEventHandler>();
+        services.AddTransient<FactResolutionServiceIntegrationEventHandler, FactResolutionServiceIntegrationEventHandler>();
+        services.AddTransient<FactIssueOutcomeIntegrationEventHandler, FactIssueOutcomeIntegrationEventHandler>();
 
         return services;
     }

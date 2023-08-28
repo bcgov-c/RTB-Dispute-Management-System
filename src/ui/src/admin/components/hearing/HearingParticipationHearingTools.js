@@ -1,3 +1,6 @@
+/**
+ * View wrapper for HearingParticipation that displays clickable actions that relate to hearing participation. Becomes enabled when hearing tools is selected.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import { HearingParticipation } from './HearingParticipation';
@@ -83,7 +86,9 @@ export default Marionette.View.extend({
   },
 
   clickCancel() {
+    this.model.getParticipations().add(this.participationsToDelete, { merge: true });
     this.model.resetHearingParticipations();
+    this.participationsToDelete = [];
     this.renderInViewMode();
   },
 
@@ -101,17 +106,21 @@ export default Marionette.View.extend({
       }
       return;
     }
+
     hearingParticipationView.saveInternalSaveDataToHearingModel();
 
-    const self = this;
     loaderChannel.trigger('page:load');
-
-    const hearingParticipationPromise = () => new Promise((res, rej) => this.model.saveHearingParticipations().then(res, generalErrorFactory.createHandler('ADMIN.PARTICIPATION.SAVE', rej)));
+    const hearingParticipationPromise = () => new Promise((res, rej) => {
+      return Promise.all(this.participationsToDelete.map(p => p.destroy()))
+        .then(() => this.model.saveHearingParticipations())
+        .then(res, generalErrorFactory.createHandler('ADMIN.PARTICIPATION.SAVE', rej));
+    });
     const hearingPromise = () => new Promise((res, rej) => this.model.save(this.model.getApiChangesOnly()).then(res, generalErrorFactory.createHandler('ADMIN.HEARING.SAVE', rej)));
     
     hearingParticipationPromise().then(hearingPromise).finally(() => {
+      this.participationsToDelete = [];
+      this.renderInViewMode();
       loaderChannel.trigger('page:load:complete');
-      self.renderInViewMode();
     });
   },
 
@@ -121,6 +130,17 @@ export default Marionette.View.extend({
     this.disputeModel = disputeChannel.request('get');
     this.mode = this.mode || 'participation-view';
     this.hasHearingParticipations = this.model.getParticipations().length;
+    this.participationsToDelete = [];
+    this.setupListeners();
+  },
+
+  setupListeners() {
+    this.stopListening(this.model.getParticipations(), 'remove', this.handleParticipantRemove);
+    this.listenTo(this.model.getParticipations(), 'remove', this.handleParticipantRemove, this);
+  },
+
+  handleParticipantRemove(model) {
+    if (model.isOther() && !this.participationsToDelete.find(m => m.id === model.id)) this.participationsToDelete.push(model);
   },
 
   renderInViewMode() {

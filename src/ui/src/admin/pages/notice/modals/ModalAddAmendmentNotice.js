@@ -116,7 +116,8 @@ const ModalAddAmendmentNotice = ModalBaseView.extend({
       processing_options: {
         maxNumberOfFiles,
         checkForDisputeDuplicates: false,
-        allowedFileTypes: configChannel.request('get', 'VALID_NOTICE_FILE_TYPES')
+        allowedFileTypes: configChannel.request('get', 'VALID_NOTICE_FILE_TYPES'),
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
       },
       file_creation_fn: function() {
         return _.extend(this.defaultFileCreationFn(...arguments), {

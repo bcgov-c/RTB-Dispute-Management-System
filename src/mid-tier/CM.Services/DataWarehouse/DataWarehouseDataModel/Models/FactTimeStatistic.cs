@@ -38,6 +38,8 @@ public class FactTimeStatistic
 
     public int Process2DisputesPaid { get; set; }
 
+    public int? Process7DisputesPaid { get; set; }
+
     public int TenantDisputesPaid { get; set; }
 
     public int LandlordDisputesPaid { get; set; }
@@ -48,13 +50,31 @@ public class FactTimeStatistic
 
     public int DeferredDisputesPaid { get; set; }
 
+    public int? NoUrgencyDisputesPaid { get; set; }
+
     public int SubServicesSubmitted { get; set; }
 
     public int AmendmentsSubmitted { get; set; }
 
     public int DisputeHearings { get; set; }
 
+    public int? DisputeHearingsEmergency { get; set; }
+
+    public int? DisputeHearingsStandard { get; set; }
+
+    public int? DisputeHearingsDeferred { get; set; }
+
+    public int? DisputeHearingsDuty { get; set; }
+
     public int EmptyHearings { get; set; }
+
+    public int? EmptyHearingsEmergency { get; set; }
+
+    public int? EmptyHearingsStandard { get; set; }
+
+    public int? EmptyHearingsDeferred { get; set; }
+
+    public int? EmptyHearingsDuty { get; set; }
 
     public decimal AvgNext10EmergEmptyHearingDays { get; set; }
 
@@ -147,4 +167,32 @@ public class FactTimeStatistic
     public int DocumentsDelivered { get; set; }
 
     public int? IntakeProcessed { get; set; }
+
+    public int? Stage2UnassignedDeferred { get; set; }
+
+    public int? Stage2UnassignedStandard { get; set; }
+
+    public int? Stage2UnassignedUrgent { get; set; }
+
+    public int? WaitTimeDaysDeferred { get; set; }
+
+    public int? WaitTimeDaysStandard { get; set; }
+
+    public int? WaitTimeDaysUrgent { get; set; }
+
+    public int? NonParticipatoryWaitingDecision { get; set; }
+
+    public DateTime? NonParticipatoryWaitingDecisionOldest { get; set; }
+
+    public int? NonParticipatoryClosed { get; set; }
+
+    public int? StatusAdjourned { get; set; }
+
+    public int? ParticipatoryWaitArsDeadline { get; set; }
+
+    public int? ParticipatoryMissArsDeadline { get; set; }
+
+    public int? ParticipatoryWaitReinstateDeadline { get; set; }
+
+    public int? ParticipatoryMissReinstateDeadline { get; set; }
 }

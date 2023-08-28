@@ -1,0 +1,21 @@
+@import '../../styles/variables';
+
+.amendment {
+  &__buttons { margin: 40px 0 20px 0; }
+  &__form-text { margin-top: 20px; }
+  &__question-one { margin-top: 55px; }
+  &__warning { 
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+  }
+  &__uploads { margin-top: 40px; }
+  &__upload-title { color: #828282; border-bottom: 1px solid #c8c8c8; font-size: $DAC-FONT-SIZE-CONTENT-TITLES; }
+
+  &__bulk-evidence,
+  &__form {
+    font-size: $DAC-FONT-SIZE-CONTENT-TITLES;
+    .file-container { background-color: #fff6e5; margin-top: 10px; }
+    .other-evidence-description { display: none; }
+  }
+  &__bulk-evidence__container { margin-top: 35px; }
+}

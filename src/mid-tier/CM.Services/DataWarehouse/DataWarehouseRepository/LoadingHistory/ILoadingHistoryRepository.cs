@@ -5,5 +5,5 @@ namespace CM.Services.DataWarehouse.DataWarehouseRepository.LoadingHistory;
 
 public interface ILoadingHistoryRepository : IDwRepository<CM.Services.DataWarehouse.DataWarehouseDataModel.Models.LoadingHistory>
 {
-    Task<System.DateTime?> GetLastLoadStartDateTime();
+    Task<System.DateTime?> GetLastLoadStartDateTime(int factTableId);
 }

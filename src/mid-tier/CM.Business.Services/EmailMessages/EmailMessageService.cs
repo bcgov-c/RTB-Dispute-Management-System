@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.EmailMessage;
+using CM.Business.Services.Base;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
-using CM.Messages.EmailNotification.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.EmailMessages;
 
@@ -44,11 +44,10 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
         var result = await UnitOfWork.EmailMessageRepository.InsertAsync(newEmailMessage);
         await UnitOfWork.Complete();
 
-        if (newEmailMessage.SendStatus == (byte)EmailStatus.UnSent && newEmailMessage.IsActive && newEmailMessage.MessageType < (byte)EmailMessageType.Pickup)
+        if (result.ReadyToSend())
         {
-            var emailNotificationIntegrationEvent = await GenerateEmailNotificationIntegrationEvent(result);
-
-            Publish(emailNotificationIntegrationEvent);
+            var emailNotificationIntegrationEvent = await result.GenerateEmailNotificationIntegrationEvent(UnitOfWork);
+            emailNotificationIntegrationEvent.Publish(Bus);
         }
 
         return MapperService.Map<EmailMessage, EmailMessageResponse>(result);
@@ -80,7 +79,7 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
         if (messageType == (byte)EmailMessageType.Manual)
         {
             var emailGenerationIntegrationEvent = GenerateEmailGenerationIntegrationEvent(newEmailMessage, payorId);
-            Publish(emailGenerationIntegrationEvent);
+            emailGenerationIntegrationEvent.Publish(Bus);
         }
 
         return MapperService.Map<EmailMessage, EmailMessageResponse>(newEmailMessage);
@@ -107,11 +106,10 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
 
         MapperService.Map(emailMessageRequestPatch, emailMessageToPatch);
 
-        if (triggerEmail && emailMessageToPatch.MessageType < (byte)EmailMessageType.Pickup)
+        if (triggerEmail && emailMessageToPatch.ReadyToSend())
         {
-            var emailNotificationIntegrationEvent = await GenerateEmailNotificationIntegrationEvent(emailMessageToPatch);
-
-            Publish(emailNotificationIntegrationEvent);
+            var emailNotificationIntegrationEvent = await emailMessageToPatch.GenerateEmailNotificationIntegrationEvent(UnitOfWork);
+            emailNotificationIntegrationEvent.Publish(Bus);
         }
 
         UnitOfWork.EmailMessageRepository.Attach(emailMessageToPatch);
@@ -126,8 +124,7 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
 
     public async Task<EmailMessageRequestPatch> GetForPatchAsync(int emailId)
     {
-        var emailMessage = await
-            UnitOfWork.EmailMessageRepository.GetNoTrackingByIdAsync(e => e.EmailMessageId == emailId);
+        var emailMessage = await UnitOfWork.EmailMessageRepository.GetNoTrackingByIdAsync(e => e.EmailMessageId == emailId);
         return MapperService.Map<EmailMessage, EmailMessageRequestPatch>(emailMessage);
     }
 
@@ -166,23 +163,13 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
     public async Task<bool> IsMessageSentAsync(int emailId)
     {
         var email = await UnitOfWork.EmailMessageRepository.GetByIdAsync(emailId);
-        if (email?.SendStatus == (byte)EmailStatus.Sent)
-        {
-            return true;
-        }
-
-        return false;
+        return email?.SendStatus == (byte)EmailStatus.Sent;
     }
 
     public async Task<bool> EmailMessageExists(int emailId)
     {
         var emailMessage = await UnitOfWork.EmailMessageRepository.GetByIdAsync(emailId);
-        if (emailMessage != null)
-        {
-            return true;
-        }
-
-        return false;
+        return emailMessage != null;
     }
 
     public async Task<DateTime?> GetLastModifiedDateAsync(object id)
@@ -202,66 +189,81 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
 
     public async Task<bool> EmailMessageExists(int? associatedEmailId, Guid disputeGuid)
     {
-        var exists = await UnitOfWork.EmailMessageRepository.EmailMessageExists(associatedEmailId.Value, disputeGuid);
+        var exists = await UnitOfWork.EmailMessageRepository.EmailMessageExists(associatedEmailId.GetValueOrDefault(), disputeGuid);
         return exists;
     }
 
-    private async Task<EmailNotificationIntegrationEvent> GenerateEmailNotificationIntegrationEvent(EmailMessage emailMessage)
+    public async Task<bool> CreateAsync(Participant participant)
     {
-        var emailNotificationIntegrationEvent = new EmailNotificationIntegrationEvent
+        var emailTemplate = await UnitOfWork.EmailTemplateRepository
+            .GetByEmailTypeAsync(AssignedTemplate.ParticipantVerificationEmail);
+
+        var newEmailMessage = new EmailMessage();
+        newEmailMessage.DisputeGuid = participant.DisputeGuid;
+        newEmailMessage.ParticipantId = participant.ParticipantId;
+        newEmailMessage.MessageType = (byte)EmailMessageType.SystemEmail;
+        newEmailMessage.AssignedTemplateId = AssignedTemplate.ParticipantVerificationEmail;
+        newEmailMessage.EmailTo = participant.Email;
+        newEmailMessage.EmailFrom = emailTemplate.ReplyEmailAddress;
+        newEmailMessage.Subject = await GetReplacedSubject(emailTemplate.SubjectLine, participant);
+        newEmailMessage.HtmlBody = await GetReplacedBody(emailTemplate.TemplateHtml, participant);
+        newEmailMessage.IsActive = true;
+        newEmailMessage.MessageGuid = Guid.NewGuid();
+        newEmailMessage.IsDeleted = false;
+
+        var result = await UnitOfWork.EmailMessageRepository.InsertAsync(newEmailMessage);
+        var res = await UnitOfWork.Complete();
+
+        if (res.CheckSuccess())
         {
-            CorrelationGuid = Guid.NewGuid(),
-            MessageGuid = emailMessage.MessageGuid,
-            EmailMessageId = emailMessage.EmailMessageId,
-            Title = "RTB DMS Notification",
-            DisputeGuid = emailMessage.DisputeGuid,
-            PreferredSendDate = DateTime.UtcNow,
-            EmailTo = emailMessage.EmailTo,
-            EmailFrom = emailMessage.EmailFrom,
-            Body = emailMessage.HtmlBody,
-            Subject = emailMessage.Subject,
-            MessageType = emailMessage.MessageType,
-            AssignedTemplateId = emailMessage.AssignedTemplateId,
-            ParticipantId = emailMessage.ParticipantId
-        };
-
-        if (emailMessage.EmailAttachments is { Count: > 0 })
-        {
-            emailNotificationIntegrationEvent.EmailAttachments = new List<EmailAttachmentNotificationIntegrationEvent>();
-
-            foreach (var item in emailMessage.EmailAttachments)
-            {
-                var emailAttachment = new EmailAttachmentNotificationIntegrationEvent { AttachmentType = item.AttachmentType };
-
-                switch (emailAttachment.AttachmentType)
-                {
-                    case AttachmentType.Common:
-                        var commonFile = await UnitOfWork.CommonFileRepository.GetByIdAsync(item.CommonFileId.GetValueOrDefault());
-
-                        if (commonFile != null)
-                        {
-                            emailAttachment.FileId = commonFile.CommonFileId;
-                        }
-
-                        break;
-                    case AttachmentType.Dispute:
-                        var file = await UnitOfWork.FileRepository.GetByIdAsync(item.FileId.GetValueOrDefault());
-
-                        if (file != null)
-                        {
-                            emailAttachment.FileId = file.FileId;
-                        }
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(emailMessage));
-                }
-
-                emailNotificationIntegrationEvent.EmailAttachments.Add(emailAttachment);
-            }
+            var emailNotificationIntegrationEvent = await result.GenerateEmailNotificationIntegrationEvent(UnitOfWork);
+            emailNotificationIntegrationEvent.Publish(Bus);
+            return true;
         }
 
-        return emailNotificationIntegrationEvent;
+        return false;
+    }
+
+    public async Task<bool> VerifyCode(Participant participant, EmailVerificationRequest request)
+    {
+        switch (request.VerificationType)
+        {
+            case VerificationType.Email:
+                participant.EmailVerified = true;
+                break;
+            case VerificationType.PrimaryPhone:
+                participant.PrimaryPhoneVerified = true;
+                break;
+            case VerificationType.SecondaryPhone:
+                participant.SecondaryPhoneVerified = true;
+                break;
+        }
+
+        UnitOfWork.ParticipantRepository.Update(participant);
+        var res = await UnitOfWork.Complete();
+
+        return res.CheckSuccess();
+    }
+
+    public async Task<ExternalEmailMessagesResponse> GetExternalDisputeEmailMessages(Guid disputeGuid, ExternalEmailMessagesRequest request, int count, int index)
+    {
+        if (count == 0)
+        {
+            count = Pagination.DefaultPageSize;
+        }
+
+        var(emailMessages, totalCount) = await UnitOfWork.EmailMessageRepository.GetExternalEmailMessages(disputeGuid, request);
+        if (emailMessages != null)
+        {
+            var emailResponse = new ExternalEmailMessagesResponse
+            {
+                EmailMessages = MapperService.Map<List<EmailMessage>, List<ExternalEmailMessageResponse>>(emailMessages).ApplyPaging(count, index),
+                TotalAvailableCount = totalCount
+            };
+            return emailResponse;
+        }
+
+        return null;
     }
 
     private EmailGenerateIntegrationEvent GenerateEmailGenerationIntegrationEvent(EmailMessage emailMessage, int payorId)
@@ -277,39 +279,24 @@ public class EmailMessageService : CmServiceBase, IEmailMessageService
         return emailNotificationIntegrationEvent;
     }
 
-    private void Publish(EmailGenerateIntegrationEvent message)
+    private async Task<string> GetReplacedBody(string templateHtml, Participant participant)
     {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
+        var dispute = await UnitOfWork.DisputeRepository.GetDispute(participant.DisputeGuid);
+        var disputeAccessUrl = await UnitOfWork.SystemSettingsRepository.GetSetting(SettingKeys.DisputeAccessUrl);
+        var builder = new StringBuilder(templateHtml);
+        builder.Replace("{file_number}", dispute.FileNumber.ToString());
+        builder.Replace("{email-verify-code}", participant.EmailVerifyCode);
+        builder.Replace("{dispute_access_url}", disputeAccessUrl.Value);
 
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
+        return builder.ToString();
     }
 
-    private void Publish(EmailNotificationIntegrationEvent message)
+    private async Task<string> GetReplacedSubject(string subjectLine, Participant participant)
     {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {CorrelationGuid} {DisputeGuid} {AssignedTemplateId}", message.CorrelationGuid, message.DisputeGuid, message.AssignedTemplateId);
-                }
+        var dispute = await UnitOfWork.DisputeRepository.GetDispute(participant.DisputeGuid);
+        var builder = new StringBuilder(subjectLine);
+        builder.Replace("<file_number>", dispute.FileNumber.ToString());
 
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
+        return builder.ToString();
     }
 }

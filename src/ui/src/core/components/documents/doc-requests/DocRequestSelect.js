@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View which wraps a Dropdown and Checkbox. Used to select a OutcomeDocGroup and OutcomeDoc to associate a DocRequest to.
+ */
 import Radio from 'backbone.radio';
 import Marionette from 'backbone.marionette';
 import React from 'react';
@@ -9,19 +12,17 @@ import CheckboxCollection from '../../checkbox/Checkbox_collection';
 import CheckboxModel from '../../checkbox/Checkbox_model';
 import CheckboxView from '../../checkbox/Checkbox';
 import './doc-request-select.css';
-import _ from 'underscore';
 
 const configChannel = Radio.channel('config');
-const documentsChannel = Radio.channel('documents');
 
 const DocRequestSelect = Marionette.View.extend({
   /**
    * @param {DocRequestModel} model - The doc request model
    * @param {OutcomeDocGroupModel} docGroupCollection - All outcome doc groups (with outcome doc files) on the dispute
-   * @param {Function} getValidDocFilesFromGroupFn - A function which recives an OutcomeDocGroupModel and returns the valid outcome doc files
-   * @param {Boolean} singleAutoSelect - Determines whether doc groups with one doc should be selected by default
-   * @param {Boolean} autoSelectAll - All available checkboxes will be selected, and the checkbox hidden.  If not passed in, Review requests default to autoSelectAll=true
-   * @param {Boolean} showOptOut - Determines whether to show the opt-out featuer
+   * @param {Function} [getValidDocFilesFromGroupFn] - A function which recives an OutcomeDocGroupModel and returns the valid outcome doc files
+   * @param {Boolean} [singleAutoSelect] - Determines whether doc groups with one doc should be selected by default
+   * @param {Boolean} [autoSelectAll] - All available checkboxes will be selected, and the checkbox hidden.  If not passed in, Review requests default to autoSelectAll=true
+   * @param {Boolean} [showOptOut] - Determines whether to show the opt-out feature
    */
   initialize(options) {
     this.template = this.template.bind(this);
@@ -37,11 +38,9 @@ const DocRequestSelect = Marionette.View.extend({
 
     this.docGroupCollection.forEach(docGroup => {
       const validOutcomeFiles = this.getValidDocFilesFromGroupFn(docGroup) || [];
-
       const checkboxOptions = validOutcomeFiles.map(docFile => {
-        const docConfig = documentsChannel.request('config:file', docFile.get('file_type') || {});
         return {
-          html: docConfig.group_title,
+          html: docFile?.config.group_title,
           checked: !!affectedDocumentIds.find(docId => docId === docFile.id),
           _docFileId: docFile.id,
           _isDecision: docFile.isDecision(),
@@ -65,22 +64,23 @@ const DocRequestSelect = Marionette.View.extend({
 
   createSubModels() {
     const isRequired = !this.model.isSubTypeOutside();
+    const shouldOptOutBeSelected = !isRequired && !this.model.get('outcome_doc_group_id');
     const groupId = String(this.model.get('outcome_doc_group_id'));
     this.dropdownModel = new DropdownModel({
       optionData: this.optionData,
       labelText: 'Available documents',
       errorMessage: 'Select an available document',
-      disabled: this.optionData.length === 0 || !isRequired,
+      disabled: shouldOptOutBeSelected,
       defaultBlank: true,
-      required: isRequired,
-      value: isRequired && this.optionData.find(obj => obj.value === groupId) ? groupId : null,
+      required: this.optionData.length > 0 && !shouldOptOutBeSelected,
+      value: this.optionData.find(obj => obj.value === groupId) ? groupId : null,
       apiMapping: 'outcome_doc_group_id'
     });
 
     this.optOutModel = new CheckboxModel({
       html: 'Not on this file',
       required: false,
-      checked: !isRequired,
+      checked: shouldOptOutBeSelected,
       apiMapping: 'request_sub_type'
     });
 

@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using CM.Business.Services.Base;
 using CM.Business.Services.SystemSettingsService;
 using CM.Common.Utilities;
 using CM.Data.Repositories.UnitOfWork;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
-using Serilog;
 
 namespace CM.Business.Services.ScheduledHearingReminder;
 
@@ -47,7 +47,7 @@ public class ScheduledReminderService : CmServiceBase, IScheduledReminderService
                     AssignedTemplateId = AssignedTemplate.ParticipatoryApplicantEvidenceReminder
                 };
 
-                Publish(message);
+                message.Publish(Bus);
             }
         }
 
@@ -73,7 +73,7 @@ public class ScheduledReminderService : CmServiceBase, IScheduledReminderService
                     AssignedTemplateId = AssignedTemplate.ParticipatoryHearingReminder
                 };
 
-                Publish(message);
+                message.Publish(Bus);
             }
         }
 
@@ -105,7 +105,7 @@ public class ScheduledReminderService : CmServiceBase, IScheduledReminderService
                     AssignedTemplateId = AssignedTemplate.ParticipatoryRespondentEvidenceReminder
                 };
 
-                Publish(message);
+                message.Publish(Bus);
             }
         }
 
@@ -122,7 +122,7 @@ public class ScheduledReminderService : CmServiceBase, IScheduledReminderService
 
         foreach (var firstDisputeHearing in hearingReminders.Select(hearing => hearing.DisputeHearings.FirstOrDefault()))
         {
-            if (firstDisputeHearing?.DisputeGuid != null && firstDisputeHearing?.Dispute.DisputeUrgency == (byte)DisputeUrgency.Emergency)
+            if (firstDisputeHearing?.DisputeGuid != null && firstDisputeHearing.Dispute.DisputeUrgency == (byte)DisputeUrgency.Emergency)
             {
                 var closedForSubmission = await UnitOfWork.DisputeStatusRepository.IsClosedForSubmission(firstDisputeHearing.DisputeGuid.Value);
                 if (closedForSubmission)
@@ -137,27 +137,10 @@ public class ScheduledReminderService : CmServiceBase, IScheduledReminderService
                     AssignedTemplateId = AssignedTemplate.EmergRespondentEvidenceReminder
                 };
 
-                Publish(message);
+                message.Publish(Bus);
             }
         }
 
         return true;
-    }
-
-    private void Publish(EmailGenerateIntegrationEvent message)
-    {
-        Bus.PubSub.PublishAsync(message)
-            .ContinueWith(task =>
-            {
-                if (task.IsCompleted)
-                {
-                    Log.Information("Publish email generation event: {DisputeGuid} {MessageType}", message.DisputeGuid, message.MessageType);
-                }
-                if (task.IsFaulted)
-                {
-                    Log.Error(task.Exception, "CorrelationGuid = {CorrelationGuid}", message.CorrelationGuid);
-                    throw new Exception($"Message = {message.CorrelationGuid} exception", task.Exception);
-                }
-            });
     }
 }

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View for creating a dispute task
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import TextareaView from '../../../core/components/textarea/Textarea';

@@ -39,17 +39,23 @@
 
       <div class="calendar-grid-event-column">
         <div class="calendar-grid-time-wrapper">
-
         <% if (eventData && eventData.length > 0) { %>
           <% _.escape.each(eventData, function(rowData, rowEventIndex) { %>
             <div class="today-calendar-grid-time-flex">
               <ul class="today-calendar-grid-time-ul">
                 <% _.escape.each(headerLabelData, function(labelData, labelIndex) { %>
                 <% var currentCellId = String(labelIndex)+String(rowEventIndex) %>
-                <% var blockData = rowData.getBlockData(labelIndex, rowEventIndex) || {} %>
                 <% var isColPrintable = printableColumns && printableColumns.indexOf(labelIndex) !== -1 %>
+                <% var blockData = rowData.getBlockData(labelIndex, rowEventIndex) || {} %>
+                <% var prevBlockData = rowData.getBlockData(labelIndex-1, rowEventIndex) || {} %>
+                <% var nextBlockData = rowData.getBlockData(labelIndex+1, rowEventIndex) || {} %>
+                <% var currPos = Number(labelIndex); %>
+                <% var showBackgroundClass = blockData && 
+                  (!blockData.startMinutes || (blockData.startPos && blockData.startPos < currPos)) &&
+                  (!blockData.endMinutes || (blockData.endPos && blockData.endPos > currPos))
+                %>
                 <li id="cell-<%= currentCellId %>" class="today-calendar-grid-time-item <%= (labelIndex === 0) ? 'no-left-border' : (labelIndex === borderCol) ? 'double-left-border' : '' %>
-                  <%= blockData && !blockData.startMinutes && !blockData.endMinutes ? blockData.class : '' %> <%= isColPrintable ? '' : 'hidden-print' %>">
+                  <%= showBackgroundClass ? blockData.class : '' %> <%= isColPrintable ? '' : 'hidden-print' %>">
 
                   <% if (rowData.events && rowData.events.length > 0) {%>
                     <% _.escape.each(rowData.events, function(event) { %>
@@ -64,13 +70,21 @@
 
                     <% }); %>
                   <% } %>
+
+                  <div class="calendar-grid-time-item--block-offsets">
+                    <% if (blockData && blockData.startMinutes && currPos === blockData.startPos) { %>
+                      <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
+                    <% } else if (nextBlockData && nextBlockData.startMinutes && nextBlockData.startPos === currPos) { %>
+                    <div class="calendar-grid-time-item--block-start-offset <%= nextBlockData.class %>"></div>
+                    <% } %>
+  
+                    <% if (blockData && blockData.endMinutes && currPos === blockData.endPos) { %>
+                        <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
+                    <% } else if (prevBlockData && prevBlockData.endMinutes && prevBlockData.endPos === currPos) { %>
+                      <div class="calendar-grid-time-item--block-end-offset <%= prevBlockData.class %>"></div>
+                    <% } %>
+                  </div>
                   
-                  <% if (blockData && blockData.startMinutes) { %>
-                    <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
-                  <% } %>
-                  <% if (blockData && blockData.endMinutes) { %>
-                    <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
-                  <% } %>
                 </li>
                 <% }); %>
               </ul>
@@ -78,16 +92,33 @@
           <% }); %>
         <% } else { %>
           <% _.escape.each(headerLabelData, function(labelData, labelIndex) { %>
+            <% var currentCellId = String(labelIndex) %>
+            <% var isColPrintable = printableColumns && printableColumns.indexOf(labelIndex) !== -1 %>
             <% var blockData = getBlockData(labelIndex) || {} %>
-            <li id="cell-<%= String(labelIndex) %>" class="today-calendar-grid-time-item <%= (labelIndex === 0) ? 'no-left-border' : (labelIndex === borderCol) ? 'double-left-border' : '' %>
-              <%= blockData && !blockData.startMinutes && !blockData.endMinutes ? blockData.class : '' %>">
-              <% if (blockData && blockData.startMinutes) { %>
-                <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
-              <% } %>
-              <% if (blockData && blockData.endMinutes) { %>
-                <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
-              <% } %>
-              <span>&nbsp;</span>
+            <% var prevBlockData = getBlockData(labelIndex-1) || {} %>
+            <% var nextBlockData = getBlockData(labelIndex+1) || {} %>
+            <% var currPos = Number(labelIndex); %>
+            <% var showBackgroundClass = blockData && 
+              (!blockData.startMinutes || (blockData.startPos && blockData.startPos < currPos)) &&
+              (!blockData.endMinutes || (blockData.endPos && blockData.endPos > currPos))
+            %>
+
+            <li id="cell-<%= currentCellId %>" class="today-calendar-grid-time-item <%= (labelIndex === 0) ? 'no-left-border' : (labelIndex === borderCol) ? 'double-left-border' : '' %>
+              <%= showBackgroundClass ? blockData.class : '' %> <%= isColPrintable ? '' : 'hidden-print' %>">
+
+              <div class="calendar-grid-time-item--block-offsets">
+                <% if (blockData && blockData.startMinutes && currPos === blockData.startPos) { %>
+                  <div class="calendar-grid-time-item--block-start-offset <%= blockData.class %>"></div>
+                <% } else if (nextBlockData && nextBlockData.startMinutes && nextBlockData.startPos === currPos) { %>
+                <div class="calendar-grid-time-item--block-start-offset <%= nextBlockData.class %>"></div>
+                <% } %>
+
+                <% if (blockData && blockData.endMinutes && currPos === blockData.endPos) { %>
+                    <div class="calendar-grid-time-item--block-end-offset <%= blockData.class %>"></div>
+                <% } else if (prevBlockData && prevBlockData.endMinutes && prevBlockData.endPos === currPos) { %>
+                  <div class="calendar-grid-time-item--block-end-offset <%= prevBlockData.class %>"></div>
+                <% } %>
+              </div>
             </li>
           <% }); %>
         <% } %>

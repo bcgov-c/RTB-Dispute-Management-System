@@ -14,6 +14,7 @@ export default Marionette.CollectionView.extend({
       participantTypes: this.getOption('participantTypes'),
       enableBirthday: this.getOption('enableBirthday'),
       enableDelete: this.getOption('enableDelete'),
+      enableCountrySelection: this.getOption('enableCountrySelection'),
       showNameWarning: this.getOption('showNameWarning'),
     };
   },

@@ -40,7 +40,10 @@
               <div class="hearing-end-time"></div>
       
               <div class="hearing-notice-generated-info">
-                <label class="review-label">Notice generated for this hearing:</label>&nbsp;<span><%= noticeGeneratedDisplay %></span>
+                <label class="review-label">Dispute Notice generated for this hearing:</label>&nbsp;<span><%= noticeGeneratedDisplay %></span>
+              </div>
+              <div class="hearing-notice-generated-info">
+                <label class="review-label">Hearing Notice:</label>&nbsp;<div class="hearing-notice-generated-files"><%= hearingNoticeDisplay %></div>
               </div>
       
               <div class="spacer-block-30"></div>
@@ -57,7 +60,7 @@
       
                 <div class="spacer-block-10"></div>
                 <div class="">
-                  <label class="review-label">Participant Access Code:</label>&nbsp;<span><%= conferenceBridgeData.participant_code %></span>
+                  <label class="review-label">Teleconference Access Code:</label>&nbsp;<span><%= conferenceBridgeData.participant_code %></span>
                 </div>
               </div>
               <div class="<%= isConference ? 'hidden' : '' %>">
@@ -73,7 +76,6 @@
           <div class="dispute-party-column right-column hearing-actions">
             <div class="hearing-owner-display"></div>
             <div class="hearing-priority-edit"></div> 
-            <% if (isReserved) { %> <span class="hearing-on-hold-view">On Hold</span> <% } %>
             <div class="hearing-on-hold-edit"></div>
             <div class="hearing-priority-edit-warning error-block hidden-item">Duty hearings should not be set to other priorities</div>
             <div class="spacer-block-10"></div>

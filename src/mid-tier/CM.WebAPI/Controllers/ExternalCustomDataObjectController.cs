@@ -6,7 +6,6 @@ using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
 using CM.WebAPI.Jwt;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -88,6 +87,15 @@ public class ExternalCustomDataObjectController : BaseController
                 if (userExists is not { SystemUserRoleId: (int)Roles.StaffUser })
                 {
                     return BadRequest(string.Format(ApiReturnMessages.InvalidExternalCustomDataObjectOwner));
+                }
+            }
+
+            var(expiryExists, expiryValue) = externalCustomObjectRequest.GetValue<DateTime?>("/external_user_session_expiry");
+            if (expiryExists)
+            {
+                if (expiryValue.HasValue && expiryValue.Value <= DateTime.UtcNow)
+                {
+                    return BadRequest(ApiReturnMessages.InvalidExpiryDate);
                 }
             }
 

@@ -113,6 +113,7 @@ export default ModalBaseView.extend({
 
     this.fileUploader = filesChannel.request('create:uploader', {
       processing_options: {
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
         maxNumberOfFiles: 1,
         checkForDisputeDuplicates: false,
         allowedFileTypes: configChannel.request('get', 'VALID_OUTCOME_DOC_FILE_TYPES')

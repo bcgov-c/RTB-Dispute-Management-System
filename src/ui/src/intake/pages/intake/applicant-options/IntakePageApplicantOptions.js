@@ -8,7 +8,9 @@ import RadioView from '../../../../core/components/radio/Radio';
 import RadioModel from '../../../../core/components/radio/Radio_model';
 import CheckboxView from '../../../../core/components/checkbox/Checkbox';
 import CheckboxModel from '../../../../core/components/checkbox/Checkbox_model';
+import ParticipantModel from '../../../../core/components/participant/Participant_model';
 import template from './IntakePageApplicantOptions_template.tpl';
+import ModalEmailVerification from '../../../../core/components/email-verification/ModalEmailVerification';
 
 const paymentsChannel = Radio.channel('payments');
 const configChannel = Radio.channel('config');
@@ -17,11 +19,13 @@ const participantsChannel = Radio.channel('participants');
 const applicationChannel = Radio.channel('application');
 const filesChannel = Radio.channel('files');
 const loaderChannel = Radio.channel('loader');
+const modalChannel = Radio.channel('modals');
 
 export default PageView.extend({
   template,
 
   // Don't use the 'ui' hash for this because we have to search it dynamically
+  JUNK_MAIL_MESSAGE_CLASS: 'junk-email-msg',
   RADIO_SEPARATOR_SELECTOR: '.intake-radio-separator',
   EMAIL_REGION: {
     name: 'emailRegion',
@@ -72,7 +76,10 @@ export default PageView.extend({
 
   showEmailInput() {
     if (!this.$(this.EMAIL_REGION.selector) || !this.$(this.EMAIL_REGION.selector).length) {
-      this.$(this.RADIO_SEPARATOR_SELECTOR).before(`<div id="${this.EMAIL_REGION.id}"></div>`);
+      this.$(this.RADIO_SEPARATOR_SELECTOR).before(`
+        <p class="${this.JUNK_MAIL_MESSAGE_CLASS}">You will be receiving e-mails directly from the Residential Tenancy Branch with important information and documents. It is important to check your Junk e-mail folders and add noreply.rtb@gov.bc.ca to your preferred contacts when possible.</p>
+        <div id="${this.EMAIL_REGION.id}"></div>
+      `);
     }
 
     if (!this.$(this.EMAIL_REGION.selector) || !this.$(this.EMAIL_REGION.selector).length) {
@@ -117,6 +124,7 @@ export default PageView.extend({
     const emailRegion = this.getRegion(this.EMAIL_REGION.name);
     if (emailRegion) {
       this.removeRegion(this.EMAIL_REGION.name);
+      $(`.${this.JUNK_MAIL_MESSAGE_CLASS}`).remove();
     }
     this.$(this.EMAIL_REGION.selector).remove();
   },
@@ -193,7 +201,7 @@ export default PageView.extend({
 
 
   getProvideEmailMessageFor(primaryApplicant) {
-    return !primaryApplicant.get('email_verified') ? `${this.PROVIDED_BY_EMAIL_TEXT_NOT_VERIFIED} ${primaryApplicant.getDisplayName()} by entering it again below` :
+    return !primaryApplicant.get('email_verified') ? `${this.PROVIDED_BY_EMAIL_TEXT_NOT_VERIFIED} ${primaryApplicant.getDisplayName()} by entering it again below.` :
         `${this.PROVIDED_BY_EMAIL_TEXT} ${primaryApplicant.getDisplayName()} (${primaryApplicant.get('email')})`;
   },
 
@@ -351,6 +359,18 @@ export default PageView.extend({
     Backbone.history.navigate('page/2', {trigger: true});
   },
 
+  saveInternalDataToModel() {
+    const applicants = participantsChannel.request('get:applicants');
+    const consentModel = this.getPageItem('consentRegion')?.getModel();
+    const documentsModel = this.getPageItem('documentsRegion')?.getModel();
+
+    applicants.forEach(applicant => {
+      applicant.set(Object.assign({
+        accepted_tou: !!consentModel?.getData(),
+        accepted_tou_date: consentModel?.getData() ? Moment() : null,
+      }, documentsModel?.getPageApiDataAttrs()))
+    });
+  },
 
   getPageApiUpdates() {
     const all_xhr = [],
@@ -407,6 +427,27 @@ export default PageView.extend({
   },
 
   nextPage() {
+    const goToNextPage = () => {
+      const all_xhr = this.getPageApiUpdates();  
+  
+      const onNextSuccessFn = function() {
+        applicationChannel.trigger('progress:step:complete', 3);
+        Backbone.history.navigate('page/4', {trigger: true});
+      };
+  
+      if (all_xhr.length === 0) {
+        console.log("[Info] No changes to the Participants or Claim Group Participants.  Moving to next page");
+        onNextSuccessFn();
+        return;
+      }
+  
+      loaderChannel.trigger('page:load');
+      Promise.all(all_xhr.map(xhr => xhr())).then(() => {
+        loaderChannel.trigger('page:load:complete');
+        onNextSuccessFn();
+      }, this.createPageApiErrorHandler(this, 'INTAKE.PAGE.NEXT.APPLICANT_OPTIONS'));
+    }
+
     if (!this.validatePage() || !this.validateEmailMatches({ no_scroll: true })) {
       console.log(`[Info] Page did not pass validation checks`);
       const visible_error_eles = this.$('.error-block:visible').filter(function() { return $.trim($(this).html()) !== ""; });
@@ -418,25 +459,24 @@ export default PageView.extend({
       return;
     }
 
+    const documentsPageItem = this.getPageItem('documentsRegion')
+    const selectedDocOption = documentsPageItem.subView.model.getData();
+    const applicants = participantsChannel.request('get:applicants');
+    const primaryApplicant = participantsChannel.request('get:primaryApplicant');
+    const currentlySelectedApplicant = applicants.at( primaryApplicant && applicants.indexOf(primaryApplicant) ? applicants.indexOf(primaryApplicant) : 0 );
 
-    const all_xhr = this.getPageApiUpdates();  
+    if (selectedDocOption === configChannel.request('get', 'SEND_METHOD_EMAIL') && !currentlySelectedApplicant.get('email_verified')) {
+      const emailVerificationModal = new ModalEmailVerification({ participantSaveModel: ParticipantModel, participant: currentlySelectedApplicant, fetchParticipantAfterVerification: true });
+      modalChannel.request('add', emailVerificationModal);
 
-    const onNextSuccessFn = function() {
-      applicationChannel.trigger('progress:step:complete', 3);
-      Backbone.history.navigate('page/4', {trigger: true});
-    };
-
-    if (all_xhr.length === 0) {
-      console.log("[Info] No changes to the Participants or Claim Group Participants.  Moving to next page");
-      onNextSuccessFn();
-      return;
+      this.listenTo(emailVerificationModal, 'removed:modal', () => {
+        // Email validation can refresh the participant and cause changes on this page to be lost before save.
+        // Ensure page changes are applied to local models before trying to save models.
+        this.saveInternalDataToModel();
+        goToNextPage();
+      });
+    } else {
+      goToNextPage();
     }
-
-    loaderChannel.trigger('page:load');
-    Promise.all(all_xhr.map(xhr => xhr())).then(() => {
-      this.intake_applicants_to_remove = [];
-      loaderChannel.trigger('page:load:complete');
-      onNextSuccessFn();
-    }, this.createPageApiErrorHandler(this, 'INTAKE.PAGE.NEXT.APPLICANT_OPTIONS'));
   }
 });

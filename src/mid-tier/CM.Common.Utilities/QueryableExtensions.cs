@@ -11,6 +11,12 @@ public static class QueryableExtensions
         return query.Skip(index * count).Take(count);
     }
 
+    public static List<T> ApplyPaging<T>(this IEnumerable<T> list, int count, int index)
+    {
+        var result = list.Skip(index * count).Take(count);
+        return result.ToList();
+    }
+
     public static IQueryable<T> ApplyPagingArrayStyle<T>(this IQueryable<T> query, int count, int index)
     {
         return query.Skip(index).Take(count);

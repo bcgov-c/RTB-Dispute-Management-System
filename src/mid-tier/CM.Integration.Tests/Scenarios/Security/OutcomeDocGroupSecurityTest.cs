@@ -30,6 +30,9 @@ public partial class SecurityTests
         var outcomeDocGroupGetAllResponse = OutcomeDocGroupManager.GetDisputeOutcomeDocGroups(Client, Data.Dispute.DisputeGuid);
         outcomeDocGroupGetAllResponse.CheckStatusCode();
 
+        var externalOutcomeDocGroupResponse = OutcomeDocGroupManager.GetExternalOutcomeDocGroups(Client, Data.Dispute.DisputeGuid, new ExternalOutcomeDocGroupRequest() { DeliveryParticipantIds = new int[] { Data.Participant.ParticipantId } });
+        externalOutcomeDocGroupResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -47,6 +50,15 @@ public partial class SecurityTests
 
         outcomeDocGroupGetAllResponse = OutcomeDocGroupManager.GetDisputeOutcomeDocGroups(Client, Data.Dispute.DisputeGuid);
         outcomeDocGroupGetAllResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalOutcomeDocGroupResponse = OutcomeDocGroupManager.GetExternalOutcomeDocGroups(Client, Data.Dispute.DisputeGuid, new ExternalOutcomeDocGroupRequest() { DeliveryParticipantIds = new int[] { Data.Participant.ParticipantId } });
+        externalOutcomeDocGroupResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
+        // LOGIN AS EXTERNAL User2
+        Client.Authenticate(Users.User2, Users.User2);
+
+        externalOutcomeDocGroupResponse = OutcomeDocGroupManager.GetExternalOutcomeDocGroups(Client, Data.Dispute.DisputeGuid, new ExternalOutcomeDocGroupRequest() { DeliveryParticipantIds = new int[] { Data.Participant.ParticipantId } });
+        externalOutcomeDocGroupResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -67,6 +79,9 @@ public partial class SecurityTests
         outcomeDocGroupGetAllResponse = OutcomeDocGroupManager.GetDisputeOutcomeDocGroups(Client, Data.Dispute.DisputeGuid);
         outcomeDocGroupGetAllResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        externalOutcomeDocGroupResponse = OutcomeDocGroupManager.GetExternalOutcomeDocGroups(Client, Data.Dispute.DisputeGuid, new ExternalOutcomeDocGroupRequest() { DeliveryParticipantIds = new int[] { Data.Participant.ParticipantId } });
+        externalOutcomeDocGroupResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -84,5 +99,8 @@ public partial class SecurityTests
 
         outcomeDocGroupGetAllResponse = OutcomeDocGroupManager.GetDisputeOutcomeDocGroups(Client, Data.Dispute.DisputeGuid);
         outcomeDocGroupGetAllResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalOutcomeDocGroupResponse = OutcomeDocGroupManager.GetExternalOutcomeDocGroups(Client, Data.Dispute.DisputeGuid, new ExternalOutcomeDocGroupRequest() { DeliveryParticipantIds = new int[] { Data.Participant.ParticipantId } });
+        externalOutcomeDocGroupResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
     }
 }

@@ -86,6 +86,24 @@ public class HearingResponse : CommonResponse
 
     [JsonIgnore]
     public int? HearingReservedById { get; set; }
+
+    [JsonProperty("notification_file_description_id")]
+    public int? NotificationFileDescriptionId { get; set; }
+
+    [JsonProperty("hearing_reserved_dispute_guid")]
+    public Guid? HearingReservedDisputeGuid { get; set; }
+
+    [JsonProperty("hearing_reserved_file_number")]
+    public int? HearingReservedFileNumber { get; set; }
+
+    [JsonProperty("notification_delivery_description")]
+    public string NotificationDeliveryDescription { get; set; }
+
+    [JsonProperty("notification_delivery_date")]
+    public string NotificationDeliveryDate { get; set; }
+
+    [JsonProperty("conference_type")]
+    public byte? ConferenceType { get; set; }
 }
 
 public class DisputeListHearingResponse : HearingResponse

@@ -26,6 +26,9 @@ import TrialLogic_BIGEvidence from '../../../core/components/trials/BIGEvidence/
 
 import ModalSelectRentIncreaseNotice from './modals/ModalSelectRentIncreaseNotice';
 import NoticeAutoActions from '../../../core/components/auto-actions/NoticeAutoActions';
+import FileBlockDisplay from '../common-files/FileBlockDisplay';
+import File_collection from '../../../core/components/files/File_collection';
+import ApplicantRequiredService from '../../../core/components/service/ApplicantRequiredService';
 
 const participantsChannel = Radio.channel('participants');
 const filesChannel = Radio.channel('files');
@@ -39,6 +42,8 @@ const modalChannel = Radio.channel('modals');
 const Formatter = Radio.channel('formatter').request('get');
 const configChannel = Radio.channel('config');
 const emailsChannel = Radio.channel('emails');
+const statusChannel = Radio.channel('status');
+const claimsChannel = Radio.channel('claims');
 
 let UAT_TOGGLING = {};
 const HEARING_TOOLS_CLASS = 'hearing-tools-enabled';
@@ -63,6 +68,7 @@ export default PageView.extend({
   regions: {
     disputeFlags: '.dispute-flags',
     showHearingToolsRegion: '.dispute-overview-claims-hearing-tools',
+    hearingNotices: '.notice-page__hearing-notices',
     noticeList: '@ui.noticeList',
     amendmentsList: '#amendment-list-container'
   },
@@ -111,31 +117,68 @@ export default PageView.extend({
   },
 
 
-  clickAddDisputeNotice(options={}) {
+  async clickAddDisputeNotice() {
     if (this.dispute.isHearingRequired() && !this.activeHearing) {
       noticeChannel.request('show:missingHearing:modal');
       return;
     }
 
-    if (!options.skipGenerate) {
+    const showArsConfirmationModalSetDeadlines = () => new Promise(res => {
+      let withDeadlines = false;
+      const onComplete = () => res(withDeadlines);
+      if (ApplicantRequiredService.canGenerateNoticeARS(this.dispute, claimsChannel.request('get'), hearingChannel.request('get:latest'), null, this.notices)) {
+        const modalView = modalChannel.request('show:standard', {
+          title: `Apply ARS Deadlines?`,
+          bodyHtml: `<div>
+            <p>This file has Applicant Required Service (ARS) deadlines.</p>
+            <p>Select "Continue with Deadlines" to generate ARS deadlines.</p>
+            <p>Only select "Remove Deadlines" if you confirmed this file should continue without ARS deadlines.</p>
+          </div>`,
+          primaryButtonText: `Continue With Deadlines`,
+          cancelButtonText: `Remove Deadlines`,
+          onContinueFn(_modalView) {
+            // Enable ARS deadlines only if the user opts-in
+            withDeadlines = true;
+            _modalView.close();
+          }
+        });
+        this.listenTo(modalView, 'removed:modal', onComplete);
+      } else {
+        onComplete();
+      }
+    });
+    const showAutoEmailConfirmationModal = (noticeViewOptions) => new Promise(res => {
       const autoActionTemplate = NoticeAutoActions.getAutoActionEmailTemplateId();
       if (autoActionTemplate) {
-        NoticeAutoActions.startAutoSendTemplate(autoActionTemplate).then(didComplete => {
-          if (didComplete) Backbone.history.loadUrl(Backbone.history.fragment);
-          else this.clickAddDisputeNotice({ skipGenerate: true });
+        NoticeAutoActions.startAutoSendTemplate(autoActionTemplate, noticeViewOptions).then(didComplete => {
+          res(didComplete);
         });
-        return;
+      } else {
+        res(false);
       }
+    });
+
+
+    const isArsEnabled = await showArsConfirmationModalSetDeadlines();
+    const noticeViewOptions = {
+      isArsEnabled,
+      isPrelim: false,
+    };
+    const didAutoEmail = await showAutoEmailConfirmationModal(noticeViewOptions);
+    if (didAutoEmail) {
+      return Backbone.history.loadUrl(Backbone.history.fragment);
     }
 
-    if (this.isDisputeCreatedAriC) {
+    if (this.isDisputeCreatedAriE || this.isDisputeCreatedPFR) {
       const eventDispatcher = new Backbone.Model();
-      this._showModalAddNoticeWithEditCheck(ModalSelectRentIncreaseNotice, { parentModel: eventDispatcher });
+      const noticeTypeDisplay = this.isDisputeCreatedAriE ? 'ARI-E' : this.isDisputeCreatedPFR ? 'PFR': null;
+      this._showModalAddNoticeWithEditCheck(ModalSelectRentIncreaseNotice, { parentModel: eventDispatcher, noticeTypeDisplay });
       this.listenTo(eventDispatcher, 'click:continue', (isPrelim) => {
-        this._showModalAddNoticeWithEditCheck(ModalAddUnitTypeNoticeView, { isPrelim });
+        noticeViewOptions.isPrelim = isPrelim;
+        this._showModalAddNoticeWithEditCheck(ModalAddUnitTypeNoticeView, noticeViewOptions);
       });
     } else {
-      this._showModalAddNoticeWithEditCheck( this.isDisputeUnitType || this.isDisputeCreatedAriE ? ModalAddUnitTypeNoticeView : ModalAddNoticeView );
+      this._showModalAddNoticeWithEditCheck(this.isDisputeUnitType ? ModalAddUnitTypeNoticeView : ModalAddNoticeView, noticeViewOptions);
     }
   },
 
@@ -174,7 +217,7 @@ export default PageView.extend({
     
     let noticePreviewClass = NoticePreviewView;
     if (this.dispute.isCreatedRentIncrease()) noticePreviewClass = AriNoticePreviewView;
-    else if (this.dispute.isCreatedPfr()) noticePreviewClass = PfrNoticePreviewView;
+    else if (this.isDisputeCreatedPFR) noticePreviewClass = PfrNoticePreviewView;
     
     this._showModalAddNoticeWithEditCheck(ModalDownloadNoticeView, { noticePreviewClass, noticePreviewOptions });
   },
@@ -246,7 +289,8 @@ export default PageView.extend({
     const dispute_guid = disputeChannel.request('get:id');
     Promise.all([
       amendmentsChannel.request('load', dispute_guid),
-      emailsChannel.request('load:templates')
+      emailsChannel.request('load:templates'),
+      statusChannel.request('load:status', dispute_guid)
     ]).then(([amendmentCollection]) => {
       loaderChannel.trigger('page:load:complete');
       this.amendments_loaded = true;
@@ -296,7 +340,14 @@ export default PageView.extend({
 
     this.isDisputeCreatedAriC = this.dispute.isCreatedAriC();
     this.isDisputeCreatedAriE = this.dispute.isCreatedAriE();
+    this.isDisputeCreatedPFR = this.dispute.isCreatedPfr();
     this.isDisputeUnitType = this.dispute.isUnitType();
+    
+    console.log(hearingChannel.request('get'))
+    console.log(hearingChannel.request('get').map(h => {
+      return h.getHearingNoticeFileDescription()
+    }));
+    this.hearingNoticeFileDescriptions = hearingChannel.request('get')?.map(h => h.getHearingNoticeFileDescription()).filter(h => h);
     
     // Hide any loaders on init, because there is an internal page loader already
     loaderChannel.trigger('page:load:complete');
@@ -393,6 +444,11 @@ export default PageView.extend({
     
     this.showChildView('disputeFlags', new DisputeFlags());
 
+    if (this.hearingNoticeFileDescriptions.length) {
+      const hearingNoticeFiles = this.hearingNoticeFileDescriptions.map(fd => fd.getUploadedFiles())?.flat()
+      this.showChildView('hearingNotices', new FileBlockDisplay({ collection: new File_collection(hearingNoticeFiles) }));
+    }
+
     if (!this.isDisputeCreatedAriC && !this.isDisputeCreatedAriE && !this.isDisputeUnitType) {
       this.showChildView('amendmentsList', new DisputeAmendmentsView({
         titleDisplay: `Unlinked Amendments&nbsp;<span class="page-section-subtitle">(${this.unlinkedAmendments.length || 0})</span>`,
@@ -453,7 +509,8 @@ export default PageView.extend({
       isLoaded: this.notices_loaded && this.amendments_loaded && this.files_loaded,
       lastRefreshTime: Moment(),
       enableQuickAccess: isQuickAccessEnabled(this.model),
-      printParticipantSubServices: this.getPrintParticipantSubServices()
+      printParticipantSubServices: this.getPrintParticipantSubServices(),
+      showHearingNotices: this.hearingNoticeFileDescriptions.length
     };
   }
 

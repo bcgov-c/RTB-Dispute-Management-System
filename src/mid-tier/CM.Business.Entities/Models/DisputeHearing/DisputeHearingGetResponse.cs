@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CM.Business.Entities.Models.Base;
 using CM.Business.Entities.Models.Hearing;
@@ -98,9 +98,27 @@ public class DisputeHearingGetResponse : CommonResponse
     [JsonProperty("hearing_reserved_by_id")]
     public int? HearingReservedById { get; set; }
 
+    [JsonProperty("notification_file_description_id")]
+    public int? NotificationFileDescriptionId { get; set; }
+
+    [JsonProperty("hearing_reserved_dispute_guid")]
+    public Guid? HearingReservedDisputeGuid { get; set; }
+
+    [JsonProperty("hearing_reserved_file_number")]
+    public int? HearingReservedFileNumber { get; set; }
+
     [JsonProperty("associated_disputes")]
     public List<DisputeHearingResponse> AssociatedDisputes { get; set; }
 
     [JsonProperty("hearing_participations")]
     public List<HearingParticipationResponse> HearingParticipations { get; set; }
+
+    [JsonProperty("notification_delivery_description")]
+    public string NotificationDeliveryDescription { get; set; }
+
+    [JsonProperty("notification_delivery_date")]
+    public string NotificationDeliveryDate { get; set; }
+
+    [JsonProperty("conference_type")]
+    public byte? ConferenceType { get; set; }
 }

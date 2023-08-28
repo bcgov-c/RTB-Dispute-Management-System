@@ -17,7 +17,8 @@
   }
   &__status-column { min-width: 105px; max-width: 105px; }
   &__created-column { min-width: 115px; max-width: 115px; }
-  &__submitter-column { min-width: 290px; flex-grow: 1; }
+  &__submitter-column { min-width: 280px; flex-grow: 1; }
+  &__respondent-column { min-width: 280px; }
   &__urgency-column {
     min-width: 100px;
     max-width: 100px;
@@ -42,6 +43,6 @@
   &__contraventions-column { min-width: 120px; max-width: 120px; text-align: center; }
   &__uploads-column { min-width: 70px; max-width: 70px; text-align: center; }
   &__files-column { min-width: 80px; max-width: 80px; text-align: center; }
-  &__owner-column { min-width: 190px; max-width: 190px; margin-left: 10px; }
+  &__owner-column { min-width: 200px; max-width: 200px; margin-left: 10px; }
 
 }

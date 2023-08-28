@@ -13,6 +13,7 @@ const routes = {
   common_files_item: 'common-files',
   reports_item: 'reports',
   ceu_complaints_item: 'ceu-complaints',
+  ceu_complaints_param_item: 'ceu-complaints/:param_id',
   schedule_manager_item: 'schedule-manager',
   schedule_manager_periods_item: 'schedule-manager/periods',
   schedule_manager_requests_item: 'schedule-manager/requests',
@@ -54,6 +55,8 @@ const routes = {
   scheduled_hearings_history_item: 'schedule/history',
   scheduled_hearings_history_param_item: 'schedule/history/:param_id',
   scheduled_hearings_history_dispute_param_item: 'schedule/history/dispute/:param_id',
+  scheduled_hearings_on_hold_item: 'schedule/onhold',
+  scheduled_requests_param_item: 'schedule/requests/:param_id',
   scheduled_requests_item: 'schedule/requests',
 
   // Some routes just for testing
@@ -85,6 +88,7 @@ export const MainViewRouter = Marionette.AppRouter.extend({
     [routes.common_files_item]: 'routingShowCommonFiles',
     [routes.reports_item]: 'routingShowOperationalReports',
     [routes.ceu_complaints_item]: 'routingShowCEUComplaints',
+    [routes.ceu_complaints_param_item]: 'routingShowCEUComplaints',
     [routes.schedule_manager_item]: 'routingShowScheduleManager',
     [routes.schedule_manager_periods_item]: 'routingShowScheduleManagerPeriods',
     [routes.schedule_manager_requests_item]: 'routingShowScheduleManager',
@@ -126,6 +130,7 @@ export const MainViewRouter = Marionette.AppRouter.extend({
     [routes.scheduled_hearings_monthly_param_item]: 'routingShowScheduleMonthly',
     [routes.scheduled_hearings_yearly_item]: 'routingShowScheduleYearly',
     [routes.scheduled_hearings_history_item]: 'routingShowScheduleHistory',
+    [routes.scheduled_hearings_on_hold_item]: 'routingShowScheduleOnHold',
     [routes.scheduled_hearings_history_param_item]: 'routingShowScheduleHistory',
     [routes.scheduled_hearings_history_dispute_param_item]: 'routingShowScheduleHistoryDispute',
     [routes.scheduled_requests_item]: 'routingShowScheduleRequests',

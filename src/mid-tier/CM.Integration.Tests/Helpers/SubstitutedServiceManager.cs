@@ -36,8 +36,13 @@ public static class SubstitutedServiceManager
         return client.GetAsync<SubstitutedServicePostResponse>(RouteHelper.GetSubstitutedService + substitutedServiceId);
     }
 
-    public static EntityWithStatus<List<SubstitutedServicePostResponse>> GeSubstitutedServices(HttpClient client, Guid disputeGuid)
+    public static EntityWithStatus<List<SubstitutedServicePostResponse>> GetSubstitutedServices(HttpClient client, Guid disputeGuid)
     {
         return client.GetAsync<List<SubstitutedServicePostResponse>>(RouteHelper.GetSubstitutedServices + disputeGuid);
+    }
+
+    public static EntityWithStatus<List<ExternalSubstitutedServiceResponse>> GetExternalSubstitutedServices(HttpClient client, Guid disputeGuid)
+    {
+        return client.GetAsync<List<ExternalSubstitutedServiceResponse>>(RouteHelper.GetExternalSubstitutedServices + disputeGuid);
     }
 }

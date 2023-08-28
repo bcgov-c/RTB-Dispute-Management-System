@@ -43,6 +43,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CM.Business.Entities\CM.Business.Entities.csproj" />
     <ProjectReference Include="..\CM.Business.Services.Interfaces\CM.Business.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\CM.Common.Database\CM.Common.Database.csproj" />
     <ProjectReference Include="..\CM.Data.Model\CM.Data.Model.csproj" />
     <ProjectReference Include="..\CM.Data.Repositories\CM.Data.Repositories.csproj" />
     <ProjectReference Include="..\CM.Common.Utilities\CM.Common.Utilities.csproj" />

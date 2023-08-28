@@ -131,4 +131,10 @@ public class FileDescriptionService : CmServiceBase, IFileDescriptionService
 
         return false;
     }
+
+    public async Task<bool> FileDescriptionExists(Guid disputeGuid, int fileDescriptionId)
+    {
+        var fileDescription = await UnitOfWork.FileDescriptionRepository.GetFileDescription(disputeGuid, fileDescriptionId);
+        return fileDescription != null;
+    }
 }

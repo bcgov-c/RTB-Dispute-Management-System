@@ -1,7 +1,10 @@
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import DisputeFlag_collection from '../dispute-flags/DisputeFlag_collection';
+import Notice_model from '../notice/Notice_model';
+import ApplicantRequiredService from '../service/ApplicantRequiredService';
 import DisputeModel from './Dispute_model';
+import ApplicantViewDispute from '../ivd/ApplicantViewDispute';
 
 const configChannel = Radio.channel('config');
 
@@ -61,7 +64,10 @@ export default Backbone.Model.extend({
     showButtonCompletePayment: false,
     textButtonCompletePayment: null,
     showButtonCompleteApplication: false,
-    showButtonUpdateApplication: false
+    showButtonUpdateApplication: false,
+    showReviewRequest: false,
+    showArsDeadlineWarning: false,
+    showArsReinstatementDeadlineWarning: false,
   },
 
   initialize() {
@@ -71,9 +77,19 @@ export default Backbone.Model.extend({
     // Get a version of this data as a dispute so we can query it more easily
     this.dispute = new DisputeModel(this.toJSON());
 
+    this.notice = new Notice_model({
+      notice_id: this.get('latest_notice_id'),
+      notice_delivered_date: this.get('latest_notice_delivery_date'),
+      has_service_deadline: this.get('latest_notice_has_service_deadline'),
+      service_deadline_date: this.get('latest_notice_service_deadline_date'),
+      second_service_deadline_date: this.get('latest_notice_second_service_deadline_date'),
+    });
+    
     this.DELETE_STATUS = configChannel.request('get', 'STATUS_DELETED');
     this.DISPUTE_ACCESS_URL = configChannel.request('get', 'DISPUTE_ACCESS_URL');
     this.DISPUTE_HEARING_LINK_TYPE_SINGLE = configChannel.request('get', 'DISPUTE_HEARING_LINK_TYPE_SINGLE');
+    
+    this.set({ notice: this.notice });
     this.set(this.getDisplayRules());
   },
 
@@ -142,12 +158,12 @@ export default Backbone.Model.extend({
     const processCanWithdraw = this.dispute.checkProcess(isCreatedAriC ? [7] : [1, 2, 5]);
     const activeAdjournedFlags = new DisputeFlag_collection(this.get('linked_dispute_flags') || []).filter(flag => flag.isAdjourned() && flag.isActive());
     const activeReviewFlags = new DisputeFlag_collection(this.get('linked_dispute_flags')).some((flag) => flag.isActive() && flag.isReview())
-
+    
     const displayRules = {
       showButtonWithdraw: this.dispute && !this.hasMultiLinkedHearing() && processCanWithdraw && !activeAdjournedFlags.length && (
         this.dispute.checkStageStatus(0, [2, 3, 4, 5]) ||
         this.dispute.checkStageStatus(2, [20, 21, 22, 23, 24, 95]) ||
-        this.dispute.checkStageStatus(4, [40, 41, 42, 43, 44, 45, 95]) ||
+        this.dispute.checkStageStatus(4, [40, 41, 42, 43, 44, 45, 93, 95]) ||
         this.dispute.checkStageStatus(6, 60) ||
         this.dispute.checkStageStatus(8, 80)
       ),
@@ -160,15 +176,11 @@ export default Backbone.Model.extend({
       textButtonCompletePayment: canCompletePayment && this.dispute.checkStageStatus(0, 3) ? 'Complete Fee Waiver' : null,
       showAccessCode: !!this.get('primary_applicant_access_code'),
       showReviewRequest: activeReviewFlags,
-      showDetailsLink: false, // Disabled for R1
-      /*dispute && (
-        dispute.checkStageStatus(2, [21, 22, 23, 24, 25, 95]) ||
-        dispute.checkStageStatus(4, [40, 41, 42, 43, 44, 45, 95]) ||
-        dispute.checkStageStatus(6, [60, 61, 62, 63, 95]) || 
-        String(dispute.getStage()) === '8' ||
-        dispute.checkStageStatus(10, [100, 101, 102, 95])
-      ),
-      */
+
+      showArsDeadlineWarning: ApplicantRequiredService.hasUpcomingArsDeadline(this.dispute, this.notice),
+      showArsReinstatementDeadlineWarning: ApplicantRequiredService.hasUpcomingArsReinstatementDeadline(this.dispute, this.notice),
+      
+      showDetailsLink: ApplicantViewDispute.isAccessibleExternally(this.dispute),
 
       showHearingDetails: this.dispute && this.hasFutureHearing() && (
         this.dispute.checkStageStatus(4, [40, 41, 42, 43, 44, 45, 95]) ||

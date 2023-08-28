@@ -3,6 +3,8 @@
  * @class core.components.editable-component.EditableComponentView
  * @memberof core.components.editable-component
  * @augments Marionnete.View
+ * @fileoverview - Wrapper for other DMS input components that switches between input and view mode
+ * TODO: Refactor - update variables to camelCase
  */
 
 import Marionette from 'backbone.marionette';
@@ -28,8 +30,28 @@ const EditableComponentView = Marionette.View.extend({
   view_value: null,
   is_disabled: false,
   subView: null,
-  defaultDisabledMessage: null,
-  _disabledMessage: null,
+  defaultDisabledMessage: null, //TODO: unused?
+  _disabledMessage: null, //TODO: unused?
+
+  /**
+   * 
+   * @param {Boolean} [is_disabled] - enables/disables sub view
+   * @param {String} [state] - edit|view|hidden. edit displays input subview, view displays the value of subview, hidden hides the subview
+   * @param {String} [label] - label for editable component wrapper
+   * @param {Number|String|Boolean} [view_value] - value of subview to display
+   * @param {String} [view_class] - css class wrapper
+   * @param {Marionette.View} subView - view to wrap, must be a core DMS input
+   */
+
+  initialize(options) {
+    this.mergeOptions(options, ['is_disabled', 'state', 'label', 'view_value', 'view_class', 'subView', 'defaultDisabledMessage', '_disabledMessage']);
+
+    if (!this.subView) {
+      console.log(`[Error] Created an EditableComponent without a subView`);
+    }
+
+    this._original_value = this.getModel() ? this.getModel().get('value') : undefined;
+  },
 
   isActive() {
     return this.subView && this.subView.$el.is(':visible');
@@ -49,16 +71,6 @@ const EditableComponentView = Marionette.View.extend({
 
   getViewState() {
     return this.state;
-  },
-
-  initialize(options) {
-    this.mergeOptions(options, ['is_disabled', 'state', 'label', 'view_value', 'view_class', 'subView', 'defaultDisabledMessage', '_disabledMessage']);
-
-    if (!this.subView) {
-      console.log(`[Error] Created an EditableComponent without a subView`);
-    }
-
-    this._original_value = this.getModel() ? this.getModel().get('value') : undefined;
   },
 
   validateAndShowErrors() {

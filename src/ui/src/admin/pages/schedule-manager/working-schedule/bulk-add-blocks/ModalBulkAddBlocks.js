@@ -14,12 +14,14 @@ import User_collection from '../../../../../core/components/user/User_collection
 import Checkbox from '../../../../../core/components/checkbox/Checkbox';
 import Checkbox_model from '../../../../../core/components/checkbox/Checkbox_model';
 import { BulkAddBlocksDaySelect } from './BulkAddBlocksDaySelect';
-import { BulkAddBlocksStaffSelect } from './BulkAddBlocksStaffSelect';
+import { StaffSelect } from '../../../../components/staff-select/StaffSelect';
 import { BulkAddBlocksUploads } from './BulkAddBlocksUploads';
 import './ModalBulkAddBlocks.scss';
 
 const MINIMUM_BLOCK_DURATION_MINUTES = 30;
 const MINIMUM_DURATION_ERROR_TEXT = `The block end time must be at least ${MINIMUM_BLOCK_DURATION_MINUTES} minutes after the start time`;
+
+const DUTY_PER_DAY_SELECTOR = '.bulkAddBlocks-modal__duty-daily .error-block';
 
 const modalChannel = Radio.channel('modals');
 const userChannel = Radio.channel('users');
@@ -260,6 +262,7 @@ const ModalBulkAddBlocks = ModalBaseView.extend({
       isValid = false;
       this.getUI('updateDutyError').show();      
     }
+
     return isValid;
   },
 
@@ -340,21 +343,46 @@ const ModalBulkAddBlocks = ModalBaseView.extend({
   },
 
   clickDutyUpdate() {
-    this.getUI('updateDutyBtn').attr('disabled', 'disabled');
     this.getUI('updateDutyError').hide();
-
     // Render all in order to get new stats on step3
     this.render();
+
+    const selectedUsers = this.users.filter(user => !user.get('_excluded'));
+    if (this.dailyDutyModel.getData() > selectedUsers.length) {
+      $(DUTY_PER_DAY_SELECTOR).text('duties per day must be less than the number of included staff');
+    } else {
+      this.getUI('updateDutyBtn').attr('disabled', 'disabled');
+      $(DUTY_PER_DAY_SELECTOR).text('');
+    }
   },
 
   clickBulkAddBlocks() {
     if (!this.validateStep3()) return;
 
     this.setBlocksToCreate();
-    if (!this.blocksToCreate.length) return alert("No blocks to be created. Change inputs and try again");
-    
-    this.isUpload = true;
-    this.render();
+    if (!this.blocksToCreate.length) {
+      this.$el.hide();
+      let cancelProcess = true;
+      const modalView = modalChannel.request('show:standard', {
+        title: 'No Blocks to Create',
+        bodyHtml: 'Would you like to change the inputs and try again?',
+        cancelButtonText: 'Cancel Process',
+        primaryButtonText: 'Change Inputs',
+        hideHeaderX: true,
+        onContinueFn(_modalView) {
+          cancelProcess = false;
+          _modalView.close();
+        },
+      });
+
+      this.listenTo(modalView, 'removed:modal', () => {
+        this.$el.show();
+        if (cancelProcess) ModalBaseView.prototype.close.call(this);
+      });
+    } else {
+      this.isUpload = true;
+      this.render();
+    }
     // Create blocks routine
   },
 
@@ -410,7 +438,7 @@ const ModalBulkAddBlocks = ModalBaseView.extend({
 
     
     if (this.stepOneComplete) {
-      this.showChildView('staffSelectRegion', new BulkAddBlocksStaffSelect({
+      this.showChildView('staffSelectRegion', new StaffSelect({
         model: this.staffSelectModel,
         collection: this.users
       }));
@@ -534,15 +562,7 @@ const ModalBulkAddBlocks = ModalBaseView.extend({
 
   renderJsxStep2() {
     return <div className={!this.stepOneComplete ? 'hidden' : ''}>
-      <div className="bulkAddBlocks-modal__staff-list-container">
-        <p>
-          <span>Exclude any staff that you don't want hearings generated for</span>&nbsp;
-          <span className="bulkAddBlocks-modal__staff-list-container__info">
-            <span class="calendar-header-userinfo-emergency">*emergency</span>&nbsp;
-            <span class="calendar-header-userinfo-duty">*duty</span>
-          </span>
-        </p>        
-
+      <div className="bulkAddBlocks-modal__staff-list-container">      
         <div className="bulkAddBlocks-modal__staff-list"></div>
       </div>
       <div className="modal-button-container">

@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using System.ComponentModel.DataAnnotations;
+using CM.Common.Utilities;
 
 namespace CM.Data.Model;
 
@@ -20,6 +21,8 @@ public class InternalUserRole : BaseEntity
 
     public int? ManagedById { get; set; }
 
+    public SystemUser ManagedBy { get; set; }
+
     public byte? RoleSubtypeId { get; set; }
 
     public byte? AccessTypes { get; set; }
@@ -27,4 +30,7 @@ public class InternalUserRole : BaseEntity
     public byte? AccessSubTypes { get; set; }
 
     public bool? IsActive { get; set; }
+
+    [StringLength(255)]
+    public string RoleNote { get; set; }
 }

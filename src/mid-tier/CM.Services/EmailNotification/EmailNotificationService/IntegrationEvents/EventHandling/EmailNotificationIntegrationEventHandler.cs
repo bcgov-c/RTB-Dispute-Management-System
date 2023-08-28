@@ -83,7 +83,7 @@ public class EmailNotificationIntegrationEventHandler : IConsumeAsync<EmailNotif
                         var filePath = await fileContext.GetFilePath(file.FilePath);
                         await using (var fs = File.OpenRead(filePath))
                         {
-                            builder.Attachments.Add(file.FileName, fs);
+                            await builder.Attachments.AddAsync(file.FileName, fs);
                         }
 
                         break;
@@ -94,7 +94,7 @@ public class EmailNotificationIntegrationEventHandler : IConsumeAsync<EmailNotif
                         var commonFilePath = await commonFileContext.GetFilePath(commonFile.FilePath);
                         await using (var fs = File.OpenRead(commonFilePath))
                         {
-                            builder.Attachments.Add(commonFile.FileName, fs);
+                            await builder.Attachments.AddAsync(commonFile.FileName, fs);
                         }
 
                         break;
@@ -126,11 +126,13 @@ public class EmailNotificationIntegrationEventHandler : IConsumeAsync<EmailNotif
 
     private async Task ArchiveEmailNotification(EmailNotificationIntegrationEvent message, EmailStatus status)
     {
+        var success = status is EmailStatus.Sent or EmailStatus.PickedUp;
+
         var emailMessageToUpdate = await _unitOfWork.EmailMessageRepository.GetEmailByMessageGuid(message.MessageGuid);
         if (emailMessageToUpdate != null)
         {
             emailMessageToUpdate.SendStatus = (byte)status;
-            emailMessageToUpdate.SentDate = DateTime.UtcNow;
+            emailMessageToUpdate.SentDate = success ? DateTime.UtcNow : null;
             emailMessageToUpdate.Retries += 1;
             _unitOfWork.EmailMessageRepository.Update(emailMessageToUpdate);
             await _unitOfWork.Complete();
@@ -143,7 +145,7 @@ public class EmailNotificationIntegrationEventHandler : IConsumeAsync<EmailNotif
                 DisputeGuid = message.DisputeGuid,
                 SendStatus = (byte)status,
                 PreferredSendDate = DateTime.UtcNow,
-                SentDate = DateTime.UtcNow,
+                SentDate = success ? DateTime.UtcNow : null,
                 EmailTo = message.EmailTo,
                 EmailFrom = message.EmailFrom,
                 ParticipantId = message.ParticipantId,

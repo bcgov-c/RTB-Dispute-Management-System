@@ -2,8 +2,12 @@ import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import PageView from '../../../core/components/page/Page';
 import AccessDisputeOverview from '../../components/access-dispute/AccessDisputeOverview';
+import ExternalParticipantModel from '../../components/external-api/ExternalParticipant_model';
+import ModalEmailVerification from '../../../core/components/email-verification/ModalEmailVerification';
+import ApplicantRequiredService from '../../../core/components/service/ApplicantRequiredService';
 import template from './AccessPage_template.tpl';
 import './AccesPage.scss';
+import ApplicantViewDispute from '../../../core/components/ivd/ApplicantViewDispute';
 
 const configChannel = Radio.channel('config');
 const disputeChannel = Radio.channel('dispute');
@@ -12,7 +16,8 @@ const Formatter = Radio.channel('formatter').request('get');
 const hearingChannel = Radio.channel('hearings');
 const participantsChannel = Radio.channel('participants');
 const flagsChannel = Radio.channel('flags');
-
+const modalChannel = Radio.channel('modals');
+const noticeChannel = Radio.channel('notice');
 const accessChannel = Radio.channel('access');
 
 export default PageView.extend({
@@ -23,9 +28,11 @@ export default PageView.extend({
   },
 
   ui: {
+    menuRequestReinstatement: '.dac__access-menu__item--reinstatement',
     menuEvidence: '.dac__access-menu__item--evidence',
     menuRecordService: '.dac__access-menu__item--service',
     menuUpdateContact: '.dac__access-menu__item--update-contact',
+    menuRequestAmendment: '.dac__access-menu__item--amendment',
     menuRequestCorrection: '.dac__access-menu__item--correction',
     menuRequestClarification: '.dac__access-menu__item--clarification',
     menuRequestSubServ: '.dac__access-menu__item--sub-serv',
@@ -35,9 +42,11 @@ export default PageView.extend({
   },
 
   events: {
+    'click @ui.menuRequestReinstatement': 'clickMenuReinstatement',
     'click @ui.menuEvidence': 'clickMenuEvidence',
     'click @ui.menuRecordService': 'clickMenuRecordService',
     'click @ui.menuUpdateContact': 'clickMenuUpdateContact',
+    'click @ui.menuRequestAmendment': 'clickMenuRequestAmendment',
     'click @ui.menuRequestCorrection': 'clickMenuRequestCorrection',
     'click @ui.menuRequestClarification': 'clickMenuRequestClarification',
     'click @ui.menuRequestSubServ': 'clickMenuSubServ',
@@ -46,16 +55,24 @@ export default PageView.extend({
     'click @ui.menuPayment': 'clickMenuPayment',
   },
 
+  clickMenuReinstatement() {
+    Backbone.history.navigate('reinstate/service/list', { trigger: true });
+  },
+
   clickMenuEvidence() {
-    Backbone.history.navigate('#evidence', {trigger: true});
+    Backbone.history.navigate('evidence', {trigger: true});
   },
 
   clickMenuRecordService() {
-    Backbone.history.navigate('update/notice/service', { trigger: true });
+    Backbone.history.navigate('notice/service/list', { trigger: true });
   },
 
   clickMenuUpdateContact() {
     Backbone.history.navigate('update/contact', { trigger: true });
+  },
+
+  clickMenuRequestAmendment() {
+    Backbone.history.navigate('amendment', { trigger: true });
   },
 
   clickMenuRequestCorrection() {
@@ -102,10 +119,23 @@ export default PageView.extend({
     const disputeParticipants = participantsChannel.request('get:all:participants');
 
     if (!this.model.get('reviewNotificationDisplayed')) {
-      flagsChannel.request('show:review:notification', reviewFlags, disputeParticipants, hearingLinkType, dispute);
       this.model.set({ reviewNotificationDisplayed: true });
+      flagsChannel.request('show:review:notification', reviewFlags, disputeParticipants, hearingLinkType, dispute)
+        .finally(() => this.checkAndShowEmailVerification());
+    } else {
+      this.checkAndShowEmailVerification();
     }
-    
+  },
+
+  checkAndShowEmailVerification() {
+    const dispute = disputeChannel.request('get');
+    if (this.model.get('emailVerificationDisplayed')) return;
+    const loggedInParticipantId = disputeChannel.request('get').get('tokenParticipantId');
+    const activeParticipant = participantsChannel.request('get:participant', loggedInParticipantId);
+    if (dispute?.get('disputeAccessOpen') && !activeParticipant.get('email_verified') && activeParticipant.get('email')) {
+      modalChannel.request('add', new ModalEmailVerification({ participantSaveModel: ExternalParticipantModel, participant: activeParticipant, fetchParticipantAfterVerification: false }));
+    }
+    this.model.set({ emailVerificationDisplayed: true });
   },
 
   showSecondaryDisputeWarning() {
@@ -128,6 +158,7 @@ export default PageView.extend({
    */
   getAccessMenuOptionsTemplateData() {
     const dispute = disputeChannel.request('get');
+    const notice = noticeChannel.request('get:active');
     const isDisputeOpen = dispute.get('disputeAccessOpen');
     const payableFees = (paymentsChannel.request('get:fees') || []).filter(fee => {
       const isUnpaidActiveFee = fee.isActive() && !fee.isPaid();
@@ -136,14 +167,16 @@ export default PageView.extend({
       return !fee.isReviewFee() && isUnpaidActiveFee && isAssociatedToUser && hasCorrectSSPO;
     });
     const canMakePayment = isDisputeOpen && payableFees.length;
-
     const showSecondaryDisputeWarning = this.showSecondaryDisputeWarning();
     
     const templateDate = {
       Formatter,
       dispute,
+      notice,
+      canRequestReinstatement: accessChannel.request('external:reinstatement'),
       canUploadEvidence: accessChannel.request('external:evidence'),
       canUpdateContactInfo: accessChannel.request('external:contact'),
+      canRequestAmendment: accessChannel.request('external:amendment'),
       canRecordServiceOfNotice: accessChannel.request('external:notice'),
       canRequestCorrection: accessChannel.request('external:correction'),
       canRequestClarification: accessChannel.request('external:clarification'),
@@ -153,7 +186,11 @@ export default PageView.extend({
       canMakePayment,
       payableFees,
       reviewFeeAmount: configChannel.request('get', 'PAYMENT_FEE_AMOUNT_REVIEW'),
-      showSecondaryDisputeWarning
+      showSecondaryDisputeWarning,
+      showArsDeadlineWarning: ApplicantRequiredService.externalLogin_hasUpcomingArsDeadline(dispute, notice),
+      showArsReinstatementDeadlineWarning: ApplicantRequiredService.externalLogin_hasUpcomingArsReinstatementDeadline(dispute, notice),
+      showIVDAlert: ApplicantViewDispute.isIvdEnabled(),
+      intakeUrl: configChannel.request('get', 'INTAKE_URL')
     };
 
     templateDate.hasMenuActions = _.any(_.pick(templateDate, ['canUploadEvidence', 'canRecordServiceOfNotice', 'canUpdateContactInfo',

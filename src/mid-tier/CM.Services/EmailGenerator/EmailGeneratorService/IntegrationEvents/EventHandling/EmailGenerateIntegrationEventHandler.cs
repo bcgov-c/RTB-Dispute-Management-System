@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using CM.Common.Utilities;
@@ -62,7 +63,7 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
                     PreferredSendDate = DateTime.UtcNow,
                     EmailTo = participant.Email,
                     EmailFrom = emailTemplate.ReplyEmailAddress,
-                    Body = await BuildEmailMessageBody(emailTemplate.TemplateHtml, message, participant),
+                    Body = await BuildEmailMessageBody(emailTemplate.TemplateHtml, message, participant, (int)message.AssignedTemplateId),
                     Subject = await BuildEmailMessageSubject(emailTemplate.SubjectLine, message),
                     MessageType = (byte)message.MessageType,
                     AssignedTemplateId = emailTemplate.AssignedTemplateId,
@@ -97,11 +98,35 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
 
                 log.Error(exception, "Email not generated. Tag could not be replaced");
             }
+            catch (TagValueMissingException exception)
+            {
+                var failedEmailMessage = new EmailMessage
+                {
+                    MessageGuid = Guid.NewGuid(),
+                    DisputeGuid = message.DisputeGuid,
+                    MessageType = (byte)message.MessageType,
+                    AssignedTemplateId = emailTemplate.AssignedTemplateId,
+                    EmailTo = participant.Email,
+                    EmailFrom = emailTemplate.ReplyEmailAddress,
+                    BodyType = (byte)EmailMessageBodyType.Html,
+                    Subject = await BuildEmailMessageSubject(emailTemplate.SubjectLine, message),
+                    HtmlBody = emailTemplate.TemplateHtml,
+                    SendStatus = (byte?)EmailStatus.MergeError,
+                    SendStatusMessage = exception.Tags.FirstOrDefault(),
+                    IsActive = false,
+                    Retries = 0
+                };
+
+                await _unitOfWork.EmailMessageRepository.InsertAsync(failedEmailMessage);
+                await _unitOfWork.Complete();
+
+                log.Warning(exception, $"Unable to send email on File {exception.DisputeGuid} using email template {exception.AssignedTemplateId} because of invalid data for merge field {exception.Tags.ToList().CreateString(",")}");
+            }
         }
     }
 
     // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-    private static void CheckTags(string htmlBody)
+    private static void CheckTags(string htmlBody, string filenumber, int assignedTemplateId)
     {
         var tags = TagDictionary.GetAllTagValues();
         foreach (var tag in tags)
@@ -111,6 +136,36 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
                 throw new TagNotFoundException($"{tag} has not appropriate data to be replaced", tag);
             }
         }
+
+        var templateTags = GetTemplateTags(htmlBody);
+        foreach (var tag in templateTags)
+        {
+            if (!tags.Contains(tag))
+            {
+                throw new TagNotFoundException($"Unable to send email on File {filenumber} using email template {assignedTemplateId} because of invalid merge field {tag}", tag);
+            }
+        }
+    }
+
+    private static IEnumerable<string> GetTemplateTags(string body)
+    {
+        var result = new List<string>();
+        string pattern = @"\{.*?\}";
+        string tagPattern = "^[a-zA-Z_]+$";
+
+        MatchCollection matches = Regex.Matches(body, pattern);
+
+        foreach (Match match in matches)
+        {
+            string matchedSubstring = match.Value.TrimStart('{').TrimEnd('}');
+            var isMatch = Regex.IsMatch(matchedSubstring, tagPattern);
+            if (isMatch)
+            {
+                result.Add(matchedSubstring);
+            }
+        }
+
+        return result;
     }
 
     private async Task<List<Participant>> GetRecipientParticipantsAsync(EmailGenerateIntegrationEvent request)
@@ -138,6 +193,9 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
             case AssignedTemplate.PfrParticipatoryDisputeWaitingForOfficePayment:
             case AssignedTemplate.PfrParticipatoryApplicationSubmitted:
             case AssignedTemplate.PfrParticipatoryUpdateSubmitted:
+            case AssignedTemplate.ArsDeclarationDeadlineReminder:
+            case AssignedTemplate.ArsDeclarationDeadlineMissed:
+            case AssignedTemplate.ArsReinstatementDeadlineReminder:
                 var primaryApplicant = await _unitOfWork.ParticipantRepository.GetPrimaryApplicantAsync(request.DisputeGuid);
                 recipientParticipants.Add(primaryApplicant);
                 break;
@@ -149,11 +207,18 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
             case AssignedTemplate.ParticipatoryHearingReminder:
             case AssignedTemplate.DisputeWithdrawn:
             case AssignedTemplate.DisputeCancelled:
+            case AssignedTemplate.ArsReinstatementDeadlineMissed:
                 var participants = await _unitOfWork.ParticipantRepository.GetDisputeParticipantsAsync(request.DisputeGuid);
                 recipientParticipants.AddRange(participants);
                 break;
             case AssignedTemplate.PaymentSubmitted:
             case AssignedTemplate.AccessCodeRecovery:
+            case AssignedTemplate.MhvApplicantAnyLinkedCnReminder:
+            case AssignedTemplate.MhvApplicantNotLinkedNotCnReminder:
+            case AssignedTemplate.MhvApplicantLinkedNotCnReminder:
+            case AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder:
+            case AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder:
+            case AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder:
                 var participant = await _unitOfWork.ParticipantRepository.GetByIdAsync(request.ParticipantId);
                 recipientParticipants.Add(participant);
                 break;
@@ -166,31 +231,32 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
         return recipientParticipants;
     }
 
-    private async Task<string> BuildEmailMessageBody(string htmlBody, EmailGenerateIntegrationEvent request, Participant participant)
+    private async Task<string> BuildEmailMessageBody(string htmlBody, EmailGenerateIntegrationEvent request, Participant participant, int assignedTemplateId)
     {
         var dispute = await _unitOfWork.DisputeRepository.GetDisputeByGuidAsync(request.DisputeGuid);
-        return await HandleEmailTemplates(htmlBody, dispute, participant);
+        return await HandleEmailTemplates(htmlBody, dispute, participant, assignedTemplateId);
     }
 
-    private async Task<string> HandleEmailTemplates(string htmlBody, Dispute dispute, Participant participant)
+    private async Task<string> HandleEmailTemplates(string htmlBody, Dispute dispute, Participant participant, int assignedTemplateId)
     {
         AbstractEmailMessageHandler handler = new FileNumberHandler(_unitOfWork);
         handler
-            .SetNext(new ApplicationEvidenceLaterListHandler(_unitOfWork))
-            .SetNext(new DisputeAccessUrlHandler(_unitOfWork))
-            .SetNext(new HearingDetailsHandler(_unitOfWork))
-            .SetNext(new InitialSubmissionDateHandler(_unitOfWork))
-            .SetNext(new IntakeUrlHandler(_unitOfWork))
-            .SetNext(new NoticePackageDeliveryMethodHandler(_unitOfWork))
-            .SetNext(new PaymentHandler(_unitOfWork))
-            .SetNext(new PrimaryApplicantNameHandler(_unitOfWork))
-            .SetNext(new RecipientAccessCodeHandler(_unitOfWork))
-            .SetNext(new RentalUnitAddressHandler(_unitOfWork))
-            .SetNext(new ThreeDaysFromTodayHandler(_unitOfWork));
+            .SetNext(new ApplicationEvidenceLaterListHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new DisputeAccessUrlHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new HearingDetailsHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new InitialSubmissionDateHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new IntakeUrlHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new NoticePackageDeliveryMethodHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new NoticeServiceDeadlineDateHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new PaymentHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new PrimaryApplicantNameHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new RecipientAccessCodeHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new RentalUnitAddressHandler(_unitOfWork, assignedTemplateId))
+            .SetNext(new ThreeDaysFromTodayHandler(_unitOfWork, assignedTemplateId));
 
         var stringBuilder = new StringBuilder(htmlBody);
         var htmlBodyBuilder = await handler.Handle(stringBuilder, dispute, participant);
-        CheckTags(htmlBodyBuilder.ToString());
+        CheckTags(htmlBodyBuilder.ToString(), dispute.FileNumber.ToString(), assignedTemplateId);
         return htmlBodyBuilder.ToString();
     }
 
@@ -225,6 +291,16 @@ public class EmailGenerateIntegrationEventHandler : IConsumeAsync<EmailGenerateI
             case AssignedTemplate.PfrParticipatoryDisputeWaitingForOfficePayment:
             case AssignedTemplate.PfrParticipatoryApplicationSubmitted:
             case AssignedTemplate.PfrParticipatoryUpdateSubmitted:
+            case AssignedTemplate.ArsDeclarationDeadlineReminder:
+            case AssignedTemplate.ArsDeclarationDeadlineMissed:
+            case AssignedTemplate.ArsReinstatementDeadlineReminder:
+            case AssignedTemplate.ArsReinstatementDeadlineMissed:
+            case AssignedTemplate.MhvApplicantAnyLinkedCnReminder:
+            case AssignedTemplate.MhvApplicantNotLinkedNotCnReminder:
+            case AssignedTemplate.MhvApplicantLinkedNotCnReminder:
+            case AssignedTemplate.MhvFinalApplicantCnAnyLinkedReminder:
+            case AssignedTemplate.MhvFinalApplicantNotCnNotLinkedReminder:
+            case AssignedTemplate.MhvFinalApplicantLinkedNotCnReminder:
                 subject = subject.Replace("<file_number>", dispute.FileNumber.ToString());
                 return subject;
             case AssignedTemplate.ParticipatoryHearingReminder:

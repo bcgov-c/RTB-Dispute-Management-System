@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Data.Repositories.UnitOfWork;
+using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Quartz.Impl.Matchers;
 
@@ -20,15 +21,18 @@ public class SchedulingService : CmServiceBase, ISchedulingService
 
     public async Task<bool> RubJob(string jobName)
     {
-        if (ServiceProvider.GetService(typeof(IScheduler)) is IScheduler scheduler)
-        {
-            var keys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals("DEFAULT"));
-            var jobKey = keys.Single(arg => arg.Name == jobName);
-            await scheduler.TriggerJob(jobKey);
+        var schedulerFactory = ServiceProvider.GetRequiredService<ISchedulerFactory>();
+        var scheduler = await schedulerFactory.GetScheduler();
 
-            return true;
+        var keys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+        var jobKey = keys.SingleOrDefault(arg => arg.Name == jobName);
+        if (jobKey == null)
+        {
+            return false;
         }
 
-        return false;
+        await scheduler.TriggerJob(jobKey);
+
+        return true;
     }
 }

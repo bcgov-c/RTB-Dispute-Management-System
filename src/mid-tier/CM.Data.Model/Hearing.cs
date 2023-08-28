@@ -83,9 +83,30 @@ public class Hearing : BaseEntity
 
     public int? HearingReservedById { get; set; }
 
+    public UserToken HearingReservedBy { get; set; }
+
+    public int? NotificationFileDescriptionId { get; set; }
+
+    public FileDescription NotificationFileDescription { get; set; }
+
+    public Guid? HearingReservedDisputeGuid { get; set; }
+
+    public Dispute HearingReservedDispute { get; set; }
+
+    [StringLength(150)]
+    public string NotificationDeliveryDescription { get; set; }
+
+    public DateTime? NotificationDeliveryDate { get; set; }
+
+    public byte? ConferenceType { get; set; }
+
     public virtual ICollection<DisputeHearing> DisputeHearings { get; set; }
 
     public virtual ICollection<HearingParticipation> HearingParticipations { get; set; }
 
     public virtual ICollection<HearingAuditLog> HearingAuditLogs { get; set; }
+
+    public virtual ICollection<Notice> Notices { get; set; }
+
+    public virtual ICollection<DisputeVerification> DisputeVerifications { get; set; }
 }

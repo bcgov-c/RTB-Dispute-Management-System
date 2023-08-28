@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays a singular dispute flag. Contains functionality for handling flag clicks
+ */
 import Radio from 'backbone.radio';
 import React from 'react';
 import Backbone from 'backbone';

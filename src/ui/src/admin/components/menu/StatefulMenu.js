@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Container View for the left site menu. Navigation to opened disputes and dashboard pages is provided.
+ */
 import Marionette from 'backbone.marionette';
 import MenuItemSearchView from './MenuItemSearch';
 import MenuItemView from './MenuItem';

@@ -6,5 +6,5 @@ namespace CM.Business.Services.DisputeAccess;
 
 public interface IDisputeAccessService
 {
-    Task<DisputeAccessResponse> GatherDisputeData(Dispute dispute, bool includeNonDeliveredOutcomeDocs = true);
+    Task<DisputeAccessResponse> GatherDisputeData(Dispute dispute, bool includeNonDeliveredOutcomeDocs = true, bool includeAccessCode = false);
 }

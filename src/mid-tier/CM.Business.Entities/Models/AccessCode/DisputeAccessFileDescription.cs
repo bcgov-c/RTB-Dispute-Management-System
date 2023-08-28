@@ -22,6 +22,9 @@ public class DisputeAccessFileDescription
     [JsonProperty("description_by")]
     public int? DescriptionBy { get; set; }
 
+    [JsonProperty("is_deficient")]
+    public bool IsDeficient { get; set; }
+
     [JsonProperty("linked_files")]
     public List<DisputeAccessLinkedFile> LinkedFiles { get; set; }
 }

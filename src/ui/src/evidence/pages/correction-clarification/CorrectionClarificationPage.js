@@ -16,7 +16,7 @@ import InputView from '../../../core/components/input/Input';
 import CheckboxModel from '../../../core/components/checkbox/Checkbox_model';
 import CheckboxView from '../../../core/components/checkbox/Checkbox';
 import PageItem from '../../../core/components/page/PageItem';
-import { CcrRequestItem } from '../../components/CcrRequestItem/CcrRequestItem';
+import { CcrRequestItem } from '../../components/ccrRequestItem/CcrRequestItem';
 import { CorrectionRequestItems } from './CorrectionRequestItems';
 import { showDocumentOptOutModal } from '../../components/optout-modal/OptoutModal';
 import { ViewJSXMixin } from '../../../core/utilities/JsxViewMixin';
@@ -30,11 +30,13 @@ const clarificationDescriptionLabel = "Please provide the information on the cla
 const correctionIntroText = <>
   <p>If the decision or an order contains typographic, grammatical, arithmetic, obvious errors or inadvertent omissions you may submit a Request for Correction.</p>
   <p>Please review&nbsp;<a className="static-external-link" href="javascript;" url="https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl25.pdf">Policy Guideline 25: Requests for Clarification or Correction of Orders and Decisions</a>&nbsp;or visit the&nbsp;<a className="static-external-link" href="javascript;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Residential Tenancy Branch website</a> for more information.</p>
+  <p>If you requested and obtained a copy of the hearing recording from the Residential Tenancy Branch, do not submit it as part of your request for correction</p>
 </>;
 const clarificationIntroText = <>
   <p>The Residential Tenancy Branch can clarify a decision or order(s) if a party is unclear about or does not understand the decision, order or reasons. Clarification allows the Residential Tenancy Branch to explain, but not to change, the decision.</p>
   <p>Either party can submit a Request for Clarification to the Residential Tenancy Branch. Requests for Clarification should be received by the Residential Tenancy Branch within 15 days of the party receiving the decision or order(s) and must include a copy of the decision and/or order(s).</p>
   <p>Please review&nbsp;<a className="static-external-link" href="javascript;" url="https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/residential-tenancies/policy-guidelines/gl25.pdf">Policy Guideline 25: Requests for Clarification or Correction of Orders and Decisions</a> or visit the <a className="static-external-link" href="javascript;" url="https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution/after-the-hearing/review-clarify-or-correct-a-decision">Residential Tenancy Branch website</a>&nbsp;for more information.</p>
+  <p>If you requested and obtained a copy of the hearing recording from the Residential Tenancy Branch, do not submit it as part of your request for clarification</p>
 </>;
 
 const correctionInfoText = <p>
@@ -262,7 +264,7 @@ const CorrectionClarificationView = Marionette.View.extend({
     const taskDescription = [
       `A ${this.REQUEST_TYPE_TEXT} request was submitted through the Dispute Access site. Submitter name ${this.model.get('submitterName')}, Initials: ${participantInitials}`,
       `Access code: ${this.model.get('accessCode')}, Date document(s) received: ${dateReceived}. Date Request Submitted: ${Formatter.toDateDisplay(Moment())}.`, 
-      `See the the outcome document request section of the documents view for more information. Days between received and submitted: ${daysInBetween}`,
+      `See the outcome document request section of the documents view for more information. Days between received and submitted: ${daysInBetween}`,
     ].join(TASK_DESCRIPTION_SEPARATION_CHARACTERS);
 
     const taskData = {

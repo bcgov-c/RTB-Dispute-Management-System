@@ -243,6 +243,7 @@ const ModalBulkMoveHearings = ModalBaseView.extend({
         hearingModel: new HearingModel(hearing)
       }
     }));
+    this.bulkMoveCollection.sort();
   },
 
   disableInputs() {
@@ -251,7 +252,11 @@ const ModalBulkMoveHearings = ModalBaseView.extend({
   },
 
   setUnprocessedHearings() {
-    this.bulkMoveCollection.map(bulkHearingModel => bulkHearingModel.get('moveOperationResult') ? bulkHearingModel : bulkHearingModel.set({ moveOperationResult: UNPROCESSED_HEARING_OBJ }))
+    this.bulkMoveCollection.forEach(bulkHearingModel => {
+      if (bulkHearingModel.get('moveOperationResult')) {
+        bulkHearingModel.set({ moveOperationResult: UNPROCESSED_HEARING_OBJ });
+      }
+    });
   },
 
   endProcess() {
@@ -444,7 +449,7 @@ const ModalBulkMoveHearings = ModalBaseView.extend({
 
   _createAndDownloadCsvFile(filenameStart, csvFileLines) {
     const csvFilename = `${filenameStart}_${Moment().format('MM-DD-YYYY')}.csv`;
-    filesChannel.request('download:csv', csvFilename, csvFileLines);
+    filesChannel.request('download:csv', csvFileLines, csvFilename);
   },
 
   /* CSV download + helpers fn end */

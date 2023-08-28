@@ -73,7 +73,7 @@ export default Marionette.View.extend({
       '.dar-step-three__payment-warning__wrapper',
       '.decision-search__issue',
       '.step-description',
-      '.pandemic-repayment-dropdown',
+      '.form-group',
       '.file-title-display-only-container',
       '.access-issue-body',
       '.access-issue-progress-bar-container',
@@ -89,7 +89,10 @@ export default Marionette.View.extend({
       '.subserv__documents-to-serve',
       '.subserv__service-options',
       '.help-target',
-      '.completeness-item'
+      '.completeness-item',
+      '.graph__table',
+      '.graph__item',
+      '.modal-graph__container'
     ];
 
     $.each(parent_view.$('.help-icon'), function() {

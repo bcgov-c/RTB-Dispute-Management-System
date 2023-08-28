@@ -20,7 +20,7 @@
       <div class="email-column">Email</div>
       <div class="mobile-column">Cell Phone</div>
       <div class="user-admin-column text-center">Admin</div>
-      <div class="rolegrop-column">Role Group</div>
+      <div class="rolegroup-column">Role Group</div>
       <div class="roletype-column">Role Type</div>
     </div>
 

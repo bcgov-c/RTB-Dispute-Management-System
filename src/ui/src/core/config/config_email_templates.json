@@ -3,10 +3,12 @@
     "1": "CUSTOM - Blank Emails",
     "2": "Send NODRP",
     "3": "Needs UPDATE",
+    "4": "DOCDEL Delivery",
     "5": "OTHER"
   },
-  "EMAIL_TEMPLATE_SELECTION_GROUPS": [1,2,3,5],
-  "CUSTOM_EMAIL_TEMPLATE_ASSIGNED_IDS": [99, 104],
+  "EMAIL_TEMPLATE_SELECTION_GROUPS": [1,2,3,4,5],
+  "CUSTOM_EMAIL_TEMPLATE_ASSIGNED_IDS": [99, 104, 162],
+  "EMAIL_TEMPLATE_EMAIL_VERIFICATION_INSTRUCTIONS": 185,
 
   "EMAIL_DELIVERY_RULE_NOTICE_PACKAGE_PREF": 1,
   "EMAIL_DELIVERY_RULE_EMAIL_ONLY": 2,
@@ -21,7 +23,9 @@
       "deliveryRule": 1,
       "allowRecipientEdit": true,
       "allowPickups": true,
-      "allowMail": true
+      "allowMail": true,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "100": {
@@ -38,12 +42,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": [2],
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "101": {
@@ -60,12 +67,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1],
-      "futureHearingLinkTypes": [1,4],
+      "hearingLinkTypes": [1,4],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "102": {
@@ -82,12 +92,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [1],
       "processes": [2],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "103": {
@@ -104,12 +117,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [2],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "104": {
@@ -125,12 +141,15 @@
       "disputeUrgencies": null,
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": false,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "105": {
@@ -147,8 +166,9 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [1],
       "processes": [1],
-      "futureHearingLinkTypes": [2,5],
+      "hearingLinkTypes": [2,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": [2],
       "disallowedHistoryProcesses": null,
@@ -157,7 +177,9 @@
         238,
         239,
         223
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "106": {
@@ -174,8 +196,9 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [1],
-      "futureHearingLinkTypes": [2,5],
+      "hearingLinkTypes": [2,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": [2],
       "disallowedHistoryProcesses": null,
@@ -187,7 +210,9 @@
         137,
         138,
         111
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "107": {
@@ -204,14 +229,41 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [1],
       "processes": [1],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": [2],
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
+    "187": {
+      "templateId": 187,
+      "templateGroup": 2,
+      "deliveryRule": 1,
+      "allowRecipientEdit": false,
+      "allowPickups": true,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": [1,2],
+      "stages": [2],
+      "disputeUrgencies": [2],
+      "disputeTypes": [1,2],
+      "disputeSubTypes": [0],
+      "processes": [2],
+      "hearingLinkTypes": null,
+      "noFutureHearing": true,
+      "futureHearingOnly": false,
+      "hasGeneratedNotice": true,
+      "includedHistoryProcesses": null,
+      "disallowedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null
+    },
 
     "108": {
       "templateId": 108,
@@ -227,12 +279,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [1],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": [2],
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "109": {
@@ -249,12 +304,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1,4,6,7],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "110": {
@@ -271,8 +329,9 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
       "includedHistoryProcesses": [2],
       "disallowedHistoryProcesses": null,
@@ -288,7 +347,9 @@
         238,
         239,
         223
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "111": {
@@ -305,9 +366,12 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [7],
-      "futureHearingLinkTypes": [1],
+      "hearingLinkTypes": [1],
       "noFutureHearing": false,
-      "hasGeneratedNotice": true
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "112": {
       "templateId": 112,
@@ -323,9 +387,12 @@
       "disputeTypes": [1],
       "disputeSubTypes": [0],
       "processes": [1],
-      "futureHearingLinkTypes": [1],
+      "hearingLinkTypes": [1],
       "noFutureHearing": false,
-      "hasGeneratedNotice": true
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "113": {
       "templateId": 113,
@@ -341,10 +408,13 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1],
-      "futureHearingLinkTypes": [1],
+      "hearingLinkTypes": [1],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": [2]
+      "includedHistoryProcesses": [2],
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "114": {
       "templateId": 114,
@@ -360,10 +430,13 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [7],
-      "futureHearingLinkTypes": [1],
+      "hearingLinkTypes": [1],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "115": {
       "templateId": 115,
@@ -379,10 +452,13 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1,2,4,6,7],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "116": {
       "templateId": 116,
@@ -398,10 +474,13 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [4],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": 1
     },
     "117": {
       "templateId": 117,
@@ -417,10 +496,13 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1,4,6,7],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "118": {
       "templateId": 118,
@@ -436,10 +518,58 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1,4,6,7],
-      "futureHearingLinkTypes": [1,2,4,5],
+      "hearingLinkTypes": [1,2,4,5],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": null
+    },
+    "119": {
+      "templateId": 119,
+      "templateGroup": 2,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": [1,2,4,5,6],
+      "stages": null,
+      "disputeUrgencies": [1,2,3],
+      "disputeTypes": [1,2],
+      "disputeSubTypes": [0,1],
+      "processes": [4],
+      "hearingLinkTypes": [1,2,4,5],
+      "noFutureHearing": false,
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "includedHistoryProcesses": null,
+      "staffSelectable": true,
+      "sortOrder": 1
+    },
+    "184": {
+      "templateId": 184,
+      "templateGroup": 2,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": [1,2,4,5,6],
+      "stages": [6],
+      "disputeUrgencies": [1,2,3],
+      "disputeTypes": [1,2],
+      "disputeSubTypes": [0,1],
+      "processes": [1,2,4,6,7],
+      "hearingLinkTypes": [1,2,4,5],
+      "noFutureHearing": false,
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "120": {
@@ -455,13 +585,16 @@
       "disputeUrgencies": [2,3],
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
-      "processes": [1,6],
-      "futureHearingLinkTypes": null,
+      "processes": [1,5,6],
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": false,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": [2],
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "122": {
       "templateId": 122,
@@ -477,15 +610,18 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [1],
       "processes": [1],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": false,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
       "allowedIssues": [
         213,
         223
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "123": {
       "templateId": 123,
@@ -501,12 +637,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [2],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": false,
       "includedHistoryProcesses": null,
       "disallowedHistoryProcesses": null,
-      "allowedIssues": null
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
     "124": {
@@ -523,8 +662,11 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [7],
-      "futureHearingLinkTypes": null,
-      "noFutureHearing": true
+      "hearingLinkTypes": null,
+      "noFutureHearing": true,
+      "futureHearingOnly": false,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "125": {
       "templateId": 125,
@@ -536,8 +678,11 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [7],
-      "futureHearingLinkTypes": null,
-      "noFutureHearing": true
+      "hearingLinkTypes": null,
+      "noFutureHearing": true,
+      "futureHearingOnly": false,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "126": {
       "templateId": 126,
@@ -553,8 +698,11 @@
       "disputeTypes": [1],
       "disputeSubTypes": [0],
       "processes": [1],
-      "futureHearingLinkTypes": null,
-      "noFutureHearing": true
+      "hearingLinkTypes": null,
+      "noFutureHearing": true,
+      "futureHearingOnly": false,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "127": {
       "templateId": 127,
@@ -570,12 +718,15 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [1],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "allowedIssues": [
         113,
         111
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "128": {
       "templateId": 128,
@@ -591,14 +742,186 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [1],
       "processes": [1],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": true,
+      "futureHearingOnly": false,
       "allowedIssues": [
         218,
         223
-      ]
+      ],
+      "staffSelectable": true,
+      "sortOrder": null
     },
 
+    "150": {
+      "templateId": 150,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [2,3,7,8,10,11,12,15,16,17,18,20,21,70,71,82,40,41],
+      "outcomeDocSubTypes": [null,1,2,3],
+      "docDeliveryPrimaryOnly": true
+    },
+    "151": {
+      "templateId": 151,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": [1],
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [81],
+      "outcomeDocSubTypes": [null,1,2,3],
+      "docDeliveryPrimaryOnly": true
+    },
+    "155": {
+      "templateId": 155,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [25],
+      "outcomeDocSubTypes": [null,1,2],
+      "docDeliveryPrimaryOnly": false
+    },
+    "159": {
+      "templateId": 159,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [40,41],
+      "outcomeDocSubTypes": [null,1,2],
+      "docDeliveryPrimaryOnly": false
+    },
+    "160": {
+      "templateId": 160,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [45,46],
+      "outcomeDocSubTypes": [null,1,2],
+      "docDeliveryPrimaryOnly": false
+    },
+    "161": {
+      "templateId": 161,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null,
+      "outcomeDocs": [50],
+      "outcomeDocSubTypes": [null,1,2],
+      "docDeliveryPrimaryOnly": false
+    },
+    "162": {
+      "templateId": 162,
+      "templateGroup": 4,
+      "deliveryRule": 2,
+      "allowRecipientEdit": true,
+      "allowPickups": false,
+      "allowMail": false,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": null,
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null,
+      "outcomeDocs": null,
+      "outcomeDocSubTypes": [null,1,2],
+      "docDeliveryPrimaryOnly": false
+    },
+    
     "180": {
       "templateId": 180,
       "templateGroup": 5,
@@ -613,10 +936,14 @@
       "disputeTypes": [1,2],
       "disputeSubTypes": [0,1],
       "processes": [1,2,4,6,7],
-      "futureHearingLinkTypes": null,
+      "hearingLinkTypes": null,
       "noFutureHearing": false,
+      "futureHearingOnly": false,
       "hasGeneratedNotice": false,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
     },
     "181": {
       "templateId": 181,
@@ -626,18 +953,90 @@
       "allowPickups": true,
       "allowMail": true,
       "allowLinkedNoticeAttachments": false,
-      "creationMethods": [1,2,4,5,6],
+      "creationMethods": [1,2,5,6],
       "stages": [2],
       "disputeUrgencies": null,
       "disputeTypes": [1,2],
       "disputeSubTypes": [0],
       "processes": [1,7],
-      "futureHearingLinkTypes": [1,4],
+      "hearingLinkTypes": [1,4],
       "noFutureHearing": false,
+      "futureHearingOnly": true,
       "hasGeneratedNotice": true,
-      "includedHistoryProcesses": null
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
+    },
+    "182": {
+      "templateId": 182,
+      "templateGroup": 5,
+      "deliveryRule": 2,
+      "allowRecipientEdit": false,
+      "allowPickups": true,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": [1,2,4,5,6],
+      "stages": [6],
+      "disputeUrgencies": null,
+      "disputeTypes": [1,2],
+      "disputeSubTypes": [0],
+      "processes": [1,7],
+      "hearingLinkTypes": [1,4],
+      "noFutureHearing": false,
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
+    },
+    "183": {
+      "templateId": 183,
+      "templateGroup": 5,
+      "deliveryRule": 2,
+      "allowRecipientEdit": false,
+      "allowPickups": true,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": [1,2,5,6],
+      "stages": [6],
+      "disputeUrgencies": null,
+      "disputeTypes": [1,2],
+      "disputeSubTypes": [0],
+      "processes": [1,7],
+      "hearingLinkTypes": [1,4],
+      "noFutureHearing": false,
+      "futureHearingOnly": true,
+      "hasGeneratedNotice": true,
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": true,
+      "sortOrder": null
+    },
+    "185": {
+      "templateId": 185,
+      "templateGroup": 5,
+      "deliveryRule": 2,
+      "allowRecipientEdit": false,
+      "allowPickups": false,
+      "allowMail": true,
+      "allowLinkedNoticeAttachments": false,
+      "creationMethods": null,
+      "stages": null,
+      "disputeUrgencies": null,
+      "disputeTypes": null,
+      "disputeSubTypes": [0,1],
+      "processes": null,
+      "hearingLinkTypes": null,
+      "noFutureHearing": false,
+      "futureHearingOnly": false,
+      "hasGeneratedNotice": false,
+      "includedHistoryProcesses": null,
+      "allowedIssues": null,
+      "staffSelectable": false,
+      "sortOrder": null
     }
-    
 
   }
 

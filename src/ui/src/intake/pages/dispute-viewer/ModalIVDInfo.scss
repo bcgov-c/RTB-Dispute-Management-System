@@ -1,0 +1,22 @@
+.modal-ivd-info {
+  .modal-dialog { width: 850px; }
+  &__img {
+    margin: 0 0 20px 20px;
+    width: 150px;
+  }
+
+  &__right-container { margin-left: 50px; }
+
+  &__bullets-wrapper { display: flex; }
+
+  .modal-title { margin-right: 45px; };
+}
+
+@media (max-width: 991px) {
+  .modal-ivd-info {
+    .modal-dialog { width: auto; }
+    &__bullets-wrapper { flex-direction: column; }
+    &__left-container { margin-bottom: -10px;  }
+    &__right-container { margin-left: 0; }
+  }
+}

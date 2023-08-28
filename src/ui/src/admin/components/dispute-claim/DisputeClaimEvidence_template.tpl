@@ -9,7 +9,7 @@
   >
   <div class="dispute-issue-evidence-upload-type <%= participant_model && participant_model.isRespondent() ? 'respondent-upload' : 'applicant-upload' %>"></div>
   <div class="dispute-issue-evidence-content <%= (showThumbnails === true) ? 'show-thumbnails' : '' %>">
-    <span class="dispute-issue-evidence-title"><%= '<b>'+title+'</b>'+(description ? ' - '+description : '') %></span>
+    <span class="dispute-issue-evidence-title"><%= isDeficient ? ('(ID: '+id+')') : ''%> <%= '<b>'+title+'</b>'+(description ? ' - '+description : '') %></span>
     <% if (files && files.length && showSubmitterInfo) { %>
       <div class="dispute-issue-evidence-submitted-info">
         <span><%= participantDisplayName %></span>
@@ -52,7 +52,11 @@
                 <% }%>
 
                 <div class="file-card-image">
-                  <img src="<%= file_model.getThumbnailURL() %>" />
+                  <img src="<%= LoaderImg %>" />
+                  <img class="hidden" src="<%= file_model.getThumbnailURL() %>" />
+                </div>
+                <div class="file-card-image-metadata">
+                  <%= file_model.getMetadataDisplay() %>
                 </div>
               </div>
             <% } %>

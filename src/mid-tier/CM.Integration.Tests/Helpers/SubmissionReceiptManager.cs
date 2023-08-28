@@ -45,4 +45,9 @@ public static class SubmissionReceiptManager
     {
         return client.GetAsync<List<SubmissionReceiptPostResponse>>(RouteHelper.GetSubmissionReceipts + disputeGuid);
     }
+
+    public static EntityWithStatus<List<SubmissionReceiptPostResponse>> GetExternalSubmissionReceipts(HttpClient client, Guid disputeGuid, ExternalSubmissionReceiptRequest request)
+    {
+        return client.GetAsync<List<SubmissionReceiptPostResponse>>(RouteHelper.GetExternalSubmissionReceipts + disputeGuid, request);
+    }
 }

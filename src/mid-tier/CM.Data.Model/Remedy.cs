@@ -57,6 +57,8 @@ public class Remedy : BaseEntity
 
     public int? PrevAwardBy { get; set; }
 
+    public SystemUser PrevAward { get; set; }
+
     public DateTime? PrevAwardDate { get; set; }
 
     public byte? PrevRemedyStatusReason { get; set; }

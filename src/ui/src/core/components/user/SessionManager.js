@@ -1,6 +1,7 @@
 /**
  * @namespace core.components.user.SessionManager
  * @memberof core.components.user
+ * @fileoverview - Manager that handles application authorization, token management, internal site re-directs, and general session management
  */
 
 import Backbone from 'backbone';
@@ -54,9 +55,9 @@ const SessionManager = Marionette.Object.extend({
     'get:user': 'getCurrentUser',
     'get:user:id': 'getCurrentUserId',
     'get:active:participant:id': 'getActiveParticipantId',
-    'get:uploads': 'getActiveUploads',
-    'set:upload': 'setActiveUpload',
-    'remove:upload': 'removeActiveUpload',
+    'get:active:api': 'getActiveApiCalls',
+    'add:active:api': 'addActiveApiCall',
+    'remove:active:api': 'removeActiveApiCall',
     'set:user:name': 'setUserName',
     'set:active:participant:id': 'setActiveParticipantId',
     'set:login:type': 'setLoginType',
@@ -102,6 +103,7 @@ const SessionManager = Marionette.Object.extend({
     this.isExternalToken = false;
     this.user = new UserModel();
     this.user.on('change:token', this.userLoginStatusChange, this);
+    this.activeApiCalls = [];
   },
 
   getCurrentUser() {
@@ -118,9 +120,13 @@ const SessionManager = Marionette.Object.extend({
   },
 
   userLoginStatusChange(model, value) {
-    // Just check if the token has been invalidated, and if so trigger logout completion event
+    // If the token has been invalidated, trigger logout event.
+    // In that case, or if initially logging in, reset last active timeout time
     if (model.previous('token') !== null && value === null) {
+      sessionStorage.setItem('lastActiveTime', null);
       this.getChannel().trigger('logout:complete');
+    } else if (!model.previous('token')) {
+      sessionStorage.setItem('lastActiveTime', null);
     }
   },
 
@@ -322,7 +328,16 @@ const SessionManager = Marionette.Object.extend({
     }
 
     const modal = this.logoutWarningModal;
+    const lastActiveTime = new Date(sessionStorage.getItem('lastActiveTime')).getTime();
+    const logoutTimer = timerChannel.request('get:timer', 'logoutTimer');
+    const currentTime = Date.now();
+    const isSessionExpired = logoutTimer && lastActiveTime ? currentTime - lastActiveTime > logoutTimer.timeout_ms + configChannel.request('get', 'TIMEOUT_WARNING_OFFSET_MS') : false;
 
+    if (isSessionExpired) {
+      sessionStorage.setItem('lastActiveTime', new Date().toISOString());
+      return this.logoutWithRedirect();
+    }
+    
     // Don't count activity time while the warning modal is displayed.
     // Note: use the data on bs.modal, isRendered will always display true if the modal has
     // previously been shown - this is known behavior
@@ -347,75 +362,22 @@ const SessionManager = Marionette.Object.extend({
     removeListener(document, 'mousemove', this.updateLastActiveTime.bind(this));
   },
 
-  setActiveUpload(file_attrs) {
-    try {
-      const fileUploadQueueString = sessionStorage.getItem('fileUploadQueue');
-      const fileUploadQueue = typeof fileUploadQueueString === 'string' ? JSON.parse(fileUploadQueueString) : [];
-
-      let matchingFile = null;
-      let matchingFileIdx = null;
-
-      // There should never be two files with the same name
-      fileUploadQueue.forEach((obj, idx) => {
-        if (obj.file_name === file_attrs.file_name) {
-          matchingFile = file_attrs.file_name;
-          matchingFileIdx = idx;
-        }
-      });
-
-      // Update the record
-      if (matchingFile && typeof matchingFileIdx  === 'number') {
-        fileUploadQueue[fileUploadQueue[matchingFileIdx]] = file_attrs;
-      } else {
-        // Add the record to the stack
-        fileUploadQueue.push(file_attrs);
-      }
-
-      sessionStorage.setItem('fileUploadQueue', JSON.stringify(fileUploadQueue));
-    } catch (err) {
-      console.log('[Info] Failed to set active upload');
-      console.log(err);
-    }
+  getActiveApiCalls() {
+    return this.activeApiCalls.map(c => c);
   },
 
-  removeActiveUpload(file_attrs) {
-    try {
-      const fileUploadQueueString = sessionStorage.getItem('fileUploadQueue');
-      const fileUploadQueue = typeof fileUploadQueueString === 'string' ? JSON.parse(fileUploadQueueString) : [];
-
-      let matchingFile = null;
-      let matchingFileIdx = null;
-
-      // There should never be two files with the same name
-      fileUploadQueue.forEach((obj, idx) => {
-        if (obj.file_name === file_attrs.file_name) {
-          matchingFile = file_attrs.file_name;
-          matchingFileIdx = idx;
-        }
-      });
-
-      // Update the record
-      if (matchingFile && typeof matchingFileIdx  === 'number') {
-        fileUploadQueue.splice(matchingFileIdx, 1);
-      }
-
-      sessionStorage.setItem('fileUploadQueue', JSON.stringify(fileUploadQueue));
-    } catch (err) {
-      console.log('[Info] Failed to delete active upload');
-      console.log(err);
-    }
+  addActiveApiCall(apiCallAttrs={}, customDescription='') {
+    const generatedId = UtilityMixin.util_generateUUIDv4();
+    const callItem = Object.assign({
+      id: generatedId,
+      data: apiCallAttrs,
+    }, customDescription ? { description: customDescription } : null);
+    this.activeApiCalls.push(callItem);
+    return generatedId;
   },
 
-  getActiveUploads() {
-    try {
-      const fileUploadQueueString = sessionStorage.getItem('fileUploadQueue');
-      const fileUploadQueue = typeof fileUploadQueueString === 'string' ? JSON.parse(fileUploadQueueString) : [];
-
-      return fileUploadQueue;
-    } catch (err) {
-      console.log('[Info] Failed to get active uploads');
-      console.log(err);
-    }
+  removeActiveApiCall(activeApiCallId=null) {
+    this.activeApiCalls = this.activeApiCalls.filter(call => call.id !== activeApiCallId);
   },
 
   clearLogoutTimers() {
@@ -445,10 +407,11 @@ const SessionManager = Marionette.Object.extend({
     });
 
     getTimeoutValues.then((timeouts) => {
+      // createLogoutTimer and createLogoutWarningTimer must be run first or this.logoutWarningModal won't exist
       const logoutTimer = this.createLogoutTimer(timeouts.logout_timeout_ms);
       this.createLogoutWarningTimer(logoutTimer, timeouts.logout_timeout_ms, timeouts.warning_offset_ms);
       
-      // createLogoutTimer and createLogoutWarningTimer must be run first or this.logoutWarningModal won't exist
+      // Reset lastActiveTime as we are re-initializing our login timers etc
       this.createMousemoveListener();
     })
     .catch(() => {});
@@ -536,10 +499,8 @@ const SessionManager = Marionette.Object.extend({
         let sessionStartTime = null;
 
         if (lastActiveTime) {
-          console.log(logoutTimer);
           // Use the last active timestamp on the timer (1s poll rate)
           sessionStartTime = new Date(logoutTimer._last_active_timestamp).getTime();
-          console.log(sessionStartTime);
 
           // Add a bit of padding to the session start time in this comparison to create a small "dead zone".
           // This is to prevent the user activty that causes API calls to be counted towards activity in that next timeout window that is started after that API call returns
@@ -549,8 +510,8 @@ const SessionManager = Marionette.Object.extend({
           }
         }
 
-        // If there are active uploads automatically extend the session
-        if (this.getActiveUploads().length > 0) {
+        // If there are active api calls automatically extend the session
+        if (this.getActiveApiCalls()?.length) {
           autoExtendSession = true;
         }
 
@@ -591,7 +552,6 @@ const SessionManager = Marionette.Object.extend({
     });
 
     this.logoutWarningModal = modalTimeout;
-
     return logoutWarningTimer;
   },
 

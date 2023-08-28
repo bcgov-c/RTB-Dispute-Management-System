@@ -25,7 +25,7 @@ public class ExternalCustomDataObjectRepository : CmRepository<Model.ExternalCus
             .Select(d => d.ModifiedDate)
             .ToListAsync();
 
-        return dates?.FirstOrDefault();
+        return dates.FirstOrDefault();
     }
 
     public async Task<List<Model.ExternalCustomDataObject>> GetByPredicate(Expression<Func<Model.ExternalCustomDataObject, bool>> expression, int count, int index, CustomObjectSortField sortBy)

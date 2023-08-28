@@ -29,7 +29,8 @@ const animationChannel = Radio.channel('animations');
 
 const CeuApplicant = Marionette.View.extend({
   initialize(options) {
-    this.mergeOptions(options, ['baseName', 'contactInfoName', 'participantTypes', 'enableBirthday', 'enableDelete', 'showNameWarning']);
+    this.mergeOptions(options, ['baseName', 'contactInfoName', 'participantTypes',
+        'enableBirthday', 'enableDelete', 'enableCountrySelection', 'showNameWarning']);
     
     this.CEU_PARTICIPANT_TYPE_DISPLAYS = configChannel.request('get', 'CEU_PARTICIPANT_TYPE_DISPLAYS') || {};
     this.APPLICANT_FIELD_MAX = configChannel.request('get', 'APPLICANT_FIELD_MAX');
@@ -89,6 +90,7 @@ const CeuApplicant = Marionette.View.extend({
 
     this.firstNameModel = new InputModel({
       name: this.cid + '-firstname',
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'First Name',
       errorMessage: 'First Name is required',
@@ -101,6 +103,7 @@ const CeuApplicant = Marionette.View.extend({
 
     this.lastNameModel = new InputModel({
       name: this.cid + '-lastname',
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Last Name',
       errorMessage: 'Last Name is required',
@@ -123,7 +126,7 @@ const CeuApplicant = Marionette.View.extend({
       json: _.mapObject(participantAddressApiMappings, function(val) { return this.model.get(val); }, this),
       apiMapping: participantAddressApiMappings,
       name: this.cid + '-address',
-      useDefaultProvince: false,
+      selectProvinceAndCountry: this.enableCountrySelection,
       streetMaxLength: configChannel.request('get', 'PARTICIPANT_ADDRESS_FIELD_MAX')
     });
 
@@ -143,9 +146,10 @@ const CeuApplicant = Marionette.View.extend({
 
     this.mailingAddressModel = new AddressModel({
       name: this.cid + '-mailing-address',
-      useDefaultProvince: false,
       json: _.mapObject(participantMailingAddressApiMappings, function(val) { return this.model.get(val); }, this),
       apiMapping: participantMailingAddressApiMappings,
+      selectProvinceAndCountry: true,
+      showUpdateControls: false,
     });
     // Add text 'Mail' to each model with a labelText on address
     Object.keys(this.mailingAddressModel.attributes).forEach(attr => {

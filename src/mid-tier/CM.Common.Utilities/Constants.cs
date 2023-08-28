@@ -17,6 +17,12 @@ public static class Constants
     public const int OneRecordSaved = 1;
 
     public const double UnitMultiplier = 1024f;
+
+    public const int SecondsInMinute = 60;
+
+    public const int CanadaTrackingMinLength = 11;
+
+    public const int CanadaTrackingMaxLength = 16;
 }
 
 public static class ServiceNames
@@ -187,6 +193,30 @@ public static class SettingKeys
     public const string RecordingBatchSize = "RecordingBatchSize";
 
     public const string RecordingSourceDir = "RecordingSourceDir";
+
+    public const string EmailErrorResentHoursAgo = "EmailErrorResentHoursAgo";
+
+    public const string CPTrackingUser = "CPTrackingUser";
+
+    public const string CPTrackingPassword = "CPTrackingPassword";
+
+    public const string CPTrackingURL = "CPTrackingURL";
+
+    public const string ARSDeclarationReminderPeriod = "ARSDeclarationReminderPeriod";
+
+    public const string ARSReinstatementReminderPeriod = "ARSReinstatementReminderPeriod";
+
+    public const string MhvAppCnFirstReminderPeriod = "MhvAppCnFirstReminderPeriod";
+
+    public const string MhvAppNotLinkedFirstReminderPeriod = "MhvAppNotLinkedFirstReminderPeriod";
+
+    public const string MhvAppLinkedFirstReminderPeriod = "MhvAppLinkedFirstReminderPeriod";
+
+    public const string MhvAppCnFinalReminderPeriod = "MhvAppCnFinalReminderPeriod";
+
+    public const string MhvAppNotLinkedFinalReminderPeriod = "MhvAppNotLinkedFinalReminderPeriod";
+
+    public const string MhvAppLinkedFinalReminderPeriod = "MhvAppLinkedFinalReminderPeriod";
 }
 
 public static class ApiHeader
@@ -243,4 +273,15 @@ public static class ContentDisposition
 {
     public const string Inline = "inline";
     public const string Attachment = "attachment";
+}
+
+public enum ContentDispositionType
+{
+    Inline,
+    Attachment
+}
+
+public static class ConstantStrings
+{
+    public const string DeficientReason = "Hearing was removed from dispute file that this notice was generated for";
 }

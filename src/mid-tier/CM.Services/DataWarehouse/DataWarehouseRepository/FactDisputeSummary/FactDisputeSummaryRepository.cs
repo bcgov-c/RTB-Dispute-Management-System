@@ -23,12 +23,10 @@ public class FactDisputeSummaryRepository : DwRepository<DataWarehouseDataModel.
         return fact;
     }
 
-    public async Task<List<Guid>> GetDelayedDisputes(int dateDelay)
+    public async Task<List<Guid>> GetAllDisputes()
     {
-        var now = DateTime.UtcNow;
         var disputes = await Context
             .FactDisputeSummaries
-            .Where(x => x.LoadDateTime < now.AddDays(-dateDelay))
             .Select(x => x.DisputeGuid)
             .ToListAsync();
 

@@ -49,4 +49,25 @@ public partial class SecurityTests
         var commonFileDeleteResponse = CommonFileManager.DeleteCommonFile(Client, Data.CommonFiles[0].CommonFileId);
         commonFileDeleteResponse.StatusCode.Should().Be(httpStatusCode);
     }
+
+    [Theory]
+    [InlineData(Users.Admin, Users.Admin, HttpStatusCode.OK)]
+    [InlineData(Users.User, Users.User, HttpStatusCode.OK)]
+    [InlineData(null, null, HttpStatusCode.Unauthorized)]
+    [InlineData(Users.RemoteOffice, Users.RemoteOffice, HttpStatusCode.OK)]
+    public void CheckExternalCommonFileSecurity(string userName, string password, HttpStatusCode httpStatusCode)
+    {
+        if (userName == null)
+        {
+            var auth = Client.Authenticate(Data.Participant.AccessCode);
+            Assert.True(auth.ResponseObject is string);
+        }
+        else
+        {
+            var token = Client.Authenticate(userName, password);
+        }
+
+        var commonFilesGetResponse = CommonFileManager.GetExternalCommonFiles(Client);
+        commonFilesGetResponse.ResponseMessage.StatusCode.Should().Be(httpStatusCode);
+    }
 }

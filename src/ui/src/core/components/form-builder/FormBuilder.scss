@@ -1,0 +1,76 @@
+
+
+.form-builder {
+  
+  &__form {
+    &__submit { margin-top: 50px; }
+
+    /* Add some default max lengths to text and other inputs */
+    input { max-width: 320px; }
+    select { max-width: 320px; }
+    textarea { max-width: 320px; }
+  }
+
+  &__step {
+
+    &--nestedForm > .page-item-child-view > div:first-child {
+      display: flex;
+
+      > .form-group { margin-right: 15px; }
+    }
+  }
+}
+
+.vertical .form-builder {
+  &__form {
+    .page-item-container { margin-top: 30px; }
+    .page-item-container:first-child { margin-top: 10px; }
+  }
+}
+
+.horizontal .form-builder {
+  &__form__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-start;
+
+    > div { margin: 0 15px 15px 0; }
+  }
+}
+
+/* Interactive Form Builder Modal POC styles */
+.form-builder__interactive {
+  display: flex;
+  justify-content: space-around;
+
+  &__modal {
+
+  }
+  
+  &__inputs {
+    width: 45%;
+    min-width: 400px !important;
+    margin-right: 10px;
+    height: calc(100vh - 105px);
+
+    &__btns {
+      :first-child { margin-right: 15px; }
+      :last-child { float: right; }
+      margin-bottom: 25px;
+    }
+    .general-link { float: right; }
+  }
+
+  &__previews {
+    width: 45%;
+    min-width: 400px;
+    overflow-y: scroll;
+    height: calc(100vh - 105px);
+  }
+
+  &__preview {
+    border: 1px solid #333;
+    padding: 10px 40px 50px 40px;
+  }
+}

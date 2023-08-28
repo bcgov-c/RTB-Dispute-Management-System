@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that wraps multiple DropdownViews. Used for displaying dropdown's that have display logic tied to each other
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 

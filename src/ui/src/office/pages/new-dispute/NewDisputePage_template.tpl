@@ -35,9 +35,7 @@
       <div class="office-new-dispute-tenantdr-warning error-block warning <%= tenantDrWarning ? '' : 'hidden' %> "><%= tenantDrWarning %></div>
 
       <div class="office-page-flex-container office-page-new-dispute-address-container <%= tenantDrWarning ? 'hidden' : '' %>">
-        <div class="office-new-dispute-street"></div>
-        <div class="office-new-dispute-city"></div>
-        <div class="office-new-dispute-postal-code"></div>
+        <div class="office-new-page-address"></div>
       </div>
 
       <div class="office-new-dispute-geozone-warning error-block warning warning-sm <%= geozoneWarning ? '' : 'hidden' %>"><%= geozoneWarning %></div>
@@ -103,7 +101,11 @@
           <div class="">Does the applicant know the address of the respondent to serve them dispute documents?</div>
         </div>
         <div class="office-new-dispute-additional-forms-error error-block warning <%= doesNotHaveRespondentAddress ? '' : 'hidden' %>">
-          If the applicant does not know the address of the respondent for serving dispute documents, they should fill out and include the substituted service application form RTB-13 with the application forms unless the applicant is confident that they are able to serve the documents in person.
+          Let the applicant know they must be able to serve documents and evidence to each respondent in a method allowed by the Residential Tenancy Act.
+          If they cannot serve documents in person, do not have the service address of each respondent or do not have a written agreement to serve documents by email, they can apply for substituted service by filling in the #RTB-13 to serve documents in a different way with proof the respondent(s) would receive them.
+          There is no additional fee for an application for substituted service. If they are unable to serve documents, the dispute may not proceed and the filing fee will not be refunded.
+          <br/>
+          Scan the completed #RTB-13 and attach it as a separate document WITH the new application.
         </div>
 
         <div class="office-page-flex-container office-new-dispute-rtb-dropdown-container clearfix <%= formConfig.includes('requiredEvidenceRegion') ? '' : 'hidden' %>">

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays clickable menu attached to hearing items (CalendarGridEvent). Used to display menu options for linked hearings.
+ */
 import Marionette from 'backbone.marionette';
 
 import template from './CalendarGridLinkMenu_template.tpl';
@@ -16,6 +19,9 @@ export default Marionette.View.extend({
     this.trigger(currentMenuOption.event, currentMenuOption.disputeHearing);
   },
 
+  /**
+   * @param {Array} linkMenuOptions
+   */
   initialize(options) {
     this.mergeOptions(options, ['linkMenuOptions']);
   },

@@ -2,6 +2,7 @@ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ContextContainer from '../../components/context-container/ContextContainer';
 import DisputeClaimView from '../../components/dispute-claim/DisputeClaim';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const disputeChannel = Radio.channel('dispute');
 const Formatter = Radio.channel('formatter').request('get');
@@ -46,6 +47,7 @@ const EvidencePageClaimView = Marionette.View.extend({
 
   onRender() {
     const isSupportingEvidence = this.model.isSupportingEvidence();
+    const disputeModel = disputeChannel.request('get');
     this.showChildView('claimWithMenu', ContextContainer.withContextMenu({
       wrappedView: new DisputeClaimView({
         model: this.model,
@@ -65,7 +67,8 @@ const EvidencePageClaimView = Marionette.View.extend({
         default: this._hasUploadedFiles ? [{ name: `Download All (${this._fileCountDisplay}, ${this._totalFileSizeDisplay})`, event: 'download:all' }] : []
       },
       cssClass: this.model.isSupportingEvidence() ? 'dispute-claim-supporting' : null,
-      disputeModel: disputeChannel.request('get')
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Evidence', 'claims', isSupportingEvidence ? 'supporting' : this.model.id),
     }));
   },
 

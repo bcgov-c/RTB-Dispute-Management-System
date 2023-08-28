@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
@@ -60,6 +60,16 @@
     <None Remove="EmailTemplates\14_NonParticipatory-SubmittedPaid.html" />
     <None Remove="EmailTemplates\15_Submit-NonPartOfficePaymentRequired.html" />
     <None Remove="EmailTemplates\16_NonParticipatory-UpdateSubmitted.html" />
+    <None Remove="EmailTemplates\33_ARS_DecDeadlineReminder.html" />
+    <None Remove="EmailTemplates\34_ARS_RecDeadlineReminder.html" />
+    <None Remove="EmailTemplates\35_ARS_RecDeadlineReminder.html" />
+    <None Remove="EmailTemplates\36_ARS_RecDeadlineReminder.html" />
+    <None Remove="EmailTemplates\37_MhvAppCnFirstReminder.html" />
+    <None Remove="EmailTemplates\38_MhvAppCnFinalReminder.html" />
+    <None Remove="EmailTemplates\39_MhvAppLinkedFirstReminder.html" />
+    <None Remove="EmailTemplates\40_MhvAppLinkedFinalReminder.html" />
+    <None Remove="EmailTemplates\41_MhvAppNotLinkedFirstReminder.html" />
+    <None Remove="EmailTemplates\42_MhvAppNotLinkedFinalReminder.html" />
     <None Remove="secrets\appsettings.json" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +149,24 @@
     <EmbeddedResource Include="EmailTemplates\31_PfrParticipatoryApplicantEvidenceReminder.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\42_MhvAppNotLinkedFinalReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\41_MhvAppNotLinkedFirstReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\40_MhvAppLinkedFinalReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\39_MhvAppLinkedFirstReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\38_MhvAppCnFinalReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EmailTemplates\37_MhvAppCnFirstReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
 	</ItemGroup>
   <ItemGroup>
     <None Update="TestData\Files\OtherFile1.pdf">
@@ -190,6 +218,22 @@
     </EmbeddedResource>
     <None Remove="EmailTemplates\07_ParticipatoryHearingReminder.html" />
     <EmbeddedResource Include="EmailTemplates\07_ParticipatoryHearingReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\33_ARS_DecDeadlineReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\33_ARS_DecDeadlineReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\34_ARS_RecDeadlineReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\34_ARS_RecDeadlineReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\35_ARS_RecDeadlineReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\35_ARS_RecDeadlineReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Remove="EmailTemplates\36_ARS_RecDeadlineReminder.html" />
+    <EmbeddedResource Include="EmailTemplates\36_ARS_RecDeadlineReminder.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

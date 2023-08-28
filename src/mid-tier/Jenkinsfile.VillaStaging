@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     dotnet = 'dotnet.exe'
-    API_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-test2/api'
+    API_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-test2/dms-services'
     CLUSTER_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-test2'
     TEMP_FOLDER = 'D:/Temp'
     BACKUP_FOLDER = 'D:/dms-build-backup'
@@ -127,7 +127,7 @@ pipeline {
     stage ('Check Service Health') {
         steps {                      
           script {
-            def response = httpRequest timeout: 30, url: 'https://www.hive1dev.ca/ext/dms-test2/api/mid-tier/check'
+            def response = httpRequest timeout: 30, url: 'https://www.hive1dev.ca/ext/dms-test2/api-gateway/dms-services/health-ui-api'
 
             if (response.status != 200 && response.status != 201 ) {
                 echo "Service error with status code = ${response.status}"

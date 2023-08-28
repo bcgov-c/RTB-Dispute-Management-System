@@ -54,6 +54,11 @@ public static class CommonFileManager
         return client.GetAsync<List<CommonFileResponse>>(RouteHelper.GetCommonFiles);
     }
 
+    public static EntityWithStatus<CommonFileExternalResponse> GetExternalCommonFiles(HttpClient client)
+    {
+        return client.GetAsync<CommonFileExternalResponse>(RouteHelper.GetExternalCommonFiles);
+    }
+
     public static HttpResponseMessage DeleteCommonFile(HttpClient client, int commonFileId)
     {
         var response = client.DeleteAsync(RouteHelper.DeleteCommonFile + commonFileId).Result;

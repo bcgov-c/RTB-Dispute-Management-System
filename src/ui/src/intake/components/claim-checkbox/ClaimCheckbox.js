@@ -32,7 +32,13 @@ export default Marionette.View.extend({
 
     this.listenTo(this.model, 'render', this.render, this);
 
-    this.listenTo(this.model, 'dropdownChanged', function() {
+    const dropdownChangeFn = this.model.get('getDropdownChangeFn');
+    this.listenTo(this.model, 'dropdownChanged', function(dropdownModel) {
+      if (typeof dropdownChangeFn === 'function') {
+        console.log("dropdown changed", this.model);
+        dropdownChangeFn.call(this, this.model, dropdownModel);
+      }
+
       // Clear all error messages when a dropdown gets a changed value
       _.each(this.regions, function(selector, region) {
         const childView = this.getChildView(region);

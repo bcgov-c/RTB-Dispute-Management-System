@@ -47,8 +47,9 @@ public class DisputeHearingRepository : CmRepository<Model.DisputeHearing>, IDis
 
     public async Task<List<Model.DisputeHearing>> GetDisputeHearingsByDispute(Guid disputeGuid)
     {
-        var disputeHearings = await Context.DisputeHearings
-            .Where(x => x.DisputeGuid == disputeGuid)
+        var disputeHearings = await Context
+            .DisputeHearings
+            .Where(x => x.DisputeGuid == disputeGuid && x.Hearing.IsDeleted == false)
             .ToListAsync();
 
         return disputeHearings;
@@ -126,12 +127,12 @@ public class DisputeHearingRepository : CmRepository<Model.DisputeHearing>, IDis
         return isExist;
     }
 
-    public async Task<List<int>> GetDisputeHearingsByHearingStartDate(DateTime startDate, DateTime endDate)
+    public async Task<List<Hearing>> GetDisputeHearingsByHearingStartDate(DateTime startDate, DateTime endDate)
     {
         var disputeHearings = await Context.DisputeHearings
             .Include(x => x.Hearing)
             .Where(x => x.Hearing.HearingStartDateTime >= startDate && x.Hearing.HearingStartDateTime <= endDate)
-            .Select(x => x.HearingId)
+            .Select(x => x.Hearing)
             .Distinct()
             .ToListAsync();
         return disputeHearings;
@@ -190,5 +191,22 @@ public class DisputeHearingRepository : CmRepository<Model.DisputeHearing>, IDis
             .ToListAsync();
 
         return disputeHearing.FirstOrDefault();
+    }
+
+    public async Task<List<Model.DisputeHearing>> GetFutureDisputeHearings(Guid disputeGuid)
+    {
+        var disputeHearings = await Context
+            .DisputeHearings
+            .Include(x => x.Hearing)
+            .Where(x => x.DisputeGuid == disputeGuid && x.Hearing.HearingStartDateTime > DateTime.UtcNow)
+            .ToListAsync();
+
+        return disputeHearings;
+    }
+
+    public async Task<bool> IsExists(int? hearingId, Guid disputeGuid)
+    {
+        var isExists = await Context.DisputeHearings.AnyAsync(x => x.HearingId == hearingId && x.DisputeGuid == disputeGuid);
+        return isExists;
     }
 }

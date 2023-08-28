@@ -6,7 +6,6 @@ using CM.Business.Services.Files;
 using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -33,7 +32,7 @@ public class FilePackageServiceController : BaseController
 
     [HttpPost("{filePackageId:int}")]
     [AuthorizationRequired(new[] { RoleNames.AdminLimited, RoleNames.ExtendedUser })]
-    public async Task<IActionResult> Post(int filePackageId, [FromBody]FilePackageServiceRequest request)
+    public async Task<IActionResult> Post(int filePackageId, [FromBody] FilePackageServiceRequest request)
     {
         if (!ModelState.IsValid)
         {
@@ -49,7 +48,7 @@ public class FilePackageServiceController : BaseController
         if (request.ParticipantId.HasValue)
         {
             var participant = await _participantService.GetByIdAsync(request.ParticipantId.Value);
-            if (filePackage.DisputeGuid != participant.DisputeGuid)
+            if (participant == null || filePackage.DisputeGuid != participant.DisputeGuid)
             {
                 return BadRequest(ApiReturnMessages.InvalidParticipant);
             }
@@ -92,7 +91,7 @@ public class FilePackageServiceController : BaseController
     [HttpPatch("{filePackageServiceId:int}")]
     [ApplyConcurrencyCheck]
     [AuthorizationRequired(new[] { RoleNames.AdminLimited, RoleNames.ExtendedUser })]
-    public async Task<IActionResult> Patch(int filePackageServiceId, [FromBody]JsonPatchDocumentExtension<FilePackageServicePatchRequest> filePackageService)
+    public async Task<IActionResult> Patch(int filePackageServiceId, [FromBody] JsonPatchDocumentExtension<FilePackageServicePatchRequest> filePackageService)
     {
         if (CheckModified(_filePackageServiceService, filePackageServiceId))
         {
@@ -136,8 +135,10 @@ public class FilePackageServiceController : BaseController
                 }
             }
 
+            var useCase = _filePackageServiceService.GetServiceAuditLogUseCase(originalFilePackageService, filePackageServiceToPatch);
+
             await DisputeResolveAndSetContext(_filePackageServiceService, filePackageServiceId);
-            var result = await _filePackageServiceService.PatchAsync(filePackageServiceId, filePackageServiceToPatch);
+            var result = await _filePackageServiceService.PatchAsync(filePackageServiceId, filePackageServiceToPatch, useCase);
 
             if (result != null)
             {

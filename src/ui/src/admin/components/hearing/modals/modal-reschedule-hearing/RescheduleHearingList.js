@@ -23,16 +23,17 @@ export default Marionette.View.extend({
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['hearingModel', 'parentModalView']);
+    this.mergeOptions(options, ['hearingModel', 'parentModalView', 'deleteAfterReschedule']);
   },
 
   onRender() {
     const hearingModel = this.hearingModel;
     const parentModalView = this.parentModalView;
+    const deleteAfterReschedule = this.deleteAfterReschedule
     this.showChildView('listRegion', new AvailableHearingsList({
       collection: this.collection,
       childViewOptions() {
-        return { hearingModel, parentModalView };
+        return { hearingModel, parentModalView, deleteAfterReschedule };
       },
       viewComparator: 'local_start_datetime'
     }));

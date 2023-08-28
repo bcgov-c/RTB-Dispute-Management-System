@@ -65,6 +65,6 @@ public class DbContextDesignTimeDbContextFactory : DesignTimeDbContextFactoryBas
 {
     protected override AdHocReportContext CreateNewInstance(DbContextOptions<AdHocReportContext> options)
     {
-        return new AdHocReportContext(options);
+        return new AdHocReportContext(options, null);
     }
 }

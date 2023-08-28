@@ -26,11 +26,15 @@
         <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
+        <PackageReference Include="FFMpegCore" Version="5.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
         <PackageReference Include="MimeTypes" Version="2.3.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="NetVips" Version="2.1.0" />
+        <PackageReference Include="PdfPig" Version="0.1.8" />
         <PackageReference Include="Serilog" Version="2.10.0" />
         <PackageReference Include="StyleCop.Analyzers.Error" Version="1.0.2" />
     </ItemGroup>

@@ -40,7 +40,7 @@
 
       <div class="float-right">
         <button type="button" class="btn btn-lg btn-default btn-cancel">Cancel</button>
-        <button type="button" class="btn btn-lg btn-default btn-primary btn-save"><%= assignToMeClicked ? 'Save and Open' : 'Save' %></button>
+        <button type="button" class="btn btn-lg btn-default btn-primary btn-save"><%= navigateAfterSave ? 'Save and Open' : 'Save' %></button>
       </div>
     </div>
   </div>

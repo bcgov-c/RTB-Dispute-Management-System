@@ -1,4 +1,6 @@
-
+/**
+ * @fileoverview - Contains helper functions for working schedule feature
+ */
 import Radio from 'backbone.radio';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -171,12 +173,8 @@ const ModalGenerateAndSendNotice = ModalBaseView.extend({
 
     const modalView = new ModalAddBlock({
       blockOwner: userChannel.request('get:user', this.model.get('request_submitter')),
-      desiredBlockType: this.model.getScheduleBlockType(),
-      desiredBlockStart: startDate,
-      desiredBlockEnd: endDate,
       model: this.model,
       hideControls: true,
-      
       blockModel,
     });
 

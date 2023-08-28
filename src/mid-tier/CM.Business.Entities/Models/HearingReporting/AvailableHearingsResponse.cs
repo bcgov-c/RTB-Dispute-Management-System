@@ -47,4 +47,7 @@ public class AvailableHearing
 
     [JsonProperty("local_end_datetime")]
     public DateTime LocalEndDateTime { get; set; }
+
+    [JsonProperty("conference_type")]
+    public byte? ConferenceType { get; set; }
 }

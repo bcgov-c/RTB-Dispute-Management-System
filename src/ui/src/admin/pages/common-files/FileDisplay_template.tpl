@@ -2,7 +2,8 @@
   <div class="file-display-card">
     <div class="file-display-card-content">
       <div class="file-display-image-container">
-        <img class="file-display-image" src="<%= file.getThumbnailURL() %>"/>
+        <img class="file-display-image" src="<%= LoaderImg %>" />
+        <img class="file-display-image hidden" src="<%= file.getThumbnailURL() %>" />
       </div>
       <div class="file-display-card-description">
         <div class="file-display-card-description-wrapper <%= noControls ? 'file-display-card-description-no-controls' : '' %>" >
@@ -15,8 +16,8 @@
           <% } %>
           <% if (showModelType) { %><img class="file-display-model-type" src="<%= modelTypeIconUrl %>"/><% } %>
           <% if (showEdit) { %><img class="file-display-edit" src="<%= require('../../static/Icon_Admin_Cmn_Edit.png') %>"/><% } %>
-          <span class="file-display-name filename-download"><%= file_name %></span>
-
+          
+          <span class="file-display-name <%= showFilenameDownload ? 'filename-download' : '' %>"><%= file_name %></span>
 <% if (showThumbnails) { %>
         </div>
 <% } %>

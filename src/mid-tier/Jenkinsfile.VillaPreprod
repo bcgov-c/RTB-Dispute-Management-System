@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     dotnet = 'dotnet.exe'
-    API_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-preprod/api'
+    API_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-preprod/dms-services'
     CLUSTER_ROOT_FOLDER = 'D:/InetPub/wwwroot/ext/dms-preprod/'
     TEMP_FOLDER = 'D:/Temp'
     BACKUP_FOLDER = 'D:/dms-build-backup'

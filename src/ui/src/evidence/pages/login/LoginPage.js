@@ -95,7 +95,7 @@ export default Marionette.View.extend({
       } else if (this.hasRestrictedDisputeCreationMethodAndTruth()) {
         this.showInvalidCreationMethodMessage();
       } else {
-        this.model.set('routingfromLogin', true);
+        this.model.set('routingFromLogin', true);
         Backbone.history.navigate('access', { trigger: true });
       }
       loaderChannel.trigger('page:load:complete');
@@ -137,7 +137,7 @@ export default Marionette.View.extend({
       cancelButtonText: 'Exit',
       onContinueFn: (modalView) => {
         modalView.close();
-        this.model.set('routingfromLogin', true);
+        this.model.set('routingFromLogin', true);
         Backbone.history.navigate('access', { trigger: true });
       },
       onCancelFn(modalView) {

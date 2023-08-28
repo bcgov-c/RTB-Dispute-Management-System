@@ -1,0 +1,29 @@
+.service-history-table {
+  margin: 30px 0 10px 0;
+  
+  &__header {
+    display: flex;
+  }
+
+  .standard-list-item { display: flex; }
+
+  &__action-date { min-width: 180px; width: 180px; }
+  &__action-by { min-width: 145px; width: 145px; }
+  &__change { min-width: 165px; width: 165px; }
+  &__record-id { min-width: 80px; width: 80px; }
+  &__served { min-width: 70px; width: 70px; }
+  &__method { min-width: 180px; width: 180px; }
+  &__date { min-width: 170px; width: 170px; }
+  &__served-by { min-width: 145px; width: 145px; }
+  &__proof-id { min-width: 100px; width: 100px; }
+  &__validation-status { min-width: 155px; width: 155px; }
+  &__details-icon{
+    &__img { cursor: pointer; }
+  }
+}
+
+#modalServiceHistory-modal {
+  .modal-dialog {
+    min-width: 1450px;
+  }
+}

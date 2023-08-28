@@ -3,8 +3,46 @@
 <div class="dac__access-menu">
 
   <% if (hasMenuActions) { %>
+    <% if (showIVDAlert) { %>
+      <div class="warning-alert">
+        <span>
+          DID YOU KNOW? You can view your submitted application, evidence and request(s) by&nbsp;<a href="<%= intakeUrl %>" target="_blank" rel="noopener noreferrer">logging in online with your BCeID</a>. 
+          Outcomes and decisions can also be viewed there once they are complete.
+        </span>
+      </div>
+    <% } %>
+
     <div class="dac__access-menu__info">The following options are available.  What would you like to do?</div>
+    
+    <% if (showArsDeadlineWarning) { %>
+      <div class="warning-alert">
+        <span>
+          You must indicate to the Residential Tenancy Branch that you served the Notice of Dispute Resolution Proceeding Package using the link below or at the Residential Tenancy Branch or Service BC Centre.
+          You must declare service for at least one respondent before&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('service_deadline_date')) %></b>&nbsp;or your hearing and application will be adjourned.
+        </span>
+      </div>
+    <% } %>
+    
+    <% if (showArsReinstatementDeadlineWarning) { %>
+      <div class="warning-alert">
+        <span>
+          This dispute has been adjourned because you did not declare service to at least one respondent before the declaration deadline&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('service_deadline_date')) %></b>.
+          If you have served the respondent(s), you may request to reinstate your hearing by providing proof of service RTB-55 at the link below or at the Residential Tenancy Branch or Service BC Centre by&nbsp;<b><%= Formatter.toFullDateAndTimeDisplay(notice.get('second_service_deadline_date')) %></b>.
+          If you do not provide proof that the notice of dispute has been served, your dispute will be deemed withdrawn.
+        </span>
+      </div>
+    <% } %>
+    
     <div class="dac__access-menu__items">
+      <% if (canRequestReinstatement) { %>
+        <div class="dac__access-menu__item dac__access-menu__item--reinstatement">
+          <div class="dac__access-menu__item__icon "></div>
+          <div class="dac__access-menu__item__content">
+            <div class="dac__access-menu__item__title">I want to request to reinstate my dispute</div>
+            <div class="dac__access-menu__item__subtitle">Use this option to upload your proof of service RTB-55</div>
+          </div>
+        </div>
+      <% } %>
       <% if (canMakePayment) { %>
         <% _.escape.each(payableFees, function(fee) { %>
           <% var feeTypeDisplay = Formatter.toFeeTypeDisplay(fee.get('fee_type')); %>
@@ -32,6 +70,15 @@
             <div class="dac__access-menu__item__content">
               <div class="dac__access-menu__item__title">I want to update my contact information</div>
               <div class="dac__access-menu__item__subtitle">Use this option to add or update your email address and phone number so that you can be contacted by the Residential Tenancy Branch about your dispute.</div>
+            </div>
+        </div>
+      <% } %>
+      <% if (canRequestAmendment) { %>
+        <div class="dac__access-menu__item dac__access-menu__item--amendment">
+            <div class="dac__access-menu__item__icon "></div>
+            <div class="dac__access-menu__item__content">
+              <div class="dac__access-menu__item__title">I want to submit a paper request for an amendment</div>
+              <div class="dac__access-menu__item__subtitle">Use this option to submit a request for an amendment.</div>
             </div>
         </div>
       <% } %>

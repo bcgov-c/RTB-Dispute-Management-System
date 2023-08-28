@@ -17,7 +17,6 @@ using CM.Storage;
 using CM.Storage.FileSystem;
 using CM.WebAPI.Filters;
 using CM.WebAPI.Jwt;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;

@@ -8,6 +8,7 @@ import NoteModel from '../../components/note/Note_model';
 import NoteView from '../../components/note/Note';
 import CommunicationNotesListView from './CommunicationNotesList';
 import template from './CommunicationNoteSection_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const NOTE_TYPE_CODE_ALL = 1;
 
@@ -30,11 +31,13 @@ export default Marionette.View.extend({
   ui: {
     'addNoteContainer': '.comm-note-section-add-container',
     'addNote': '#comm-add-note-btn',
-    'notesFilter': '.notes-filter'
+    'notesFilter': '.notes-filter',
+    collapse: '.dispute-section-title-add.collapse-icon',
   },
 
   events: {
-    'click @ui.addNote': 'clickAddNote'
+    'click @ui.addNote': 'clickAddNote',
+    'click @ui.collapse': 'clickCollapse',
   },
 
   clickAddNote() {
@@ -43,6 +46,12 @@ export default Marionette.View.extend({
     }
     this.initializeNoteAddModel();
     this.renderNoteAddRegion();
+  },
+
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
   },
 
   initializeNoteAddModel() {
@@ -76,6 +85,9 @@ export default Marionette.View.extend({
   initialize() {
     this.dispute = this.model;
     this.draftText = notesChannel.request('get:draft', this.dispute.id);
+    
+    this.collapseHandler = SessionCollapse.createHandler(this.dispute, 'Communications', 'Notes');
+    this.isCollapsed = this.collapseHandler?.get();
     this.createSubModels();
     this.setupListeners();
   },
@@ -166,6 +178,7 @@ export default Marionette.View.extend({
   },
 
   onRender() {
+    if (this.isCollapsed) return;
     this.showChildView('noteTypeFilters', new RadioView({ model: this.noteTypeFiltersModel }));
     this.showChildView('noteCreatorFilter', new DropdownView({ model: this.noteCreatorFilterModel, displayTitle: 'Created By:' }));
 
@@ -202,7 +215,9 @@ export default Marionette.View.extend({
   templateContext() {
     return {
       length: this.collection.length,
-      selectedNoteFilter: this.getPrintNoteFilterText()
+      selectedNoteFilter: this.getPrintNoteFilterText(),
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 });

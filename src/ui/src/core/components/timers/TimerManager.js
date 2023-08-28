@@ -1,5 +1,5 @@
 /**
- * Tracks global timers.  These timers keep time on mobile devices as well
+ * @fileoverview - Tracks global timers.  These timers keep time on mobile devices as well
  * Manages the disputeChannel.  Exports a singleton instance of {@link core.components.timers.|TimerManagerClass}.
  * @namespace core.components.timers.TimerManager
  * @memberof core.components.timers

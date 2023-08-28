@@ -6,6 +6,7 @@ using AutoMapper;
 using CM.Business.Entities.Models.DisputeHearing;
 using CM.Business.Services.Hearings;
 using CM.Common.Utilities;
+using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
 
 namespace CM.Business.Services.DisputeHearing;
@@ -13,11 +14,13 @@ namespace CM.Business.Services.DisputeHearing;
 public class DisputeHearingService : CmServiceBase, IDisputeHearingService
 {
     private readonly IHearingAuditLogService _hearingAuditLogService;
+    private readonly IHearingService _hearingService;
 
-    public DisputeHearingService(IMapper mapper, IUnitOfWork unitOfWork, IHearingAuditLogService hearingAuditLogService)
+    public DisputeHearingService(IMapper mapper, IUnitOfWork unitOfWork, IHearingAuditLogService hearingAuditLogService, IHearingService hearingService)
         : base(unitOfWork, mapper)
     {
         _hearingAuditLogService = hearingAuditLogService;
+        _hearingService = hearingService;
     }
 
     public async Task<DisputeHearingResponse> CreateAsync(DisputeHearingRequest request)
@@ -135,5 +138,41 @@ public class DisputeHearingService : CmServiceBase, IDisputeHearingService
     {
         var disputeHearing = await UnitOfWork.DisputeHearingRepository.GetHearingByRecordCodeAndDate(recordCode, startDate);
         return disputeHearing;
+    }
+
+    public async Task<List<Data.Model.DisputeHearing>> GetDisputeHearings(Guid disputeGuid)
+    {
+        var disputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearings(disputeGuid);
+        return disputeHearings;
+    }
+
+    public async Task<DisputeHearingGetResponse> LinkPastHearing(Guid staticDisputeGuid, Guid movedDisputeGuid)
+    {
+        var movedDisputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearings(movedDisputeGuid);
+        var movedDisputeHearing = movedDisputeHearings.OrderByDescending(x => x.Hearing.HearingStartDateTime).FirstOrDefault();
+        await DeleteAsync(movedDisputeHearing.DisputeHearingId);
+
+        var staticDisputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearings(staticDisputeGuid);
+        var staticDisputeHearing = staticDisputeHearings.OrderByDescending(x => x.Hearing.HearingStartDateTime).FirstOrDefault();
+
+        await CreateAsync(new DisputeHearingRequest()
+        {
+            DisputeGuid = movedDisputeGuid,
+            HearingId = staticDisputeHearing.HearingId,
+            DisputeHearingRole = (byte)DisputeHearingRole.Secondary,
+            SharedHearingLinkType = (byte)SharedHearingLinkType.Cross
+        });
+
+        staticDisputeHearing.SharedHearingLinkType = (byte)SharedHearingLinkType.Cross;
+        staticDisputeHearing.DisputeHearingRole = (byte)DisputeHearingRole.Active;
+        await PatchAsync(staticDisputeHearing);
+
+        return await _hearingService.GetHearing(staticDisputeHearing.HearingId);
+    }
+
+    public async Task<bool> IsExistedDisputeHearing(int? hearingId, Guid disputeGuid)
+    {
+        var isExisted = await UnitOfWork.DisputeHearingRepository.IsExists(hearingId, disputeGuid);
+        return isExisted;
     }
 }

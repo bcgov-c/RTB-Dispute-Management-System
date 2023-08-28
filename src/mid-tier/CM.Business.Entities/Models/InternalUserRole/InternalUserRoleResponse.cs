@@ -35,4 +35,7 @@ public class InternalUserRoleResponse : CommonResponse
 
     [JsonProperty("access_sub_types")]
     public byte? AccessSubTypes { get; set; }
+
+    [JsonProperty("role_note")]
+    public string RoleNote { get; set; }
 }

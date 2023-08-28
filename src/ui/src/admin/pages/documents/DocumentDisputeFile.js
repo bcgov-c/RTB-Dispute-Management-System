@@ -32,6 +32,7 @@ export default Marionette.View.extend({
   clickEditFile() {
     const modalAddFiles = new ModalAddFiles({
       processing_options: {
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
         errorModalTitle: 'Adding Documents',
         maxNonVideoFileSize: 50 * 1024 * 1024
       }, // 50MB
@@ -64,6 +65,8 @@ export default Marionette.View.extend({
 
   initialize(options) {
     this.mergeOptions(options, ['showControls']);
+    const isAmendment = configChannel.request('get', 'AMENDMENT_FORM_CODES')?.includes(this.model.getDescriptionCode());
+    this.showControls = isAmendment ? false : this.showControls;
   },
 
   onRender() {

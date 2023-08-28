@@ -7,7 +7,6 @@ using CM.Business.Services.NoticeService;
 using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 using NoticeService = CM.Data.Model.NoticeService;
@@ -19,18 +18,16 @@ namespace CM.WebAPI.Controllers;
 public class NoticeServiceController : BaseController
 {
     private readonly IFileDescriptionService _fileDescriptionService;
-    private readonly IFileService _fileService;
     private readonly IMapper _mapper;
     private readonly INoticeService _noticeService;
     private readonly INoticeServiceService _noticeServiceService;
     private readonly IParticipantService _participantService;
 
-    public NoticeServiceController(INoticeServiceService noticeServiceService, INoticeService noticeService, IParticipantService participantService, IFileService fileService, IMapper mapper, IFileDescriptionService fileDescriptionService)
+    public NoticeServiceController(INoticeServiceService noticeServiceService, INoticeService noticeService, IParticipantService participantService, IMapper mapper, IFileDescriptionService fileDescriptionService)
     {
         _noticeServiceService = noticeServiceService;
         _noticeService = noticeService;
         _participantService = participantService;
-        _fileService = fileService;
         _fileDescriptionService = fileDescriptionService;
         _mapper = mapper;
     }
@@ -70,6 +67,27 @@ public class NoticeServiceController : BaseController
             return BadRequest(string.Format(ApiReturnMessages.ParticipantDoesNotExist, request.ParticipantId));
         }
 
+        var notice = await _noticeService.GetNoTrackingNoticeAsync(noticeId);
+        if (request.ProofFileDescriptionId.HasValue)
+        {
+            var proofFileDescriptionExists = await _fileDescriptionService
+                .FileDescriptionExists(notice.DisputeGuid, request.ProofFileDescriptionId.Value);
+            if (!proofFileDescriptionExists)
+            {
+                return BadRequest(string.Format(ApiReturnMessages.ProofFileDescriptionInvalid, request.ProofFileDescriptionId, notice.DisputeGuid));
+            }
+        }
+
+        if (request.OtherProofFileDescriptionId.HasValue)
+        {
+            var otherProofFileDescriptionExists = await _fileDescriptionService
+                .FileDescriptionExists(notice.DisputeGuid, request.OtherProofFileDescriptionId.Value);
+            if (!otherProofFileDescriptionExists)
+            {
+                return BadRequest(string.Format(ApiReturnMessages.OtherProofFileDescriptionInvalid, request.OtherProofFileDescriptionId, notice.DisputeGuid));
+            }
+        }
+
         await DisputeResolveAndSetContext(_noticeService, noticeId);
         var newNoticeService = await _noticeServiceService.CreateAsync(noticeId, request);
         EntityIdSetContext(newNoticeService.NoticeServiceId);
@@ -99,7 +117,7 @@ public class NoticeServiceController : BaseController
 
     [HttpPatch("{noticeServiceId:int}")]
     [ApplyConcurrencyCheck]
-    [AuthorizationRequired(new[] { RoleNames.AdminLimited, RoleNames.ExtendedUser })]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser })]
     public async Task<IActionResult> Patch(int noticeServiceId, [FromBody]JsonPatchDocumentExtension<NoticeServicePatchRequest> noticeService)
     {
         if (CheckModified(_noticeServiceService, noticeServiceId))
@@ -124,40 +142,10 @@ public class NoticeServiceController : BaseController
                 return BadRequest(string.Format(ApiReturnMessages.ParticipantDoesNotExist, participantId.Value));
             }
 
-            var servedParticipantId = noticeService.GetValue<int>("/served_by");
-            if (servedParticipantId.Exists && !await _participantService.ParticipantExists(servedParticipantId.Value))
+            var servedParticipantId = noticeService.GetValue<int?>("/served_by");
+            if (servedParticipantId.Exists && servedParticipantId.Value != null && !await _participantService.ParticipantExists(servedParticipantId.Value))
             {
                 return BadRequest(string.Format(ApiReturnMessages.ParticipantDoesNotExist, servedParticipantId.Value));
-            }
-
-            var file1Id = noticeService.GetValue<int>("/notice_service_file_1id");
-            if (file1Id.Exists && !await _fileService.FileExists(file1Id.Value))
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, file1Id.Value));
-            }
-
-            var file2Id = noticeService.GetValue<int>("/notice_service_file_2id");
-            if (file2Id.Exists && !await _fileService.FileExists(file2Id.Value))
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, file2Id.Value));
-            }
-
-            var file3Id = noticeService.GetValue<int>("/notice_service_file_3id");
-            if (file3Id.Exists && !await _fileService.FileExists(file3Id.Value))
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, file3Id.Value));
-            }
-
-            var file4Id = noticeService.GetValue<int>("/notice_service_file_4id");
-            if (file4Id.Exists && !await _fileService.FileExists(file4Id.Value))
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, file4Id.Value));
-            }
-
-            var file5Id = noticeService.GetValue<int>("/notice_service_file_5id");
-            if (file5Id.Exists && !await _fileService.FileExists(file5Id.Value))
-            {
-                return BadRequest(string.Format(ApiReturnMessages.FileDoesNotExist, file5Id.Value));
             }
 
             var proofFileDescriptionId = noticeService.GetValue<int?>("/proof_file_description_id");
@@ -171,9 +159,22 @@ public class NoticeServiceController : BaseController
                 }
             }
 
+            var otherProofFileDescriptionId = noticeService.GetValue<int?>("/other_proof_file_description_id");
+            if (otherProofFileDescriptionId.Exists && otherProofFileDescriptionId.Value.HasValue)
+            {
+                var fileDescription = await _fileDescriptionService.GetAsync(otherProofFileDescriptionId.Value.Value);
+                var notice = await _noticeService.GetNoTrackingNoticeAsync(originalNoticeService.NoticeId);
+                if (fileDescription.DisputeGuid != notice.DisputeGuid)
+                {
+                    return BadRequest(string.Format(ApiReturnMessages.FileDescriptionInvalid, otherProofFileDescriptionId.Value, notice.DisputeGuid));
+                }
+            }
+
+            var useCase = _noticeServiceService.GetServiceAuditLogUseCase(originalNoticeService, noticeServiceToPatch);
+
             await DisputeResolveAndSetContext(_noticeServiceService, noticeServiceId);
             _mapper.Map(noticeServiceToPatch, originalNoticeService);
-            var result = await _noticeServiceService.PatchAsync(originalNoticeService);
+            var result = await _noticeServiceService.PatchAsync(originalNoticeService, useCase);
 
             if (result != null)
             {

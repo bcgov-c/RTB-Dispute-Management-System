@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays monthly hearings calendar view
+ */
 import Backbone from 'backbone';
 import Marionette from 'backbone.marionette';
 import { routeParse } from '../../../routers/mainview_router';

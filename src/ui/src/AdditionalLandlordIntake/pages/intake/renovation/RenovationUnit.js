@@ -312,7 +312,7 @@ export default Marionette.View.extend({
   
 
   onRender() {
-    this.showChildView('addressRegion', new AddressView({ useFlatLayout: true, model: this.unitModel.get('addressModel') }));
+    this.showChildView('addressRegion', new AddressView({ model: this.unitModel.get('addressModel') }));
     
     this.renderPageItem('hasUnitTypeRegion', new PageItemView({
       stepText: 'If the rental unit is part of a larger residential property with a shared address, does it have a unique unit identifier (i.e. basement, upper, lower, coach house, etc.)?',

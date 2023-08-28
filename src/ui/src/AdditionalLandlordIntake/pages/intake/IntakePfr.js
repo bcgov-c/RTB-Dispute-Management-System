@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import MenuCollection from '../../components/menu/Menu_collection';
 import IntakePfrPageGeneral from './general-info/IntakePfrPageGeneral';
-import IntakePageApplicants from './applicants/IntakePageApplicants';
+import IntakePageApplicants from './applicants/IntakeAriPageApplicants';
 import IntakeAriPageApplicantOptions from './applicant-options/IntakeAriPageApplicantOptions';
 import IntakePfrPageRenovationUnits from './renovation/IntakePfrPageRenovationUnits';
 import IntakePfrPageUnitTenants from './unit-tenants/IntakePfrPageUnitTenants';
@@ -28,7 +28,7 @@ export default IntakeBase.extend({
       { step: 5, text: 'Unit Tenants' },
       { step: 6, text: 'Review and Submit' },
       { step: 7, text: 'Payment', unreachable: hasCompletedPayment },
-      { step: 8, text: 'Payment Receipt', unreachable: hasCompletedPayment }
+      { step: 8, text: 'Submission Receipt', unreachable: hasCompletedPayment }
     ], {
       paymentStep: PFR_PAYMENT_STEP_NUMBER,
       paymentReceiptStep: PFR_PAYMENT_RECEIPT_STEP_NUMBER

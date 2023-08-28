@@ -13,7 +13,7 @@
 <div class="outcome-doc-file-status"></div>
 
 <div class="outcome-doc-file-comment"></div>
-<div class="outcome-doc-file-visible"></div>
+<div class="outcome-doc-file-visible" <%= hasUploadedFile ? '' : 'style="visibility:hidden;"' %> ></div>
 
 <div class="outcome-doc-file-source"></div>
 <div class="outcome-doc-file-source-btn-container">

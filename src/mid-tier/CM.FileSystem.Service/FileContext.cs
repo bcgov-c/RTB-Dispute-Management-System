@@ -7,6 +7,7 @@ using CM.Business.Entities.Models.Dispute;
 using CM.Business.Entities.Models.Files;
 using CM.Common.ChunkedFileUpload;
 using CM.Common.Utilities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -97,13 +98,19 @@ public class FileContext
             throw;
         }
 
-        ThumbnailHelper.Create(absolutePath, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
+        await ThumbnailHelper.CreateAsync(absolutePath, storeFileRequest.MimeType, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
 
         return file;
     }
 
     public async Task<FileUploadInfo> StoreAsync(UploadFileRequest uploadFileRequest, DisputeResponse dispute)
     {
+        if (FileExtensionWhitelisted(uploadFileRequest.OriginalFile) == false)
+        {
+            Log.Warning("The uploaded file type is not allowed");
+            throw new ArgumentException("The uploaded file type is not allowed");
+        }
+
         var tempFileFolder = await _storageStrategy.TempFileRootAsync;
         FileUtils.CheckIfNotExistsCreate(tempFileFolder);
 
@@ -141,6 +148,7 @@ public class FileContext
         var fileDate = Convert.ToDateTime(uploadFileRequest.FileDate, culture);
 
         var fileInfo = new FileInfo(path);
+        var fileMetaSummary = await FilePropertyInfoExtractor.GenerateFileMetaSummary(fileInfo, formFile.ContentType);
 
         var file = new FileUploadInfo
         {
@@ -154,7 +162,8 @@ public class FileContext
             FileDate = fileDate,
             AddedBy = uploadFileRequest.AddedBy,
             FilePackageId = uploadFileRequest.FilePackageId,
-            SubmitterName = uploadFileRequest.SubmitterName
+            SubmitterName = uploadFileRequest.SubmitterName,
+            FileMetaSummary = fileMetaSummary
         };
 
         var rootFolder = await _storageStrategy.StorageRootFolderAsync;
@@ -173,13 +182,19 @@ public class FileContext
             throw;
         }
 
-        ThumbnailHelper.Create(absolutePath, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
+        await ThumbnailHelper.CreateAsync(absolutePath, formFile.ContentType, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
 
         return file;
     }
 
     public async Task<FileUploadInfo> StoreAsync(UploadFileRequest uploadFileRequest)
     {
+        if (FileExtensionWhitelisted(uploadFileRequest.OriginalFile) == false)
+        {
+            Log.Warning("The uploaded file type is not allowed");
+            throw new ArgumentException("The uploaded file type is not allowed");
+        }
+
         var tempFileFolder = await _storageStrategy.TempFileRootAsync;
         FileUtils.CheckIfNotExistsCreate(tempFileFolder);
 
@@ -251,7 +266,7 @@ public class FileContext
             throw;
         }
 
-        ThumbnailHelper.Create(absolutePath, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
+        await ThumbnailHelper.CreateAsync(absolutePath, formFile.ContentType, await _storageStrategy.SystemSettingsService.GetValueAsync<int>(SettingKeys.ThumbnailHeight));
 
         return file;
     }
@@ -260,6 +275,38 @@ public class FileContext
     {
         var filePath = await GetFilePath(fileResponse.FilePath);
         File.Delete(filePath);
+    }
+
+    public async Task DeleteThumbnail(FileResponse fileResponse)
+    {
+        var filePath = await GetFileThumbnailPath(fileResponse);
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    public async Task<bool> IsExists(FileResponse fileResponse)
+    {
+        var filePath = await GetFilePath(fileResponse.FilePath);
+        return File.Exists(filePath);
+    }
+
+    private async Task<string> GetFileThumbnailPath(FileResponse fileResponse)
+    {
+        var filePath = await GetFilePath(fileResponse.FilePath);
+
+        var thumbFileName = string.Format(ThumbnailHelper.FilePattern, Path.GetFileName(filePath));
+        var thumbFileDirName = Path.GetDirectoryName(filePath);
+
+        if (thumbFileDirName != null)
+        {
+            var thumbFilePath = Path.Combine(thumbFileDirName, thumbFileName);
+
+            return await GetFilePath(thumbFilePath);
+        }
+
+        return null;
     }
 
     private async Task<IActionResult> GetFile(string filePath, string fileMimeType)
@@ -292,6 +339,12 @@ public class FileContext
         }
 
         return null;
+    }
+
+    private bool FileExtensionWhitelisted(IFormFile formFile)
+    {
+        var extension = Path.GetExtension(formFile.FileName);
+        return _storageStrategy.WhitelistedExtensions.Count <= 0 || _storageStrategy.WhitelistedExtensions.Contains(extension);
     }
 
     private async Task<IActionResult> GetFileFromResource(string namespaceAndFileName, string fileMimeType)

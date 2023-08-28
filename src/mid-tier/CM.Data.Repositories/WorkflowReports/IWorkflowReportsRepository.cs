@@ -46,4 +46,6 @@ public interface IWorkflowReportsRepository
     Task<int> GetDocumentsMissingDeliveries(Guid disputeGuid);
 
     Task<int> GetMissingEvidenceService(Guid disputeGuid);
+
+    Task<int> GetMissingNoticeServiceConfirmations(Guid disputeGuid);
 }

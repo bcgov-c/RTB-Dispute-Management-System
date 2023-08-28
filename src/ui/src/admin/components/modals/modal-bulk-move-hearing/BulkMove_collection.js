@@ -5,6 +5,6 @@ export default Backbone.Collection.extend({
   model: BulkMoveModel,
 
   comparator(hearing) {
-    return -Number(Moment(hearing.get('local_start_datetime')));
+    return Number(Moment(hearing.get('local_start_datetime')));
   },
 })

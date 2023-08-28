@@ -115,6 +115,7 @@ const ModalAddOtherNotice = ModalBaseView.extend({
       processing_options: {
         maxNumberOfFiles,
         checkForDisputeDuplicates: false,
+        maxNonVideoFileSize: configChannel.request('get', 'INTERNAL_ATTACHMENT_MAX_FILESIZE_BYTES'),
         allowedFileTypes: configChannel.request('get', 'VALID_NOTICE_FILE_TYPES')
       },
       file_creation_fn: function() {

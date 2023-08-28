@@ -1,10 +1,13 @@
 <div class="hearing-tools-header <%= mode %>">
-  <span><%= containerTitle %></span>
-  <span class="clickable float-right hearing-tools-edit">Edit</span>
-  <span class="float-right hearing-tools-edit-mode-buttons hidden-item">
-    <span class="clickable float-right hearing-tools-mark-served">Mark All Acknowledged Served</span>
-    <span class="float-right hearing-tools-separator"></span>
-    <span class="clickable float-right hearing-tools-mark-not-served"><%= saveAllNotServedButtonText %></span>
+  <div class="hearing-tools-left-container">
+    <span><%= containerTitle %></span>
+    <div class="show-archived-checkbox"></div>
+  </div>
+  <span class="clickable hearing-tools-edit">Edit</span>
+  <span class="hearing-tools-edit-mode-buttons <%= isArbEditable && isEditMode ? '' : 'hidden' %>">
+    <span class="clickable hearing-tools-mark-served"><%= saveAllAcknowledgedServedButtonText %></span>
+    <span class="hearing-tools-separator"></span>
+    <span class="clickable hearing-tools-mark-not-served"><%= saveAllNotServedButtonText %></span>
   </span>
 </div>
 <div class="notice-services-container <%= mode %>"></div>

@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Basic View that displays a HTML Header, Footer, and main content. Contains basic hide/show functions.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import { HeaderView } from '../header/Header';

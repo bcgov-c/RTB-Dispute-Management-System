@@ -32,6 +32,7 @@ public abstract class DesignTimeDbContextFactoryBase<TContext> :
 
     private TContext Create(string basePath, string environmentName)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         var builder = new ConfigurationBuilder()
             .SetBasePath(basePath)
             .AddJsonFile("appsettings.json")

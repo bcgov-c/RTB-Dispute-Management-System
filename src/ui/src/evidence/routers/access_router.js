@@ -26,9 +26,16 @@ export default Marionette.AppRouter.extend({
     [routes.access]: 'showAccessView',
     'update/contact': 'showUpdateContactView',
     'update/contact/receipt': 'showUpdateContactReceiptView',
-    'update/notice/service/receipt': 'showNoticeServiceReceiptView',
-    'update/notice/service': 'showUpdateNoticeServiceView',
-    'modify/notice/service': 'showModifyNoticeServiceView',
+    'notice/service/list': 'showNoticeServiceMenuView',
+    'notice/service': 'showSubmitNoticeServiceView',
+    'notice/service/receipt': 'showSubmitNoticeServiceReceiptView',
+    
+    'reinstate/service/receipt': 'showReinstateServiceReceiptView',
+    'reinstate/service/list': 'showReinstateServiceListView',
+    'reinstate/service': 'showReinstateServiceView',
+
+    'amendment': 'showAmendmentView',
+    'amendment/receipt': 'showAmendmentReceiptView',
     'evidence': 'showEvidenceSummaryView',
     'evidence/upload': 'showEvidenceUploadView',
     'evidence/receipt': 'showEvidenceUploadReceiptView',
@@ -58,9 +65,11 @@ export default Marionette.AppRouter.extend({
   pagesNeedingAuth: {
     'update/contact': true,
     'update/contact/receipt': true,
-    'update/notice/service/receipt': true,
-    'update/notice/service': true,
-    'modify/notice/service': true,
+    'notice/service/receipt': true,
+    'notice/service/list': true,
+    'notice/service': true,
+    'amendment': true,
+    'amendment/receipt': true,
     evidence: true,
     'evidence/upload': true,
     'evidence/receipt': true,
@@ -119,7 +128,11 @@ export default Marionette.AppRouter.extend({
   },
 
   routeIsNoticeService(route) {
-    return /(update||modify)\/notice\/service/.test(route) && !this.routeIsReceipt(route);
+    return /notice\/service/.test(route) && !this.routeIsReceipt(route);
+  },
+
+  routeIsNoticeReinstatementService(route) {
+    return /reinstate\/service/.test(route) && !this.routeIsReceipt(route);
   },
 
   routeIsCorrection(route) {
@@ -142,6 +155,10 @@ export default Marionette.AppRouter.extend({
     return /substituted-service/.test(route) && !this.routeIsReceipt(route);
   },
 
+  routeIsAmendment(route) {
+    return /amendment/.test(route) && !this.routeIsReceipt(route);
+  },
+
   _isRouteRestricted(route) {
     const dispute = disputeChannel.request('get');
     const isDisputeOpen = dispute && dispute.get('disputeAccessOpen');
@@ -158,10 +175,12 @@ export default Marionette.AppRouter.extend({
       (this.routeIsEvidence(route) && !accessChannel.request('external:evidence')),
       (this.routeIsUpdateContact(route) && !accessChannel.request('external:contact')),
       (this.routeIsNoticeService(route) && !accessChannel.request('external:notice')),
+      (this.routeIsNoticeReinstatementService(route) && !accessChannel.request('external:reinstatement')),
       (this.routeIsCorrection(route) && !accessChannel.request('external:correction')),
       (this.routeIsClarification(route) && !accessChannel.request('external:clarification')),
       (this.routeIsReviewStep(route) && !accessChannel.request('external:review')),
       (this.routeIsReviewPayment(route) && !accessChannel.request('external:review:payment')),
+      (this.routeIsAmendment(route) && !accessChannel.request('external:amendment')),
       (dispute && this.routeIsSubServe(route) && !accessChannel.request('external:subserv', dispute?.get('tokenParticipantId')))
     ];
 

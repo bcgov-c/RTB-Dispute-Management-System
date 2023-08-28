@@ -20,6 +20,6 @@ public class DisputeStatusOwnerSearchRequest
     [JsonProperty("status_start_date_greater_than")]
     public DateTime? StatusStartDateGreaterThan { get; set; }
 
-    [JsonProperty("status_start_date_less_than ")]
+    [JsonProperty("status_start_date_less_than")]
     public DateTime? StatusStartDateLessThan { get; set; }
 }

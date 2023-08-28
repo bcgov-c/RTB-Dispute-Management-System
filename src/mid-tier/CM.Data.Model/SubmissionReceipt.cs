@@ -13,6 +13,8 @@ public class SubmissionReceipt : BaseEntity
 
     public int ParticipantId { get; set; }
 
+    public Participant Participant { get; set; }
+
     public byte ReceiptType { get; set; }
 
     public byte? ReceiptSubType { get; set; }

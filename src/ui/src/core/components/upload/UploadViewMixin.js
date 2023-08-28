@@ -1,5 +1,6 @@
 
 /**
+ * @fileoverview - Mixin that can be extended from that contains file upload helper functions
  * Required functions to be defined:
  * - onUploadComplete: will be called when uploads finished, or when cancel occurrs
  * - onCancelButtonNoUpload: will be called when cancel button pressed but not during uploads
@@ -156,7 +157,6 @@ export default {
     this.isUpload = true;
     this.uploadModel.toUpload();
     this.render();
-    //this.renderButtonsForUpload();
     const dfd = $.Deferred()
     $.scrollPageToTop();
     return dfd.resolve().promise();

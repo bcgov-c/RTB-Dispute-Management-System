@@ -5,7 +5,6 @@ using CM.Business.Services.OutcomeDocument;
 using CM.Business.Services.Parties;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -96,7 +95,7 @@ public class OutcomeDocDeliveryController : BaseController
             }
 
             var associatedEmailId = outcomeDocDelivery.GetValue<int?>("/associated_email_id");
-            if (associatedEmailId.Exists && !await _emailMessageService.EmailMessageExists(associatedEmailId.Value, outcomeDocDeliveryToPatch.DisputeGuid))
+            if (associatedEmailId.Exists && associatedEmailId.Value != null && !await _emailMessageService.EmailMessageExists(associatedEmailId.Value, outcomeDocDeliveryToPatch.DisputeGuid))
             {
                 return BadRequest(string.Format(ApiReturnMessages.EmailMessageDoesNotExist, associatedEmailId.Value));
             }

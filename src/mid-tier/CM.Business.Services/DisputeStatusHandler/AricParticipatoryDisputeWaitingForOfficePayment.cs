@@ -1,4 +1,5 @@
-﻿using CM.Common.Utilities;
+﻿using CM.Business.Services.Base;
+using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Messages.EmailGenerator.Events;
 using EasyNetQ;
@@ -32,7 +33,7 @@ public class AricParticipatoryDisputeWaitingForOfficePayment : DisputeTransition
                 AssignedTemplateId = AssignedTemplate.AricParticipatoryDisputeWaitingForOfficePayment
             };
 
-            Publish(message);
+            message.Publish(Bus);
         }
     }
 }
@@ -63,7 +64,7 @@ public class AricParticipatoryDisputeWaitingForOfficePayment2 : DisputeTransitio
                 AssignedTemplateId = AssignedTemplate.AricParticipatoryDisputeWaitingForOfficePayment
             };
 
-            Publish(message);
+            message.Publish(Bus);
         }
     }
 }
@@ -94,7 +95,7 @@ public class AricParticipatoryDisputeWaitingForOfficePayment3 : DisputeTransitio
                 AssignedTemplateId = AssignedTemplate.AricParticipatoryDisputeWaitingForOfficePayment
             };
 
-            Publish(message);
+            message.Publish(Bus);
         }
     }
 }

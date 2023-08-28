@@ -38,11 +38,11 @@ const ModalDownloadNotice = ModalBaseView.extend({
 
   events() {
     return _.extend({}, ModalBaseView.prototype.events, {
-      'click @ui.download': 'clickDownload' 
+      'click @ui.download': 'clickDownloadAndClose' 
     });
   },
 
-  clickDownload() {
+  async clickDownloadAndClose() {
     const view = this.getChildView('specialInstructionsText');
     if (!view.validateAndShowErrors()) {
       return;
@@ -58,8 +58,8 @@ const ModalDownloadNotice = ModalBaseView.extend({
     }
 
     const noticeHtml = `<html>${noticeForDownload.$el.html()}</html>`;
-    filesChannel.request('download:html', noticeHtml, `${this.disputeNoticeTitleModel.getData()}.doc`);
-    setTimeout(() => this.close(), 100);
+    const result = await filesChannel.request('download:html', noticeHtml, `${this.disputeNoticeTitleModel.getData()}.doc`);
+    if (result) this.close();
   },
 
 

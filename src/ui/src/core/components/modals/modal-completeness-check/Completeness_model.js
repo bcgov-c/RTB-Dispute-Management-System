@@ -1,6 +1,4 @@
-import Backbone from 'backbone';
 import CMModel from '../../model/CM_model';
-import Radio from 'backbone.radio';
 
 export default CMModel.extend({
   defaults: {

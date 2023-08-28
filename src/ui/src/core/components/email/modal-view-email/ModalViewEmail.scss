@@ -1,0 +1,35 @@
+/* TODO: Refactor to to scss */
+.modal-view-email {
+  &__file-download { word-break: break-word; }
+  &__content-wrapper { 
+    padding: 10px 0!important;
+  }
+  &__email-content {
+    border: 1px #a5a5a5 solid;
+  }
+}
+
+.modal-button-container { margin-top: 15px; }
+.modal-view-email-attachment-container { line-height: 20px; }
+
+.preview-email__inner {
+  padding: 0 !important;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.modalViewEmail .modal-dialog { min-height: 800px; width: 991px; overflow: hidden; }
+
+.modalViewEmail .modal-body,
+.modalViewEmail .row-bottom-margin { padding-top: 0 !important; }
+.modalViewEmail .filename-download { font-size: 17px; }
+
+@media (max-width: 991px) {
+  .col-xs-12 { padding-right: 0; }
+  .row { margin-right: 0; }
+  .modal-body { padding: 10px; }
+  .modalViewEmail .modal-dialog {
+    min-width: auto !important;
+    width: auto !important;
+  }
+}

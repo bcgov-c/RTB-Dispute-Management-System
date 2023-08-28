@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Manager that handles notices, notice amendments, and subtituted services
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
@@ -8,7 +11,9 @@ import NoticeModel from './Notice_model';
 import { routeParse } from '../../../admin/routers/mainview_router';
 
 const api_notice_load_name = 'disputenotices';
+const api_external_load_name = 'externaldisputenotices';
 const api_substituted_services_load_name = 'disputesubstitutedservices';
+const api_external_substituted_services_load_name = 'externaldisputesubstitutedservices';
 
 const apiChannel = Radio.channel('api');
 const configChannel = Radio.channel('config');
@@ -28,6 +33,7 @@ const NoticeManager = Marionette.Object.extend({
     'check:is:original': 'isNoticeOriginalNotice',
     'get:original': 'getOriginalNotice',
     'get:subservices': 'getSubstitutedServices',
+    'get:subservice:by:id': 'getSubstitutedServiceById',
     'get:subservices:for:participant': 'getSubstitutedServicesForParticipant',
     'update:subservice:participants': 'updateSubserviceParticipantsStatePromise',
     'get:subservices:quadrant:config': 'getSubServiceQuadrantConfig',
@@ -39,8 +45,9 @@ const NoticeManager = Marionette.Object.extend({
     
     refresh: 'loadNotice',
     load: 'loadNotice',
+    'load:external': 'loadExternalNotices',
     'load:subservices': 'loadSubstitutedServices',
-    'load:dispute:notices': 'loadNoticesForDispute',
+    'load:subservices:external': 'loadExternalSubstitutedServices',
     'load:disputeaccess': 'loadFromDisputeAccessResponse',
 
     clear: 'clearAllData',
@@ -104,10 +111,6 @@ const NoticeManager = Marionette.Object.extend({
    */
   clearAllData() {
     this.substitutedServices = new SubstitutedServiceCollection();
-    this.clearNoticeData();
-  },
-
-  clearNoticeData() {
     this.notices = new NoticeCollection();
   },
 
@@ -121,8 +124,32 @@ const NoticeManager = Marionette.Object.extend({
       notice_service: _.filter(noticeServicesData, serviceData => (serviceData.notice_id === activeNoticeId &&
         (!serviceData.participant_id || participantsChannel.request('check:id', serviceData.participant_id))
       )),
-      notice_associated_to: noticeAssociatedTo
+      notice_associated_to: noticeAssociatedTo,
     }));
+    
+    // Some notice service data is in the service records
+    this.notices.forEach(notice => {
+      const firstService = notice.get('notice_service')?.at?.(0);
+      if (firstService) {
+        notice.set({
+          has_service_deadline: firstService.get('has_service_deadline'),
+          service_deadline_date: firstService.get('service_deadline_date'),
+          second_service_deadline_date: firstService.get('second_service_deadline_date'),
+        });
+      }
+    });
+  },
+
+  loadExternalNotices(disputeGuid) {
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_load_name}/${disputeGuid}`
+      }).done(response => {
+        this.notices = new NoticeCollection(response);
+        res(this.notices);
+      }).fail(rej);
+    });
   },
 
   _loadNoticePromise(dispute_guid) {
@@ -136,27 +163,22 @@ const NoticeManager = Marionette.Object.extend({
     });
   },
 
-  loadNotice(dispute_guid) {
+  loadNotice(dispute_guid, options={}) {
     const dfd = $.Deferred();
     this._loadNoticePromise(dispute_guid).done(response => {
-      this.clearNoticeData();
-      this.notices.reset(response);
-      // Filter out any removed participants
-      this.notices.each(notice => {
-        const services = notice.getServices();
-        const servicesToRemove = services.filter(model => !participantsChannel.request('check:id', model.get('participant_id')));
-        services.remove(servicesToRemove, { silent: true });
-      });
-    
-      dfd.resolve(this.notices);
-    }).fail(dfd.reject);
-    return dfd.promise();
-  },
-
-  loadNoticesForDispute(dispute_guid) {
-    const dfd = $.Deferred();
-    this._loadNoticePromise(dispute_guid).done(function(response) {
-      dfd.resolve(new NoticeCollection(response));
+      if (options.no_cache) {
+        return dfd.resolve(new NoticeCollection(response));
+      } else {
+        this.notices = new NoticeCollection(response);
+        // Filter out any removed participants
+        this.notices.each(notice => {
+          const services = notice.getServices();
+          const servicesToRemove = services.filter(model => !participantsChannel.request('check:id', model.get('participant_id')));
+          services.remove(servicesToRemove, { silent: true });
+        });
+      
+        dfd.resolve(this.notices);
+      }
     }).fail(dfd.reject);
     return dfd.promise();
   },
@@ -178,6 +200,18 @@ const NoticeManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
+  loadExternalSubstitutedServices(disputeGuid) {
+    return new Promise((res, rej) => {
+      apiChannel.request('call', {
+        type: 'GET',
+        url: `${configChannel.request('get', 'API_ROOT_URL')}${api_external_substituted_services_load_name}/${disputeGuid}`
+      }).done(response => {
+        this.substitutedServices.reset(response);
+        res(this.substitutedServices);
+      }).fail(rej);
+    });
+  },
+
   getAllNotices() {
     return this.notices;
   },
@@ -196,6 +230,10 @@ const NoticeManager = Marionette.Object.extend({
 
   getSubstitutedServices() {
     return this.substitutedServices;
+  },
+
+  getSubstitutedServiceById(subServId) {
+    return this.substitutedServices.findWhere({ sub_service_id: subServId });
   },
 
   getSubstitutedServicesForParticipant(participantId) {

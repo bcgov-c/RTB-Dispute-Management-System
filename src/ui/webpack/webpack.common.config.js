@@ -61,8 +61,7 @@ module.exports = (env, argv) => {
         'trumbowyg/table': 'trumbowyg/plugins/table/trumbowyg.table.js',
         'jquery-timepickerjs': 'jquery-timepicker/jquery.timepicker.js',
         'colresizablejs': 'colresizable/colResizable-1.6.min.js',
-        'cleave-addons/phone-formatter': 'cleave.js/dist/addons/cleave-phone.i18n',
-        'scrollbooster': 'scrollbooster/dist/scrollbooster.min.js',
+        'cleave-addons/phone-formatter': 'cleave.js/dist/addons/cleave-phone.i18n'
       }
     },
   
@@ -143,7 +142,7 @@ module.exports = (env, argv) => {
             },
           },
 
-          exclude: [BabelEnvDepsPlugin.exclude({ except: ['scrollbooster'] })],
+          //exclude: [BabelEnvDepsPlugin.exclude({ except: ['scrollbooster'] })],
           //include: [BabelEnvDepsPlugin.include()]
         },
         {
@@ -164,7 +163,12 @@ module.exports = (env, argv) => {
             'resolve-url-loader',
 
             // Compiles Sass to CSS
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true,
+              }
+            }
           ],
         },
         /* Give all loaders a limit=1 so that no images are replaced inline with "data:..." */
@@ -251,7 +255,7 @@ module.exports = (env, argv) => {
             options: {
               name: () => `${UI_CONFIGURATION_FILENAME}.[ext]`,
               publicPath: path.join(output_dir, '..'),
-              outputPath: `../${UI_CONFIGURATION_FOLDER}`
+              outputPath: `./${UI_CONFIGURATION_FOLDER}`
             }
           }],
         },

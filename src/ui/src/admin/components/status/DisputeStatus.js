@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Edit/View SSPO of dispute. Also displays available quick status options
+ */
 import Marionette from 'backbone.marionette';
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
@@ -129,7 +132,7 @@ export default Marionette.View.extend({
         } else if (wasAssignedToCurrentUserNowUnassiged) {
           menuChannel.trigger('add:to:item:count', disputesMenuItems, -1);
         }
-        statusChannel.request('apply:sspo:flags', status_changes, this.model).finally(() => onSaveCompleteFn());
+        statusChannel.request('apply:sspo:after:actions', status_changes, this.model).finally(() => onSaveCompleteFn());
       })
       .fail((statusSaveResponse, disputeSaveResponse) => {
         const onErrorFn = () => {
@@ -238,10 +241,12 @@ export default Marionette.View.extend({
   },
 
   applyStatusCheck() {
+    const stage = this.stageEditModel.getData({ parse: true });
     const status = this.statusEditModel.getData({ parse: true });
-    const evidenceOverride = this.overrideEditModel.getData({ parse: true });
+    const process = this.processEditModel.getData({ parse: true });
+    const evidence_override = this.overrideEditModel.getData({ parse: true });
     return new Promise((res, rej) => (
-      statusChannel.request('check:sspo:status', this.model, status, evidenceOverride).then(res, () => {
+      statusChannel.request('check:sspo:status', this.model, { stage, status, process, evidence_override }).then(res, () => {
         this.model.stopEditInProgress();
         this.trigger('contextRender');
         rej();
@@ -444,6 +449,10 @@ export default Marionette.View.extend({
 
     if (Number(stage) === 0 && _.isArray(STAGE_0_STATUSES_THAT_CANNOT_BE_SET) && STAGE_0_STATUSES_THAT_CANNOT_BE_SET.length) {
       statuses = _.omit(statuses, status => _.contains(STAGE_0_STATUSES_THAT_CANNOT_BE_SET, status));
+    }
+
+    if (this.model?.getStatus() !== configChannel.request('get', 'STATUS_ADJOURNED_APPLICANT_INACTION')) {
+      statuses = _.omit(statuses, status => status === configChannel.request('get', 'STATUS_ADJOURNED_APPLICANT_INACTION'));
     }
 
     const creationMethodStatusRestrictions = {

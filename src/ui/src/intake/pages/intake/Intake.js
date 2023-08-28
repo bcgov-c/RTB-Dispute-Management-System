@@ -59,14 +59,68 @@ export default Marionette.View.extend({
       { step: 6, text: 'Information' },
       { step: 7, text: 'Review and Submit' },
       { step: 8, text: 'Payment', unreachable: hasCompletedPayment },
-      { step: 9, text: 'Payment Receipt', unreachable: hasCompletedPayment }
+      { step: 9, text: 'Submission Receipt', unreachable: hasCompletedPayment }
     ]);
+    this.menuCollection.forEach(step => step.set('route', `page/${step.get('step')}`));
   },
 
   onRender() {
+    const setMenuStepsVisited = (menuCollection) => {
+      const PAYMENT_RECEIPT_STEP_NUMBER = 9;
+      const PAYMENT_STEP_NUMBER = 8;
+      const dispute = disputeChannel.request('get');
+      const progress = applicationChannel.request('get:progress');
+      if (dispute && dispute.isPaymentState()) {
+        menuCollection.each(function(menuStep) {
+          if (menuStep.get('step') < PAYMENT_STEP_NUMBER) {
+            menuStep.set({
+              visited: true,
+              disabled: true,
+              unreachable: true,
+              active: false
+            });
+          }
+        });
+      } else if (dispute && dispute.isReviewOnlyState()) {
+        menuCollection.each(function(menuStep) {
+          if (menuStep.get('step') !== PAYMENT_RECEIPT_STEP_NUMBER) {
+            menuStep.set({
+              visited: true,
+              disabled: true,
+              unreachable: true,
+              active: false
+            });
+          } else {
+            menuStep.set({
+              visited: true,
+              disabled: false,
+              unreachable: false
+            });
+          }
+        });
+      } else {
+        menuCollection.each(function(menuStep) {
+          // Activate the last step completed and everything below it.
+          // Also active the next step after the last completed step
+          if (menuStep.get('step') <= progress + 1) {
+            menuStep.set('visited', true);
+          } else {
+            menuStep.set({
+              visited: false,
+              disabled: false
+            });
+          }
+        });
+      }
+    };
+    
     menuChannel.trigger('enable:mobile');
+    const menuView = new MenuView({
+      actionOnRender: setMenuStepsVisited,
+      collection: this.menuCollection
+    });
 
-    const menuView = new MenuView({ collection: this.menuCollection });
+
     this.showChildView('menuRegion', menuView);
     this.dispute = disputeChannel.request('get');
 

@@ -10,6 +10,7 @@ import DisputeClaimCollection from '../../../../core/components/claim/DisputeCla
 import Filesize from 'filesize';
 import { ReceiptContainer } from '../../../../core/components/receipt-container/ReceiptContainer';
 import { ViewJSXMixin } from '../../../../core/utilities/JsxViewMixin';
+import ApplicantViewDispute from '../../../../core/components/ivd/ApplicantViewDispute';
 
 const PAGE_TITLE = `Evidence submitted`;
 const RECEIPT_TITLE = 'Evidence Submission';
@@ -135,7 +136,8 @@ const UploadReceiptPage = PageView.extend({
     const RECEIPT_FONT_SIZE_PX = this.model.getReceiptFontSizePx();
     const isApplicant = this.loggedInParticipant.isApplicant();
     const filePackageDisplay =  this.findPackageId() ? this.findPackageId() : 'N/A';
-    const addedForDisplay = `${isApplicant ? 'Applicant' : 'Respondent'} ${(!(this.dispute.isLandlord() ^ isApplicant)) ? 'Landlord' : `Tenant - ${this.loggedInParticipant.getInitialsDisplay()}`}`
+    const addedForDisplay = `${isApplicant ? 'Applicant' : 'Respondent'} ${(!(this.dispute.isLandlord() ^ isApplicant)) ? 'Landlord' : `Tenant - ${this.loggedInParticipant.getInitialsDisplay()}`}`;
+    const showIVDReceiptLanguage = ApplicantViewDispute.isIvdEnabled();
     const uploadedFilesCount = _.reduce(this.uploaded_evidence, function(memo, dispute_evidence_model) {
       return memo + _.filter(dispute_evidence_model.getDisputeAccessFiles(), function(file) { return file.isUploaded(); }).length;
     }, 0);
@@ -162,7 +164,7 @@ const UploadReceiptPage = PageView.extend({
       </table>
 
       <p className="er-text" style={{ textAlign: 'left', padding: '0px 0px 0px 0px', margin: '0px 0px 10px 0px' }}>
-        The following was submitted to the Residential Tenancy Branch. For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
+        The following was submitted to the Residential Tenancy Branch.{showIVDReceiptLanguage ? <span> You can view your submitted request and outcome by <a href={configChannel.request('get', 'INTAKE_URL')} target="_blank" rel="noopener noreferrer">logging in online with the BceID that was used to create this application</a>.</span> : ''} For information privacy purposes, any personal information that was not provided as part of this submission may be abbreviated or partially hidden (**).
 	    </p>
 
       <p className="er-subheader" style={{ borderBottom: '1px solid #e3e3e3', margin: '0px 0px 10px 0px', padding:'5px 5px 2px 0px', color:'#8d8d8d' }}>Submission Information</p>
@@ -204,14 +206,14 @@ const UploadReceiptPage = PageView.extend({
                     </tr>
                     {disputeEvidences.map((model, index) => {
                       const fileDescription = model.get('file_description')
-                      const uploadedFiles = model.getDisputeAccessFiles()
+                      const uploadedFiles = model.getDisputeAccessFiles()?.filter(file => file.isUploaded());
                       if (!model.hasDisputeAccessFiles()) { return; }
 
                       return (
                         <>
                           <tr className="er-nesttable-tr" key={index}>
                             <td colSpan="2" className="er-nesttable-item" style={{ padding: '8px', width: '100%', border: '1px solid #e3e3e3' }}>
-                              { model.get('required').isRequired ? 
+                              { model.get('required').isRequired || model.get('isRespondent') ? 
                                 fileDescription.title : 
                                 <>
                                   <b>{ fileDescription.get('title') }</b> <i>(optional):</i>

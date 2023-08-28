@@ -5,7 +5,6 @@ using CM.Business.Services.Parties;
 using CM.Business.Services.Payment;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -49,7 +48,7 @@ public class DisputeFeeController : BaseController
     }
 
     [HttpPatch("{disputeFeeId:int}")]
-    [AuthorizationRequired(new[] { RoleNames.AdminLimited, RoleNames.ExtendedUser })]
+    [AuthorizationRequired(new[] { RoleNames.AdminLimited, RoleNames.ExtendedUser, RoleNames.OfficePay })]
     [ApplyConcurrencyCheck]
     public async Task<IActionResult> Patch(int disputeFeeId, [FromBody]JsonPatchDocumentExtension<PatchDisputeFeeRequest> disputeFee)
     {

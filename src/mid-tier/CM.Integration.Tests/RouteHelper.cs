@@ -1,4 +1,5 @@
-﻿namespace CM.Integration.Tests;
+// cSpell:disable
+namespace CM.Integration.Tests;
 
 public static class RouteHelper
 {
@@ -24,6 +25,8 @@ public static class RouteHelper
     public const string PostIntakeQuestion = "api/dispute/intakequestions/";
     public const string PatchIntakeQuestion = "api/dispute/intakequestions/";
     public const string GetIntakeQuestion = "api/dispute/intakequestions/";
+    public const string GetDisputeUsersByGuid = "api/dispute/disputeusers/";
+    public const string PatchDisputeUser = "api/dispute/disputeuseractive/";
 
     // Participant
     public const string PostAccessCode = "api/accesscodelogin/";
@@ -42,6 +45,7 @@ public static class RouteHelper
     public const string GetExternalDisputeDetails = "api/externalupdate/disputedetails?";
     public const string PatchExternalDisputeInfo = "api/externalupdate/disputeinfo/";
     public const string PostExternalNotice = "api/externalupdate/notice/";
+    public const string GetHearingWaitTime = "api/externalupdate/hearingwaittime";
 
     // File Package
     public const string PostFilePackage = "api/filepackage/";
@@ -63,6 +67,7 @@ public static class RouteHelper
     // Common File
     public const string PostCommonFile = "api/commonfiles";
     public const string GetCommonFiles = "api/commonfiles";
+    public const string GetExternalCommonFiles = "api/externalcommonfiles";
     public const string PatchCommonFiles = "api/commonfiles/";
     public const string DeleteCommonFile = "api/commonfiles/";
 
@@ -99,6 +104,12 @@ public static class RouteHelper
     public const string GetImportSchedules = "api/importhistoryrecords/";
     public const string GetAvailableStaff = "api/availablestaff/";
     public const string GetAvailableConferenceBridges = "api/availableconferencebridges/";
+    public const string GetOnHoldHearings = "api/hearings/onholdhearings";
+    public const string ReserveAvailableHearings = "api/hearings/reserveavailablehearing";
+    public const string HoldHearing = "api/hearings/holdhearing/";
+    public const string BookReservedHearing = "api/hearings/bookreservedhearing/";
+    public const string CancelReservedHearing = "api/hearings/cancelreservedhearing/";
+    public const string LinkPastHearings = "api/hearings/linkpasthearings";
 
     // hearing Participation
     public const string PostHearingParticipant = "api/hearingparticipation/";
@@ -110,6 +121,7 @@ public static class RouteHelper
     public const string DeleteDisputeHearing = "api/disputehearing/";
     public const string PatchDisputeHearing = "api/disputehearing/";
     public const string GetDisputeHearingsHistory = "api/disputehearinghistory?";
+    public const string GetExternalDisputeHearings = "api/externaldisputehearings/";
 
     // Note
     public const string PostNote = "api/note/";
@@ -133,6 +145,7 @@ public static class RouteHelper
     public const string DeleteNotice = "api/notice/";
     public const string GetNotice = "api/notice/";
     public const string GetDisputeNotices = "api/disputenotices/";
+    public const string GetExternalNotices = "api/externaldisputenotices/";
 
     // Notice Service
     public const string PostNoticeService = "api/noticeservice/";
@@ -205,6 +218,8 @@ public static class RouteHelper
     public const string PatchEmailMessage = "api/emailmessage/";
     public const string GetEmailMessage = "api/emailmessage/";
     public const string GetDisputeEmailMessages = "api/disputeemailmessages/";
+    public const string GetExternalEmailMessages = "api/externaldisputeemailmessages/";
+    public const string PostBulkEmailMessage = "api/bulkemailmessages";
 
     // EmailAttachment
     public const string PostEmailAttachment = "api/emailattachment/";
@@ -283,6 +298,7 @@ public static class RouteHelper
     public const string DeleteOutcomeDocGroup = "api/outcomedocgroup/";
     public const string GetOutcomeDocGroup = "api/disputeoutcomedocgroup/";
     public const string GetDisputeOutcomeDocGroups = "api/disputeoutcomedocgroups/";
+    public const string GetExternalOutcomeDocGroups = "api/externaldisputeoutcomedocgroups/";
 
     // OutcomeDocRequest
     public const string PostOutcomeDocRequest = "api/outcomedocrequests/outcomedocrequest/";
@@ -290,6 +306,7 @@ public static class RouteHelper
     public const string DeleteOutcomeDocRequest = "api/outcomedocrequests/outcomedocrequest/";
     public const string GetOutcomeDocRequest = "api/outcomedocrequests/outcomedocrequest/";
     public const string GetDisputeOutcomeDocRequests = "api/outcomedocrequests/outcomedocrequests/";
+    public const string GetExternalDisputeOutcomeDocRequests = "api/outcomedocrequests/externaloutcomedocrequests/";
 
     // OutcomeDocReqItem
     public const string PostOutcomeDocReqItem = "api/outcomedocrequests/outcomedocrequestitem/";
@@ -313,6 +330,8 @@ public static class RouteHelper
     public const string GetYearlyHearings = "api/yearlyhearingsummary/";
     public const string GetMonthlyHearings = "api/monthlyhearingsummary/";
     public const string GetDailyHearings = "api/dailyhearingdetail/";
+    public const string GetOwnerHearingsDetail = "api/ownerhearingdetail/";
+    public const string GetAvailableHearings = "api/availablehearings";
 
     // Workflow Reports
     public const string GetWorkflowReports = "api/WorkflowReports/incompletedisputeitems/";
@@ -326,6 +345,14 @@ public static class RouteHelper
     public const string DeleteCustomObject = "api/customobject/";
     public const string GetDisputeCustomObjects = "api/customobjects/";
     public const string GetCustomObject = "api/customobject/";
+
+    // Custom Config Object
+    public const string PostCustomConfigObject = "api/customconfigobject";
+    public const string PatchCustomConfigObject = "api/customconfigobject/";
+    public const string GetCustomConfigObject = "api/customconfigobject/";
+    public const string GetPublicCustomObjects = "api/publiccustomconfigobjects/";
+    public const string GetPrivateCustomObjects = "api/privatecustomconfigobjects/";
+    public const string DeleteCustomConfigObject = "api/customconfigobject/";
 
     // SchedulePeriod
     public const string PostSchedulePeriod = "api/schedulemanager/newscheduleperiod/";
@@ -353,6 +380,7 @@ public static class RouteHelper
     public const string DeleteSubmissionReceipt = "api/submissionreceipt/";
     public const string GetSubmissionReceipt = "api/submissionreceipt/";
     public const string GetSubmissionReceipts = "api/submissionreceipts/";
+    public const string GetExternalSubmissionReceipts = "api/externalsubmissionreceipts/";
 
     // Substituted Service
     public const string PostSubstitutedService = "api/substitutedservice/";
@@ -360,6 +388,7 @@ public static class RouteHelper
     public const string DeleteSubstitutedService = "api/substitutedservice/";
     public const string GetSubstitutedService = "api/substitutedservice/";
     public const string GetSubstitutedServices = "api/disputesubstitutedservices/";
+    public const string GetExternalSubstitutedServices = "api/externaldisputesubstitutedservices/";
 
     // External Custom Data Object
     public const string PostExternalCustomDataObject = "api/externalcustomdataobject/";
@@ -387,4 +416,74 @@ public static class RouteHelper
     public const string PatchExternalFileOtt = "api/externalfiles/{0}/externalsession/{1}";
     public const string DeleteExternalFileOtt = "api/externalfiles/{0}/externalsession/{1}";
     public const string PostPdfFromHtmlExternalOtt = "api/externalfiles/PDFfromhtml/{0}/externalsession/{1}";
+
+    // AdHoc report
+    public const string PostAdHocDlReport = "api/adhocdlreport/downloadreport/";
+    public const string PatchAdHocDlReport = "api/adhocdlreport/downloadreport/";
+    public const string DeleteAdHocDlReport = "api/adhocdlreport/downloadreport/";
+    public const string GetAdHocDlReport = "api/adhocdlreport/downloadreport/";
+    public const string GetAdHocDlReports = "api/adhocdlreport/downloadreports/";
+
+    public const string PostAdHocEmailReport = "api/adhocdlreport/reportemail/";
+    public const string PatchAdHocEmailReport = "api/adhocdlreport/reportemail/";
+    public const string DeleteAdHocEmailReport = "api/adhocdlreport/reportemail/";
+
+    public const string PostAdHocReportAttachment = "api/adhocdlreport/reportemailattachment/";
+    public const string PatchAdHocReportAttachment = "api/adhocdlreport/reportemailattachment/";
+    public const string DeleteAdHocReportAttachment = "api/adhocdlreport/reportemailattachment/";
+
+    public const string GetAdHocReport = "api/adhocdlreport/reportemail/";
+    public const string GetAdHocReports = "api/adhocdlreport/reportemails/";
+
+    // ExternalErrorLog
+    public const string PostExternalErrorLog = "api/externalerrorlogitem/";
+    public const string SessionPostExternalErrorLog = "api/externalerrorlogitem/";
+    public const string PatchExternalErrorLog = "api/externalerrorlogitem/";
+    public const string DeleteExternalErrorLog = "api/externalerrorlogitem/";
+    public const string GetExternalErrorLog = "api/externalerrorlogitem/";
+    public const string GetExternalErrorLogs = "api/externalerrorlogitems";
+
+    // Polls
+    public const string PostPoll = "api/polls/poll/";
+    public const string PatchPoll = "api/polls/poll/";
+    public const string DeletePoll = "api/polls/poll/";
+    public const string GetPoll = "api/polls/poll/";
+    public const string GetPolls = "api/polls/polls/";
+
+    public const string PostPollResp = "api/polls/pollresponse/";
+    public const string PatchPollResp = "api/polls/pollresponse/";
+    public const string DeletePollResp = "api/polls/pollresponse/";
+    public const string GetPollResp = "api/polls/pollresponse/";
+    public const string GetParticipantPollResponses = "api/polls/participantpollresponses/";
+    public const string GetDisputePollResponses = "api/polls/disputepollresponses/";
+
+    // ParticipantIdentity
+    public const string PostParticipantIdentity = "/api/participants/participantidentity";
+    public const string PatchParticipantIdentity = "/api/participants/participantidentity/";
+    public const string DeleteParticipantIdentity = "/api/participants/participantidentity/";
+    public const string GetParticipantIdentity = "/api/participants/participantidentity/";
+    public const string GetIdentitiesByDispute = "/api/participants/disputeparticipantidentities/";
+    public const string GetIdentitiesByParticipant = "/api/participants/disputeparticipantidentities/";
+
+    // OnlineMeeting
+    public const string PostOnlineMeeting = "/api/linking/onlinemeeting/";
+    public const string PatchOnlineMeeting = "/api/linking/onlinemeeting/";
+    public const string DeleteOnlineMeeting = "/api/linking/onlinemeeting/";
+    public const string GetOnlineMeeting = "/api/linking/onlinemeeting/";
+
+    // DisputeLink
+    public const string PostDisputeLink = "/api/linking/disputelink/";
+    public const string PatchDisputeLink = "/api/linking/disputelink/";
+    public const string DeleteDisputeLink = "/api/linking/disputelink/";
+    public const string GetDisputeLink = "/api/linking/disputelinks/";
+
+    // DisputeVerification
+    public const string PostDisputeVerification = "api/verification/disputeverification/";
+    public const string PatchDisputeVerification = "api/verification/disputeverification/";
+    public const string DeleteDisputeVerification = "api/verification/disputeverification/";
+    public const string GetDisputeVerification = "api/verification/disputeverification/";
+    public const string GetDisputeVerifications = "api/verification/disputeverifications/";
+    public const string PostVerificationAttempt = "api/verification/verificationattempt/";
+    public const string PatchVerificationAttempt = "api/verification/verificationattempt/";
+    public const string DeleteVerificationAttempt = "api/verification/verificationattempt/";
 }

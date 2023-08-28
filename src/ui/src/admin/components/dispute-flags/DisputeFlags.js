@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - View that displays all flags associated to a primary or linked dispute.
+ */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import React from 'react';

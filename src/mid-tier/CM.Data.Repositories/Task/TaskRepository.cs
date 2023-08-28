@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CM.Business.Entities.Models.Task;
@@ -40,7 +41,10 @@ public class TaskRepository : CmRepository<Model.Task>, ITaskRepository
 
     public async Task<List<Model.Task>> GetOwnerTasks(int taskOwnerId, TasksFilterRequest criteria)
     {
-        var tasks = await Context.Tasks.Where(x => x.TaskOwnerId.Equals(taskOwnerId)).Include(d => d.Dispute).ToListAsync();
+        var tasks = await Context.Tasks
+            .Where(x => x.TaskOwnerId.Equals(taskOwnerId))
+            .Include(d => d.Dispute).ThenInclude(s => s.DisputeStatuses)
+            .ToListAsync();
 
         return GetFilteredTasks(tasks, criteria);
     }
@@ -53,8 +57,10 @@ public class TaskRepository : CmRepository<Model.Task>, ITaskRepository
 
     public async Task<List<Model.Task>> GetUnassignedTasks(TasksFilterRequest criteria)
     {
-        var tasks = await Context.Tasks.Where(x => x.TaskStatus == (byte)TaskStatus.Incomplete && x.TaskOwnerId.HasValue == false)
+        var tasks = await Context.Tasks
             .Include(d => d.Dispute)
+            .ThenInclude(s => s.DisputeStatuses)
+            .Where(x => x.TaskStatus == (byte)TaskStatus.Incomplete && x.TaskOwnerId.HasValue == false)
             .ToListAsync();
 
         return GetFilteredTasks(tasks, criteria);
@@ -85,6 +91,16 @@ public class TaskRepository : CmRepository<Model.Task>, ITaskRepository
         if (criteria.RestrictTaskActivityTypeList is { Length: > 0 })
         {
             tasks = tasks.Where(x => x.TaskActivityType.HasValue && criteria.RestrictTaskActivityTypeList.Contains(x.TaskActivityType.Value)).AsQueryable().ToList();
+        }
+
+        if (criteria.ExcludeDisputeStatuses is { Length: > 0 })
+        {
+            tasks = tasks
+                .Where(x => !criteria.ExcludeDisputeStatuses
+                            .Contains(x.Dispute.DisputeStatuses
+                            .FirstOrDefault(x => x.IsActive == true).Status))
+                .AsQueryable()
+                .ToList();
         }
 
         switch (criteria.SortByField)

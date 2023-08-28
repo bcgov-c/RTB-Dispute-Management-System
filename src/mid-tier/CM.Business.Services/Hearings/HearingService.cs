@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.DisputeHearing;
+using CM.Business.Entities.Models.ExternalUpdate;
 using CM.Business.Entities.Models.Hearing;
 using CM.Business.Services.SystemSettingsService;
 using CM.Business.Services.TokenServices;
@@ -64,17 +65,24 @@ public class HearingService : CmServiceBase, IHearingService
 
             if (logRes)
             {
-                return MapperService.Map<Hearing, HearingResponse>(hearingToPatch);
+                var response = MapperService.Map<Hearing, HearingResponse>(hearingToPatch);
+                if (response.HearingReservedDisputeGuid.HasValue)
+                {
+                    var reservedDispute = await UnitOfWork.DisputeRepository.GetDispute(response.HearingReservedDisputeGuid.Value);
+                    response.HearingReservedFileNumber = reservedDispute?.FileNumber;
+                }
+
+                return response;
             }
         }
 
         return null;
     }
 
-    public async Task<HearingPatchRequest> GetForPatchAsync(int hearingId)
+    public async Task<Hearing> GetForPatchAsync(int hearingId)
     {
         var hearing = await UnitOfWork.HearingRepository.GetNoTrackingByIdAsync(p => p.HearingId == hearingId);
-        return MapperService.Map<Hearing, HearingPatchRequest>(hearing);
+        return hearing;
     }
 
     public async Task<HearingResponse> GetHearingAsync(int hearingId)
@@ -94,6 +102,12 @@ public class HearingService : CmServiceBase, IHearingService
 
         var hearingResponse = MapperService.Map<Hearing, DisputeHearingGetResponse>(hearing);
 
+        if (hearingResponse.HearingReservedDisputeGuid.HasValue)
+        {
+            var dispute = await UnitOfWork.DisputeRepository.GetDispute(hearingResponse.HearingReservedDisputeGuid.Value);
+            hearingResponse.HearingReservedFileNumber = dispute.FileNumber;
+        }
+
         var associatedDisputes = await UnitOfWork.DisputeHearingRepository.GetByHearingId(hearing.HearingId);
 
         hearingResponse.AssociatedDisputes = MapperService.Map<List<Data.Model.DisputeHearing>, List<DisputeHearingResponse>>(associatedDisputes);
@@ -110,6 +124,12 @@ public class HearingService : CmServiceBase, IHearingService
         foreach (var hearing in disputeHearings)
         {
             var disputeHearing = await GetHearing(hearing.HearingId);
+
+            if (disputeHearing.HearingReservedDisputeGuid.HasValue)
+            {
+                var dispute = await UnitOfWork.DisputeRepository.GetDispute(disputeHearing.HearingReservedDisputeGuid.Value);
+                disputeHearing.HearingReservedFileNumber = dispute.FileNumber;
+            }
 
             disputeHearingsResponse.Add(disputeHearing);
         }
@@ -192,9 +212,7 @@ public class HearingService : CmServiceBase, IHearingService
 
     public async Task<List<AvailableConferenceBridgesResponse>> GetAvailableBridges(AvailableConferenceBridgesRequest request)
     {
-        var activeBridges = await UnitOfWork.ConferenceBridgeRepository.GetActiveConferenceBridges();
-
-        var availableConferenceBridges = await UnitOfWork.HearingRepository.GetAvailableHearingsByPeriod(request, activeBridges);
+        var availableConferenceBridges = await UnitOfWork.HearingRepository.GetAvailableHearingsByPeriod(request);
 
         return availableConferenceBridges;
     }
@@ -290,6 +308,20 @@ public class HearingService : CmServiceBase, IHearingService
             await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.DeleteDisputeHearing, firstHearing, disputeHearing, false);
         }
 
+        if (firstHearing.NotificationFileDescriptionId.HasValue)
+        {
+            var fileDescription = await UnitOfWork.FileDescriptionRepository.GetByIdAsync(firstHearing.NotificationFileDescriptionId.Value);
+            if (fileDescription != null)
+            {
+                fileDescription.IsDeficient = true;
+                fileDescription.IsDeficientReason = ConstantStrings.DeficientReason;
+                UnitOfWork.FileDescriptionRepository.Attach(fileDescription);
+            }
+
+            firstHearing.NotificationFileDescriptionId = null;
+            UnitOfWork.HearingRepository.Attach(firstHearing);
+        }
+
         UnitOfWork.HearingRepository.Attach(firstHearing);
         UnitOfWork.HearingRepository.Attach(secondHearing);
 
@@ -298,13 +330,13 @@ public class HearingService : CmServiceBase, IHearingService
         return result.CheckSuccess();
     }
 
-    public async Task<bool> IsAssignedHearings(int userId, DateTime blockStart)
+    public async Task<bool> IsAssignedHearings(int userId, DateTime blockStart, DateTime blockEnd)
     {
-        var isHearingsAssigned = await UnitOfWork.HearingRepository.IsAssignedHearings(userId, blockStart);
-        return isHearingsAssigned;
+        var associatedHearingsCount = await UnitOfWork.HearingRepository.GetAssociatedHearingsCount(blockStart, blockEnd, userId);
+        return associatedHearingsCount > 0;
     }
 
-    public async Task<List<ReserveAvailableHearingResponse>> ReserveAvailableHearings(ReserveAvailableHearingsRequest request, string token)
+    public async Task<List<ReserveAvailableHearingResponse>> ReserveAvailableHearings(ReserveAvailableHearingsRequest request, string token, Guid? disputeGuid)
     {
         var hearings = await UnitOfWork.HearingRepository.GetReserveAvailableHearings(request);
 
@@ -318,6 +350,7 @@ public class HearingService : CmServiceBase, IHearingService
             {
                 hearing.HearingReservedUntil = now.AddMinutes(hearingReservationDuration);
                 hearing.HearingReservedById = userToken.UserTokenId;
+                hearing.HearingReservedDisputeGuid = disputeGuid;
                 UnitOfWork.HearingRepository.Attach(hearing);
 
                 await _hearingAuditLogService.CreateAsync(HearingAuditLogCase.HearingReservation, hearing, null, false);
@@ -346,6 +379,11 @@ public class HearingService : CmServiceBase, IHearingService
         };
 
         var disputeHearingResult = await UnitOfWork.DisputeHearingRepository.InsertAsync(disputeHearing);
+
+        var hearing = await UnitOfWork.HearingRepository.GetByIdAsync(hearingId);
+        hearing.HearingReservedDisputeGuid = null;
+        UnitOfWork.HearingRepository.Attach(hearing);
+
         var result = await UnitOfWork.Complete();
         if (result.CheckSuccess())
         {
@@ -365,6 +403,7 @@ public class HearingService : CmServiceBase, IHearingService
         var hearing = await UnitOfWork.HearingRepository.GetByIdAsync(hearingId);
         hearing.HearingReservedUntil = null;
         hearing.HearingReservedById = null;
+        hearing.HearingReservedDisputeGuid = null;
 
         UnitOfWork.HearingRepository.Attach(hearing);
         var result = await UnitOfWork.Complete();
@@ -386,13 +425,21 @@ public class HearingService : CmServiceBase, IHearingService
         return hearing;
     }
 
-    public async Task<bool> HoldHearing(int hearingId, string token)
+    public async Task<bool> HoldHearing(int hearingId, string token, HoldHearingRequest request)
     {
         var userToken = await TokenService.GetUserToken(token);
 
         var hearing = await UnitOfWork.HearingRepository.GetByIdAsync(hearingId);
-        hearing.HearingReservedUntil = hearing.HearingStartDateTime;
+
+        hearing.HearingReservedUntil = request.HearingReservedUntil.HasValue ?
+                                        request.HearingReservedUntil.Value :
+                                        hearing.HearingStartDateTime;
+
         hearing.HearingReservedById = userToken.UserTokenId;
+        if (request.HearingReservedDisputeGuid.HasValue)
+        {
+            hearing.HearingReservedDisputeGuid = request.HearingReservedDisputeGuid.Value;
+        }
 
         UnitOfWork.HearingRepository.Attach(hearing);
         var result = await UnitOfWork.Complete();
@@ -404,5 +451,74 @@ public class HearingService : CmServiceBase, IHearingService
         }
 
         return false;
+    }
+
+    public async Task<int?> GetHearingWaitTime(ExternalHearingWaitTimeRequest request)
+    {
+        var waitTime = await UnitOfWork.HearingRepository.GetHearingWaitTime(request);
+        return waitTime;
+    }
+
+    public async Task<OnHoldHearingsGetResponse> GetOnHoldHearings(OnHoldHearingsRequest request, int index, int count)
+    {
+        if (count == 0)
+        {
+            count = Pagination.DefaultPageSize;
+        }
+
+        var response = new OnHoldHearingsGetResponse();
+        var hearings = await UnitOfWork.HearingRepository.GetOnHoldHearings(request);
+
+        response.TotalAvailableRecords = hearings.Count;
+        var finalHearings = hearings.ApplyPaging(count, index);
+
+        var mappedHearings = MapperService.Map<List<Hearing>, List<OnHoldHearingResponse>>(finalHearings);
+
+        foreach (var item in mappedHearings)
+        {
+            if (item.HearingReservedDisputeGuid.HasValue)
+            {
+                var reservedDispute = await UnitOfWork.DisputeRepository.GetDispute(item.HearingReservedDisputeGuid.Value);
+                item.HearingReservedFileNumber = reservedDispute?.FileNumber;
+            }
+        }
+
+        response.AvailableHearings = mappedHearings;
+
+        return response;
+    }
+
+    public async Task<List<ExternalDisputeHearingGetResponse>> GetExternalDisputeHearings(Guid disputeGuid)
+    {
+        var disputeHearingsResponse = new List<ExternalDisputeHearingGetResponse>();
+
+        var disputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearingsByDispute(disputeGuid);
+
+        foreach (var hearing in disputeHearings)
+        {
+            var disputeHearing = await GetExternalHearing(hearing.HearingId);
+
+            disputeHearingsResponse.Add(disputeHearing);
+        }
+
+        return disputeHearingsResponse;
+    }
+
+    public async Task<ExternalDisputeHearingGetResponse> GetExternalHearing(int hearingId)
+    {
+        var hearing = await UnitOfWork.HearingRepository.GetHearingWithConferenceBridge(hearingId);
+
+        if (hearing == null)
+        {
+            return null;
+        }
+
+        var hearingResponse = MapperService.Map<Hearing, ExternalDisputeHearingGetResponse>(hearing);
+
+        var associatedDisputes = await UnitOfWork.DisputeHearingRepository.GetByHearingId(hearing.HearingId);
+
+        hearingResponse.AssociatedDisputes = MapperService.Map<List<Data.Model.DisputeHearing>, List<ExternalDisputeHearingResponse>>(associatedDisputes);
+
+        return hearingResponse;
     }
 }

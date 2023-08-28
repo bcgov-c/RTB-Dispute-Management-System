@@ -111,9 +111,9 @@ public class FileService : CmServiceBase, IFileService
         return result.CheckSuccess();
     }
 
-    public async Task<FileResponse> GetAsync(Guid fileGuid)
+    public async Task<FileResponse> GetAsync(Guid fileGuid, bool ignoreFilter = false)
     {
-        var file = await UnitOfWork.FileRepository.GetNoTrackingByIdAsync(r => r.FileGuid.Equals(fileGuid));
+        var file = await UnitOfWork.FileRepository.GetNoTrackingByIdAsync(r => r.FileGuid.Equals(fileGuid), ignoreFilter);
 
         return file != null ? MapperService.Map<CmFile, FileResponse>(file) : null;
     }
@@ -234,6 +234,31 @@ public class FileService : CmServiceBase, IFileService
     {
         var file = await UnitOfWork.FileRepository.FindAllAsync(f => f.OriginalFileName == originalFileName);
         return file.Any();
+    }
+
+    public async Task<bool> SoftDelete(int fileId)
+    {
+        var file = await UnitOfWork.FileRepository.GetByIdAsync(fileId, true);
+
+        if (file != null)
+        {
+            file.IsSourceFileDeleted = true;
+            UnitOfWork.FileRepository.Update(file);
+            await UnitOfWork.Complete();
+        }
+
+        return true;
+    }
+
+    public async Task<bool> IsFileAssociatedToDispute(int fileId, Guid disputeGuid)
+    {
+        var file = await UnitOfWork.FileRepository.GetByIdAsync(fileId);
+        if (file != null && file.DisputeGuid == disputeGuid)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private async Task<string> GetFileUrl(CmFile file)

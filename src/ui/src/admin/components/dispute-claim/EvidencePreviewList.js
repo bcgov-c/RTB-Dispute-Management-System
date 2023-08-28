@@ -38,14 +38,15 @@ export default Marionette.View.extend({
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['listData', 'highlightedFileId', 'evidenceModels', 'fileModels']);
+    this.mergeOptions(options, ['listData', 'highlightedFileId', 'evidenceModels', 'fileModels', 'hideArbControls']);
   },
 
   templateContext() {
     return {
       Formatter,
       listData: this.listData,
-      highlightedFileId: this.highlightedFileId
+      highlightedFileId: this.highlightedFileId,
+      hideArbControls: this.hideArbControls
     };
   }
 });

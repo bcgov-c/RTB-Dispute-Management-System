@@ -12,6 +12,9 @@
 
   <div id="p4-LandlordSeekingMoney" class="step claim-question hidden-step landlord-seeking-money"></div>
   <div id="p4-LandlordSeekingMoneyClaims" class="step claim-selection hidden-step landlord-seeking-money-claims"></div> 
+
+  <div id="p4-LandlordSeekingOther" class="step claim-question hidden-step landlord-seeking-other"></div>
+  <div id="p4-LandlordSeekingOtherClaims" class="step claim-selection hidden-step landlord-seeking-other-claims"></div> 
 </div>
 
 <div id="is_tenant">

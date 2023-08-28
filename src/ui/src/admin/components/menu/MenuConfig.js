@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Config file driving the left menu. Dashboard pages are always available, while dispute pages are available only when a dispute is loaded.
+ */
 import Radio from 'backbone.radio';
 const configChannel = Radio.channel('config');
 

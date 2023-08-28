@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CM.Business.Entities.Models.ScheduleBlock;
 using CM.Common.Utilities;
+using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
+using Polly;
 
 namespace CM.Business.Services.ScheduleBlock;
 
@@ -27,7 +29,11 @@ public class ScheduleBlockService : CmServiceBase, IScheduleBlockService
         var result = await UnitOfWork.Complete();
         if (result.CheckSuccess())
         {
-            return MapperService.Map<Data.Model.ScheduleBlock, ScheduleBlockPostResponse>(scheduleBlockResult);
+            var block = MapperService.Map<Data.Model.ScheduleBlock, ScheduleBlockPostResponse>(scheduleBlockResult);
+            block.AssociatedHearings = await UnitOfWork
+                .HearingRepository
+                .GetAssociatedHearingsCount(scheduleBlock.BlockStart, scheduleBlock.BlockEnd, scheduleBlock.SystemUserId);
+            return block;
         }
 
         return null;
@@ -56,24 +62,33 @@ public class ScheduleBlockService : CmServiceBase, IScheduleBlockService
 
         var result = new ScheduleBlocksGetFullResponse();
 
-        var blocks = await UnitOfWork
-            .ScheduleBlockRepository
-            .FindAllAsync(x => x.BlockStart >= request.BlockStartingAfter
-                               && x.BlockEnd <= request.BlockStartingBefore);
+        var predicate = PredicateBuilder.True<Data.Model.ScheduleBlock>();
+
+        predicate = predicate.And(x => x.BlockStart >= request.BlockStartingAfter
+                               && x.BlockStart < request.BlockStartingBefore);
 
         if (request.SystemUserId.HasValue)
         {
-            blocks = blocks.Where(x => x.SystemUserId == request.SystemUserId).ToList();
+            predicate = predicate.And(x => x.SystemUserId == request.SystemUserId);
         }
 
-        result.TotalAvailableRecords = blocks.Count;
-        var pageBlocks = blocks.AsQueryable().ApplyPaging(count, index).ToList();
+        var(totalCount, pageBlocks) = await UnitOfWork
+            .ScheduleBlockRepository
+            .GetScheduleBlocks(predicate, count, index);
+
+        result.TotalAvailableRecords = totalCount;
+
         foreach (var item in pageBlocks)
         {
             var blockWithHearing = MapperService.Map<Data.Model.ScheduleBlock, ScheduleBlockGetResponse>(item);
             blockWithHearing.AssociatedHearings = await UnitOfWork
                 .HearingRepository
                 .GetAssociatedHearingsCount(item.BlockStart, item.BlockEnd, item.SystemUserId);
+
+            blockWithHearing.AssociatedBookedHearings = await UnitOfWork
+                .HearingRepository
+                .GetAssociatedBookedHearingsCount(item.BlockStart, item.BlockEnd, item.SystemUserId);
+
             result.ScheduleBlocks.Add(blockWithHearing);
         }
 
@@ -89,6 +104,9 @@ public class ScheduleBlockService : CmServiceBase, IScheduleBlockService
             result.AssociatedHearings = await UnitOfWork
                 .HearingRepository
                 .GetAssociatedHearingsCount(scheduleBlock.BlockStart, scheduleBlock.BlockEnd, scheduleBlock.SystemUserId);
+            result.AssociatedBookedHearings = await UnitOfWork
+                .HearingRepository
+                .GetAssociatedBookedHearingsCount(scheduleBlock.BlockStart, scheduleBlock.BlockEnd, scheduleBlock.SystemUserId);
             return result;
         }
 
@@ -131,6 +149,9 @@ public class ScheduleBlockService : CmServiceBase, IScheduleBlockService
                     currentBlock.AssociatedHearings = await UnitOfWork
                         .HearingRepository
                         .GetAssociatedHearingsCount(item.BlockStart, item.BlockEnd, item.SystemUserId);
+                    currentBlock.AssociatedBookedHearings = await UnitOfWork
+                        .HearingRepository
+                        .GetAssociatedBookedHearingsCount(item.BlockStart, item.BlockEnd, item.SystemUserId);
                     scheduleBlocks.Add(currentBlock);
                 }
 
@@ -187,13 +208,17 @@ public class ScheduleBlockService : CmServiceBase, IScheduleBlockService
         return overlapped;
     }
 
-    public async Task<Data.Model.ScheduleBlock> PatchAsync(Data.Model.ScheduleBlock originalBlock)
+    public async Task<ScheduleBlockPatchResponse> PatchAsync(Data.Model.ScheduleBlock originalBlock)
     {
         UnitOfWork.ScheduleBlockRepository.Attach(originalBlock);
         var result = await UnitOfWork.Complete();
         if (result.CheckSuccess())
         {
-            return originalBlock;
+            var block = MapperService.Map<Data.Model.ScheduleBlock, ScheduleBlockPatchResponse>(originalBlock);
+            block.AssociatedHearings = await UnitOfWork
+                .HearingRepository
+                .GetAssociatedHearingsCount(originalBlock.BlockStart, originalBlock.BlockEnd, originalBlock.SystemUserId);
+            return block;
         }
 
         return null;

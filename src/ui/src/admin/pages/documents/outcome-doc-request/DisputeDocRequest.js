@@ -322,6 +322,7 @@ const DisputeDocRequest = Marionette.View.extend({
 
   template() {
     const hasUploadedFiles = (this.model.getUploadedFiles() || []).length;
+    const participant = participantsChannel.request('get:participant', this.model.get('submitter_id'));
     return (
       <>
         <div className="doc-request__top">
@@ -335,7 +336,7 @@ const DisputeDocRequest = Marionette.View.extend({
             </div>
             
             <div className="doc-request__labelval">
-              <label>Submitter:</label>&nbsp;<span>{participantsChannel.request('get:participant:name', this.model.get('submitter_id'))}</span>
+              <label>Submitter:</label>&nbsp;<span>{!participant ? '-' : `${participant.isLandlord() ? 'Landlord' : 'Tenant'} - ${participant.getDisplayName()}`}</span>
               {this.model.get('submitter_details') ? <span>&nbsp;({this.model.get('submitter_details')})</span> : null}
             </div>
 

@@ -1,6 +1,7 @@
 /**
  * @namespace core.components.modals.ModalManager
  * @memberof core.components.modals
+ * @fileoverview - Manager that handles display and removal of all system modals
 */
 
 import Marionette from 'backbone.marionette';
@@ -131,7 +132,9 @@ const ModalManagerRadio = Marionette.Object.extend({
     'add': 'addModal',
     'remove': 'removeModal',
     'remove:all': 'removeAllModals',
-    'render:root': 'renderRootManager'
+    'render:root': 'renderRootManager',
+    'hide:all': 'hideAllModals',
+    'show:hidden': 'showHiddenModals'
   },
 
   initialize() {
@@ -179,6 +182,13 @@ const ModalManagerRadio = Marionette.Object.extend({
     $('body').append(modalManagerInstance.render().el);
   },
 
+  hideAllModals() {
+    modalManagerInstance.$('.modal').css({ visibility: 'hidden' });
+  },
+
+  showHiddenModals() {
+    modalManagerInstance.$('.modal').css({ visibility: 'visible' });
+  },
 
   // A utility function to create a "default" modal, with a few configurable options passed in
   createAndAddStandardModal(modal_options) {

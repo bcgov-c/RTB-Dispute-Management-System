@@ -40,6 +40,9 @@ public partial class SecurityTests
         var noticePostResponse = ExternalUpdateManager.CreateNotice(Client, Data.Dispute.DisputeGuid, new OfficeUserPostNoticeRequest());
         noticePostResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+        var hearingWaitTimeGetResponse = ExternalUpdateManager.GetHearingWaitTime(Client, new ExternalHearingWaitTimeRequest());
+        hearingWaitTimeGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
 
@@ -66,6 +69,9 @@ public partial class SecurityTests
 
         noticePostResponse = ExternalUpdateManager.CreateNotice(Client, Data.Dispute.DisputeGuid, new OfficeUserPostNoticeRequest());
         noticePostResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        hearingWaitTimeGetResponse = ExternalUpdateManager.GetHearingWaitTime(Client, new ExternalHearingWaitTimeRequest());
+        hearingWaitTimeGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -95,6 +101,9 @@ public partial class SecurityTests
         noticePostResponse = ExternalUpdateManager.CreateNotice(Client, Data.Dispute.DisputeGuid, new OfficeUserPostNoticeRequest());
         noticePostResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
+        hearingWaitTimeGetResponse = ExternalUpdateManager.GetHearingWaitTime(Client, new ExternalHearingWaitTimeRequest());
+        hearingWaitTimeGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
+
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
 
@@ -121,5 +130,8 @@ public partial class SecurityTests
 
         noticePostResponse = ExternalUpdateManager.CreateNotice(Client, Data.Dispute.DisputeGuid, new OfficeUserPostNoticeRequest());
         noticePostResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        hearingWaitTimeGetResponse = ExternalUpdateManager.GetHearingWaitTime(Client, new ExternalHearingWaitTimeRequest());
+        hearingWaitTimeGetResponse.ResponseMessage.StatusCode.Should().NotBe(HttpStatusCode.Unauthorized);
     }
 }

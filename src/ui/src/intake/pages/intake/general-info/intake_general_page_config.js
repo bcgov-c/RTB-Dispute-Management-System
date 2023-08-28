@@ -169,9 +169,9 @@ export default {
     question_name: 'S1_HasCounterDispute',
     page_item_options(questionModel) {
       return {
-        stepText: 'Is there currently a dispute filed against you at the same rental address and are you filing this application in response',
+        stepText: 'Is there currently an application for dispute resolution filed with the Residential Tenancy Branch against you at the same rental address above, and are you filing this application in response to that dispute?',
         stepComplete: questionModel.get('question_answer') !== null,
-        helpHtml: 'If your Application for Dispute Resolution is being made to respond to an existing application that has been filed against you, select yes.<br/>The Residential Tenancy Branch may schedule both the hearings to be heard at the same time, with the same arbitrator. If the issues are not related or there is not enough time to meet service rules, this application may need to be heard at a separate time.'
+        helpHtml: 'If your Application for Dispute Resolution is being made to respond to an existing application that has been filed with the Residential Tenancy Branch against you, select yes.<br/>The Residential Tenancy Branch may schedule both the hearings to be heard at the same time, with the same arbitrator. If the issues are not related or there is not enough time to meet service rules, this application may need to be heard at a separate time.'
       };
     },
     question_options: {

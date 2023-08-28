@@ -34,7 +34,7 @@ public class OutcomeDocRequestPatchRequest
     public int? OutcomeDocGroupId { get; set; }
 
     [JsonProperty("file_description_id")]
-    public int FileDescriptionId { get; set; }
+    public int? FileDescriptionId { get; set; }
 
     [JsonProperty("request_status")]
     public byte RequestStatus { get; set; }
@@ -58,4 +58,7 @@ public class OutcomeDocRequestPatchRequest
 
     [JsonProperty("request_source")]
     public byte? RequestSource { get; set; }
+
+    [JsonProperty("request_sub_status")]
+    public byte? RequestSubStatus { get; set; }
 }

@@ -24,7 +24,7 @@ import 'flexboxgrid/dist/flexboxgrid.min.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'jquery-ui/themes/base/theme.css';
 import 'jquery-ui/themes/base/datepicker.css';
-import 'trumbowyg/dist/ui/trumbowyg.min.css';
+import 'trumbowyg/dist/ui/trumbowyg.css';
 import 'trumbowyg/dist/plugins/table/ui/trumbowyg.table.css';
 import 'trumbowyg/dist/plugins/colors/ui/trumbowyg.colors.css';
 import 'trumbowyg/dist/plugins/history/trumbowyg.history.min.js';
@@ -75,6 +75,7 @@ import './components/data-channel-helpers/CeuConfigHelper';
 import './components/data-channel-helpers/CeuFilesHelper';
 import ExternalCustomObj_model from '../core/components/custom-data-objs/external/ExternalCustomObj_model';
 import ModalTimeout from '../core/components/modals/modal-timeout/ModalTimeout';
+import AnalyticsUtil from '../core/utilities/AnalyticsUtil';
 
 // Add site name
 var g = window || global;
@@ -380,8 +381,8 @@ const AppModel = Backbone.Model.extend({
           }
         }
 
-        // If there are active uploads automatically extend the session
-        if (sessionChannel.request('get:uploads')?.length) {
+        // If there are active api calls automatically extend the session
+        if (sessionChannel.request('get:active:api')?.length) {
           autoExtendSession = true;
         }
 
@@ -507,14 +508,30 @@ const App = Marionette.Application.extend({
     });
   },
 
+  initializeEventsAndAnimations() {
+    $.initializeCustomAnimations({
+      scrollableContainerSelector: '#intake-content'
+    });
+    $.initializeDatepickerScroll();
+  },
+
   initializeSiteDependentData() {
     sessionChannel.request('set:login:external');
   },
 
   onStart() {
+    this.initializeErrorReporting();
     this.initializeSiteDependentData();
+    this.initializeEventsAndAnimations();
     this.initializeViews();
     this.initializeRoutersAndRouteListeners();
+    AnalyticsUtil.initializeAnalyticsTracking();
+  },
+
+  initializeErrorReporting() {
+    apiChannel.request('create:errorHandler', {
+      error_site: configChannel.request('get', 'ERROR_SITE_CEU')
+    });
   },
 
   initializeViews() {

@@ -89,14 +89,21 @@ public class FactTimeStatisticManager : StatisticManagerBase
 
         var disputeHearings = await UnitOfWork.DisputeHearingRepository.GetDisputeHearingsByHearingStartDate(utcStart, utcEnd);
 
-        var emptyHearings = await UnitOfWork.HearingRepository.GetHearingsByHearingStartDate(utcStart, utcEnd, disputeHearings);
+        var disputeHearingsEmergency = disputeHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Emergency);
+        var disputeHearingsStandard = disputeHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Standard);
+        var disputeHearingsDeferred = disputeHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Deferred);
+        var disputeHearingsDuty = disputeHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Duty);
+
+        var emptyHearings = await UnitOfWork.HearingRepository
+                            .GetHearingsByHearingStartDate(utcStart, utcEnd, disputeHearings.Select(x => x.HearingId).ToList());
+
+        var emptyHearingsEmergency = emptyHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Emergency);
+        var emptyHearingsStandard = emptyHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Standard);
+        var emptyHearingsDeferred = emptyHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Deferred);
+        var emptyHearingsDuty = emptyHearings.Where(x => x.HearingPriority == (byte)HearingPriority.Duty);
 
         var avgNextDisputeHearings = await UnitOfWork.DisputeHearingRepository.FindAllAsync(x => x.IsDeleted != true);
         var avgNextDisputeHearingsId = avgNextDisputeHearings.Select(x => x.HearingId).ToList();
-
-        var avgNext10EmergHearingDays = await UnitOfWork.HearingRepository.GetAvgNext10HearingDays(12, 1, avgNextDisputeHearingsId);
-        var avgNext10StandardHearingDays = await UnitOfWork.HearingRepository.GetAvgNext10HearingDays(23, 2, avgNextDisputeHearingsId);
-        var avgNext10DeferredHearingDays = await UnitOfWork.HearingRepository.GetAvgNext10HearingDays(21, 3, avgNextDisputeHearingsId);
 
         var files = await UnitOfWork.FileRepository.GetFilesByCreatedDate(utcStart, utcEnd);
         LogInformation($"File Count - {files?.Count}");
@@ -108,8 +115,13 @@ public class FactTimeStatisticManager : StatisticManagerBase
         var disputeStatuses =
             await UnitOfWork.DisputeStatusRepository.GetStatusesByStatusStartDate(utcStart, utcEnd);
 
+        var disputeStatusesAll =
+            await UnitOfWork.DisputeStatusRepository.GetAllStatusesByStatusStartDate(utcStart, utcEnd);
+
         var statusWaitingProofServices =
-            disputeStatuses.Where(x => x.Status == (byte)DisputeStatuses.WaitingForProofOfService);
+            disputeStatuses
+            .Where(x => x.Status == (byte)DisputeStatuses.WaitingForProofOfService
+                        && x.Process == (byte?)DisputeProcess.NonParticipatoryHearing);
 
         var statusAbandonedNeedsUpdates = disputeStatuses.Where(x =>
             x.Status == (byte)DisputeStatuses.AbandonedApplicantInaction &&
@@ -127,13 +139,7 @@ public class FactTimeStatisticManager : StatisticManagerBase
 
         var statusWithdrawn = disputeStatuses.Where(x => x.Status == (byte)DisputeStatuses.Withdrawn);
 
-        var statusWaitingForDecision = disputeStatuses
-            .Where(x => x.Status is
-                (byte)DisputeStatuses.DecisionPending or
-                (byte)DisputeStatuses.InterimDecisionPending or
-                (byte)DisputeStatuses.ClarificationDecisionPending or
-                (byte)DisputeStatuses.CorrectionDecisionPending)
-            .ToList();
+        var statusWaitingForDecisionsCount = await UnitOfWork.DisputeStatusRepository.GetWaitingForDecisionsCount();
 
         var statusesForOldest = await UnitOfWork.DisputeStatusRepository.GetOldestStatus(_oldStatuses);
 
@@ -283,6 +289,87 @@ public class FactTimeStatisticManager : StatisticManagerBase
 
         var intakeProcessedCount = await UnitOfWork.DisputeStatusRepository.GetDisputesCountLastChangesStatusFrom2(utcStart, utcEnd);
 
+        var stage2UnassignedUrgent = await UnitOfWork.DisputeRepository.GetStage2Unassigned(1);
+        var stage2UnassignedStandard = await UnitOfWork.DisputeRepository.GetStage2Unassigned(2);
+        var stage2UnassignedDeferred = await UnitOfWork.DisputeRepository.GetStage2Unassigned(3);
+
+        var waitTimeDaysDeferred = await UnitOfWork.HearingRepository.GetWaitTimeDays(3, 23, stage2UnassignedDeferred);
+        var waitTimeDaysStandard = await UnitOfWork.HearingRepository.GetWaitTimeDays(2, 23, stage2UnassignedStandard);
+        var waitTimeDaysUrgent = await UnitOfWork.HearingRepository.GetWaitTimeDays(1, 10, stage2UnassignedUrgent);
+
+        var nonParticipatoryStatuses = await UnitOfWork
+            .DisputeStatusRepository
+            .FindAllAsync(x => x.IsActive &&
+                  (x.Status == (byte)DisputeStatuses.ClosedForSubmissions
+                || x.Status == (byte)DisputeStatuses.Adjourned
+                || x.Status == (byte)DisputeStatuses.Closed));
+
+        var nonParticipatoryWaitingDecision = nonParticipatoryStatuses
+                                    .Count(x => x.Status == (byte)DisputeStatuses.ClosedForSubmissions
+                                    && x.Process == (byte?)DisputeProcess.NonParticipatoryHearing);
+
+        var nonParticipatoryWaitingDecisionOldest = nonParticipatoryStatuses
+                                    .Where(x => x.Status == (byte)DisputeStatuses.ClosedForSubmissions
+                                    && x.Process == (byte?)DisputeProcess.NonParticipatoryHearing)
+                                    .OrderBy(x => x.StatusStartDate)
+                                    .FirstOrDefault()
+                                    .StatusStartDate;
+
+        var nonParticipatoryClosed = nonParticipatoryStatuses
+                                    .Count(x => x.Status == (byte)DisputeStatuses.Closed
+                                    && x.Process == (byte?)DisputeProcess.NonParticipatoryHearing
+                                    && x.StatusStartDate >= utcStart
+                                    && x.StatusStartDate <= utcEnd);
+
+        var statusAdjourned = nonParticipatoryStatuses
+                                    .Count(x => x.Status == (byte)DisputeStatuses.Adjourned
+                                    && x.StatusStartDate >= utcStart
+                                    && x.StatusStartDate <= utcEnd);
+
+        var participatoryWaitArsDeadline = await UnitOfWork
+            .DisputeStatusRepository
+            .GetStatusesCount(x => x.IsActive == true
+                            && (x.Status == (byte)DisputeStatuses.WaitingForProofOfService
+                            || x.Status == (byte)DisputeStatuses.OfficePaymentRequired)
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing);
+
+        var deadlineDisputeGuids = disputeStatusesAll
+            .Where(x => x.Status == (byte)DisputeStatuses.WaitingForProofOfService
+                            && x.Stage == (byte)DisputeStage.ServingDocuments
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing)
+            .Select(x => x.DisputeGuid)
+            .Distinct()
+            .ToList();
+
+        var participatoryMissArsDeadline = await UnitOfWork
+            .DisputeStatusRepository
+            .GetStatusesCount(x => x.Status == (byte)DisputeStatuses.Dismissed
+                            && x.Stage == (byte)DisputeStage.ServingDocuments
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing
+                        && deadlineDisputeGuids.Contains(x.DisputeGuid) && x.IsActive == true);
+
+        var participatoryWaitReinstateDeadline = await UnitOfWork
+            .DisputeStatusRepository
+            .GetStatusesCount(x => x.IsActive == true
+                            && x.Status == (byte)DisputeStatuses.Dismissed
+                            && x.Stage == (byte)DisputeStage.ServingDocuments
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing);
+
+        var reinstateDeadlineDisputeGuids = disputeStatusesAll
+            .Where(x => x.Status == (byte)DisputeStatuses.Dismissed
+                            && x.Stage == (byte)DisputeStage.ServingDocuments
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing)
+            .Select(x => x.DisputeGuid)
+            .Distinct()
+            .ToList();
+
+        var participatoryMissReinstateDeadline = await UnitOfWork
+            .DisputeStatusRepository
+            .GetStatusesCount(x => x.Status == (byte)DisputeStatuses.Withdrawn
+                            && x.Stage == (byte)DisputeStage.ServingDocuments
+                        && x.Process == (byte?)DisputeProcess.ParticipatoryHearing
+                        && reinstateDeadlineDisputeGuids.Contains(x.DisputeGuid) && x.IsActive == true);
+
         LogInformation("Entity created");
 
         var factTimeStatistics = new FactTimeStatistic
@@ -319,29 +406,43 @@ public class FactTimeStatisticManager : StatisticManagerBase
                     .FirstOrDefault()?
                     .Process == (byte)DisputeProcess.NonParticipatoryHearing),
 
-            TenantDisputesPaid = disputesIpd.Count(x => x.DisputeSubType == (byte)DisputeSubType.ApplicantIsTenant),
+            Process7DisputesPaid = disputesIpd
+                .Count(x => x.DisputeStatuses.OrderByDescending(ds => ds.DisputeStatusId)
+                    .FirstOrDefault()?
+                    .Process == (byte)DisputeProcess.RentIncrease),
+
+        TenantDisputesPaid = disputesIpd.Count(x => x.DisputeSubType == (byte)DisputeSubType.ApplicantIsTenant),
             LandlordDisputesPaid = disputesIpd.Count(x => x.DisputeSubType == (byte)DisputeSubType.ApplicantIsLandlord),
             EmergencyDisputesPaid = disputesIpd.Count(x => x.DisputeUrgency == (byte)DisputeUrgency.Emergency),
             StandardDisputesPaid = disputesIpd.Count(x => x.DisputeUrgency == (byte)DisputeUrgency.Regular),
             DeferredDisputesPaid = disputesIpd.Count(x => x.DisputeUrgency == (byte)DisputeUrgency.Deferred),
+            NoUrgencyDisputesPaid = disputesIpd.Count(x => x.DisputeUrgency == null),
             SubServicesSubmitted = subServicesSubmitted.Count,
             AmendmentsSubmitted = amendmentsSubmitted.Count,
             DisputeHearings = disputeHearings.Count,
+            DisputeHearingsEmergency = disputeHearingsEmergency.Count(),
+            DisputeHearingsStandard = disputeHearingsStandard.Count(),
+            DisputeHearingsDeferred = disputeHearingsDeferred.Count(),
+            DisputeHearingsDuty = disputeHearingsDuty.Count(),
             EmptyHearings = emptyHearings.Count,
-            AvgNext10EmergEmptyHearingDays = avgNext10EmergHearingDays,
-            AvgNext10StandardEmptyHearingDays = avgNext10StandardHearingDays,
-            AvgNext10DeferredEmptyHearingDays = avgNext10DeferredHearingDays,
+            EmptyHearingsEmergency = emptyHearingsEmergency.Count(),
+            EmptyHearingsStandard = emptyHearingsStandard.Count(),
+            EmptyHearingsDeferred = emptyHearingsDeferred.Count(),
+            EmptyHearingsDuty = emptyHearingsDuty.Count(),
+            AvgNext10EmergEmptyHearingDays = 0,
+            AvgNext10StandardEmptyHearingDays = 0,
+            AvgNext10DeferredEmptyHearingDays = 0,
             Files = files?.Count ?? 0,
-            FilesMb = Utils.ConvertBytesToMegabytes(filesMb),
+            FilesMb = FileUtils.ConvertBytesToMegabytes(filesMb),
             EvidenceFiles = evidenceFiles?.Count ?? 0,
-            EvidenceFilesMb = Utils.ConvertBytesToMegabytes(evidenceFilesMb),
+            EvidenceFilesMb = FileUtils.ConvertBytesToMegabytes(evidenceFilesMb),
             StatusWaitingProofService = statusWaitingProofServices.Count(),
             StatusAbandonedNeedsUpdate = statusAbandonedNeedsUpdates.Count(),
             StatusAbandonedNoService = statusAbandonedNoService.Count(),
             StatusCancelled = statusCancelled.Count(),
             StatusNeedsUpdate = statusNeedsUpdate.Count(),
             StatusWithdrawn = statusWithdrawn.Count(),
-            StatusWaitingForDecision = statusWaitingForDecision.Count,
+            StatusWaitingForDecision = statusWaitingForDecisionsCount,
             StatusWaitingForDecisionOldest = statusWaitingForDecisionOldest,
             CorrectionRequests = correctionRequests.Count(),
             ClarificationRequests = clarificationRequests.Count(),
@@ -373,7 +474,21 @@ public class FactTimeStatisticManager : StatisticManagerBase
             DocumentsUndeliveredUrgent = documentsUndeliveredUrgent.Count,
             DocumentsUndeliveredUrgentOldest = documentsUndeliveredUrgentOldest.GetValueOrDefault(),
             DocumentsDelivered = documentsDelivered.Count(),
-            IntakeProcessed = intakeProcessedCount
+            IntakeProcessed = intakeProcessedCount,
+            Stage2UnassignedUrgent = stage2UnassignedUrgent,
+            Stage2UnassignedStandard = stage2UnassignedStandard,
+            Stage2UnassignedDeferred = stage2UnassignedDeferred,
+            WaitTimeDaysDeferred = waitTimeDaysDeferred,
+            WaitTimeDaysStandard = waitTimeDaysStandard,
+            WaitTimeDaysUrgent = waitTimeDaysUrgent,
+            NonParticipatoryWaitingDecision = nonParticipatoryWaitingDecision,
+            NonParticipatoryWaitingDecisionOldest = nonParticipatoryWaitingDecisionOldest,
+            NonParticipatoryClosed = nonParticipatoryClosed,
+            StatusAdjourned = statusAdjourned,
+            ParticipatoryWaitArsDeadline = participatoryWaitArsDeadline,
+            ParticipatoryMissArsDeadline = participatoryMissArsDeadline,
+            ParticipatoryWaitReinstateDeadline = participatoryWaitReinstateDeadline,
+            ParticipatoryMissReinstateDeadline = participatoryMissReinstateDeadline
         };
 
         return factTimeStatistics;

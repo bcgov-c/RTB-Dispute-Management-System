@@ -113,7 +113,7 @@ export default Marionette.View.extend({
     UAT_TOGGLING = configChannel.request('get', 'UAT_TOGGLING') || {};
 
     const INTAKE_URL = configChannel.request('get', 'INTAKE_URL');
-    this.alternateIntakeLink = INTAKE_URL && INTAKE_URL.replace('/Login', '');
+    this.alternateIntakeLink = INTAKE_URL && INTAKE_URL.replace('Login', '');
 
     this.radioModel = new RadioModel({
       optionData: [

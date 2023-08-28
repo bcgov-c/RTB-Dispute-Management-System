@@ -1,0 +1,108 @@
+.upload-table {
+  &__progress { margin-top: 15px; margin-bottom: 10px; }
+  &__filter-wrapper--edit { margin-bottom: 30px; }
+  &__filters--edit { display: flex; align-items: center; border-bottom: 1px solid #b8b8b8; }
+  &__list-header {
+    display: flex;
+    background-color: #d2d2d2;
+    border: 1px solid #333;
+    border-bottom: none;
+    font-weight: bold;
+
+    > div { padding: 2px 4px; }
+  }
+  
+  &__error-download { 
+    margin-right: 0!important;
+    display: inline-block;
+    border-right: 1px solid #ccc; 
+
+    img { margin-top: -2px; }
+  }
+  &__list {
+    height: 500px;
+    overflow-y: scroll;
+    border: 1px solid #333;
+  }
+  &__editable-row { cursor: pointer; }
+  &__editable-row-height { height: 36px; }
+  &__list-item {
+    display: flex;
+    border-bottom: 1px solid #333;
+
+    
+    > div { padding: 2px 4px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
+
+    &--active {
+      @extend .upload-table__list-item;
+      background-color: #dbeaf6;
+      border-left: 5px #2772be solid;
+      margin-left: -5px;
+      cursor: auto;
+    }
+
+    &__id { 
+      width: 70px; 
+      min-width: 70px; 
+      background-color: #8e8e8e; 
+      border-right: 1px solid #333; 
+      padding-left: 1px;
+
+      &__delete { 
+        @extend .upload-table__list-item__id;
+        background-color: #e3c8c9;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      
+    }
+    &__name { width: 280px; min-width: 280px; border-right: 1px solid #333; }
+    &__first-name { width: 220px; min-width: 220px; border-right: 1px solid #333; }
+    &__last-name { width: 220px; min-width: 220px; border-right: 1px solid #333; }
+    &__date { width: 190px; min-width: 190px; border-right: 1px solid #333; }
+    &__duration { width: 190px; min-width: 190px; border-right: 1px solid #333; }
+    &__type { width: 140px; min-width: 140px; border-right: 1px solid #333; }
+    &__region { width: 140px; min-width: 140px; border-right: 1px solid #333; }
+    &__start-time { width: 120px; min-width: 120px; border-right: 1px solid #333; }
+    &__end-time { width: 120px; min-width: 120px; border-right: 1px solid #333; }
+    &__priority { 
+      flex-grow: 1;
+      & * { margin: 0; }
+    }
+    &__result { width: 295px; min-width: 295px; }
+  }
+  
+  &__error {
+    background-image: url('../../core/static/Icon_AlertLrg.png');
+    background-repeat: no-repeat;
+    background-size: 35px;
+    background-position-y: 6px;
+    padding-left: 48px;
+    margin-top: 20px;
+    font-size: 17px;
+  }
+
+  &__buttons {
+    margin-top: 20px;
+    text-align: right;
+
+    &__edit { 
+      border: 1px solid #829ab3;
+      outline: none;
+      text-decoration: none;
+      background-color: #FFF;
+      color: #829ab3;
+
+      &:hover { color: #829ab3; }
+    }
+    
+    > * { margin-right: 15px; }
+    > button:last-child { margin-right: 0; }
+  }
+
+  &__delete {
+    width: 27px;
+    height: 26px;
+  }
+}

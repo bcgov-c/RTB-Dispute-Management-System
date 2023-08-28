@@ -20,10 +20,6 @@
 
 .notice-buttons button { margin-left: 10px; }
 
-
-.previewableContainer { margin: 20px 0px 0px 0px; border: 1px #396bc3 solid; display: block; overflow-y: scroll; height: calc(100vh - 540px) !important; min-height: 525px; }
-/*#notice-preview { margin: 20px 0px 0px 0px; border: 1px #396bc3 solid; display: block; overflow-y: scroll; height: calc(100vh - 540px) !important; min-height: 525px; }*/
-
 .service-unknown-icon { background: url('../static/Icon_NoNoticeInfo.png') no-repeat; }
 .service-served-icon { background: url('../static/Icon_NoticeProvided_DIS.png') no-repeat; }
 .service-not-served-icon { background: url('../static/Icon_NoticeNotProvided_DIS.png') no-repeat; }
@@ -48,7 +44,7 @@
 .edit .notice-delivery-time,
 .edit .notice-rtb-initiated,
 .edit .notice-other-delivery-description,
-.edit .package-provided-dropdown  { display: initial; }
+.edit .package-provided-dropdown  { display: initial; min-width: 125px;}
 
 .notice-delivery-method, 
 .notice-delivered-to, 
@@ -62,28 +58,24 @@
 .package-delivered-container .package-provided-by { display: block; }
 
 .notice-method-and-date-container, .package-provided-container { display: flex; }
-
 .package-provided-dropdown,
 .notice-delivery-method,
 .notice-delivery-date { margin-right: 15px; }
 
+.notice-ars-deadlines { margin-top: 20px; }
+.notice-ars-deadlines--enabled .notice-ars-deadline { background: url('../static/Admin_Icon_DeliverReadyCheck.png') no-repeat; }
+.notice-ars-deadlines--disabled .notice-ars-deadline { background: url('../static/Icon_Admin_DeliverNotReadyX.png') no-repeat; }
+.notice-ars-deadline { padding-left: 30px; }
 
 .notice-list-container .dispute-party-column {overflow: visible; }
 .notice-list-container .context-container { padding-bottom: 50px; }
 
-.service-edit .service-type { width: 280px; }
-.service-edit .respondent-notice-delivery-method { width: 200px; }
-.service-edit .respondent-notice-delivery-date, .service-edit .respondent-notice-received-date { width: 170px; }
-
-.service-type, .respondent-notice-delivery-method, .respondent-notice-delivery-date, .respondent-notice-received-date { margin-right: 20px; }
-
 .respondent-delivery-method:not(:empty) { width: 300px; padding-top: 5px; }
 .respondent-received-date:not(:empty) { width: 240px; margin-right: 10px; }
 .respondent-delivery-date:not(:empty) { width: 225px; margin-right: 10px; padding-top: 5px;}
-.respondent-notice-service-comment .rtb-editable-component-label { min-width: 85px; }
 .notice-list-container .dispute-party-column.right-column { height: 175px; }
 
-.not-served .respondent-notice-service-comment { width: calc(100% - 377px); }
+
 
 .respondent-notice-container { padding-bottom: 15px; border-bottom: 1px solid #e5e5e5; }
 .respondent-notice-container-row { display: flex; }
@@ -101,12 +93,10 @@
 }
 .notice-page-unlinked-amendments-summary span { margin-top: 7px; display: inline-block; }
 
+.notice-page__hearing-notices .file-block,
+.notice-page__hearing-notices .file-display { display: inline; }
+
 /* Add all addNotice styles */
-
-#ri-notice-select-modal .modal-dialog { width: 800px; }
-.ri-notice-select-modal__type label { display:block; margin-left: 0; margin-bottom: 10px; }
-.ri-notice-select-modal__type label:last-child { margin-bottom: 0px; }
-
 #addNotice-modal .modal-dialog { min-width: 1200px; max-width: 1440px; width: calc(100% - 80px); overflow: hidden; }
 #addNotice-modal .modal-body { padding: 0; }
 #addNotice-modal .modal-body-inner { padding: 15px; }
@@ -120,6 +110,8 @@
 #addNotice-modal .dispute-process { margin-top: 27px; margin-left: 50px;}
 #addNotice-modal .use-special-instructions { margin-top: 24px; margin-left: 50px;}
 #addNotice-modal .use-special-instructions label { font-size: 16px !important; }
+#addNotice-modal .notice-single-generation { margin-top: 24px; margin-left: 40px;}
+#addNotice-modal .notice-single-generation label { font-size: 16px !important; }
 #addNotice-modal .special-instructions { margin-top: 20px; }
 #addNotice-modal .btn-cancel { margin-left: 0; }
 
@@ -163,91 +155,15 @@
 .notice-respondent-service-container-hearing-tools .hearing-tools-header.service-view { margin-bottom: 5px; }
 .notice-respondent-service-container-hearing-tools .dispute-notice-service-item:last-child { border: none; }
 
-.dispute-notice-service-item { display: flex; border-bottom: 1px solid #e5e5e5; min-height: 65px; padding: 0 0 5px 0; margin-right: 10px; }
-
-.dispute-notice-service-name { min-width: 257px; width: 257px; display: flex; color: black; font-weight: bold; padding-right: 3px; }
-.dispute-notice-service-name > span { width: 100%; display: flex; align-self: center; align-items: center; justify-content: space-between; margin-left: 10px; margin-top: 5px; overflow: hidden; }
-.dispute-notice-service-name .dispute-notice-service-name > span > div {
-  display: inline-block;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.respondent-service-details { display: flex; min-width: fit-content; }
-
 .sub-service-icon-wrapper { display: flex; }
-
-.dispute-notice-service-details-container { display: flex; align-items: center; }
-.dispute-notice-service-details-container + div { margin-left: 257px; }
-
-.service-view .dispute-notice-service-details-container > div { margin-top: 7px; }
-
-.service-view .dispute-notice-service-details-container > .dispute-notice-service-name { margin-top: 0; position:relative; }
-.service-view .not-served .respondent-notice-service-comment { margin-top: 18px; }
-
-.service-view .dispute-notice-service-name { min-width: 350px; width: 350px; }
-.service-view .dispute-notice-service-details-container + div { margin-left: 350px; }
-
-.service-edit .dispute-notice-service-details-container { flex-wrap: wrap; }
-
-.respondent-notice-delivery-icon-display { margin-left: 10px; display: flex; align-items: center; }
-
-.dispute-notice-name-wrapper { display: flex; }
-.dispute-notice-name-and-meta-data-wrapper { display: flex; flex-direction: column; }
-.dispute-notice-meta-data { color: #8e8e8e; font-weight: normal; font-style: italic; line-height: 18px; font-size: 15px; margin-top: 5px; }
-
-.dispute-notice-service-item { margin-left: 5px; }
-
-.respondent-notice-delivery-date { margin-right: 5px; }
-.respondent-notice-received-date { margin-right: 20px; }
-
-.service-edit .service-type:not(:empty) { width: 190px; }
-.service-edit .respondent-notice-delivery-method:not(:empty) { width: 180px; }
-.service-edit .respondent-notice-delivery-date:not(:empty) { width: 160px; }
-.service-edit .respondent-notice-received-date:not(:empty) { width: 160px; }
-
-.respondent-notice-received-date .input-model-custom-link-container { float: right; }
-
 
 .respondent-date-used-icon { background: url('../static/Icon_Admin_HighlightText.png') no-repeat; height: 19px; width: 19px; margin-top: 2px; margin-left: 7px; margin-right: 3px;}
 
 .notice-list-container .respondent-delivery-date,
 .notice-list-container .respondent-received-date { display: flex; }
 
-.respondent-notice-delivery-icons { width: 120px; }
-
-.respondent-notice-delivery-icons .radio-icon,
-.respondent-notice-delivery-icon-display { height: 35px; width: 52px; min-width: 52px;}
-
 .notice-service-item-container .not-served-label { color: red; }
 .notice-service-item-container .served-label { color: green; }
-
-.service-edit .respondent-notice-delivery-icon-display { display: none; }
-
-.service-view .respondent-notice-add-files,
-.service-view .respondent-notice-delivery-icons { display: none; }
-
-.dispute-notice-service-name .sub-service-icon-wrapper { min-width: 26px; width: 26px; height: 24px; position: relative; top: 0; margin-right: 10px; }
-
-.service-edit .respondent-notice-delivery-icons { margin-top: 20px; }
-.service-edit .respondent-notice-add-files { margin-top: 26px; }
-
-.service-view .respondent-notice-add-files-container  { display: none; }
-
-.respondent-notice-add-files-container { min-width: 170px; }
-
-.respondent-notice-add-files {
-  background-image: url('../static/AddIcon_NoticeService.png');
-  background-repeat: no-repeat;
-  background-size: 29px 28px;
-  color: #337ab7;
-  cursor: pointer;
-  padding-left: 36px;
-  line-height: 28px;
-  display: inline-block;
-  user-select: none;
-}
 
 .hearing-tools-enabled .notice-respondent-service-display-container { display: none; }
 .hearing-tools-enabled .notice-respondent-service-container-hearing-tools { display: block; }
@@ -262,6 +178,9 @@
   border-bottom: 2px solid #d2d2d2;
   color: #8e8e8e;
 }
+
+.add-notice-service-files { min-width: 800px; }
+
 .amendments-title-container-empty { display: flex; align-items: center; height: 48px; }
 .notice-container-component .amendments-title-container .page-section-title { font-size: 19px; font-weight: normal; }
 

@@ -1,0 +1,13 @@
+.hold-hearing {
+  &__description { margin-top: 20px; }
+
+  &__date-select-wrapper {
+    display: flex;
+  }
+
+  &__hold-hearing-date {
+    width: 200px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+  }
+}

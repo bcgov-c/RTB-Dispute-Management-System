@@ -24,6 +24,7 @@ const claimsChannel = Radio.channel('claims');
 const participantsChannel = Radio.channel('participants');
 const modalChannel = Radio.channel('modals');
 const loaderChannel = Radio.channel('loader');
+const userChannel = Radio.channel('users');
 
 const DisputeManager = Marionette.Object.extend({
   /**
@@ -43,9 +44,9 @@ const DisputeManager = Marionette.Object.extend({
     'create:ari': 'createAriDispute',
     'create:pfr': 'createPfrDispute',
     'load': 'loadDisputePromise',
-    'load:detailed': 'loadDisputeByArea',
     'load:disputes': 'loadDisputeListPromise',
 
+    'get:dispute:creator': 'getDisputeCreator',
     'check:issue:state': 'checkIssueStateAndGetDiscrepancies',
     'check:complexity': 'checkDisputeComplexity',
     'incomplete:dispute:check': 'loadIncompleteDisputeCheck',
@@ -63,17 +64,19 @@ const DisputeManager = Marionette.Object.extend({
    * performs a fetch on the existing model, otherwise creates a new model.
    * Always sets the dispute model to be active.
    * @param {string} dispute_guid - The dispute guid to load
+   * @param {Object} options - Params for the argument. "no_cache" cases no side effects
    * @returns {Promise} - The promise object for the load
    * @memberof core.components.dispute.DisputeManagerClass
    */
-  loadDisputePromise(dispute_guid) {
-    const activeDispute = this.getActiveDispute(),
-      disputeModel = activeDispute && activeDispute.get('dispute_guid') === dispute_guid ?
-          activeDispute : new DisputeModel({ dispute_guid: dispute_guid });
+  loadDisputePromise(dispute_guid, options={}) {
+    const activeDispute = this.getActiveDispute();
+    const disputeModel = !options.no_cache && activeDispute?.get('dispute_guid') === dispute_guid ? activeDispute : new DisputeModel({ dispute_guid: dispute_guid });
+    const dfd = $.Deferred();
 
-    /* Always set the loaded dispute to be "active" */
-    this.setActiveDispute(disputeModel);
-    return disputeModel.fetch();
+    if (!options.no_cache) this.setActiveDispute(disputeModel);
+    
+    disputeModel.fetch().done(() => dfd.resolve(disputeModel)).fail(dfd.reject);
+    return dfd.promise();
   },
 
 
@@ -218,6 +221,10 @@ const DisputeManager = Marionette.Object.extend({
     return dfd.promise();
   },
 
+  getDisputeCreator() {
+    const disputeCreatorId = this.getActiveDispute()?.get('created_by');
+    return userChannel.request('get:dispute:users')?.find(dUser => dUser.get('system_user_id') === disputeCreatorId);
+  },
 
   /**
    * Gets the active dispute, if it exists.
@@ -398,15 +405,19 @@ const DisputeManager = Marionette.Object.extend({
     });
   },
 
-  checkCompleteness() {
-    const disputeModel = this.getActiveDispute();
+  async checkCompleteness(disputeModel=null) {
+    disputeModel = disputeModel || this.getActiveDispute();
     loaderChannel.trigger('page:load');
-    return this.loadIncompleteDisputeCheck(disputeModel).done(response => {
-      loaderChannel.trigger('page:load:complete');
-      modalChannel.request('add', new ModalCompletenessCheck({ model: disputeModel, incompleteItems: response }));
-    })
-  }
-
+    const response = await this.loadIncompleteDisputeCheck(disputeModel)
+    if (!response) return Promise.resolve();
+    loaderChannel.trigger('page:load:complete');
+    return new Promise((resolve, reject) => {
+      const completenessModalView = new ModalCompletenessCheck({ model: disputeModel, incompleteItems: response, autoCloseIfAllComplete: true })
+      this.listenTo(completenessModalView, 'removed:modal', () => reject());
+      this.listenTo(completenessModalView, 'save:complete', () => resolve());
+      modalChannel.request('add', completenessModalView);
+    });
+  },
 });
 
 const disputeManagerInstance = new DisputeManager();

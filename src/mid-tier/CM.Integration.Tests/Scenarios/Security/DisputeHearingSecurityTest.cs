@@ -18,6 +18,9 @@ public partial class SecurityTests
         var disputeHearingGetResponse = DisputeHearingManager.GetDisputeHearings(Client, Data.Dispute.DisputeGuid);
         disputeHearingGetResponse.CheckStatusCode();
 
+        var externalDisputeHearingGetResponse = DisputeHearingManager.GetExternalDisputeHearings(Client, Data.Dispute.DisputeGuid);
+        externalDisputeHearingGetResponse.CheckStatusCode();
+
         // SCHEDULER ADMIN(STAFF) USERS
         Client.Authenticate(Data.HearingUsers[0].Username, "12345" + Data.HearingUsers[0].Username);
 
@@ -63,11 +66,17 @@ public partial class SecurityTests
         disputeHearingGetResponse = DisputeHearingManager.GetDisputeHearings(Client, Data.Dispute.DisputeGuid);
         disputeHearingGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
+        externalDisputeHearingGetResponse = DisputeHearingManager.GetExternalDisputeHearings(Client, Data.Dispute.DisputeGuid);
+        externalDisputeHearingGetResponse.CheckStatusCode();
+
         disputeHearingGetHistoryResponse = DisputeHearingManager.GetDisputeHearingsHistory(Client, new DisputeHearingHistoryRequest { SearchType = 1, DisputeGuid = Data.Dispute.DisputeGuid });
         disputeHearingGetHistoryResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS UNAUTHORIZED EXTERNAL USER //
         Client.Authenticate(Users.User2, Users.User2);
+
+        externalDisputeHearingGetResponse = DisputeHearingManager.GetExternalDisputeHearings(Client, Data.Dispute.DisputeGuid);
+        externalDisputeHearingGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -84,6 +93,9 @@ public partial class SecurityTests
 
         disputeHearingGetResponse = DisputeHearingManager.GetDisputeHearings(Client, Data.Dispute.DisputeGuid);
         disputeHearingGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalDisputeHearingGetResponse = DisputeHearingManager.GetExternalDisputeHearings(Client, Data.Dispute.DisputeGuid);
+        externalDisputeHearingGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         disputeHearingGetHistoryResponse = DisputeHearingManager.GetDisputeHearingsHistory(Client, new DisputeHearingHistoryRequest { SearchType = 1, DisputeGuid = Data.Dispute.DisputeGuid });
         disputeHearingGetHistoryResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -102,6 +114,9 @@ public partial class SecurityTests
 
         disputeHearingGetResponse = DisputeHearingManager.GetDisputeHearings(Client, Data.Dispute.DisputeGuid);
         disputeHearingGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalDisputeHearingGetResponse = DisputeHearingManager.GetExternalDisputeHearings(Client, Data.Dispute.DisputeGuid);
+        externalDisputeHearingGetResponse.CheckStatusCode();
 
         disputeHearingGetHistoryResponse = DisputeHearingManager.GetDisputeHearingsHistory(Client, new DisputeHearingHistoryRequest { SearchType = 1, DisputeGuid = Data.Dispute.DisputeGuid });
         disputeHearingGetHistoryResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

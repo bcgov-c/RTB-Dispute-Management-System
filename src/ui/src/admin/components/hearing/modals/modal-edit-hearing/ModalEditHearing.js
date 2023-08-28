@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal that displays hearing information, and allows for editing of some fields
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../../core/components/modals/ModalBase';
 import EditableComponentView from '../../../../../core/components/editable-component/EditableComponent';
@@ -30,7 +33,7 @@ export default ModalBaseView.extend({
     hearingNoteRegion: '.hearing-note',
     hearingEndTimeRegion: '.hearing-end-time',
     hearingPriorityRegion: '.hearing-priority-edit',
-    hearingOnHoldRegion: '.hearing-on-hold-edit'
+    hearingOnHoldRegion: '.hearing-on-hold-edit',
   },
 
   ui() {
@@ -101,7 +104,9 @@ export default ModalBaseView.extend({
         return { value: String(value), text: Formatter.toUrgencyDisplay(value) };
       });
   },
-
+  /**
+   * @param {Boolean} viewOnly - disables edit mode 
+   */
   initialize(options) {
     this.mergeOptions(options, ['viewOnly']);
     
@@ -297,7 +302,6 @@ export default ModalBaseView.extend({
       isReserved: this.model.isReserved(),
       isAdjourned: null
     }));
-
     
 
     const hearingNote = this.hearingNoteModel.getData();
@@ -331,7 +335,8 @@ export default ModalBaseView.extend({
       conferenceBridgeData: conferenceBridge ? conferenceBridge.toJSON() : {},
       instructionsDisplay: this.model.getInstructions(),
       noticeGeneratedDisplay: this.hasMatchingNotice ? `<span class="success-green">Yes</span>` : `<span class="error-red">No</span>`,
-      isReserved: this.model.isReserved()
+      hearingNoticeDisplay: this.model.get('notification_file_description_id') ? `Yes` : `-`,
+      isReserved: this.model.isReserved(),
     };
   }
 });

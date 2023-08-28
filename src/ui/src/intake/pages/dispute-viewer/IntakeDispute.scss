@@ -1,0 +1,319 @@
+.intake-dispute {
+  padding: 20px;
+  font-size: 17px;
+  line-height: 20px;
+
+  &__word-break {
+    word-break: break-word;
+  }
+  
+
+  .review-label {
+    color: #8d8d8d;
+  }
+
+  &__label {
+    margin-bottom: 7px;
+    &--break-word { 
+      @extend .intake-dispute__label;
+      word-break: break-word;
+     }
+  }
+
+  &__header-actions {
+    min-width: fit-content;
+  }
+
+  &__page-title {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    font-size: 21px;
+    background-color: #e6e6e6;
+    padding: 12px 10px 8px 10px;
+    margin-bottom: 20px;
+
+    &__print {
+      cursor: pointer;
+      margin-left:12px;
+    }
+
+    &__refresh {
+      cursor: pointer;
+    }
+  }
+
+  &__description {
+    font-size: 19px;
+    line-height: 23px;
+    margin-bottom: 15px;
+  }
+
+  &__section-title {
+    margin: 30px 0 5px 0;
+    font-size: 19px;
+  }
+
+  &__requests-title {
+    font-size: 19px;
+    margin: 30px 0 3px 0;
+    line-height: 23px;
+  }
+
+  &__item-header {
+    border-bottom: 1px solid rgb(227, 227, 227);
+    margin: 5px 0px 10px;
+    padding: 5px 5px 2px 0px;
+    color: rgb(141, 141, 141);
+  }
+
+  &__item-wrapper {
+    margin-bottom: 25px;
+  }
+
+  &__no-evidence {
+    margin: 10px 0;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+
+    &__error-icon {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+    }
+  }
+
+  &__seperator {
+    border-bottom: 1px solid #d2d2d2;
+    margin: 10px 0;
+  }
+
+  &__attachments-display {
+    color: #757575;
+    margin-left: 5px;
+  }
+
+  &__attachments-icon {
+    padding: 0px; 
+    position: relative;
+    top: -2px;
+    margin-right: 1px;
+  }
+
+  &__view-details {
+    white-space: nowrap;
+  }
+
+  &__receipt-title {
+    margin-right: 25px;
+  }
+
+  &__subject {
+    margin-right: 25px;
+  }
+
+  /* issues */
+  &__issue-item {
+    margin-bottom: 10px;
+    word-break: break-word;
+  }
+
+  /* Hearing styles */
+  &__hearing-header {
+    border-bottom: 1px solid #d2d2d2;
+    margin-bottom: 5px;
+  }
+
+  &__hearing-time {
+    margin: 10px 0;
+
+    &__display { font-size: 20px; margin-left: 5px; }
+  }
+
+  &__hearing-icon {
+    position: relative;
+    bottom: 5px;
+  }
+
+  &__notice-item {
+    margin-bottom: 25px;
+  }
+
+  &__notice-amendment {
+    padding-top: 10px;
+  }
+
+  /* Pagination */
+  &__pagination {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #d2d2d2;
+    font-size: 19px;
+
+    &__view-text { margin-right: 15px; }
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      color: #ccc;
+
+      & span + span {
+        content: '';
+        border-left: 1px solid #ccc;
+        margin: 0 5px;
+        padding: 0 5px;
+      }
+    }
+
+    &__seperator {
+      position: relative;
+      bottom: -1px;
+      padding: 0 5px;
+    }
+
+    &__selectable-text {
+      display: flex;
+      align-items: center;
+      color: #337ab7;
+      cursor: pointer;
+      position: relative;
+      top: 3px;
+    }
+
+    &__disabled-text {
+      display: flex;
+      align-items: center;
+      color: #8e8e8e;
+      user-select: none;
+      position: relative;
+      top: 3px;
+    }
+
+    &__icon {
+      position: relative;
+      padding: 0 7px;
+    }
+  }
+
+  &__warning {
+
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &__text {
+      color: #de2f3c;
+    }
+
+    &__icon {
+      width: 23px;
+      height: 23px;
+      margin-right: 7px;
+    }
+
+    &__wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  &__evidence {
+    &__thumbnail-item { display: flex; flex-wrap: wrap; }
+    &__item-wrapper { margin-bottom: 5px; }
+    &__thumbnail-wrapper { display: flex; margin-top: 30px; }
+    &__thumbnail-toggle { margin-left: 30px; }
+    &__evidence-title {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      background-color: #e6e6e6;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  #emailReceipt_modal .modal-dialog {
+    min-width: auto !important;
+    width: auto !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .intake-dispute {
+    padding: 5px;
+
+    &__page-title {
+      font-size: 18px;
+    }
+  }
+}
+
+/** TODO BUG NOTE: This print section duplicates tons of core styles, both print styles and non print styles - REMOVE THIS **/
+@media print {
+  @page {
+    size: A4 portrait;
+    max-height:100%;
+    max-width:100%;
+  }
+
+  .print-page-top-container { display: flex!important; height: 110px!important; margin: 20px 0px; }
+  .print-page-logo {height: 100px!important; width: 120px!important; }
+  .print-page-title-container { margin: 0 0 0 30px; align-self: center; }
+  .print-page-sub-title { font-size: 18px; float: left; margin-bottom: 0px; width: 100%; }
+  .print-page-title { font-size: 20px; font-weight: bold; }
+
+  .review-label { color: #8d8d8d!important; }
+
+  .general-link { text-decoration: none; color: #337ab7!important; }
+  table, .intake-dispute__item-wrapper { break-inside: avoid; }
+  .intake-dispute__item-wrapper { page-break-inside: avoid; }
+  .intake-dispute__section-title { page-break-after: avoid; }
+
+  body { margin: 0; padding: 0; color:#292929; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; font-family: Arial, Helvetica, sans-serif; background: #F0F0F0; } 
+  html, body{ width:100%; margin:0; padding:0; }
+  body { background-color: #fff !important; }
+
+  .hidden-print {
+    display: none;
+  }
+
+  .intake-dispute { padding: 0 !important;}
+  .intake-dispute__description { line-height: inherit !important; }
+  .intake-dispute__hearing-time__display { margin-left: 0; }
+
+  .intake-dispute__page-title { padding: 0; };
+
+  .intake-dispute__evidence__evidence-title { padding-left: 0; }
+
+  #main-content { left:0; padding-bottom:10px; width: 1000px!important; }
+  
+  #intake-content {
+    overflow: visible;
+  }
+
+  .intake-dispute {
+    overflow: visible;
+  }
+
+  .general-link { color: #333!important; }
+}
+
+.modalEmail-modal .modal-dialog, #emailReceipt_modal .modal-dialog {
+  min-width: 991px;
+  max-width: 991px;
+}

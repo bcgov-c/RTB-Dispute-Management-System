@@ -1,6 +1,6 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
-import ModalViewEmail from '../../components/modals/modal-view-email/ModalViewEmail';
+import ModalViewEmail from './modals/ModalViewCommunicationEmail';
 import ModalCreateEmail from './modals/ModalCreateEmail';
 import template from './CommunicationEmail_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
@@ -71,7 +71,7 @@ export default Marionette.View.extend({
     const participantDisplay = participant ? `${participant.isTenant() ? 'Tenant: ' : 'Landlord: '}${participant.getDisplayName()}` : '';
     return {
       Formatter,
-      messageTypeToDisplay: !this.model.get('message_type') ? '-' : EMAIL_TYPE_DISPLAY[this.model.get('message_type')],
+      messageTypeToDisplay: EMAIL_TYPE_DISPLAY?.[this.model.get('message_type')] || '-',
       statusToDisplay: this.model.toStatusDisplay(),
       isSentError: this.model.isSentError(),
       isUnsentDraft,

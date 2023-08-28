@@ -1,0 +1,81 @@
+
+.generate-outcome-doc {
+
+  .modal-dialog { min-width: 1240px; }
+
+  .doc-option-one {
+    &__issue-options { margin-bottom: 20px; }
+  }
+
+  // Sub-serve and CCR
+  .sub-serv-ccr-table {
+    border: 1px #003366 solid;
+    padding: 5px;
+    margin-bottom: 20px;
+
+    &__table-header {
+      margin-top: 20px;
+      display: flex;
+    };
+
+    .standard-list-item { display: flex; }
+
+    .standard-list-items {
+      height: 126px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+
+    &__row {
+      display: flex;
+      align-items: center;
+      padding: 5px 3px 5px 3px;
+      border-bottom: 1px #e5e5e5 solid;
+      cursor: pointer;
+
+      &--active {
+        @extend .sub-serv-ccr-table__row;
+        background-color: #dbeaf6;
+        border-left: 5px #2772be solid;
+      }
+    }
+
+    &__requested-by-column { min-width: 260px; width: 260px; }
+    &__source-column { min-width: 100px; width: 100px; }
+    &__requested-date-column { min-width: 150px; width: 150px; }
+    &__service-to-column { min-width: 260px; width: 260px; }
+    &__documents-column { min-width: 280px; width: 280px; }
+    &__status-column {
+      display: flex;
+      justify-content: space-between;
+      min-width: 112px;
+
+      &__img {
+        width: 25px;
+        height: 24px;
+      }
+    }
+
+    &__use-request {
+      display: flex;
+      justify-content: end;
+      margin-top: 10px;
+      margin-right: 18px;
+    }
+  }
+
+  &__preview-loading {
+    display: block;
+    padding-top: 30px;
+    text-align: center;
+    font-size: 17px;
+    color: #888;
+    font-style: italic;
+    height: 100%;
+    opacity: 0.7;
+    cursor: not-allowed;
+    user-select: none;
+  }
+
+  .previewableContainer > div { height: 100%; }
+}

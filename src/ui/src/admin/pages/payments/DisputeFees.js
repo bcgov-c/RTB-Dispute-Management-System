@@ -1,6 +1,7 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ContextContainer from '../../components/context-container/ContextContainer';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 import DisputeFeeView from './DisputeFee';
 
 const disputeChannel = Radio.channel('dispute');
@@ -64,11 +65,13 @@ const DisputeFeesView = Marionette.CollectionView.extend({
         }
       };
     };
+    const disputeModel = disputeChannel.request('get');
     const view = ContextContainer.withContextMenu(_.extend({
       wrappedView: new DisputeFeeView(options),
       titleDisplay: `Dispute Fee ${Formatter.toLeftPad(child.collection ? child.collection.length - childViewOptions.childIndex : '', '0', 2)}`,
       menu_title: `Dispute Fee ID ${child.id}`,
-      disputeModel: disputeChannel.request('get'),
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Payment', 'fees', child.id),
       
       contextRender(contextContainerView) {
         _.extend(contextContainerView, getMenuConfigFn());

@@ -3,7 +3,7 @@
 </div>
 <div class="user-id-column"><%= user_id %></div>
 <div class="name-column"><%= name %></div>
-<div class="rolegrop-column"><%= roleGroup %></div>
+<div class="rolegroup-column"><%= roleGroup %></div>
 <div class="roletype-column"><%= roletype %></div>
 <div class="managedby-column"><%= managedBy %></div>
 

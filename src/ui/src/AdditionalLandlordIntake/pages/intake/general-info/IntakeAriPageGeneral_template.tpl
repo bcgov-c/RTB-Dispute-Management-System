@@ -10,7 +10,7 @@
 
 <div id="p1-RentalAddress"></div>
 <div id="out-of-bc-warning" class="ari-intake-page-warning hidden-item">
-  <span>This address does not appear to be a valid British Columbia address. Check that the address is correct before you continue.</span>
+  <span>We were not able to confirm your address with the Canada Post system. Please update the address then press the&nbsp;<b>Retry</b>&nbsp;link above. If no corrections need to be made, you may continue without changes.</span>
 </div>
 
 <div id="p1-repairsInPastQuestion"></div>

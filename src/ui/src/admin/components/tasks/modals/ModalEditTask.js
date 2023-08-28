@@ -1,3 +1,6 @@
+/**
+ * @fileoverview - Modal for editing some task information
+ */
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../../../core/components/modals/ModalBase';
 import TaskView from '../Task';

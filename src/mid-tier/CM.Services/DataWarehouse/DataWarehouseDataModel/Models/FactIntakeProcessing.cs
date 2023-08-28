@@ -85,6 +85,8 @@ public class FactIntakeProcessing
 
     public int? CreationMethod { get; set; }
 
+    public int? DisputeComplexity { get; set; }
+
     public bool? TenancyEnded { get; set; }
 
     public DateTime? TenancyEndDateTime { get; set; }
@@ -124,4 +126,6 @@ public class FactIntakeProcessing
     public int? ProcessStartStage { get; set; }
 
     public int? ProcessStartStatus { get; set; }
+
+    public bool? HasArsDeadline { get; set; }
 }

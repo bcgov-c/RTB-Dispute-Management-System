@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CM.Data.Model;
 using CM.Data.Repositories.Base;
 
 namespace CM.Data.Repositories.DisputeHearing;
@@ -25,7 +26,7 @@ public interface IDisputeHearingRepository : IRepository<Model.DisputeHearing>
 
     Task<bool> IsOverlappedHearingExist(Guid disputeGuid, int hearingId);
 
-    Task<List<int>> GetDisputeHearingsByHearingStartDate(DateTime startDate, DateTime endDate);
+    Task<List<Hearing>> GetDisputeHearingsByHearingStartDate(DateTime startDate, DateTime endDate);
 
     Task<Model.DisputeHearing> GetLatestDisputeHearing(Guid disputeGuid, int hearingId);
 
@@ -34,4 +35,8 @@ public interface IDisputeHearingRepository : IRepository<Model.DisputeHearing>
     Task<int?> GetPrimaryPreviousHearingId(int hearingId, Guid primaryDisputeGuid);
 
     Task<Model.DisputeHearing> GetHearingByRecordCodeAndDate(string recordCode, DateTime startDate);
+
+    Task<List<Model.DisputeHearing>> GetFutureDisputeHearings(Guid disputeGuid);
+
+    Task<bool> IsExists(int? hearingId, Guid disputeGuid);
 }

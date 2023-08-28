@@ -44,6 +44,12 @@
     <ProjectReference Include="..\CM.UserResolverService\CM.UserResolverService.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="CaseManagementContext.CaseFileLastModified.cs">
+      <DependentUpon>CaseManagementContext.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

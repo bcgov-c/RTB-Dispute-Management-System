@@ -41,7 +41,7 @@ const CALC_DAYS_Q2_YES = 5;
 const CALC_DAYS_Q2_NO = 15;
 const FORM_EVIDENCE_MISSING_MSG = 'You must add the application form to continue';
 
-const FORM_EVIDENCE_HELP = `Upload the application form(s), any other related forms and evidence.`;
+const FORM_EVIDENCE_HELP = `Upload the application form(s), and any other related forms and evidence. If the party requested and obtained a copy of the hearing recording from the Residential Tenancy Branch, please advise them it is not required as evidence.`;
 const DEFAULT_DATE_CONTINUE_MSG = `Explain the warning above to the person filing this request.  Would they like to continue?`;
 const ITEM_DESCRIPTION_TEXT = 'Office Submission - see paper application ----------------------';
 
@@ -55,6 +55,7 @@ const animationChannel = Radio.channel('animations');
 const configChannel = Radio.channel('config');
 const Formatter = Radio.channel('formatter').request('get');
 const flagsChannel = Radio.channel('flags');
+const documentsChannel = Radio.channel('documents');
 
 const OfficeRequestPageView = PageView.extend({
   template,
@@ -200,6 +201,9 @@ const OfficeRequestPageView = PageView.extend({
   _createDocRequestPromise() {
     if(!this.docRequestModel) return;
 
+    const outcomeDocGroupModels = documentsChannel.request('get:all');
+    const shouldAutoAddDocId = outcomeDocGroupModels?.length === 1;
+
     this.docRequestModel.set({
       dispute_guid: this.dispute.get('dispute_guid'),
       request_type: this.requestType,
@@ -210,7 +214,8 @@ const OfficeRequestPageView = PageView.extend({
       request_source: configChannel.request('get', 'TASK_REQUEST_SOURCE_OFFICE'),
       file_description_id: this.fileDescription.get('file_description_id'),
       request_description: this._getRequestDescription(),
-      submitter_id: this.participantToUse.id
+      submitter_id: this.participantToUse.id,
+      outcome_doc_group_id: shouldAutoAddDocId ? outcomeDocGroupModels?.at(0)?.id : null
     });
 
     this.docRequestItemTypesCollection.forEach((item) => {
@@ -367,6 +372,7 @@ const OfficeRequestPageView = PageView.extend({
     this._createEvidenceModels();
 
     this.firstNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'First name',
       errorMessage: 'First name is required',
@@ -377,6 +383,7 @@ const OfficeRequestPageView = PageView.extend({
     });
 
     this.lastNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Last name',
       errorMessage: 'Last name is required',
@@ -812,7 +819,7 @@ const OfficeRequestPageView = PageView.extend({
       this.isFeeWaiverMode ? _.bind(this.saveFeeWaiverPayment, this) : _.bind(dfd.resolve, dfd);
 
     // Always save office
-    this.disputeFeeModel.save().done(function() {
+    this.disputeFeeModel.save(this.disputeFeeModel.getApiChangesOnly()).done(function() {
       saveTransactionPromise().done(function(response) {
         if (_.isEmpty(response)) {
           dfd.reject();

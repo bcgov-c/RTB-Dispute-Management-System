@@ -11,8 +11,12 @@
     <div class="complexity-and-urgency-display hidden-print"><%= complexityAndUrgencyDisplay %></div>
     <% } %>
   </div>
-  <div class="context-menu-icon-container hidden-print">
+  <div class="context-menu-icon-container hidden-print <%= isCollapsed ? 'collapsed' : '' %>">
     <div class="context-menu-icon edit-icon"></div>
+
+    <% if (enableCollapse) { %>
+      <div class="context-menu-icon collapse-icon <%= isCollapsed ? 'collapsed' : '' %>"></div>
+    <% } %>
   </div>
 </div>
 <div class="context-menu hidden-print"></div>

@@ -101,4 +101,15 @@ public class SubstitutedService : CmServiceBase, ISubstitutedService
 
         return null;
     }
+
+    public async Task<List<ExternalSubstitutedServiceResponse>> GetExternalDisputeSubstitutedServices(Guid disputeGuid)
+    {
+        var subServices = await UnitOfWork.SubstitutedServiceRepository.FindAllAsync(x => x.DisputeGuid == disputeGuid);
+        if (subServices != null)
+        {
+            return MapperService.Map<ICollection<Data.Model.SubstitutedService>, List<ExternalSubstitutedServiceResponse>>(subServices);
+        }
+
+        return null;
+    }
 }

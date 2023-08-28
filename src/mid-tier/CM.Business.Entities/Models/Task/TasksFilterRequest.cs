@@ -26,4 +26,7 @@ public class TasksFilterRequest
 
     [JsonProperty("task_activity_type_list")]
     public int[] RestrictTaskActivityTypeList { get; set; }
+
+    [JsonProperty("exclude_dispute_statuses")]
+    public int[] ExcludeDisputeStatuses { get; set; }
 }

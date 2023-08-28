@@ -14,9 +14,12 @@ import DoubleSelectorModel from '../../../core/components/double-selector/Double
 import DisputeStatusModel from '../../../core/components/dispute/DisputeStatus_model';
 import DisputeStatusView from '../../components/status/DisputeStatus';
 import ModalAmendmentConfirmView from '../../components/amendments/ModalAmendmentConfirm';
+import IconAddressNotVerified from '../../../core/static/Icon_Admin_AddressNotVerified.png';
+import IconAddressVerified from '../../../core/static/Icon_Admin_AddressVerified.png'
 import PartyNames from './PartyNames';
 import template from './DisputeInfo_template.tpl';
 import { generalErrorFactory } from '../../../core/components/api/ApiLayer';
+import ModalManagerUserAccess from '../../components/modals/modal-manage-user-access/ModalManageUserAccess';
 
 const paymentsChannel = Radio.channel('payments');
 const configChannel = Radio.channel('config');
@@ -29,6 +32,7 @@ const filesChannel = Radio.channel('files');
 const modalChannel = Radio.channel('modals');
 const loaderChannel = Radio.channel('loader');
 const Formatter = Radio.channel('formatter').request('get');
+const userChannel = Radio.channel('users');
 
 export default Marionette.View.extend({
   template,
@@ -61,13 +65,16 @@ export default Marionette.View.extend({
   ui: {
     filename: '.filename-download',
     autoSetUrgency: '.review-urgency-auto-set',
-    autoSetComplexity: '.review-complexity-auto-set'
+    autoSetComplexity: '.review-complexity-auto-set',
+    addressWarning: '.review-dispute-address-warning',
+    disputeUserActiveToggle: '.dispute-user-manager'
   },
 
   events: {
     'click @ui.filename': 'clickFilename',
     'click @ui.autoSetUrgency': 'autoSetUrgency',
-    'click @ui.autoSetComplexity': 'autoSetComplexity'
+    'click @ui.autoSetComplexity': 'autoSetComplexity',
+    'click @ui.disputeUserActiveToggle': 'disputeUserActiveToggle'
   },
 
   clickFilename(ev) {
@@ -474,6 +481,16 @@ export default Marionette.View.extend({
     this.complexityEditModel.trigger('render');
   },
 
+  disputeUserActiveToggle() {
+    const userAccessModal = new ModalManagerUserAccess({ model: disputeChannel.request('get:dispute:creator') });
+    modalChannel.request('add', userAccessModal);
+    this.listenTo(userAccessModal, 'removed:modal', () => {
+      //this.render(); TODO: mid-tier bug after patch results in full_name and user_name not being returned. Workaround is to full refresh
+      const currentRoute = Backbone.history.getFragment();
+      Backbone.history.loadUrl(`${currentRoute}`, { trigger: true, replace: true });
+    });
+  },
+
   createEditModels() {
     // Create rental address type and question
     const RENT_UNIT_TYPE_OTHER = String(configChannel.request('get', 'RENT_UNIT_TYPE_OTHER') || '');
@@ -516,18 +533,20 @@ export default Marionette.View.extend({
       postalCode: 'tenancy_zip_postal',
       geozoneId: 'tenancy_geozone_id',
       unitType: 'tenancy_unit_type',
-      unitText: 'tenancy_unit_text'
+      unitText: 'tenancy_unit_text',
+      addressIsValidated: 'tenancy_address_validated'
     };
     this.addressEditModel = new AddressModel({
       json: _.mapObject(rentalAddressApiMappings, function(val) { return this.model.get(val); }, this),
       apiMapping: rentalAddressApiMappings,
       required: true,
       useSubLabel: false,
-      useDefaultProvince: true,
-      showValidate: false
+      selectProvinceAndCountry: false,
+      showUpdateControls: false,
+      useSubLabel: false,
+      useAddressValidation: false,
+      isOptional: true,
     });
-    this.addressEditModel.setToOptional();
-
 
     this.submittedDateEditModel = new InputModel({
       labelText: 'Last Submitted Date',
@@ -632,7 +651,7 @@ export default Marionette.View.extend({
       secondDropdownOptions = [
         { value: '1', text: 'First day of the month' },
         { value: '2', text: 'Last day of the month' },
-        { value: '3', text: 'Middle day of the month' }
+        { value: '3', text: '15th day of the month' }
       ];
     this.rentalIntervalEditModel = new DoubleSelectorModel({
       showValidate: false,
@@ -770,15 +789,20 @@ export default Marionette.View.extend({
       view_value: ' ',
       subView: new DoubleSelectorView({ model: this.unitTypeModel })
     }));
-
-    this.showChildView('addressRegion', new EditableComponentView({
+    
+    const addressView = this.showChildView('addressRegion', new EditableComponentView({
       state: 'view',
       label: 'Rental Address',
-      view_value: this.model.get('sessionSettings')?.hearingToolsEnabled && this.addressEditModel.getAddressString() ? this.addressEditModel.getAddressString().toUpperCase() : this.addressEditModel.getAddressString(),
+      view_value: `<img class="address-validated-icon" src="${this.model.get('tenancy_address_validated') ? IconAddressVerified : IconAddressNotVerified}" />&nbsp;${this.model.get('sessionSettings')?.hearingToolsEnabled && this.addressEditModel.getAddressString() ? this.addressEditModel.getAddressString().toUpperCase() : this.addressEditModel.getAddressString()}`,
       subView: new AddressView({
         model: this.addressEditModel
       })
     }));
+
+    this.listenTo(addressView?.currentView?.subView, 'itemComplete', () => {
+      if (!this.addressEditModel.get('addressIsValidated')) this.getUI('addressWarning').removeClass('hidden');
+      else this.getUI('addressWarning').addClass('hidden');
+    })
 
     this.showChildView('submittedDateRegion', new EditableComponentView({
       state: 'view',
@@ -954,7 +978,7 @@ export default Marionette.View.extend({
       menu_model: status ? new DisputeStatusModel(status) : null,
       // Render the whole DisputeInfo view if dispute status triggers this event
       contextRender: () => this.render(),
-      disputeModel: this.model
+      disputeModel: this.model,
     }));
   },
 
@@ -989,13 +1013,16 @@ export default Marionette.View.extend({
       '-';
     const isCreatedPfr = this.model.isCreatedPfr();
 
+    const disputeCreator = disputeChannel.request('get:dispute:creator');
+    const creatorDisplay = disputeCreator ? `(Filed by ${userChannel.request('get:user', disputeCreator.get('system_user_id'))?.getObscuredUsername()} - Access ${disputeCreator.get('is_active') ? 'Active' : 'Inactive'} <span class="general-link dispute-user-manager">Manage Access</span>)` : '';
+
     return {
       Formatter,
       issueCodesDisplay: isCreatedPfr && this.claims.length ? this.claims.at(0).getClaimCodeReadable() : Formatter.toIssueCodesDisplay(this.claims),
       disputeSubtypeDisplay: this.model.get('dispute_sub_type') === null ? 'None selected' : ( this.model.isLandlord() ? 'Landlord' : 'Tenant' ),
       disputeTypeDisplay: this.model.get('dispute_type') === null ? 'None selected' : ( this.model.isMHPTA() ? 'MHPTA (Manufactured home or trailer)' : 'RTA (Residential)' ),
       urgencyDisplay: _.has(DISPUTE_URGENCY_DISPLAY, this.model.get('dispute_urgency')) ? DISPUTE_URGENCY_DISPLAY[this.model.get('dispute_urgency')] : this.model.get('dispute_urgency'),
-      creationMethodDisplay: _.has(DISPUTE_CREATION_METHOD_DISPLAY, this.model.get('creation_method')) ? DISPUTE_CREATION_METHOD_DISPLAY[this.model.get('creation_method')] : this.model.get('creation_method'),
+      creationMethodDisplay: _.has(DISPUTE_CREATION_METHOD_DISPLAY, this.model.get('creation_method')) ? `${DISPUTE_CREATION_METHOD_DISPLAY[this.model.get('creation_method')]} ${creatorDisplay}` : this.model.get('creation_method'),
       primaryApplicant: primaryApplicant ? ( this.model.get('sessionSettings')?.hearingToolsEnabled ? `${primaryApplicant.getContactName()}`.toUpperCase() : primaryApplicant.getContactName() ) : null,
       hearingOptionsByDisplay: primaryApplicantPackageDelivery ? Formatter.toHearingOptionsByDisplay(primaryApplicantPackageDelivery) :  '-',
       hearingDisplay: latestHearing ? latestHearing.toHearingDisplay() : '-',

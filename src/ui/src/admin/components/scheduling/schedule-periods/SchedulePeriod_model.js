@@ -52,7 +52,7 @@ export default CMModel.extend({
   },
 
   areEditsAllowed() {
-    return (this.isStatusActive() || this.isLockedForPrep()) && !this.hasEnded();
+    return this.isStatusActive() || this.isLockedForPrep();
   },
 
   isStatusActive() {

@@ -190,6 +190,16 @@ public class DisputeStatusRepository : CmRepository<Model.DisputeStatus>, IDispu
         return statuses;
     }
 
+    public async Task<List<Model.DisputeStatus>> GetAllStatusesByStatusStartDate(DateTime startDate, DateTime endDate)
+    {
+        var statuses = await Context
+            .DisputeStatuses
+            .Where(x => x.StatusStartDate >= startDate && x.StatusStartDate <= endDate)
+            .ToListAsync();
+
+        return statuses;
+    }
+
     public async Task<Model.DisputeStatus> GetOldestStatus(int[] oldStatuses)
     {
         var oldestStatus = await Context
@@ -286,7 +296,11 @@ and ""StatusStartDate"" > '{utcStart.ToString(CultureInfo.InvariantCulture)}' an
 
     public async Task<List<Model.DisputeStatus>> GetDisputeStatuses(Guid disputeGuid)
     {
-        var statuses = await Context.DisputeStatuses.Where(x => x.DisputeGuid == disputeGuid).ToListAsync();
+        var statuses = await Context
+            .DisputeStatuses
+            .Where(x => x.DisputeGuid == disputeGuid)
+            .OrderBy(x => x.DisputeStatusId)
+            .ToListAsync();
         return statuses;
     }
 
@@ -324,6 +338,37 @@ and ""StatusStartDate"" > '{utcStart.ToString(CultureInfo.InvariantCulture)}' an
     {
         var statuses = await Context.DisputeStatuses.Where(x => disputeGuids.Contains(x.DisputeGuid)).ToListAsync();
         return statuses;
+    }
+
+    public async Task<int> GetWaitingForDecisionsCount()
+    {
+        var statusesCount = await Context.DisputeStatuses
+            .CountAsync(x => x.IsActive &&
+                            (x.Status == (byte)DisputeStatuses.DecisionPending ||
+                            x.Status == (byte)DisputeStatuses.InterimDecisionPending ||
+                            x.Status == (byte)DisputeStatuses.ClarificationDecisionPending ||
+                            x.Status == (byte)DisputeStatuses.CorrectionDecisionPending));
+
+        return statusesCount;
+    }
+
+    public async Task<List<Model.DisputeStatus>> GetAllWithDisputeAsync()
+    {
+        var statuses = await Context
+            .DisputeStatuses
+            .Include(x => x.Dispute)
+            .ToListAsync();
+
+        return statuses;
+    }
+
+    public async Task<int> GetStatusesCount(Expression<Func<Model.DisputeStatus, bool>> expression)
+    {
+        var statusesCount = await Context
+            .DisputeStatuses
+            .CountAsync(expression);
+
+        return statusesCount;
     }
 }
 

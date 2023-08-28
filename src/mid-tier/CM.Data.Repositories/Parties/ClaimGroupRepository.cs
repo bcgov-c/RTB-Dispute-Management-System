@@ -21,6 +21,16 @@ public class ClaimGroupRepository : CmRepository<ClaimGroup>, IClaimGroupReposit
         return claimGroups;
     }
 
+    public async Task<List<ClaimGroup>> GetDisputeClaimGroupsWithAllChilds(Guid disputeGuid)
+    {
+        var claimGroups = await Context
+            .ClaimGroups
+            .Include(c => c.Claims).ThenInclude(r => r.Remedies).ThenInclude(rd => rd.RemedyDetails)
+            .Where(c => c.DisputeGuid == disputeGuid)
+            .ToListAsync();
+        return claimGroups;
+    }
+
     public async Task<List<ClaimGroup>> GetDisputeClaimGroupsWithParties(Guid disputeGuid)
     {
         var claimGroups = await Context.ClaimGroups.Include(x => x.ClaimGroupParticipants).Where(c => c.DisputeGuid == disputeGuid).ToListAsync();

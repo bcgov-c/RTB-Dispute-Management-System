@@ -27,8 +27,11 @@ public partial class SecurityTests
         var substitutedServiceGetResponse = SubstitutedServiceManager.GetSubstitutedService(Client, Data.SubstitutedServices[0].SubstitutedServiceId);
         substitutedServiceGetResponse.CheckStatusCode();
 
-        var substitutedServicesGetResponse = SubstitutedServiceManager.GeSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        var substitutedServicesGetResponse = SubstitutedServiceManager.GetSubstitutedServices(Client, Data.Dispute.DisputeGuid);
         substitutedServicesGetResponse.CheckStatusCode();
+
+        var externalSubstitutedServicesGetResponse = SubstitutedServiceManager.GetExternalSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        externalSubstitutedServicesGetResponse.CheckStatusCode();
 
         // LOGIN AS EXTERNAL
         Client.Authenticate(Users.User, Users.User);
@@ -45,8 +48,11 @@ public partial class SecurityTests
         substitutedServiceGetResponse = SubstitutedServiceManager.GetSubstitutedService(Client, Data.SubstitutedServices[0].SubstitutedServiceId);
         substitutedServiceGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-        substitutedServicesGetResponse = SubstitutedServiceManager.GeSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        substitutedServicesGetResponse = SubstitutedServiceManager.GetSubstitutedServices(Client, Data.Dispute.DisputeGuid);
         substitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubstitutedServicesGetResponse = SubstitutedServiceManager.GetExternalSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        externalSubstitutedServicesGetResponse.CheckStatusCode();
 
         // LOGIN AS UNAUTHORIZED EXTERNAL USER //
         Client.Authenticate(Users.User2, Users.User2);
@@ -63,8 +69,11 @@ public partial class SecurityTests
         substitutedServiceGetResponse = SubstitutedServiceManager.GetSubstitutedService(Client, Data.SubstitutedServices[0].SubstitutedServiceId);
         substitutedServiceGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-        substitutedServicesGetResponse = SubstitutedServiceManager.GeSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        substitutedServicesGetResponse = SubstitutedServiceManager.GetSubstitutedServices(Client, Data.Dispute.DisputeGuid);
         substitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubstitutedServicesGetResponse = SubstitutedServiceManager.GetExternalSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        externalSubstitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS ACCESSCODE
         var auth = Client.Authenticate(Data.Participant.AccessCode);
@@ -82,8 +91,11 @@ public partial class SecurityTests
         substitutedServiceGetResponse = SubstitutedServiceManager.GetSubstitutedService(Client, Data.SubstitutedServices[0].SubstitutedServiceId);
         substitutedServiceGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-        substitutedServicesGetResponse = SubstitutedServiceManager.GeSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        substitutedServicesGetResponse = SubstitutedServiceManager.GetSubstitutedServices(Client, Data.Dispute.DisputeGuid);
         substitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubstitutedServicesGetResponse = SubstitutedServiceManager.GetExternalSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        externalSubstitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
         // LOGIN AS OFFICE PAY
         Client.Authenticate(Users.RemoteOffice, Users.RemoteOffice);
@@ -100,7 +112,10 @@ public partial class SecurityTests
         substitutedServiceGetResponse = SubstitutedServiceManager.GetSubstitutedService(Client, Data.SubstitutedServices[0].SubstitutedServiceId);
         substitutedServiceGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
 
-        substitutedServicesGetResponse = SubstitutedServiceManager.GeSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        substitutedServicesGetResponse = SubstitutedServiceManager.GetSubstitutedServices(Client, Data.Dispute.DisputeGuid);
         substitutedServicesGetResponse.ResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+
+        externalSubstitutedServicesGetResponse = SubstitutedServiceManager.GetExternalSubstitutedServices(Client, Data.Dispute.DisputeGuid);
+        externalSubstitutedServicesGetResponse.CheckStatusCode();
     }
 }

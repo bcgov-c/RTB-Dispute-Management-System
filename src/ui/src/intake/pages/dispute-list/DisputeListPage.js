@@ -104,7 +104,7 @@ export default Marionette.View.extend({
     this.mergeOptions(options, ['total_available_records']);
 
     const INTAKE_URL = configChannel.request('get', 'INTAKE_URL');
-    this.alternateIntakeLink = INTAKE_URL && INTAKE_URL.replace('/Intake', '/AdditionalLandlordIntake').replace('/Login', '');
+    this.alternateIntakeLink = INTAKE_URL && INTAKE_URL.replace('/Intake', '/AdditionalLandlordIntake').replace('Login', '');
 
     this._lock_dispute_list_load = false;
     this._last_searched_index = 0;

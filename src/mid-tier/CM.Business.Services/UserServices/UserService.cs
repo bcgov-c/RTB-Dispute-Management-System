@@ -8,11 +8,14 @@ using CM.Business.Entities.Models.User;
 using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.Data.Repositories.UnitOfWork;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace CM.Business.Services.UserServices;
 
 public class UserService : CmServiceBase, IUserService
 {
+    private const int TopRecentRecordsCount = 5;
+
     public UserService(IMapper mapper, IUnitOfWork unitOfWork)
         : base(unitOfWork, mapper)
     {
@@ -246,5 +249,11 @@ public class UserService : CmServiceBase, IUserService
         }
 
         return false;
+    }
+
+    public async Task<List<RecentLoginsResponse>> GetRecentLogins(int userId)
+    {
+        var recentLogins = await UnitOfWork.TokenRepository.GetRecentRecords(userId, TopRecentRecordsCount);
+        return MapperService.Map<List<UserToken>, List<RecentLoginsResponse>>(recentLogins);
     }
 }

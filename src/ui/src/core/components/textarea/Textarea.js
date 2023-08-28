@@ -1,4 +1,5 @@
 /**
+ * @fileoverview - Customizable multi line text input View. Wraps a <textarea> element
  * @class core.components.textarea.TextareaView
  * @memberof core.components.textarea
  */
@@ -138,6 +139,7 @@ export default ViewMixin.extend({
     if (this.model.get('value') !== null) {
       this.setValidateTextToUpdate();
     }
+    this.initializeHelp(this, this.model.get('helpHtml'));
   },
 
   templateContext() {

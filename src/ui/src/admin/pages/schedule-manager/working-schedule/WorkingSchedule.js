@@ -21,6 +21,8 @@ import ModalAddBlock from '../../../components/calendar/block-calendar/ModalAddB
 import { ModalEditPeriod } from '../ModalEditPeriod';
 import UndoHandler from './UndoHandler';
 import { ModalBulkAddBlocks } from './bulk-add-blocks/ModalBulkAddBlocks';
+import { ModalHearingGeneration } from './hearing-generation/ModalHearingGeneration'
+import { ModalBlockEditor } from './block-editor/ModalBlockEditor';
 
 const CUSTOM_LINK_TEXT = 'This week';
 const CALENDAR_SCROLL_DEBOUNCE_MS = 60;
@@ -70,7 +72,7 @@ const WorkingScheduleView = Marionette.View.extend({
     this.createSubModels();
     this.setupListeners();
 
-    this.model.set('_selectedEditToolId', EDIT_TOOL_CONFIGS.HEAR, { silent: true });
+    this.model.set('_selectedEditToolId', EDIT_TOOL_CONFIGS.EDIT, { silent: true });
     this.loadPeriods();
   },
 
@@ -135,13 +137,25 @@ const WorkingScheduleView = Marionette.View.extend({
         this.showModalBulkAddBlocks();
       } else {
         modalChannel.request('show:standard', {
-          title: 'Bulk Add Blocks',
-          bodyHtml: '<p>The Bulk Add Blocks tool cannot be used when the period is not in the "Locked for Preparation" status, or when a schedule period contains any dates in the past.</p>',
+          title: 'Hearing Generation',
+          bodyHtml: '<p>The Hearing Generation tool cannot be used when the period is not in the "Locked for Preparation" status, or when a schedule period contains any dates in the past.</p>',
           hideContinueButton: true,
           cancelButtonText: 'Close',
         });
       }
     });
+    this.listenTo(this.model, 'show:hearingGeneration', () => {
+      if (this.currentPeriod && this.currentPeriod.isLockedForPrep() && this.currentPeriod.areEditsAllowed()) {
+        this.showModalHearingGeneration();
+      } else {
+        modalChannel.request('show:standard', {
+          title: 'Hearing Generation',
+          bodyHtml: '<p>The Bulk Add Blocks tool cannot be used when the period is not in the "Locked for Preparation" status, or when a schedule period contains any dates in the past.</p>',
+          hideContinueButton: true,
+          cancelButtonText: 'Close',
+        });
+      }
+    })
     this.listenTo(this.calendarModel, 'click:block', this.handleBlockClick, this);
     this.listenTo(this.calendarModel, 'paint:block', this.handlePaintBlockComplete, this);
     this.listenTo(this.calendarModel, 'addBlock:complete', (result) => {
@@ -205,27 +219,78 @@ const WorkingScheduleView = Marionette.View.extend({
     modalChannel.request('add', bulkAddBlocksModal);
   },
 
+  showModalHearingGeneration() {
+    const hearingGenerationModal = new ModalHearingGeneration({
+      model: this.model,
+      periodModel: this.currentPeriod
+    });
+
+    this.listenTo(hearingGenerationModal, 'removed:modal', this.render, this);
+    modalChannel.request('add', hearingGenerationModal);
+  },
+
   handlePaintBlockComplete(blockModel) {
     const blockOwner = userChannel.request('get:user', blockModel.get('system_user_id'));
     if (blockModel.get('block_type') === EDIT_TOOL_CONFIGS.DUTY && (!blockOwner || !blockOwner.isDutyScheduler())) {
       this.calendarModel.trigger('clear:dragSelects');
       this.showDutySchedulerUserWarningModal();
     } else {
-      this.openModalAddBlock(blockModel, blockOwner);
+      this.openModalAddBlock(blockModel, { blockOwner });
     }
   },
 
-  openModalAddBlock(blockModel, blockOwner=null) {
-    const modalView = new ModalAddBlock({
-      blockOwner: blockOwner || userChannel.request('get:user', blockModel.get('system_user_id')),
+  openModalAddBlock(blockModel, modalAddBlockOptions={}) {
+    const blockOwner = modalAddBlockOptions.blockOwner || userChannel.request('get:user', blockModel.get('system_user_id'));
+    const modalView = new ModalAddBlock(Object.assign({}, {
+      blockOwner,
       periodModel: this.calendarModel.get('periodModel'),
       model: this.calendarModel,
       blockModel,
-    });
+      loadedUserBlocks: this.calendarModel.get('scheduleBlocksCollection').filter(b => b.get('system_user_id') === blockOwner?.id),
+    }, modalAddBlockOptions));
 
     this.listenToOnce(modalView, 'removed:modal', () => {
       this.calendarModel.trigger('clear:dragSelects');
     });
+    modalChannel.request('add', modalView);
+  },
+
+  openModalBlockEditor(blockModel) {
+    const blockUserID = blockModel.get('system_user_id');
+    const powerEditCalendarModel = new BlockCalendarGridModel({
+      periodModel: this.calendarModel.get('periodModel'),
+      headerLabel: 'Staff Name',
+      undoHandler: this.undoHandler,
+      showReporting: false,
+      disableHeaderRouting: true,
+      // Only show current user
+      userFilterFn: (user) => user.id === blockUserID,
+      todayIndicator: true,
+      selectedBlockId: blockModel.id,
+    });
+    const powerEditCollection = new ScheduleBlock_collection(this.calendarModel.get('scheduleBlocksCollection').filter(b => b.get('system_user_id') === blockUserID));
+    powerEditCalendarModel.parseBlocksFromApi(powerEditCollection);
+
+    const modalView = new ModalBlockEditor({
+      userModel: userChannel.request('get:user', blockModel.get('system_user_id')),
+      periodModel: this.calendarModel.get('periodModel'),
+      selectedBlock: blockModel,
+      calendarModel: powerEditCalendarModel,
+      // Use a new model so that the selected tool doesn't change main page selections
+      model: new Backbone.Model(),
+    });
+
+    this.listenToOnce(modalView, 'removed:modal', () => {
+      // Merge changed data back into the parent calendar
+      const blockCollection = this.calendarModel.get('scheduleBlocksCollection');
+      blockCollection.add(powerEditCalendarModel.get('scheduleBlocksCollection')?.models, { merge: true });
+      this.calendarModel.parseBlocksFromApi(blockCollection);
+      this.prepareAndRenderCalendar();
+    });
+    this.listenToOnce(modalView, 'shown:modal', () => {
+      modalView.loadHearingsForBlockAndRender(blockModel);
+    });
+
     modalChannel.request('add', modalView);
   },
 
@@ -234,41 +299,48 @@ const WorkingScheduleView = Marionette.View.extend({
     const isPaintTool = this.isPaintBlockSelectedFn(toolId);
     const isEditTool = this.isEditBlockSelectedFn(toolId);
     const isRemoveTool = this.isRemoveBlockSelectedFn(toolId);
-    const ignoreHearings = isPaintTool && (
-      (toolId === EDIT_TOOL_CONFIGS.DUTY && blockModel.get('block_type') === EDIT_TOOL_CONFIGS.HEAR)
-      || (toolId === EDIT_TOOL_CONFIGS.HEAR && blockModel.get('block_type') === EDIT_TOOL_CONFIGS.DUTY)
-    );
-
-    if (!isPaintTool && !isEditTool && !isRemoveTool) return;
-
-    if (this.checkScheduleBlockEditError(blockModel, { ignoreHearings })) return this.showWorkingScheduleEditError(blockModel);
-
-    if (isPaintTool && toolId !== blockModel.get('block_type')) return this.handlePaintToolClick(blockModel, toolId);
-    else if (isEditTool) return this.handleEditToolClick(blockModel);
-    else if (isRemoveTool) return this.handleRemoveToolClick(blockModel);
+    
+    if (isPaintTool) {
+      // Some block types need a description - open to edit mode, with the paint tool used as the block type
+      if (!blockModel.get('block_description') && (toolId === EDIT_TOOL_CONFIGS.BLK || toolId === EDIT_TOOL_CONFIGS.OTH)) {
+        blockModel.set('block_type', toolId);
+        return this.openModalAddBlock(blockModel);
+      }
+      return this.handlePaintToolClick(blockModel, toolId);
+    } else if (isEditTool) {
+      if (this.canAccessPowerEdit(blockModel)) return this.openModalBlockEditor(blockModel);
+      else return this.openModalAddBlock(blockModel);
+    } else if (isRemoveTool) {
+      return this.handleRemoveToolClick(blockModel);
+    }
   },
 
   handlePaintToolClick(blockModel, toolId) {
+    if (toolId === blockModel.get('block_type')) return;
+
     // Handle duty user changes
     const blockOwner = userChannel.request('get:user', blockModel.get('system_user_id'));
     if (this.isDutyBlockSelectedFn(toolId) && (!blockOwner || !blockOwner.isDutyScheduler())) {
       return this.showDutySchedulerUserWarningModal();
     }
-    
-    const promiseChangeBlockType = (block_type) => new Promise((res, rej) => blockModel.save({ block_type })
+
+    const promiseChangeBlockType = (block_type, block_description) => new Promise((res, rej) => blockModel.save({ block_type, block_description })
         .done(res).fail(generalErrorFactory.createHandler('SCHEDULE.BLOCK.UPDATE', rej)));
 
     const originalBlockType = blockModel.get('block_type');
+    const originalBlockDescription = blockModel.get('block_description');
     const promiseChangeBlockTypeUndo = () => new Promise((res, rej) => {
       blockModel.fetch()
-        .then(() => Promise.all([blockModel.save({ block_type: originalBlockType })]))
+        .then(() => Promise.all([blockModel.save({ block_type: originalBlockType, block_description: originalBlockDescription })]))
         .then(() => {
           res();
         }, generalErrorFactory.createHandler('SCHEDULE.BLOCK.UPDATE', rej))
     });
     
     loaderChannel.trigger('page:load');
-    return promiseChangeBlockType(toolId)
+    // Clear block description on paint if the block type does not require a description
+    const blockDescriptionToSet = toolId === EDIT_TOOL_CONFIGS.BLK || toolId === EDIT_TOOL_CONFIGS.OTH ? blockModel.get('block_description') : null;
+    return promiseChangeBlockType(toolId, blockDescriptionToSet)
       .then(() => {
         this.undoHandler.addChangeItem({
           title: 'Edit block type',
@@ -276,20 +348,24 @@ const WorkingScheduleView = Marionette.View.extend({
         });
       })
       .finally(() => {
-      // Re-parse own collection to update cssClass etc for created blocks
-      this.calendarModel.parseBlocksFromApi(this.calendarModel.get('scheduleBlocksCollection'));
-      this.prepareAndRenderCalendar();
-    });
-  },
-
-  handleEditToolClick(blockModel) {
-    this.openModalAddBlock(blockModel);
+        // Re-parse own collection to update cssClass etc for created blocks
+        this.calendarModel.parseBlocksFromApi(this.calendarModel.get('scheduleBlocksCollection'));
+        this.prepareAndRenderCalendar();
+      });
   },
 
   handleRemoveToolClick(blockModel) {
+    if (blockModel.get('associated_hearings')) {
+      return modalChannel.request('show:standard', {
+        title: 'Delete Schedule Time',
+        bodyHtml: `<p>You cannot delete schedule time that has empty or booking hearings in the block you are trying to delete.</p>`,
+        cancelButtonText: 'Close',
+        hideContinueButton: true,
+      });
+    }
+
     const promiseDeleteBlock = () => new Promise((res, rej) => blockModel.destroy()
       .done(res).fail(generalErrorFactory.createHandler('SCHEDULE.BLOCK.DELETE', rej)));
-
     // Create blank block so it can be re-added
     const originalBlockData = blockModel.toJSON();
     delete originalBlockData[blockModel.idAttribute];
@@ -311,37 +387,8 @@ const WorkingScheduleView = Marionette.View.extend({
     }).finally(() => this.prepareAndRenderCalendar());
   },
 
-  checkScheduleBlockEditError(blockModel, options={}) {
-    return Moment().isAfter(Moment(blockModel.get('block_start')), 'minute')
-      || (!options.ignoreHearings && blockModel.get('associated_hearings'));
-  },
-
-  showWorkingScheduleEditError(blockModel) {
-    const SCHEDULE_BLOCK_TYPE_DISPLAY = configChannel.request('get', 'SCHEDULE_BLOCK_TYPE_DISPLAY') || {};
-    const blockTimeframeDisplay = `${Formatter.toDateAndTimeDisplay(blockModel.get('block_start'))} - ${Formatter.toDateAndTimeDisplay(blockModel.get('block_end'))} - ${
-      Formatter.toDurationFromSecs(blockModel.getBlockDuration()/1000)}`;
-    modalChannel.request('show:standard', {
-      modalCssClasses: 'working-sched__edit-warning-modal',
-      title: 'Editing Working Schedule',
-      bodyHtml: `<div>A block cannot be edited if it is in the past.  A block also cannot be edited if it contains hearings. 
-      You can convert future duty and hearing blocks even if they contain hearings but those
-      are the only conversions that are allowed. You can only edit blocks that are in the future and that do not contain hearings.</div>
-      <div class="spacer-block-10"></div>
-      <div><label class="general-modal-label">Block ID:</label>&nbsp;<span class="">${blockModel.id}</span></div>
-      <div><label class="general-modal-label">Block Type:</label>
-        <span class="">
-          <b>${SCHEDULE_BLOCK_TYPE_DISPLAY[blockModel.get('block_type')]}</b>
-          ${blockModel.get('block_description') ? `<span class="">- ${blockModel.get('block_description')}</span>` : ''}
-        </span>
-      </div>
-      <div><label class="general-modal-label">Associated To:</label>&nbsp;<span class=""><b>${userChannel.request('get:user:name', blockModel.get('system_user_id'))}</b></span></div>
-      <div><label class="general-modal-label">Block Timeframe:</label>&nbsp;<span class="">${blockTimeframeDisplay}</span></div>`,
-      hideCancelButton: true,
-      primaryButtonText: 'Close',
-      onContinueFn(modalView) {
-        modalView.close();
-      }
-    });
+  canAccessPowerEdit(blockModel) {
+    return blockModel?.get('assocaited_booked_hearings')
   },
 
   loadPeriods() {

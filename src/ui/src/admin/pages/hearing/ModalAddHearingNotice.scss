@@ -1,0 +1,42 @@
+
+.generate-notice {
+  .modal-dialog {
+    min-width: 1200px;
+    max-width: 1440px;
+    width: calc(100% - 80px);
+    overflow: hidden;
+  }
+  .modal-body { padding: 0; }
+  .modal-body-inner { padding: 15px; }
+
+  &__top-section {
+    border-top: 2px solid #d2d2d2;
+    background-color: #f6f6f6;
+    padding: 5px 5px 5px 5px;
+    
+    .radio-display-title { margin-left: 10px; }
+  }
+
+  &__info-section {
+    display: flex;
+    justify-content: flex-start;
+
+    > div { margin-right: 20px; }
+  }
+
+  &__title {
+    width: 300px;
+  }
+
+  &__process {
+    align-self: flex-end;
+    margin-bottom: 10px;
+  }
+
+  &__buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+
+}

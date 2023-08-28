@@ -157,6 +157,14 @@ const DAPaymentPage = PageView.extend({
 
     this.feeWaiverModel = new FeeWaiverModel({ step: 1, disputeFeeId: this.disputeFeeId });
 
+    // If non-Intake fee, make sure to clear any already uploaded evidence, to force new evidence to be created
+    if (!this.disputeFeeModel.isIntakeFee()) {
+      this.feeWaiverModel?.evidenceModel?.get('evidenceCollection')?.forEach(evidence => {
+        evidence.description_by = participantsChannel.request('get:primaryApplicant:id');
+        evidence.file_description = null;
+      });
+    }
+
     if (this.feeWaiverModel.payorModel) this.feeWaiverModel.payorModel.set({ value: sessionChannel.request('name') || null });
   },
 
@@ -240,7 +248,7 @@ const DAPaymentPage = PageView.extend({
   _onUploadComplete(uploadedEvidence) {
     this.feeWaiverIsUpload = false;
 
-    const routeToReceiptFn = () => {      
+    const routeToReceiptFn = () => {
       if (this.disputeFeeModel.isReviewFee()) {
         Backbone.history.navigate(`#review/step1`, { trigger: true });
       } else {
@@ -270,7 +278,7 @@ const DAPaymentPage = PageView.extend({
         routingFn();
       });
     } else {
-      setTimeout(routingFn, 500);
+      setTimeout(() => routingFn(), 500);
     }
   },
 
@@ -330,8 +338,8 @@ const DAPaymentPage = PageView.extend({
     return new Promise((resolve, reject) => {
       this._savePaymentTransaction({ payment_status: configChannel.request('get', 'PAYMENT_STATUS_APPROVED') })
       // Parse data back
-      .then(response => {
-        //this.disputeFeeModel.set(this.disputeFeeModel.parse(response), { silent: true });
+      .then(() => {
+        this.disputeFeeModel.set({ is_paid: true }, { silent: true });
       }, generalErrorFactory.createHandler('OS.PAYMENT.SAVE', reject))
       .then(() => this.updateDisputeStatusPromise())
       .then(() => this.updateDisputeInfoPromise(), generalErrorFactory.createHandler('OS.STATUS.SAVE', reject, PAYMENT_API_ERROR_MSG))

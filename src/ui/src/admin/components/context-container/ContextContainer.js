@@ -1,5 +1,5 @@
 /**
- *
+ * @fileoverview - Wraps a view, and provides a customizable header bar and hamburger menu  
  */
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
@@ -15,7 +15,12 @@ const NOTE_COUNT_SELECTOR = '.note-count';
 const CONTEXT_MENU_TITLE_SELECTOR = '.context-menu-title';
 const context_container_with_notes_wrapper_html = `
 <div class="has-notes-column"></div>
-<div class="notes-column hidden-print"><div>`;
+<div class="notes-column hidden-print">
+  <div class="notes-wrapper">
+    <div class="notes-column-region"></div>
+    <div class="notes-empty-div"></div>
+  </div>
+<div>`;
 const notes_buttons_html = `
 <div class="context-menu-icon notes-icon notes-view-icon <%= notesCount ? '' : 'hidden' %>">
   <span class="notes-view note-count"><%= notesCount %></span>
@@ -35,7 +40,7 @@ const ContextContainerWithNotesView = Marionette.View.extend({
 
   regions: {
     contentRegion: '.has-notes-column',
-    notesRegion: '.notes-column'
+    notesRegion: '.notes-column-region',
   },
 
   ui: {
@@ -43,19 +48,26 @@ const ContextContainerWithNotesView = Marionette.View.extend({
     contentNotes: '.notes-column',
     notesAdd: '.notes-add-icon',
     notesView: '.notes-view-icon',
+    notesList: '.notes-list-container',
     notesEmpty: '.notes-empty-div'
   },
 
   events: {
     'click @ui.notesAdd': 'clickAddNotes',
     'click @ui.notesView': 'clickViewNotes',
-    'click @ui.notesEmpty': 'clickCloseNotes'
+    'click @ui.notesEmpty': 'clickCloseNotes',
   },
 
   clickCloseNotes() {
     this.clickViewNotes();
   },
 
+  /**
+   * @param {ContextContainerView} wrappedContextContainerView - The ContextContainerView that is to be wrapped
+   * @param {NoteCollection} notes - Collection of notes that should be attached to this ContextContainer
+   * @param {Object} noteCreationData - fields that new notes will be created with
+   * @param {Boolean} showComplexityAndUrgency - displays dispute complexity and urgency text and icons
+   */
   initialize(options) {
     this.mergeOptions(options, ['wrappedContextContainerView', 'notes', 'noteCreationData', 'showComplexityAndUrgency']);
     if (!options.model) {
@@ -79,6 +91,14 @@ const ContextContainerWithNotesView = Marionette.View.extend({
       // We have cancelled from one empty one
       // If we press cancel when showing notes, hide the panel
     }, this);
+
+    this.stopListening(this.wrappedContextContainerView, 'change:isCollapsed');
+    this.listenTo(this.wrappedContextContainerView, 'change:isCollapsed', (m, value) => {
+      if (value) {
+        this.closeNotesColumn({ no_animate: true });
+      }
+      this.renderNotes();
+    });
   },
 
   clickAddNotes() {
@@ -91,9 +111,7 @@ const ContextContainerWithNotesView = Marionette.View.extend({
       this.notes.add(this.noteCreationData, {at: 0});
     }
     if (this._notesAreHidden()) {
-      this.$(CONTEXT_MENU_TITLE_SELECTOR).css({'max-width': '800px'});
-      this.getUI('contentNotes').css('right', '-350px').animate({right: '0'}, {duration: 600});
-      this.getUI('contentMain').css('padding-right', '0').animate({'padding-right': '350px'}, {duration: 600, complete: focusCurrentNoteFn});
+      this.openNotesColumn({}, focusCurrentNoteFn)
     } else {
       focusCurrentNoteFn();
     }
@@ -101,31 +119,45 @@ const ContextContainerWithNotesView = Marionette.View.extend({
   },
 
   clickViewNotes() {
-    const self = this;
     if (this._notesAreHidden()) {
-      this.$(CONTEXT_MENU_TITLE_SELECTOR).css({'max-width': '800px'});
-      this.getUI('contentNotes').css('right', '-350px').animate({right: '0px'}, {duration: 600});
-      this.getUI('contentMain').css('padding-right', '0').animate({'padding-right': '350px'}, {duration: 600, complete: function() {
-      
-      }});
+      this.openNotesColumn();
     } else {
-      this.getUI('contentNotes').animate({'right': '-350px'}, {duration: 600} );
-      this.getUI('contentMain').animate({'padding-right': '0'}, {duration: 600, complete: function() {
-        self.$(CONTEXT_MENU_TITLE_SELECTOR).css({'max-width': '1200px'});
-      }});
+      this.closeNotesColumn();
     }
+  },
+
+  closeNotesColumn(options={}) {
+    const self = this;
+    this.getUI('contentNotes').animate({'right': '-350px'}, {duration: options.no_animate ? 0 : 600} );
+    this.getUI('contentMain').animate({'padding-right': '0'}, {duration: options.no_animate ? 0 : 600, complete() {
+      self.$(CONTEXT_MENU_TITLE_SELECTOR).css({'max-width': '1200px'});
+    }});
+  },
+
+  openNotesColumn(options={}, onFinishFn=null) {
+    this.$(CONTEXT_MENU_TITLE_SELECTOR).css({'max-width': '800px'});
+    this.getUI('contentNotes').css('right', '-350px').animate({right: '0px'}, {duration: options.no_animate ? 0 : 600});
+    this.getUI('contentMain').css('padding-right', '0').animate({'padding-right': '350px'}, {duration: options.no_animate ? 0 : 600, complete: onFinishFn?.() || function(){ } });
   },
 
   _notesAreHidden() {
     return this.getUI('contentNotes').css('right') !== '0px';
   },
 
-  renderClickableDiv() {
-    const context_menu_ele = this.$('.notes-list-container');
-    context_menu_ele.after(_.template(`<div class="notes-empty-div"></div>`))
-    this.$('.notes-list-container, .notes-empty-div').wrapAll(_.template(`<div class="notes-wrapper"></div>`))
+  onRender() {
+    this.showChildView('contentRegion', this.wrappedContextContainerView);
+    this.renderNotes();
   },
 
+  renderNotes() {
+    this.renderNotesButtons(CONTEXT_MENU_ICON_SELECTOR);
+    this.showChildView('notesRegion', new NoteCollectionView({
+      collection: this.notes,
+      childViewOptions: {
+        autofocus: false
+      }
+    }));
+  },
 
   renderNotesButtons() {
     // NOTE: Notes are placed relative to the context menu icon
@@ -135,17 +167,6 @@ const ContextContainerWithNotesView = Marionette.View.extend({
     }));
   },
 
-  onRender() {
-    this.showChildView('contentRegion', this.wrappedContextContainerView);
-    this.renderNotesButtons(CONTEXT_MENU_ICON_SELECTOR);
-    this.showChildView('notesRegion', new NoteCollectionView({
-      collection: this.notes,
-      childViewOptions: {
-        autofocus: false
-      }
-    }));
-    this.renderClickableDiv();
-  }
 });
 
 
@@ -174,14 +195,16 @@ const ContextContainerView =  Marionette.View.extend({
 
   ui: {
     menu: CONTEXT_MENU_ICON_SELECTOR,
+    collapse: '.collapse-icon',
     amendmentIcon: '.amendment-icon',
     subServiceIcon: '.sub-service-icon-wrapper'
   },
 
   events: {
     'click @ui.menu': 'clickMenu',
+    'click @ui.collapse': 'clickCollapse',
     'click @ui.amendmentIcon': 'clickAmendmentIcon',
-    'click @ui.subServiceIcon': 'clickSubServiceIcon'
+    'click @ui.subServiceIcon': 'clickSubServiceIcon',
   },
 
   clickAmendmentIcon() {
@@ -220,30 +243,33 @@ const ContextContainerView =  Marionette.View.extend({
     }
   },
 
+  clickCollapse() {
+    if (this.collapseHandler) {
+      this.collapseHandler.update(!this.collapseHandler.get());
+    }
+    this._collapseChanged = true;
+    this.render();
+  },
+
   // Initialize the component values
   initialize(options) {
     this.mergeOptions(options, ['wrappedView', 'disputeModel', 'contextRender', 'titleDisplay', 'amendmentTypeToUse', 'showSubServiceIcon', 'showComplexityAndUrgency',
-      'onMenuOpenFn', 'menu_states', 'menu_events', 'menu_title', 'menu_model', 'menu_help_fn', 'menu_options', 'displayOnly', 'cssClass']);
+      'onMenuOpenFn', 'menu_states', 'menu_events', 'menu_title', 'menu_model', 'menu_help_fn', 'menu_options', 'displayOnly', 'cssClass', 'collapseHandler']);
 
     if (!options.model) {
       this.model = this.wrappedView.model;
     }
 
-    if (!this.displayOnly) {
-      this.setupListenersOnWrappedView();
-    }
+    this.setupListeners();
   },
 
-  updateMenu(menuStates) {
-    if (menuStates) {
-      this.menu_states = menuStates;
+  setupListeners() {
+    if (this.contextMenu) {
+      this.listenTo(this.contextMenu, 'open:complete', () => this.getUI('collapse').hide());
+      this.listenTo(this.contextMenu, 'close:complete', () => this.getUI('collapse').show());
     }
-
-    const isMenuOpen = this.contextMenu.isOpen();
-    this.renderMenu();
-
-    if (isMenuOpen) {
-      this.contextMenu.open({ no_animate: true });
+    if (!this.displayOnly) {
+      this.setupListenersOnWrappedView();
     }
   },
 
@@ -282,6 +308,19 @@ const ContextContainerView =  Marionette.View.extend({
     }, this.menu_options));
 
     this._setupMenuEventDelegation();
+  },
+
+  updateMenu(menuStates) {
+    if (menuStates) {
+      this.menu_states = menuStates;
+    }
+
+    const isMenuOpen = this.contextMenu.isOpen();
+    this.renderMenu();
+
+    if (isMenuOpen) {
+      this.contextMenu.open({ no_animate: true });
+    }
   },
 
   _setupMenuEventDelegation() {
@@ -383,7 +422,9 @@ const ContextContainerView =  Marionette.View.extend({
   getSubServRequestStatusImgClass() {
     if (!this.showSubServiceIcon) return;
     
-    const model_to_use = this.menu_model ? this.menu_model : this.wrappedView.model
+    const model_to_use = this.menu_model ? this.menu_model : this.wrappedView.model;
+    if (!model_to_use) return;
+    
     const participantModel = participantChannel.request('get:participant', model_to_use.id);
     if (!participantModel) return;
 
@@ -396,6 +437,8 @@ const ContextContainerView =  Marionette.View.extend({
 
   getSubServiceTypeText() {
     const model_to_use = this.menu_model ? this.menu_model : this.wrappedView.model
+    if (!model_to_use) return;
+
     const participantModel = participantChannel.request('get:participant', model_to_use.id);
     if (!participantModel) return;
 
@@ -431,19 +474,35 @@ const ContextContainerView =  Marionette.View.extend({
     if (this.disputeModel && this.disputeModel.checkEditInProgressModel(this.model)) {
       this.disputeModel.stopEditInProgress();
     }
+
+    this.isCollapsed = this.collapseHandler?.get();
   },
 
   onRender() {
     this.renderMenu();
 
-    this.wrappedView.render();
-    this.setupListenersOnWrappedView();
-    this.showChildView('wrappedViewRegion', this.wrappedView);
+    if (!this.isCollapsed) {
+      this.wrappedView.render();
+      this.setupListenersOnWrappedView();
+      this.showChildView('wrappedViewRegion', this.wrappedView);
+    }
+
+    // Must trigger a custom event once rendering is finished so that any wrapping Notes can be applied
+    if (this._collapseChanged) {
+      this.trigger('change:isCollapsed', this, this.isCollapsed);
+    }
+    this._collapseChanged = false;
   },
 
   renderMenu() {
     this.createContextMenu();
     this.showChildView('menuRegion', this.contextMenu);
+    
+    if (this.contextMenu.isOpen()) {
+      this.getUI('collapse').hide();
+    } else {
+      this.getUI('collapse').show();
+    }
   },
 
   templateContext() {
@@ -454,7 +513,9 @@ const ContextContainerView =  Marionette.View.extend({
       subServiceIconClass: this.getSubServRequestStatusImgClass(),
       subServiceText: this.getSubServiceTypeText(),
       showComplexityAndUrgency: this.showComplexityAndUrgency,
-      complexityAndUrgencyDisplay: this.getComplexityAndUrgencyDisplay()
+      complexityAndUrgencyDisplay: this.getComplexityAndUrgencyDisplay(),
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed,
     };
   }
 });
@@ -472,6 +533,8 @@ export default {
    * If this model is not provided, menu will receive the model from wrappedView.
    * @param {string} [context_container_data.menu_title] - The menu title.  Will override any other values.
    * @param {Function} [contextRender] -  a function that will be run whenever "contextRender" event is triggered on the wrapped view
+   * @param {DisputeModel} [disputeModel]
+   * @param {SessionCollapseHandler} [collapseHandler] - an object that accesses and sets the session collapse toggling for this container
    *
    * @returns {ContextContainerView} - The new ContextContainerView that was created to wrap the passed in view.
    */

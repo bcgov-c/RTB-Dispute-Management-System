@@ -210,7 +210,13 @@ export default PageView.extend({
     });
 
     this.addPageItem('EvidenceRegion', new PageItemView({
-      stepText: 'Select all income sources for the tenants and family members above and choose how you will provide the proof',
+      stepText: `
+      Select all income sources for the tenants and family members above and upload files for all sources you have selected to provide.
+      <b>You will receive a receipt for your fee waiver once your selected proof of income is uploaded or submitted to the Residential Tenancy Branch.</b>
+      Applications that do not include all selected income proof will be abandoned.
+      <br/><br/>
+      If you cannot provide a previously selected proof of income, uncheck the box to proceed with the remaining income source(s) you selected.
+      `,
       subView: new EvidenceCheckboxCollectionView({ collection: feeWaiverEvidenceCheckboxCollection })
     }));
   },

@@ -4,6 +4,7 @@ import ContextContainer from '../../components/context-container/ContextContaine
 import DisputePartyView from './DisputeParty';
 import ModalAddParty from '../../components/modals/modal-add-party/ModalAddParty';
 import template from './DisputeParties_template.tpl';
+import SessionCollapse from '../../components/session-settings/SessionCollapseHandler';
 
 const participantsChannel = Radio.channel('participants');
 const configChannel = Radio.channel('config');
@@ -43,7 +44,9 @@ const DisputePartiesView = Marionette.CollectionView.extend({
       { name: 'Edit', event: isPostNotice || shouldFollowUnitTypeRules ? 'edit:post:notice' : 'edit:pre:notice' },
       ...(isPostNotice && !isUnitType && !this.model.isCreatedAriE() ? [{ name: 'Amend', event: 'amend' }] : []),
       ...(model.hasSubstitutedService() ? [{ name: 'Manage Substituted Service', event: 'manage:subservice' }] : []),
-      ...(model.get('email') ? [{ name: 'Email Access Code', event: 'email:access:code' }] : [])
+      ...(model.get('email') ? [{ name: 'Email Access Code', event: 'email:access:code' }] : []),
+      ...(model.get('email') && !model.get('email_verified') ? [{ name: 'Send Confirmation Instructions', event: 'email:verification:instructions' }] : []),
+      ...(model.get('email') && !model.get('email_verified') ? [{ name: 'Start Manual Email Confirmation', event: 'email:manual:verification'}] : []) 
     ];
 
     return {
@@ -175,7 +178,8 @@ const DisputePartiesView = Marionette.CollectionView.extend({
           self.render();
           loaderChannel.trigger('page:load:complete');
         },
-        disputeModel: this.model
+        disputeModel: this.model,
+        collapseHandler: SessionCollapse.createHandler(this.model, 'DisputeView', 'parties', child.id),
       }),
       notes: notesChannel.request('get:participant', child.id),
       noteCreationData: {
@@ -217,7 +221,8 @@ export default Marionette.View.extend({
   template,
 
   ui: {
-    add: '.dispute-section-title-add',
+    add: '.participant-add-icon',
+    collapse: '.dispute-section-title-add.collapse-icon'
   },
 
   regions: {
@@ -225,13 +230,16 @@ export default Marionette.View.extend({
   },
 
   events: {
-    'click @ui.add': 'clickAdd'
+    'click @ui.add': 'clickAdd',
+    'click @ui.collapse': 'clickCollapse',
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['hideAddButton', 'unitCollection']);
+    this.mergeOptions(options, ['hideAddButton', 'unitCollection', 'participantType']);
 
     _.extend(this.options, {}, options);
+    this.collapseHandler = SessionCollapse.createHandler(this.model, 'DisputeView', this.participantType);
+    this.isCollapsed = this.collapseHandler?.get();
   },
 
   clickAdd() {
@@ -255,7 +263,12 @@ export default Marionette.View.extend({
         this.model.showEditInProgressModalPromise()
       }
     );
+  },
 
+  clickCollapse() {
+    this.isCollapsed = !this.isCollapsed;
+    this.collapseHandler.update(this.isCollapsed);
+    this.render();
   },
 
 
@@ -275,16 +288,19 @@ export default Marionette.View.extend({
     return Promise.all(allXHR.map(xhr => xhr()));
   },
 
-
   onRender() {
-    this.showChildView('partiesRegion', new DisputePartiesView(this.options));
+    if (!this.collapseHandler?.get()) {
+      this.showChildView('partiesRegion', new DisputePartiesView(this.options));
+    }
   },
 
   templateContext() {
     return {
       headerHtml: this.getOption('headerHtml'),
       showAddButton: !this.hideAddButton && !this.model.isMigrated(),
-      addButtonDisplay: this.getOption('addButtonDisplay') ? this.getOption('addButtonDisplay') : 'Add'
+      addButtonDisplay: this.getOption('addButtonDisplay') ? this.getOption('addButtonDisplay') : 'Add',
+      enableCollapse: !!this.collapseHandler,
+      isCollapsed: this.isCollapsed
     };
   }
 

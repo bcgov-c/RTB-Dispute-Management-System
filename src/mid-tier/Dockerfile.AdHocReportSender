@@ -1,0 +1,28 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+COPY ["CM.Services/AdHocReportSender/AdHocReportSenderService/AdHocReportSenderService.csproj", "CM.Services/AdHocReportSender/AdHocReportSenderService/"]
+COPY ["CM.Common.Utilities/CM.Common.Utilities.csproj", "CM.Common.Utilities/"]
+COPY ["CM.Messages/CM.Messages.csproj", "CM.Messages/"]
+
+RUN dotnet restore "CM.Services/AdHocReportSender/AdHocReportSenderService/AdHocReportSenderService.csproj"
+COPY . .
+RUN dotnet build "CM.Services/AdHocReportSender/AdHocReportSenderService/AdHocReportSenderService.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "CM.Services/AdHocReportSender/AdHocReportSenderService/AdHocReportSenderService.csproj" -c Release -o /app/publish
+
+FROM base AS final
+
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+RUN apt-get update && apt-get install -y curl
+
+ENTRYPOINT ["dotnet", "AdHocReportSenderService.dll"]
+

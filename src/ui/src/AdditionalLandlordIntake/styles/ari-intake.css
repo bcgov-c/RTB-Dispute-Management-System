@@ -237,6 +237,11 @@
   line-height: 22px;
 }
 
+.junk-email-msg {
+  font-size: 17px;
+  margin-top: 10px;
+}
+
 /* Tablet breakpoint */
 @media (max-width: 991px) {
   .pfr-unit-section .intake-address-component { display: block; max-width: 600px; }

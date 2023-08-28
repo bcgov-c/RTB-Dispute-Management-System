@@ -1,14 +1,10 @@
 /**
- * This Manager loads external and internal config files into its memory, and then it is responsible for performing the config file lookups for the application.
+ * @fileoverview - This Manager loads external and internal config files into its memory, and then it is responsible for performing the config file lookups for the application.
  *  It is likely the most-used manager in the system, as almost all modules will need to look up system values.
  * @namespace core.components.config.ConfigManager
  * @memberof core.components.config
  */
 import Marionette from 'backbone.marionette';
-
-// Required for webpack to target file and create output subfolder.  Can be replaced by build agent during deployment process
-require('../../../siteconfig/ui-configuration-deploy.json');
-
 import INTERNAL_CONFIG from './internal_config';
 
 const ISSUES_CONFIG_NAME = 'issues_config';

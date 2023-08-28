@@ -54,11 +54,13 @@ export default CMModel.extend({
     unit_text: null,
     unit_type: null,
     address: null,
+    address_is_validated: null,
     city: null,
     province_state: null,
     country: null,
     postal_zip: null,
     mail_address: null,
+    mail_address_is_validated: null,
     mail_city: null,
     mail_province_state: null,
     mail_country: null,
@@ -91,7 +93,6 @@ export default CMModel.extend({
     'accepted_tou_date',
     'known_contact_fields',
     'email',
-    'email_verified',
     'no_email',
     'primary_phone',
     'primary_phone_ext',
@@ -109,11 +110,13 @@ export default CMModel.extend({
     'unit_text',
     'unit_type',
     'address',
+    'address_is_validated',
     'city',
     'province_state',
     'country',
     'postal_zip',
     'mail_address',
+    'mail_address_is_validated',
     'mail_city',
     'mail_province_state',
     'mail_country',
@@ -131,9 +134,7 @@ export default CMModel.extend({
   },
 
   getInitialsDisplay() {
-    // Always display initials with a peroid separating the letters, whether the dots were present first or not
-    const name_abbreviation = $.trim(this.get('name_abbreviation'));
-    return name_abbreviation ? `${name_abbreviation.replace(/\./g, '').split('').join('.')}.` : '-';
+    return `${(this.get('name_abbreviation')||'').trim()}`;
   },
 
   getContactName() {
@@ -332,6 +333,13 @@ export default CMModel.extend({
 
     if (this.get('email_address_hint') && !this.get('email')) {
       changes.email = this.get('email_address_hint');
+    }
+
+    if (this.get('access_code')) {
+      // Always use the hint in access code for privacy
+      changes.access_code = this.get('access_code_hint');
+      // Save real access code in private-style variable
+      changes._access_code = this.get('access_code');
     }
     
     this.set(changes, { silent: true });

@@ -3,6 +3,7 @@ import Radio from 'backbone.radio';
 import PageView from '../../../core/components/page/Page';
 import OfficeDisputeOverview from '../../components/office-dispute/OfficeDisputeOverview';
 import OfficeTopSearchView from '../office-main/OfficeTopSearch';
+import ExternalDisputeStatusModel from '../../components/external-api/ExternalDisputeStatus_model';
 import InputModel from '../../../core/components/input/Input_model';
 import DropdownModel from '../../../core/components/dropdown/Dropdown_model';
 import InputView from '../../../core/components/input/Input';
@@ -126,7 +127,7 @@ const SubServicePageView = PageView.extend({
   },
 
 
-  _createParallelTask() {
+  createParallelTask(subServiceId) {
     const TASK_DESCRIPTION_SEPARATION_CHARACTERS = ' -- ';
     const pageApiData = this._getPageApiData();
     const {
@@ -150,7 +151,9 @@ const SubServicePageView = PageView.extend({
     const taskData = {
       task_text: taskDescription,
       dispute_guid: this.dispute.get('dispute_guid'),
-      task_activity_type: configChannel.request('get', 'TASK_ACTIVITY_TYPE_OS_SUB_SERVICE')
+      task_activity_type: configChannel.request('get', 'TASK_ACTIVITY_TYPE_OS_SUB_SERVICE'),
+      task_link_id: subServiceId,
+      task_linked_to: configChannel.request('get', 'TASK_LINK_SUB_SERVE')
     };
     const taskCreator = taskChannel.request(`task:creator`, {
       docGroupId: null,
@@ -166,7 +169,7 @@ const SubServicePageView = PageView.extend({
     return Promise.all([flag.save()]);
   },
 
-  createSubstitutedServiceRecordWithFlag() {
+  createSubstitutedServiceRecordWithLinkedData() {
     const docTypeValue = this.correctDocumentsModel.getData();//this.docTypeDropdownModel.getData();
 
     const substitutedServiceModel = new SubstitutedServiceModel({
@@ -180,13 +183,11 @@ const SubServicePageView = PageView.extend({
       request_source: configChannel.request('get', 'SUB_SERVICE_REQUEST_SOURCE_OS')
     });
 
-    
-
-    console.log(substitutedServiceModel.toJSON());
     return substitutedServiceModel.save()
-      .then(() => {
-        return this.createFlag(substitutedServiceModel.id, this.serviceToParticipantModel.getData());
-      })
+      .then(() => Promise.all([
+        this.createFlag(substitutedServiceModel.id, this.serviceToParticipantModel.getData()),
+        this.createParallelTask(substitutedServiceModel.id),
+      ]))
       .catch(err => new Promise((resolve, reject) => generalErrorFactory.createHandler('OS.REQUEST.SUBSERVICE.CREATE', reject)(err) ));
   },
 
@@ -347,6 +348,7 @@ const SubServicePageView = PageView.extend({
     this._createEvidenceModels();
     
     this.firstNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'First name',
       errorMessage: 'First name is required',
@@ -357,6 +359,7 @@ const SubServicePageView = PageView.extend({
     });
 
     this.lastNameModel = new InputModel({
+      allowedCharacters: InputModel.getRegex('person_name__allowed_chars'),
       restrictedCharacters: InputModel.getRegex('person_name__restricted_chars'),
       labelText: 'Last name',
       errorMessage: 'Last name is required',
@@ -608,6 +611,19 @@ const SubServicePageView = PageView.extend({
     });
   },
 
+  changeDisputeStatusPromise() {
+    if ((this.dispute.checkStageStatus(2, 20) && !this.dispute.getOwner()) || this.dispute.checkStageStatus(4, 41)) {
+      const statusSaveModel = new ExternalDisputeStatusModel({
+        file_number: this.dispute.get('file_number'),
+        dispute_stage: 2, 
+        dispute_status: 95
+      });
+      return new Promise((res, rej) => statusSaveModel.save().then(res, generalErrorFactory.createHandler('OS.REQUEST.SUBSERVICE.CREATE', rej)))
+    } else {
+      return Promise.resolve();
+    }
+  },
+
   onUploadComplete() {
     this.isUpload = false;
     this.fileUploader = null;
@@ -636,20 +652,20 @@ const SubServicePageView = PageView.extend({
   },
 
   performApiCallsAfterUpload() {
+    const changeDisputeStatusPromise = () => this.changeDisputeStatusPromise();
     // Create task and substituted service model
     loaderChannel.trigger('page:load');
-    $.whenAll(
-      this._createParallelTask(),
-      this.createSubstitutedServiceRecordWithFlag()
-    ).done(() => {
-      this._routeToReceiptPage();
-      loaderChannel.trigger('page:load:complete');
-    }).fail(() => {
-      // Detailed user messaging for task or notice error happens in createParallelTask and createSubstitutedServiceRecordWithFlag.
-      // Just handle the reject routing here
-      loaderChannel.trigger('page:load:complete');
-      this._routeToReceiptPage();
-    });
+    this.createSubstitutedServiceRecordWithLinkedData()
+      .done(changeDisputeStatusPromise)
+      .done(() => {
+        this._routeToReceiptPage();
+        loaderChannel.trigger('page:load:complete');
+      }).fail(() => {
+        // Detailed user messaging for task or notice error happens createSubstitutedServiceRecordWithLinkedData.
+        // Just handle the reject routing here
+        loaderChannel.trigger('page:load:complete');
+        this._routeToReceiptPage();
+      });
   },
 
   _checkAndShowFileUploadErrors(routingFn) {

@@ -19,4 +19,6 @@ public interface ISubmissionReceiptService : IServiceBase, IDisputeResolver
     Task<SubmissionReceiptPostResponse> GetAsync(int submissionReceiptId);
 
     Task<List<SubmissionReceiptPostResponse>> GetList(Guid disputeGuid);
+
+    Task<ExternalSubmissionReceiptResponse> GetExternalSubmissionReceipts(Guid disputeGuid, ExternalSubmissionReceiptRequest request, int count, int index);
 }

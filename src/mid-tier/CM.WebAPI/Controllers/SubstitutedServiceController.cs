@@ -9,7 +9,6 @@ using CM.Business.Services.SubstitutedService;
 using CM.Business.Services.UserServices;
 using CM.Common.Utilities;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -144,6 +143,19 @@ public class SubstitutedServiceController : BaseController
         if (substitutedServices != null)
         {
             return Ok(substitutedServices);
+        }
+
+        return NotFound();
+    }
+
+    [HttpGet("/api/externaldisputesubstitutedservices/{disputeGuid:Guid}")]
+    [AuthorizationRequired(new[] { RoleNames.Admin, RoleNames.ExtendedUser, RoleNames.OfficePay })]
+    public async Task<IActionResult> GetExternalDisputeSubstitutedServices(Guid disputeGuid)
+    {
+        var externalSubstitutedServices = await _substitutedService.GetExternalDisputeSubstitutedServices(disputeGuid);
+        if (externalSubstitutedServices != null)
+        {
+            return Ok(externalSubstitutedServices);
         }
 
         return NotFound();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using CM.Common.Utilities;
 
 namespace CM.Data.Model;
@@ -16,7 +17,11 @@ public class ScheduleRequest : BaseEntity
 
     public int? RequestSubmitter { get; set; }
 
+    public SystemUser RequestSubmitterUser { get; set; }
+
     public int? RequestOwnerId { get; set; }
+
+    public SystemUser RequestOwner { get; set; }
 
     public DateTime? RequestStart { get; set; }
 
@@ -31,6 +36,9 @@ public class ScheduleRequest : BaseEntity
 
     [StringLength(500)]
     public string RequestNote { get; set; }
+
+    [Column(TypeName = "jsonb")]
+    public string RequestJson { get; set; }
 
     public bool? IsDeleted { get; set; }
 }

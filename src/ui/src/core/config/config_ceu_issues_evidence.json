@@ -1,4 +1,9 @@
 {
+  "EVIDENCE_CODE_OTHER_ISSUE": 52,
+  "EVIDENCE_CODE_OFFICE_USE": 56,
+  "EVIDENCE_CODE_NON_ISSUE_EVIDENCE": 50,
+  "CUSTOM_NON_ISSUE_NON_EVIDENCE_CODE": 99,
+
   "ceu_issues_config": {
 
     "EREP": {
@@ -200,8 +205,8 @@
     },
     "RTQE": {
       "id": 6,
-      "selectionTitle": "The landlord is not protecting the tenant's right to quiet enjoyment",
-      "issueTitle": "The landlord is not protecting the tenant's right to quiet enjoyment",
+      "selectionTitle": "An outside factor (such as another tenant) is significantly disturbing the tenant, and the landlord has been informed and is not taking action to protect the tenant's right to quiet enjoyment",
+      "issueTitle": "An outside factor (such as another tenant) is significantly disturbing the tenant, and the landlord has been informed and is not taking action to protect the tenant's right to quiet enjoyment",
       "selectionHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
       "issueHelp": "Quiet enjoyment means that tenants have a right to peace, quiet, and privacy in their homes. Under BC tenancy laws, you may be entitled to compensation if your right to quiet enjoyment is violated. To obtain a monetary order, you must <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>file an application for dispute resolution</a> with the Residential Tenancy Branch.",
       "textDescriptionTitle": "Please describe how and when the landlord was made aware of the situation, and how the landlord failed to resolve the issues",
@@ -524,8 +529,8 @@
     },
     "CHPR": {
       "id": 16,
-      "selectionTitle": "The landlord is changing Park Rules in a manner that contravenes BC tenancy laws",
-      "issueTitle": "The landlord is changing Park Rules in a manner that contravenes BC tenancy laws",
+      "selectionTitle": "The landlord is changing Park Rules in a manner that contravenes British Columbia tenancy law. Only select this if your complaint is about a contravention under the Manufactured Home Park Tenancy Act.",
+      "issueTitle": "The landlord is changing Park Rules in a manner that contravenes British Columbia tenancy law",
       "selectionHelp": "A park committee or a landlord (if there is no park committee) can establish, change or repeal manufactured home park rules. Park rules must be consistent with the <i>Manufactured Home Park Tenancy Act</i> or a term in a tenancy agreement. If park rules contravene the Act, tenants may <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> through the Residential Tenancy Branch</a>.",
       "issueHelp": "A park committee or a landlord (if there is no park committee) can establish, change or repeal manufactured home park rules. Park rules must be consistent with the <i>Manufactured Home Park Tenancy Act</i> or a term in a tenancy agreement. If park rules contravene the Act, tenants may <a class='static-external-link' href='javascript:;' url='https://tenancydispute.gov.bc.ca/Intake/Login'>apply for dispute resolution</a> through the Residential Tenancy Branch</a>.",
       "textDescriptionTitle": "Please describe why the park rules that do not comply with the Manufactured Home Park Tenancy Act and/or tenancy agreement",

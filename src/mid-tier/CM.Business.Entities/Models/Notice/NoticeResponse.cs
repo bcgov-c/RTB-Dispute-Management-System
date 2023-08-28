@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CM.Business.Entities.Models.Base;
 using CM.Business.Entities.Models.NoticeService;
 using Newtonsoft.Json;
@@ -12,21 +13,6 @@ public class NoticeResponse : CommonResponse
 
     [JsonProperty("parent_notice_id")]
     public int? ParentNoticeId { get; set; }
-
-    [JsonProperty("notice_file1_id")]
-    public int? NoticeFile1Id { get; set; }
-
-    [JsonProperty("notice_file2_id")]
-    public int? NoticeFile2Id { get; set; }
-
-    [JsonProperty("notice_file3_id")]
-    public int? NoticeFile3Id { get; set; }
-
-    [JsonProperty("notice_file4_id")]
-    public int? NoticeFile4Id { get; set; }
-
-    [JsonProperty("notice_file5_id")]
-    public int? NoticeFile5Id { get; set; }
 
     [JsonProperty("notice_title")]
     public string NoticeTitle { get; set; }
@@ -78,4 +64,16 @@ public class NoticeResponse : CommonResponse
 
     [JsonProperty("notice_delivered_to_other")]
     public string NoticeDeliveredToOther { get; set; }
+
+    [JsonProperty("has_service_deadline")]
+    public bool HasServiceDeadline { get; set; }
+
+    [JsonProperty("service_deadline_days")]
+    public int? ServiceDeadlineDays { get; set; }
+
+    [JsonProperty("service_deadline_date")]
+    public string ServiceDeadlineDate { get; set; }
+
+    [JsonProperty("second_service_deadline_date")]
+    public string SecondServiceDeadlineDate { get; set; }
 }

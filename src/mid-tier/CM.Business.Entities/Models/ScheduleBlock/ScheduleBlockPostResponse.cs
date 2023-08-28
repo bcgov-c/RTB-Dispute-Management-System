@@ -35,4 +35,7 @@ public class ScheduleBlockPostResponse : CommonResponse
 
     [JsonProperty("block_note")]
     public string BlockNote { get; set; }
+
+    [JsonProperty("associated_hearings")]
+    public int AssociatedHearings { get; set; }
 }

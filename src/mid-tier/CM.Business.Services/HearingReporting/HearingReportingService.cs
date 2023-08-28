@@ -19,14 +19,9 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
     {
     }
 
-    public List<Hearing> AssignedHearings { get; set; }
-
-    public List<Hearing> UnassignedHearings { get; set; }
-
     public async Task<Year> GetYearlyHearings(int year, HearingReportingRequest request)
     {
         var yearlyHearings = await UnitOfWork.HearingRepository.GetHearingsByYear(year, request.Priorities);
-        await SplitHearings(yearlyHearings);
         var yearlyReport = await CollectYearlyHearingData(yearlyHearings, year, request);
 
         yearlyReport.Months = new List<Month>();
@@ -50,11 +45,13 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
     public async Task<MonthlyReport> GetMonthlyHearings(int month, int year, HearingReportingRequest request)
     {
         var monthlyHearings = await UnitOfWork.HearingRepository.GetHearingsByMonth(month, year, request.Priorities);
-        await SplitHearings(monthlyHearings);
+
+        var(assignedHearings, unAssignedHearings) = SplitHearings(monthlyHearings);
+
         var monthlyReport = await CollectMonthlyHearingData(monthlyHearings, month, year, request);
 
         monthlyReport.Days = new List<Day>();
-        var lastDay = DateTime.DaysInMonth(2018, month);
+        var lastDay = DateTime.DaysInMonth(year, month);
         var monthDays = new int[lastDay];
         var dayOfMonth = 0;
         for (var i = 0; i < monthDays.Length; i++)
@@ -81,14 +78,14 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
     {
         var dailyHearings = await UnitOfWork.HearingRepository.GetHearingsByDay(date);
 
-        await SplitHearings(dailyHearings);
+        var(assignedHearings, unAssignedHearings) = SplitHearings(dailyHearings);
 
         var dailyReport = new DayReport
         {
             Date = date.ToString("yyyy-MM-dd"),
             DayTotalHearings = dailyHearings.Count,
-            DayAssignedHearings = AssignedHearings.Count,
-            DayUnassignedHearings = UnassignedHearings.Count
+            DayAssignedHearings = assignedHearings.Count,
+            DayUnassignedHearings = unAssignedHearings.Count
         };
 
         var sb = await UnitOfWork
@@ -110,9 +107,9 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
 
         var ownerInfo = await UnitOfWork.SystemUserRepository.GetByIdAsync(hearingOwnerId);
 
-        await SplitHearings(ownerHearings);
-        var totalAssignedCount = AssignedHearings.Count;
-        var totalUnassignedCount = UnassignedHearings.Count;
+        var(assignedHearings, unAssignedHearings) = SplitHearings(ownerHearings);
+        var totalAssignedCount = assignedHearings.Count;
+        var totalUnassignedCount = unAssignedHearings.Count;
 
         response.UserId = hearingOwnerId;
         response.FullName = ownerInfo.FullName;
@@ -139,6 +136,12 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
                 var hearingDisputes = await UnitOfWork.DisputeHearingRepository.GetHearingDisputes(dayHearing.HearingId);
 
                 var hearing = MapperService.Map<HearingReport>(dayHearing);
+                if (hearing.HearingReservedDisputeGuid.HasValue)
+                {
+                    hearing.HearingReservedFileNumber = await UnitOfWork
+                        .DisputeRepository.GetFileNumber(hearing.HearingReservedDisputeGuid.Value);
+                }
+
                 hearing.Disputes = MapperService.Map<List<HearingReportDispute>>(hearingDisputes);
                 hearings.Add(hearing);
             }
@@ -181,22 +184,26 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
         return response;
     }
 
-    private async Task<Year> CollectYearlyHearingData(IReadOnlyCollection<Hearing> yearlyHearings, int year, HearingReportingRequest request)
+    private async Task<Year> CollectYearlyHearingData(
+        IReadOnlyCollection<Hearing> yearlyHearings,
+        int year,
+        HearingReportingRequest request)
     {
+        var(assignedHs, unAssignedHs) = SplitHearings(yearlyHearings);
         var yearlyReport = new Year
         {
             HearingYear = year,
             YearTotalHearings = yearlyHearings.Count,
-            YearAssignedHearings = AssignedHearings.Count,
-            YearUnassignedHearings = UnassignedHearings.Count,
+            YearAssignedHearings = assignedHs.Count,
+            YearUnassignedHearings = unAssignedHs.Count,
             YearDetails = new List<YearDetail>()
         };
 
         foreach (var priority in request.Priorities)
         {
             var hearings = await yearlyHearings.Where(h => h.HearingPriority == priority).ToListAsync();
-            var assignedHearings = await AssignedHearings.Where(h => h.HearingPriority == priority).ToListAsync();
-            var unassignedHearings = await UnassignedHearings.Where(h => h.HearingPriority == priority).ToListAsync();
+            var assignedHearings = await assignedHs.Where(h => h.HearingPriority == priority).ToListAsync();
+            var unassignedHearings = await unAssignedHs.Where(h => h.HearingPriority == priority).ToListAsync();
             var hearingDetails = new YearDetail
             {
                 HearingPriority = priority,
@@ -211,10 +218,15 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
         return yearlyReport;
     }
 
-    private async Task<Month> CollectMonthlyHearingDataForYearReport(IReadOnlyCollection<Hearing> monthlyHearings, int month, int year, HearingReportingRequest request)
+    private async Task<Month> CollectMonthlyHearingDataForYearReport(
+        IReadOnlyCollection<Hearing> monthlyHearings,
+        int month,
+        int year,
+        HearingReportingRequest request)
     {
-        var assignedHearingIds = await AssignedHearings.Select(h => h.HearingId).ToListAsync();
-        await UnassignedHearings.Select(h => h.HearingId).ToListAsync();
+        var(assignedHs, unAssignedHs) = SplitHearings(monthlyHearings);
+        var assignedHearingIds = await assignedHs.Select(h => h.HearingId).ToListAsync();
+        await unAssignedHs.Select(h => h.HearingId).ToListAsync();
 
         var monthlyAssignedHearings = new List<Hearing>();
         var monthlyUnassignedHearings = new List<Hearing>();
@@ -259,10 +271,15 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
         return monthlyReport;
     }
 
-    private async Task<MonthlyReport> CollectMonthlyHearingData(IReadOnlyCollection<Hearing> monthlyHearings, int month, int year, HearingReportingRequest request)
+    private async Task<MonthlyReport> CollectMonthlyHearingData(
+        IReadOnlyCollection<Hearing> monthlyHearings,
+        int month,
+        int year,
+        HearingReportingRequest request)
     {
-        var assignedHearingIds = await AssignedHearings.Select(h => h.HearingId).ToListAsync();
-        await UnassignedHearings.Select(h => h.HearingId).ToListAsync();
+        var(assignedHs, unAssignedHs) = SplitHearings(monthlyHearings);
+        var assignedHearingIds = await assignedHs.Select(h => h.HearingId).ToListAsync();
+        await unAssignedHs.Select(h => h.HearingId).ToListAsync();
 
         var monthlyAssignedHearings = new List<Hearing>();
         var monthlyUnassignedHearings = new List<Hearing>();
@@ -309,8 +326,9 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
 
     private async Task<Day> CollectDailyHearingData(IReadOnlyCollection<Hearing> dailyHearings, int day, int month, int year, HearingReportingRequest request)
     {
-        var assignedHearingIds = await AssignedHearings.Select(h => h.HearingId).ToListAsync();
-        await UnassignedHearings.Select(h => h.HearingId).ToListAsync();
+        var(assignedHs, unAssignedHs) = SplitHearings(dailyHearings);
+        var assignedHearingIds = await assignedHs.Select(h => h.HearingId).ToListAsync();
+        await unAssignedHs.Select(h => h.HearingId).ToListAsync();
 
         var dailyAssignedHearings = new List<Hearing>();
         var dailyUnassignedHearings = new List<Hearing>();
@@ -365,6 +383,16 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
             {
                 var hearings = MapperService.Map<List<Hearing>, List<HearingReport>>(groupedHearing.ToList());
 
+                foreach (var hearing in hearings)
+                {
+                    if (hearing.HearingReservedDisputeGuid.HasValue)
+                    {
+                        hearing.HearingReservedFileNumber = await UnitOfWork
+                            .DisputeRepository
+                            .GetFileNumber(hearing.HearingReservedDisputeGuid.Value);
+                    }
+                }
+
                 var ownerHearing = new OwnerHearing
                 {
                     UserId = (int)groupedHearing.Key,
@@ -389,23 +417,23 @@ public class HearingReportingService : CmServiceBase, IHearingReportingService
         return orderedOwnerHearings;
     }
 
-    private async System.Threading.Tasks.Task SplitHearings(IEnumerable<Hearing> hearings)
+    private(List<Hearing> assignedHearings, List<Hearing> unAssignedHearings) SplitHearings(IEnumerable<Hearing> hearings)
     {
-        AssignedHearings = new List<Hearing>();
-        UnassignedHearings = new List<Hearing>();
+        var assignedHearings = new List<Hearing>();
+        var unAssignedHearings = new List<Hearing>();
 
         foreach (var hearing in hearings)
         {
-            var disputeHearings =
-                await UnitOfWork.DisputeHearingRepository.GetByHearingId(hearing.HearingId);
-            if (disputeHearings is { Count: > 0 })
+            if (hearing.DisputeHearings is { Count: > 0 })
             {
-                AssignedHearings.Add(hearing);
+                assignedHearings.Add(hearing);
             }
             else
             {
-                UnassignedHearings.Add(hearing);
+                unAssignedHearings.Add(hearing);
             }
         }
+
+        return (assignedHearings, unAssignedHearings);
     }
 }

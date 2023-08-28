@@ -2,6 +2,7 @@
  * @class core.components.dropdown.DropdownView
  * @memberof core.components.dropdown
  * @augments Marionette.View
+ * @fileoverview - Customizable dropdown View. Wraps a basic <select> element, where each clickable dropdown option is a <option> element.
  */
 
 import Marionette from 'backbone.marionette';
@@ -13,8 +14,7 @@ export default Marionette.View.extend({
   tagName: 'div',
   defaultClass: 'intake-dropdown-component form-group',
   className() {
-    const extraCssClasses = this.model.get('cssClass');
-    return this.defaultClass + ' ' + (extraCssClasses ? extraCssClasses : '');
+    return this.defaultClass;
   },
 
   ui: {

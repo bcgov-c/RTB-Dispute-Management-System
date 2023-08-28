@@ -1,6 +1,7 @@
 import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
 import ContextContainer from '../../../components/context-container/ContextContainer';
+import SessionCollapse from '../../../components/session-settings/SessionCollapseHandler';
 import DisputeFilePackageView from './DisputeFilePackage';
 
 const disputeChannel = Radio.channel('dispute');
@@ -35,6 +36,7 @@ const FilePackagesView = Marionette.CollectionView.extend({
     const noFilesConsidered = !_.any(filesInPackage, function(file) { return file.isConsidered(); });
     const allFilesNotConsideredOrNotReferenced = !_.any(filesInPackage, function(file) { return !file.isReferenced() || !file.isConsidered(); });
 
+    const disputeModel = disputeChannel.request('get');
     const self = this;
     // Create the child view instance
     const view = ContextContainer.withContextMenu({
@@ -51,7 +53,8 @@ const FilePackagesView = Marionette.CollectionView.extend({
       contextRender() {
         self.render();
       },
-      disputeModel: disputeChannel.request('get')
+      disputeModel,
+      collapseHandler: SessionCollapse.createHandler(disputeModel, 'Evidence', 'packages', child?.get('filePackageModel')?.id),
     });
     return view;
   },

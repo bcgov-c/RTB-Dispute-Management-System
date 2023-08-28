@@ -11,7 +11,7 @@
   justify-content: space-between;
 }
 
-.admin-banner__options { display: flex; margin-top: -5px; }
+.admin-banner__options { display: flex; margin-top: -5px; align-items: center; }
 .admin-banner__thumbnails .form-group { margin-bottom: 0; }
 
 .thumbnails .doc-request__docs-label.has-files { display: block; }

@@ -11,11 +11,21 @@ import DropdownModel from '../dropdown/Dropdown_model';
 
 const configChannel = Radio.channel('config');
 
+
 const defaultStreetSubLabel = `Please ensure address is complete and indicate if unit is upper, lower or a basement suite if applicable eg. BSMT 1234 Fort Street`;
 
 /**
  * @class AddressModel
  * @memberof core.components.address
+ * @param {Boolean} [selectProvinceAndCountry] - If false= BC/Canada as default, true=province and country are selectable
+ * @param {Boolean} [useSubLabel] - Turn on/off text label below address
+ * @param {String} [streetSubLabel] - Text displayed below address if useSubLabel: true
+ * @param {Boolean} [showUpdateControls] - Turn on/off display of "update" button
+ * @param {Boolean} [useAddressValidation] - Whether or not to run address validation on address inputs once "Verify" is clicked
+ * @param {Number} [addressIsValidated] - Api mapping to get/set passed in address validation key
+ * @param {Boolean} [useCPToolBackup] - If true, it will give the option to use the native Canada Post tool if no address is found using Hive 1 tool
+ * @param {JSON} [json]   Maps json fields to inputs and populates them
+ * @param {String} [helpHtml] - Text to display in help '?' dropdown
  */
 export default Backbone.Model.extend({
 
@@ -23,22 +33,23 @@ export default Backbone.Model.extend({
     return {
       cssClass: null,
       name: 'address',
-      countryTextValue: null,
-      provinceTextValue: null,
-      postalCodeValue: undefined,
-      useDefaultProvince: false,
+      selectProvinceAndCountry: false,
       useSubLabel: true,
       streetSubLabel: null,
       streetMaxLength: null,
-      showValidate: false,
-      stepComplete: false,
+      showUpdateControls: false,
+      stepComplete: false, //TODO: unsed?
       json: null,
       helpName: null,
       helpHtml: null,
+      useAddressValidation: false,
+      addressIsValidated: null,
+      useCPToolBackup: false,
+      isOptional: false,
 
       apiMapping: null,
 
-      geozone_id: configChannel.request('get', 'INVALID_GEOZONE_CODE')
+      geozone_id: configChannel.request('get', 'INVALID_GEOZONE_CODE')//TODO: unsed?
     };
   },
 
@@ -51,6 +62,8 @@ export default Backbone.Model.extend({
 
     this.set('json', this.get('json') || {});
     this.initializeData();
+
+    if (this.get('isOptional')) this.setToOptional();
   },
 
   initializeData() {
@@ -70,6 +83,8 @@ export default Backbone.Model.extend({
   createSubModels(json) {
     const name = this.get('name');
     this.set('streetModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('address__allowed_chars'),
+      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
       name: name + '-street',
       labelText: 'Street Address',
       errorMessage: 'Address is required',
@@ -78,10 +93,11 @@ export default Backbone.Model.extend({
       maxLength: this._ADDRESS_FIELD_MAX,
       subLabel: this.get('useSubLabel') ? (this.get('streetSubLabel') || defaultStreetSubLabel) : null,
       value: json.street,
-      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
     }));
 
     this.set('cityModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('address__allowed_chars'),
+      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
       name: name + '-city',
       labelText: 'City',
       errorMessage: 'City is required',
@@ -124,6 +140,8 @@ export default Backbone.Model.extend({
     }));
 
     this.set('countryTextModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('address__allowed_chars'),
+      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
       name: name + '-country-text',
       labelText: 'Other Country',
       errorMessage: 'Other Country is required',
@@ -133,6 +151,8 @@ export default Backbone.Model.extend({
     }));
 
     this.set('provinceTextModel', new InputModel({
+      allowedCharacters: InputModel.getRegex('address__allowed_chars'),
+      restrictedCharacters: InputModel.getRegex('address__restricted_chars'),
       name: name + '-country-text',
       labelText: 'Region, State or Province',
       errorMessage: 'Region, State or Province is required',
@@ -140,6 +160,26 @@ export default Backbone.Model.extend({
       maxLength: this.APPLICANT_FIELD_MAX,
       value: (!json.country || json.country === 'Canada')? null : json.province
     }));
+
+    
+
+    this.set('addressIsValidated', !json.street ? null : json.addressIsValidated);
+  },
+
+  enableInputs(options={}) {
+    const modelList = ['streetModel', 'cityModel', 'postalCodeModel', 'countryDropdownModel', 'countryTextModel', 'provinceTextModel', 'provinceDropdownModel'];
+    modelList.forEach(modelName => {
+      this.get(modelName).set('disabled', false);
+    });
+    if (options.render) this.trigger('render');
+  },
+
+  disableInputs(options={}) {
+    const modelList = ['streetModel', 'cityModel', 'postalCodeModel', 'countryDropdownModel', 'countryTextModel', 'provinceTextModel', 'provinceDropdownModel'];
+    modelList.forEach(modelName => {
+      this.get(modelName).set('disabled', true);
+    });
+    if (options.render) this.trigger('render');
   },
 
   setToOptional() {
@@ -147,6 +187,18 @@ export default Backbone.Model.extend({
     _.each(modelList, function(modelName) {
       this.get(modelName).set({
         required: false
+      });
+    }, this);
+
+    this.get('countryDropdownModel').set('defaultBlank', true);
+    this.get('provinceDropdownModel').set('defaultBlank', true);
+  },
+
+  setToRequired() {
+    const modelList = ['streetModel', 'cityModel', 'postalCodeModel', 'countryDropdownModel', 'countryTextModel', 'provinceTextModel', 'provinceDropdownModel'];
+    _.each(modelList, function(modelName) {
+      this.get(modelName).set({
+        required: true
       });
     }, this);
 
@@ -168,12 +220,13 @@ export default Backbone.Model.extend({
         nonCanadaPostalCode: false
       });
     }
+    this.trigger('render');
   },
 
   setupListeners() {
     const modelList = ['streetModel', 'cityModel', 'postalCodeModel', 'countryDropdownModel'];
 
-    this.listenTo(this.get('countryDropdownModel'), 'change:value', _.bind(this.onCountryDropdownChange, this));
+    this.listenTo(this.get('countryDropdownModel'), 'change:value', () => this.onCountryDropdownChange(...arguments));
     _.each(modelList, function(modelName) {
       this.listenTo(this.get(modelName), 'change:value', function() {
         this.trigger('change', this.model);
@@ -192,7 +245,7 @@ export default Backbone.Model.extend({
       modelList.push('provinceDropdownModel');
     }
 
-    if (this.get('useDefaultProvince')) {
+    if (this.get('selectProvinceAndCountry')) {
       // If use default, don't validate the province/countries
       _.each(['countryDropdownModel', 'provinceDropdownModel', 'countryTextModel', 'provinceTextModel'], function(modelName) {
         var index = modelList.indexOf(modelName);
@@ -242,7 +295,7 @@ export default Backbone.Model.extend({
     );
   },
 
-  getGeozoneAddressString(options) {
+  getGeozoneAddressString(options) {//TODO: unused?
     // Hardcode no province or country.  Should be changed if using Geozone elsewhere in system besides step1
     const order = ['street', 'city'];
     const address_components = this._getAddressStringComponents(options);
@@ -257,10 +310,10 @@ export default Backbone.Model.extend({
     return address_string;
   },
 
-  getAddressString(options) {
+  getAddressString(options={}) {
     const order = ['street', 'city', 'province', 'country', 'postal_code'];
     const address_components = this._getAddressStringComponents(options);
-    const unitTypeDisplay = this.getUnitTypeDisplay();
+    const unitTypeDisplay = options.no_unit ? null : this.getUnitTypeDisplay();
 
     return `${unitTypeDisplay ? `(${unitTypeDisplay}) ` : ''}${_.filter(_.map(order, function(key) {
       return _.has(address_components, key) ? address_components[key] : null;
@@ -292,7 +345,8 @@ export default Backbone.Model.extend({
       province: 'province',
       country: 'country',
       postalCode: 'postalCode',
-      geozoneId: 'geozoneId'
+      geozoneId: 'geozoneId',
+      addressIsValidated: 'addressIsValidated'
     }, this.get('apiMapping'));
 
 
@@ -306,7 +360,13 @@ export default Backbone.Model.extend({
     return_obj[apiMapping.country] = (this.get('countryDropdownModel').get('value') === 'Other') ?
       this.get('countryTextModel').get('value') : this.get('countryDropdownModel').get('value');
     return_obj[apiMapping.geozoneId] = this.get('geozone_id');
+    return_obj[apiMapping.addressIsValidated] = this.get('addressIsValidated')
 
     return return_obj;
-  }
+  },
+
+  getData() {
+    return this.getPageApiDataAttrs();
+  },
+
 });

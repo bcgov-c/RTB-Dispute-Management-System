@@ -1,5 +1,9 @@
-import Marionette from 'backbone.marionette';
+/**
+ * @fileoverview - This View displays a notice based on dispute data. All DMS generated notices are based on the NoticePreview View.
+ *  
+*/ import Marionette from 'backbone.marionette';
 import Radio from 'backbone.radio';
+import ApplicantRequiredService from '../../../core/components/service/ApplicantRequiredService';
 import pdf_template from './NoticePdf_template.tpl';
 
 const disputeChannel = Radio.channel('dispute');
@@ -23,7 +27,7 @@ export default Marionette.View.extend({
   },
 
   initialize(options) {
-    this.mergeOptions(options, ['templateToUse', 'templateData']);
+    this.mergeOptions(options, ['templateToUse', 'templateData', 'isArsEnabled']);
 
     this.dispute = disputeChannel.request('get');
     // Always remove claims/evidence that were removed by party
@@ -89,6 +93,8 @@ export default Marionette.View.extend({
       return memo + (files && files.getUploadedIntake().length);
     }, 0);
 
+    const arsDeadlines = ApplicantRequiredService.getServiceDeadlines();
+
     return _.extend({
       templateToUse: this.templateToUse || pdf_template,
       Formatter,
@@ -130,10 +136,13 @@ export default Marionette.View.extend({
       supportingTitleBulk: applicantBulkEvidences.length ? applicantBulkEvidences[0].get('title') : '',
       supportingDescriptionBulk: applicantBulkEvidences.length ? applicantBulkEvidences[0].get('description') : '',
       supportingFilesCountBulk,
-
       isParticipatoryHearing,
-
-      INTAKE_LOGIN_URL: configChannel.request('get', 'INTAKE_URL')
+      INTAKE_LOGIN_URL: configChannel.request('get', 'INTAKE_URL'),
+      isArsEnabled: this.isArsEnabled,
+      arsDeadline: arsDeadlines?.service_deadline_date,
+      arsSecondDeadline: arsDeadlines?.second_service_deadline_date,
+      checkClaimsContain: (codeStr) => this.disputeClaims.find(c => c?.claimConfig?.code === codeStr),
+      
     }, this.templateData);
   }
 });

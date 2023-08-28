@@ -1,3 +1,7 @@
+/**
+ * @fileoverview - Modal that contains functionality for selecting a file through file explorer or drag and drop, and uploading file. Used for general file uploads through system. Exampels are evidence files, outcome doc files, external submission files
+ */
+
 import Backbone from 'backbone';
 import Radio from 'backbone.radio';
 import ModalBaseView from '../../modals/ModalBase';
@@ -152,7 +156,7 @@ export default ModalBaseView.extend({
    * @param {BackboneFileCollection} files - The FileCollection list which will be changed by user selections in this modal.
    * @param {String} [title] - Modal title to display.  If none is provided, uses a default value
    * @param {Object} [processing_options] - Options to pass through to the FileUploader
-   * 
+   * @param {Object} [extra_file_creation_fn] - Run additional handling when a file model is created, in addition to the existing default file creation behaviour
    * @param {Boolean} [isOnlyFiles] - Indicates when this modal is to be used with no FileDescription as the underlying model
    * @param {Boolean} [hideDescription] - Indicates whether to show the description component.  Does not affect whether description model is required or not
    * @param {Boolean} [showDelete] - Indicates whether to allow "Delete All" of the files and underlying FileDescription.  Default true
@@ -169,7 +173,7 @@ export default ModalBaseView.extend({
    * @param {String} [cssClass] - An optional string of class names to add to top level modal element
    */
   initialize(options) {
-    this.mergeOptions(options, ['files', 'title', 'processing_options', 'isOnlyFiles', 'hideDescription', 'showDelete', 'isDescriptionRequired',
+    this.mergeOptions(options, ['files', 'title', 'extra_file_creation_fn', 'processing_options', 'isOnlyFiles', 'hideDescription', 'showDelete', 'isDescriptionRequired',
         'fileType', 'filePackageId', 'noUploadOnSave', 'saveButtonText', 'mobileSaveButtonText', 'useFileTypeDropdown', 'hideCloseButton', 
         'autofillRename', 'cssClass']);
     
@@ -347,19 +351,21 @@ export default ModalBaseView.extend({
     const fileType = this.fileType;
     const addedBy = this.addedBy;
     const autofillRename = this.autofillRename;
+    const self = this;
     const fileUploader = filesChannel.request('create:uploader', {
       // Use the DisputeEvidenceModel that was passed in
       processing_options: this.processing_options ? this.processing_options : {},
       files: this.files,
       file_description: !this.isOnlyFiles ? this.model.get('file_description') : null,
       file_creation_fn: function() { // Scope context is the FileUploader so that we can use the default params
-        return _.extend({}, this.defaultFileCreationFn(...arguments), {
+        const fileData = Object.assign({}, this.defaultFileCreationFn(...arguments), {
             added_by: addedBy ? addedBy : participantChannel.request('get:primaryApplicant:id'),
             file_type: fileType ? fileType : configChannel.request('get', 'FILE_TYPE_USER_EXTERNAL_EVIDENCE'),
             autofillRename,
           },
           filePackageId ? { file_package_id: filePackageId } : {}
         );
+        return _.isFunction(self.extra_file_creation_fn) ? self.extra_file_creation_fn(fileData) : fileData;
       }
     });
 

@@ -10,6 +10,7 @@ public class DisputeAccessResponse
 {
     public DisputeAccessResponse()
     {
+        ClaimGroups = new List<DisputeAccessClaimGroup>();
         Claims = new List<DisputeAccessClaim>();
         DisputeFees = new List<DisputeAccessDisputeFee>();
         NoticeServices = new List<DisputeAccessNoticeService>();
@@ -59,6 +60,9 @@ public class DisputeAccessResponse
 
     [JsonProperty("dispute_complexity")]
     public DisputeComplexity? DisputeComplexity { get; set; }
+
+    [JsonProperty("tenancy_address_validated")]
+    public bool? TenancyAddressValidated { get; set; }
 
     [JsonProperty("created_date")]
     public string CreatedDate { get; set; }

@@ -1,5 +1,8 @@
 <div class="outcome-documents-title-container page-section-title-container">
   <span class="page-section-title">Outcome Documents</span>
+  <% if (enableCollapse) { %>
+    <span class="dispute-section-title-add collapse-icon <%= isCollapsed ? 'collapsed' : '' %>"></span>
+  <% } %>
   <span class="dispute-section-title-add outcome-documents-add-icon">Create Outcome Document Set</span>
 </div>
 

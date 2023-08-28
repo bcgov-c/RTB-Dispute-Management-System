@@ -21,4 +21,6 @@ public interface IFileDescriptionService : IServiceBase, IDisputeResolver
     Task<FileDescription> GetTrackingFileDescriptionAsync(int fileDescriptionId);
 
     Task<bool> FileDescriptionExists(int fileDescriptionId);
+
+    Task<bool> FileDescriptionExists(Guid disputeGuid, int fileDescriptionId);
 }

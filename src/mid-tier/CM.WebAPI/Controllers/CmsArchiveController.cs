@@ -10,7 +10,6 @@ using CM.Common.Utilities;
 using CM.Data.Model;
 using CM.FileSystem.Service;
 using CM.WebAPI.Filters;
-using CM.WebAPI.WebApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using static System.Net.Mime.MediaTypeNames;

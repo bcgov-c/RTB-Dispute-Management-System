@@ -1,6 +1,4 @@
-
 import Marionette from 'backbone.marionette';
-
 import NoteView from './Note';
 
 export default Marionette.CollectionView.extend({

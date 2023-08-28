@@ -108,7 +108,11 @@ export default CMModel.extend({
   },
 
   isRemoved() {
-    return this.get('claim_status') === configChannel.request('get', 'CLAIM_STATUS_DELETED') || this.isAmendRemoved();
+    return this.isDeleted() || this.isAmendRemoved();
+  },
+
+  isDeleted() {
+    return this.get('claim_status') === configChannel.request('get', 'CLAIM_STATUS_DELETED');
   },
 
   isAmendRemoved() {
